@@ -34,10 +34,23 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine.tools</groupId>
+      <artifactId>appengine-gcs-client</artifactId>
+      <version>0.8</version>
+    </dependency>
+    <!--
+    SE NON COMMENTATO, appengine:run segnala molti info/warning (WARN:oeja.AnnotationParser:qtp1620303253-17: org.apache.taglibs.standard.Version scanned from multiple locations)
+    <dependency>
       <groupId>jstl</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
-    </dependency>
+    </dependency> -->
  
 
 
