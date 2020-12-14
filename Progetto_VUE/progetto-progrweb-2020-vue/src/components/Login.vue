@@ -15,12 +15,6 @@
     <h1>Benvenuto nella pagina di login</h1>
   </header>
 
-  <form :action="`${LOGIN_SERVER_URL}`" method="post">
-    <label>Username<input type="text" name="username" autocomplete="off" required autofocus></label>
-    <label>Password<input type="password" name="password" autocomplete="off" required autofocus></label>
-    <input type="submit" value="Login">
-  </form>
-
 </template>
 
 <script>
@@ -30,8 +24,7 @@ export default {
   data() {
     return {
       NOME_APPLICAZIONE: process.env.VUE_APP_NOME_APPLICAZIONE,
-      PERCORSO_LOGO: process.env.VUE_APP_PERCORSO_LOGO,
-      LOGIN_SERVER_URL: process.env.VUE_APP_LOGIN_SERVER_URL
+      PERCORSO_LOGO: process.env.VUE_APP_PERCORSO_LOGO
     }
   }
 }
