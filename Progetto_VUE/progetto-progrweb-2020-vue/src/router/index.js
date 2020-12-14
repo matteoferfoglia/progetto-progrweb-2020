@@ -10,7 +10,7 @@ const routes = [
   {
     path: '/registrazione',
     // route level code-splitting (lazy-loaded when the route is visited)
-    component: () => import('../views/login/RegistrazioneNuovoUtente.vue')
+    component: () => import('../views/login/RegistrazioneNuovoConsumer.vue')
   }
 ]
 
