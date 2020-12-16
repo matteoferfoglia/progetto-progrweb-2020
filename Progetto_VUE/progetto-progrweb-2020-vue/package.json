@@ -2,9 +2,15 @@
   "name": "progetto-progrweb-2020-vue",
   "version": "0.1.0",
   "private": true,
+  "description": "Applicazione Vue per il progetto del corso di Programmazione Web, anno accademico 2019-2020.",
+  "author": {
+    "name": "Matteo Ferfoglia",
+    "email": "matteoferfoglia@gmail.com"
+  },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service test:unit && vue-cli-service serve",
+    "build": "vue-cli-service test:unit && vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -12,17 +18,23 @@
     "bootstrap-vue": "^2.20.1",
     "core-js": "^3.6.5",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0"
+    "vue-router": "^4.0.0-0",
+    "jquery": "^3.5.1"
   },
   "devDependencies": {
+    "@jest/globals": "^26.6.2",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "^4.5.9",
+    "@vue/cli-plugin-unit-jest": "^4.5.9",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
+    "@vue/test-utils": "^2.0.0-0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0-0"
+    "eslint-plugin-vue": "^7.0.0-0",
+    "typescript": "~3.9.3",
+    "vue-jest": "^5.0.0-0"
   },
   "eslintConfig": {
     "root": true,
