@@ -1,3 +1,4 @@
+<!--suppress JSUnusedGlobalSymbols -->
 <template>
   <h1>Area riservata</h1>
 </template>

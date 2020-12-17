@@ -1,7 +1,7 @@
 <template>
   <h2>Login > Registrati</h2>
 
-  <form @submit.prevent="validaEdInviaForm">
+  <form @submit.prevent="validaEdInviaForm" ref="form">
     <label>Codice fiscale<input type="text" v-model="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="`${REGEX_CODICE_FISCALE}`" required autofocus></label>
     <label>Nome e cognome<input type="text" v-model="nomeCognome" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required></label>
     <label>Email<input type="email" v-model="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" required></label>
@@ -24,18 +24,35 @@ export default {
       email: "",
       password: "",
       confermaPassword: "",
-      REGEX_CODICE_FISCALE: "^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST]{1}[0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z]{1}[0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z]{1})|([0-9]{11})$"  // TODO : verificare correttazza RegEx del codice fiscale, tratto da: https://regexlib.com/(A(CAg_Bth78XI7Ry2C7vo_2HR3yuG9GuP1YeCHLd1AH53pIpI-z7JHENTvKnhDjJJhOkjyka4kah-CTZaupEY3MAVWa6qYC256houEBaNXoG01))/UserPatterns.aspx?authorId=10d43491-1297-481f-ae66-db9f2263575c&AspxAutoDetectCookieSupport=1
+      REGEX_CODICE_FISCALE: process.env.VUE_APP_REGEX_CODICE_FISCALE,
+      REGEX_MAIL: process.env.VUE_APP_REGEX_MAIL
     }
   },
   methods: {
     validaEdInviaForm() {
 
-      let isFormValido = () => {
-        // altri campi dovrebbero essere controllati dallo user-agent ("the user agent will check the user's input before the form is submitted", https://html.spec.whatwg.org/multipage/forms.html#client-side-form-validation)
-        return this.password===this.confermaPassword && this.password.length > 0;
+      const isFormValido = () => {
+        return this.nomeCognome.length>0 &&
+            RegExp(this.REGEX_MAIL).test(this.email) &&
+            RegExp(this.REGEX_CODICE_FISCALE).test(this.codiceFiscale) &&
+            this.password===this.confermaPassword &&
+            this.password.length > 0;
       };
 
-      let inviaForm = () => {
+      const informaUtenteFormInvalido = () => {
+        alert("Le password inserite sono diverse.");
+        this.confermaPassword = "";
+      }
+
+      const registrazioneCompletata = () => this.$router.push("/");
+
+      const registrazioneFallita = ris => {
+        console.error("Errore durante la registrazione: " + ris);
+        alert("Si è verificato un errore durante la registrazione. Riprovare in seguito.");
+        // TODO notificare l'errore ai gestori (via mail ?)
+      }
+
+      const inviaForm = () => {
 
         let campiFormDaInviareAlServer = {};
         {
@@ -46,19 +63,10 @@ export default {
         }
 
         axios.post(process.env.VUE_APP_SIGNUP_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
-          .then(ris => console.log(ris))     // TODO: fai qualcosa qui, serve questo then?
-          .catch(ris => {
-            console.error("Errore durante la registrazione: " + ris);
-            alert("Si è verificato un errore durante la registrazione. Riprovare in seguito.");
-
-            (() => { console.error(ris) })(); // TODO notificare l'errore ai gestori (via mail ?)
-          });
+            .then(() =>   registrazioneCompletata() )
+            .catch(ris => registrazioneFallita(ris) );
       };
 
-      let informaUtenteFormInvalido = () => {
-        alert("Le password inserite sono diverse.");
-        this.confermaPassword = "";
-      }
 
 
       if(isFormValido()){

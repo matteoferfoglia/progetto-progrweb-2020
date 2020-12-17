@@ -7,6 +7,7 @@
   </form>
 </template>
 
+<!--suppress JSUnusedGlobalSymbols -->
 <script>
 
 export default {

@@ -8,8 +8,8 @@
 
 <script>
 
-import Login from '@/components/Login'
-import AreaRiservata from "@/components/AreaRiservata";
+import Login from './components/Login'
+import AreaRiservata from "./components/AreaRiservata";
 
 export default {
   name: 'App',

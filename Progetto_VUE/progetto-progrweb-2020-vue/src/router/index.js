@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Login from "@/views/login/LoginUtenteGiaRegistrato";
+import Login from "../views/login/LoginUtenteGiaRegistrato";
 
 const routes = [
   {
@@ -16,7 +16,7 @@ const routes = [
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes: routes
 })
 
 export default router
