@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter(asyncSupported = true, urlPatterns = {"/api/*"})
-public class FiltroCORS {
+@WebFilter(filterName = "FiltroCORS", asyncSupported = true, urlPatterns = {"/api/*"})
+public class FiltroCORS implements Filter {
 
     // TODO questo filtro è da rivedere / implementare
 
@@ -15,7 +15,6 @@ public class FiltroCORS {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
-
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
