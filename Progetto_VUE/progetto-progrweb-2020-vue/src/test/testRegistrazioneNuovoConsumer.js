@@ -16,15 +16,20 @@ import RegistrazioneNuovoConsumer from '../views/login/RegistrazioneNuovoConsume
 jest.spyOn(window, 'alert').mockImplementation(x => x);
 
 // Setup: falsa implementazione di axios
-let sarebberoInviatiIDatiDalForm;   // true quando si effettua una richiesta asincrona
+let mockSarebberoInviatiIDatiDalForm_varGlobale;   // true quando si effettua una richiesta asincrona
+let mockUrl_varGlobale, mockDatiInviati_varGlobale;           // url e data della richiesta asincrona
 jest.mock('axios', () => ({
     get: url => {
-        sarebberoInviatiIDatiDalForm = true;
+        mockSarebberoInviatiIDatiDalForm_varGlobale = true;
+        mockUrl_varGlobale = url;
+        mockDatiInviati_varGlobale = null;
         return Promise.resolve({url: url, data: 'value'});
     },
     post: (url, data) => {
-        sarebberoInviatiIDatiDalForm = true;
-        return Promise.resolve(data)
+        mockSarebberoInviatiIDatiDalForm_varGlobale = true;
+        mockUrl_varGlobale = url;
+        mockDatiInviati_varGlobale = data;
+        return Promise.resolve(data);
     }
 }));
 
@@ -46,27 +51,59 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
     const formInputFields = wrapper.findAll("form input:not([type=submit])");
 
     test('Se esiste un campo del form non riempito, allora non si invia il form.',  async () => {
-        await simulaRiempimentoFormRegistrazione();
+        await simulaRiempimentoFormRegistrazioneESubmit();
         
         if(esisteUnCampoNonRiempito(formInputFields))
-            expect(sarebberoInviatiIDatiDalForm).toStrictEqual(false);
+            expect(mockSarebberoInviatiIDatiDalForm_varGlobale).toStrictEqual(false);
     });
 
     test('Se la password inserita o quella di conferma non coincidono, allora non si invia il form.',  async () => {
-        await simulaRiempimentoFormRegistrazione();
+        await simulaRiempimentoFormRegistrazioneESubmit();
 
         if(password!==confermaPassword)
-            expect(sarebberoInviatiIDatiDalForm).toStrictEqual(false);
+            expect(mockSarebberoInviatiIDatiDalForm_varGlobale).toStrictEqual(false);
     });
 
     test('Se il form è stato riempito correttamente, si invia il form al server.',  async () => {
-        await simulaRiempimentoFormRegistrazione();
-        expect(sarebberoInviatiIDatiDalForm).toStrictEqual(formRiempitoCorrettamente);
+        await simulaRiempimentoFormRegistrazioneESubmit();
+        expect(mockSarebberoInviatiIDatiDalForm_varGlobale).toStrictEqual(formRiempitoCorrettamente);
     });
 
+        // TODO test se, dopo che viene fatto submit nel form, al server arrivano i dati corretti (usando jest.mock)
+    /** Simula il server. */
+    test('Verifica dei dati ricevuti dal server.',  async () => {
+
+        await simulaRiempimentoFormRegistrazioneESubmit();
+
+        if(formRiempitoCorrettamente) {
+
+            const urlAzioneForm = mockUrl_varGlobale;
+            const datiJSONInviati = JSON.stringify(mockDatiInviati_varGlobale);
+
+            const datiAttesi = {};
+            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME] = codFisc;
+            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] = nomeCognome;
+            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME] = email;
+            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] = password;
+            const datiJSONAttesi = JSON.stringify(datiAttesi);
+
+            // console.log("Inviato: \t{url=" + urlAzioneForm + ", dati=" + datiJSONInviati + " }");
+            // console.log("Atteso: \t{url=" + process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL + ", dati=" + datiJSONAttesi + " }");
+
+            expect(datiJSONInviati).toStrictEqual(datiJSONAttesi);
+            expect(urlAzioneForm).toStrictEqual(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL);
+
+        }
+
+    });
+
+
+
     /** Simula la compilazione del form */
-    async function simulaRiempimentoFormRegistrazione() {
-        sarebberoInviatiIDatiDalForm = false;
+    async function simulaRiempimentoFormRegistrazioneESubmit() {
+        mockSarebberoInviatiIDatiDalForm_varGlobale = false;
+        mockUrl_varGlobale = undefined;
+        mockDatiInviati_varGlobale = undefined;
 
         await riempiCampiForm(formInputFields, [codFisc, nomeCognome, email, password, confermaPassword]);
         await wrapper.find("form").trigger("submit");
