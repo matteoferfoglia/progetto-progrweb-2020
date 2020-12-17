@@ -13,6 +13,8 @@
 
 <script>
 
+// TODO in caso di errore (input inserito dall'utente non valido) evidenziare la casella di input invalida (selector css ":invalid")
+
 import axios from "axios";
 
 export default {
@@ -56,13 +58,13 @@ export default {
 
         let campiFormDaInviareAlServer = {};
         {
-          campiFormDaInviareAlServer[process.env.VUE_APP_SIGNUP_CONSUMER_CODFISC_INPUT_FIELD_NAME] = this.codiceFiscale;
-          campiFormDaInviareAlServer[process.env.VUE_APP_SIGNUP_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] = this.nomeCognome;
-          campiFormDaInviareAlServer[process.env.VUE_APP_SIGNUP_CONSUMER_EMAIL_INPUT_FIELD_NAME] = this.email;
-          campiFormDaInviareAlServer[process.env.VUE_APP_SIGNUP_CONSUMER_PASSWORD_INPUT_FIELD_NAME] = this.password;
+          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME] = this.codiceFiscale;
+          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] = this.nomeCognome;
+          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME] = this.email;
+          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] = this.password;
         }
 
-        axios.post(process.env.VUE_APP_SIGNUP_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
+        axios.post(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
             .then(() =>   registrazioneCompletata() )
             .catch(ris => registrazioneFallita(ris) );
       };

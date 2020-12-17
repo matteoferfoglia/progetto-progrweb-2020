@@ -33,7 +33,7 @@ jest.mock('axios', () => ({
     }
 }));
 
-// noinspection SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection,SpellCheckingInspection
+// noinspection SpellCheckingInspection
 const tabellaParametriDeiTest = [
     ["SPNFRZ63D22H5L1S","Mario Rossi","prova@example.com","pssw","pssw",true],
     ["SPNFRZ63D22H5L1S","Mario Rossi","prova@example.com","pssw","",false],
