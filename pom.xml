@@ -21,6 +21,9 @@
     </properties>
 
     <dependencies>
+
+        <!-- TODO: eliminare dipendenze non necessarie -->
+
         <!-- Compile/runtime dependencies -->
         <dependency>
             <groupId>com.google.appengine</groupId>
@@ -35,11 +38,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <version>2.1</version>
@@ -50,13 +48,44 @@
             <artifactId>appengine-gcs-client</artifactId>
             <version>0.8</version>
         </dependency>
-        <!--
-        SE NON COMMENTATO, appengine:run segnala molti info/warning (WARN:oeja.AnnotationParser:qtp1620303253-17: org.apache.taglibs.standard.Version scanned from multiple locations)
+
+        <!--Jersey! -->
         <dependency>
-          <groupId>jstl</groupId>
-          <artifactId>jstl</artifactId>
-          <version>1.2</version>
-        </dependency> -->
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <!--<artifactId>jersey-container-servlet-core</artifactId>-->
+            <!-- use the following artifactId if you don't need servlet 2.x compatibility -->
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.28</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.ext</groupId>
+            <artifactId>jersey-mvc</artifactId>
+            <version>2.28</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.ext</groupId>
+            <artifactId>jersey-mvc-jsp</artifactId>
+            <version>2.28</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            <version>2.28</version>
+            <exclusions>
+                <exclusion>
+                    <!-- Evita il warn WARN:oeja.AnnotationParser:qtp1932831450-15: javax.json.* scanned from multiple locations -->
+                    <groupId>jakarta.json</groupId>
+                    <artifactId>jakarta.json-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>2.28</version>
+        </dependency>
+        <!--fine Jersey! -->
+
 
 
         <!-- Test Dependencies -->
@@ -100,35 +129,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!--Jersey! -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <!--<artifactId>jersey-container-servlet-core</artifactId>-->
-            <!-- use the following artifactId if you don't need servlet 2.x compatibility -->
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-mvc</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-mvc-jsp</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-moxy</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>2.28</version>
-        </dependency>
-        <!--fine Jersey! -->
+
 
     </dependencies>
 
