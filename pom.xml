@@ -129,6 +129,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- OWASP Java Encoder, https://owasp.org/owasp-java-encoder/encoder/index.html per encoding -->
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
 
 
     </dependencies>
