@@ -47,7 +47,15 @@ const tabellaParametriDeiTest = [
 describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
     (codFisc, nomeCognome, email, password, confermaPassword, formRiempitoCorrettamente) => {
 
-    const wrapper = mount(RegistrazioneNuovoConsumer);
+    const wrapper = mount(RegistrazioneNuovoConsumer, {
+        global: {
+            mocks: {
+                $router: {          //https://vue-test-utils.vuejs.org/v2/guide/vue-router.html#using-a-mocked-router
+                    push: jest.fn()
+                }
+            }
+        }
+    });
     const formInputFields = wrapper.findAll("form input:not([type=submit])");
 
     test('Se esiste un campo del form non riempito, allora non si invia il form.',  async () => {
