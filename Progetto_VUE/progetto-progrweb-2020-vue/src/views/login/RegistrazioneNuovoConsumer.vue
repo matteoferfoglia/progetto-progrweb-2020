@@ -27,7 +27,7 @@ export default {
       password: "",
       confermaPassword: "",
       REGEX_CODICE_FISCALE: process.env.VUE_APP_REGEX_CODICE_FISCALE,
-      REGEX_MAIL: process.env.VUE_APP_REGEX_MAIL
+      REGEX_EMAIL: process.env.VUE_APP_REGEX_EMAIL
     }
   },
   methods: {
@@ -35,7 +35,7 @@ export default {
 
       const isFormValido = () => {
         return this.nomeCognome.length>0 &&
-            RegExp(this.REGEX_MAIL).test(this.email) &&
+            RegExp(this.REGEX_EMAIL).test(this.email) &&
             RegExp(this.REGEX_CODICE_FISCALE).test(this.codiceFiscale) &&
             this.password===this.confermaPassword &&
             this.password.length > 0;
