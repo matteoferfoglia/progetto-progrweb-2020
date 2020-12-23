@@ -12,11 +12,11 @@ import javax.ws.rs.core.MediaType;
 public class RegistrazioneNuovoConsumer {
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes({MediaType.APPLICATION_JSON})
-    public CampiFormRegistrazione registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
         // TODO metodo e signature
-        return campiFormRegistrazione;
+        return "Registrazione completata per " + campiFormRegistrazione.getCodiceFiscale();
     }
 }
 
