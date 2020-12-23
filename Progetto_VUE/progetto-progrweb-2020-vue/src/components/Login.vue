@@ -9,7 +9,7 @@
     <nav>
       <ul>
         <li><router-link to="/Login">Login</router-link></li>
-        <li><router-link to="/Registrazione">Registrazione</router-link></li>
+        <li><router-link to="/Registrazione">Registrazione Consumer</router-link></li>
       </ul>
     </nav>
 

@@ -1,7 +1,7 @@
 <template>
   <h2>Login > Registrati</h2>
 
-  <form @submit.prevent="validaEdInviaForm" ref="form">
+  <form @submit.prevent="validaEdInviaForm">
     <label>Codice fiscale<input type="text" v-model="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="`${REGEX_CODICE_FISCALE}`" required autofocus></label>
     <label>Nome e cognome<input type="text" v-model="nomeCognome" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required></label>
     <label>Email<input type="email" v-model="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" required></label>
@@ -33,6 +33,8 @@ export default {
   methods: {
     validaEdInviaForm() {
 
+      // TODO : questo metodo è presente anche nel form di login: refactoring per evitare duplicazione!
+
       const isFormValido = () => {
         return this.nomeCognome.length>0 &&
             RegExp(this.REGEX_EMAIL).test(this.email) &&
@@ -42,7 +44,8 @@ export default {
       };
 
       const informaUtenteFormInvalido = () => {
-        alert("Le password inserite sono diverse.");
+        alert("Compilare correttamente i campi del form.");
+        // TODO: migliorare messaggio dell' alert, magari evidenziare con CSS i campi input invalidi e mostrare il popup con l'errore specifico.
         this.confermaPassword = "";
       }
 
