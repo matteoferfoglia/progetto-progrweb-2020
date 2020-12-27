@@ -64,7 +64,7 @@ public class SecurityManager {
 
         byte[] signedBytes = sha256Hmac.doFinal(datiDaFirmare.getBytes(StandardCharsets.UTF_8));
 
-        return Base64Helper.encodeToBase64(signedBytes);
+        return Base64Helper.encodeToBase64UrlEncoded(signedBytes);
 
     }
 

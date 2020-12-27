@@ -54,8 +54,8 @@ public class JwtToken {
                     + "esattamente tre componenti (header, payload e signature) separate dal punto (.),"
                     + "ma sono state trovate " + componentiDelJwt.length + " componenti.");
 
-        JwtHeader jwtHeader = new JwtHeader(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64ToString(componentiDelJwt[0])));
-        JwtPayload jwtPayload = new JwtPayload(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64ToString(componentiDelJwt[1])));
+        JwtHeader jwtHeader = new JwtHeader(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64UrlEncodedToString(componentiDelJwt[0])));
+        JwtPayload jwtPayload = new JwtPayload(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64UrlEncodedToString(componentiDelJwt[1])));
         JwtSignature jwtSignature = new JwtSignature(componentiDelJwt[2]);  // signature da non codificare base64
 
         return new JwtToken(jwtHeader, jwtPayload, jwtSignature);
@@ -95,8 +95,8 @@ public class JwtToken {
 
         // TODO : la codifica a base 64 viene già fatta quando si deve calcolare la firma: è uno spreco di risorse ricalcolarla qui!
 
-        return Base64Helper.encodeToBase64(header.convertiClaimsSetToJSON())
-                + "." + Base64Helper.encodeToBase64(payload.convertiClaimsSetToJSON())
+        return Base64Helper.encodeToBase64UrlEncoded(header.convertiClaimsSetToJSON())
+                + "." + Base64Helper.encodeToBase64UrlEncoded(payload.convertiClaimsSetToJSON())
                 + "." + signature.getSignature();
     }
 

@@ -23,9 +23,9 @@ public class JwtSignature {
     public JwtSignature(JwtHeader jwtHeader, JwtPayload jwtPayload)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        this.signature = SecurityManager.hmacSha256(Base64Helper.encodeToBase64(jwtHeader.convertiClaimsSetToJSON())
+        this.signature = SecurityManager.hmacSha256(Base64Helper.encodeToBase64UrlEncoded(jwtHeader.convertiClaimsSetToJSON())
                 + "."
-                + Base64Helper.encodeToBase64(jwtPayload.convertiClaimsSetToJSON()));
+                + Base64Helper.encodeToBase64UrlEncoded(jwtPayload.convertiClaimsSetToJSON()));
 
     }
 
