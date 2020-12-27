@@ -1,23 +1,37 @@
 <template>
   <h2>Login > Accedi</h2>
-  <form @submit.prevent="validaEdInviaForm"> <!-- TODO: action del form da fare -->
-    <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
-    <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
-    <input type="submit" value="Login">
-  </form>
+  <div v-if="isCaricato">
+    <form @submit.prevent="validaEdInviaForm"> <!-- TODO: action del form da fare -->
+      <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
+      <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
+      <input type="hidden" v-model="CSRF_token">
+      <input type="submit" value="Login">
+    </form>
+  </div>
+  <div v-else></div>
 </template>
 
 <script>
 
 import axios from "axios";
+import {richiediCSRFTokenAlServer} from "../../utils/CSRF";
 
 export default {
   name: 'LoginUtenteGiaRegistrato',
   data() {
     return {
       username: "",
-      password: ""
+      password: "",
+      isCaricato: false,  // modificato al termine della promise per il CSRF token
+      CSRF_token: ""
     }
+  },
+  created() {
+    this.CSRF_token = richiediCSRFTokenAlServer().then(valoreToken => {
+      // "rendering is a synchronous process, it can’t wait for asynchronous code to finish"
+      this.isCaricato = true;
+      this.CSRF_token = valoreToken;
+    });
   },
   methods: {
     validaEdInviaForm() {
@@ -48,6 +62,7 @@ export default {
         {
           campiFormDaInviareAlServer[process.env.VUE_APP_LOGIN_USERNAME_INPUT_FIELD_NAME] = this.username;
           campiFormDaInviareAlServer[process.env.VUE_APP_LOGIN_PASSWORD_INPUT_FIELD_NAME] = this.password;
+          campiFormDaInviareAlServer[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME] = this.CSRF_token;
         }
 
         axios.post(process.env.VUE_APP_LOGIN_SERVER_URL, campiFormDaInviareAlServer)

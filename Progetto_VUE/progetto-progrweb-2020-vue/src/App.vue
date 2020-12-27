@@ -1,4 +1,5 @@
 <template id="app">  <!-- TODO Questa pagina è da adattare al progetto (è quella creata da Vue) -->
+
   <AreaRiservata v-if="isUtenteAutenticato()"></AreaRiservata>
   <Login v-else></Login>
 
@@ -10,6 +11,7 @@
 
 import Login from './components/Login'
 import AreaRiservata from "./components/AreaRiservata";
+import {isAutenticato} from "./utils/utils";
 
 export default {
   name: 'App',
@@ -19,8 +21,7 @@ export default {
   },
   methods: {
     isUtenteAutenticato(){
-      //TODO verificare se l'utente è autenticato
-      return false;
+      return isAutenticato();
     }
   }
 }

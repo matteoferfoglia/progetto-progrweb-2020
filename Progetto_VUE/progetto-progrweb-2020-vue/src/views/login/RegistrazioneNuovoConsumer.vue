@@ -2,7 +2,7 @@
   <h2>Login > Registrati</h2>
 
   <form @submit.prevent="validaEdInviaForm">
-    <label>Codice fiscale<input type="text" v-model="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="`${REGEX_CODICE_FISCALE}`" required autofocus></label>
+    <label>Codice fiscale<input type="text" v-model="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="REGEX_CODICE_FISCALE" required autofocus></label>
     <label>Nome e cognome<input type="text" v-model="nomeCognome" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required></label>
     <label>Email<input type="email" v-model="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" required></label>
     <label>Password<input type="password" v-model="password" autocomplete="off" maxlength="100" required></label>
