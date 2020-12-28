@@ -1,11 +1,16 @@
 package it.units.progrweb.rest.api;
 
+import it.units.progrweb.entities.Attore;
+import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.csrf.CsrfToken;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+/**
+ * @author Matteo Ferfoglia
+ */
 @Path("/login")
 public class Login {
 
@@ -16,10 +21,14 @@ public class Login {
         // TODO metodo e signature
         if(CsrfToken.isCsrfTokenValido(campiFormLogin.getCsrfToken(), cookieHeader)) {
 
-            // TODO : se il csrf è valido => procedura di login (verifica credenziali) da implementare
-            // TODO : se procedura di login va a buon fine => impostare COOKIE-AUTENTICAZIONE
+            Attore attore = Autenticazione.getAttoreDaCredenziali(campiFormLogin.getUsername(), campiFormLogin.getPassword());
+            if(Autenticazione.isAttoreAutenticato(attore)) {
 
-            return "Benvenuto " + campiFormLogin.getUsername();
+                // TODO : se procedura di login va a buon fine => impostare COOKIE-AUTENTICAZIONE
+                return "Benvenuto " + campiFormLogin.getUsername();
+            }
+
+            return "Credenziali invalide";
         }
         else
             return "CsrfToken invalido";

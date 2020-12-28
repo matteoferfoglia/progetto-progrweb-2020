@@ -5,6 +5,8 @@ import org.owasp.encoder.Encode;
 /**
  * Classe di utilità per l'encoding col fine di difesa dagli attacchi XSS.
  * @see Encode .
+ *
+ * @author Matteo Ferfoglia
  */
 public class EncoderPrevenzioneXSS {
 

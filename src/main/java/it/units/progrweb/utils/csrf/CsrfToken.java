@@ -25,6 +25,8 @@ import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanume
  * Quest'ultimo valore identificativo del client viene aggiunto anche
  * come claim del JWT token di cui sopra (così è possibile effettuare
  * una "verifica incrociata" sull'identità del client).
+ *
+ * @author Matteo Ferfoglia
  */
 public class CsrfToken {
 

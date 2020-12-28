@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
  * che il client che fa uso del token CSRF sia lo stesso che ne ha fatto
  * richiesta.
  * // TODO : verificare che questo meccanismo con due cookie sia sicuro.
+ *
+ * @author Matteo Ferfoglia
  */
 @Path("/CSRFToken")
 public class CreazioneCsrfToken {

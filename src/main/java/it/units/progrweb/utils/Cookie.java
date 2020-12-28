@@ -4,7 +4,11 @@ import javax.ws.rs.core.NewCookie;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-/** Classe helper per la gestione dei cookie. */
+/**
+ * Classe helper per la gestione dei cookie.
+ *
+ * @author Matteo Ferfoglia
+ */
 public class Cookie extends NewCookie {
 
     // Parametri comuni e tipici per tutti i cookie creati da questo server (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)

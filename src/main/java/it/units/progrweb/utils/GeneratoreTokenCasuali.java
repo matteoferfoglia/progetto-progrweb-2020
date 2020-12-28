@@ -3,7 +3,11 @@ package it.units.progrweb.utils;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-/** Classe di utilità per la generazione di token (es.: token CSRF).*/
+/**
+ * Classe di utilità per la generazione di token (es.: token CSRF).
+ *
+ * @author Matteo Ferfoglia
+ */
 public class GeneratoreTokenCasuali {
     /**
      * Genera un token alfanumerico con un numero di caratteri

@@ -7,8 +7,10 @@ import java.security.*;
 
 /**
  * Gestore delle chiavi privata e pubblica per questo server.
- * Fonte: https://docs.oracle.com/javase/tutorial/security/apisign/step1.html,
- * https://docs.oracle.com/javase/tutorial/security/apisign/step2.html .
+ * Fonti: <a href="https://docs.oracle.com/javase/tutorial/security/apisign/step1.html">Fonte</a>,
+ * <a href="https://docs.oracle.com/javase/tutorial/security/apisign/step2.html">Fonte</a>.
+ *
+ * @author Matteo Ferfoglia
  */
 public class GestoreSicurezza {
 

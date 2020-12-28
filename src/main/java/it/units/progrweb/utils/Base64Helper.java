@@ -3,6 +3,9 @@ package it.units.progrweb.utils;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * @author Matteo Ferfoglia
+ */
 public class Base64Helper {
 
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();

@@ -5,6 +5,12 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+/**
+ * Classe di helper per il formato JSON.
+ *
+ * @author Matteo Ferfoglia
+ */
 public class JsonHelper {
 
     /**

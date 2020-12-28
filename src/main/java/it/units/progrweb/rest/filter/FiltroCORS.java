@@ -6,6 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @author Matteo Ferfoglia
+ */
 @WebFilter(filterName = "FiltroCORS", asyncSupported = true, urlPatterns = {"/api/*"})
 public class FiltroCORS implements Filter {
 

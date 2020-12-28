@@ -12,6 +12,8 @@ import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodifica
  * il primo conterrà il token jwt nel cui payload vi è il token
  * CSRF ed un identificativo del client, il secondo conterrà
  * l'identificativo del client.
+ *
+ * @author Matteo Ferfoglia
  */
 public class CsrfCookies {
 
