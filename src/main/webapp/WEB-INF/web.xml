@@ -16,7 +16,8 @@
     </init-param>
     <init-param>
       <param-name>jersey.config.server.provider.packages</param-name>
-      <param-value>it.units.progrweb.rest,io.swagger.v3.jaxrs2.integration.resources</param-value>
+      <param-value>it.units.progrweb.api,io.swagger.v3.jaxrs2.integration.resources</param-value>
+      <!-- TODO : rendere questi parametri (necessari per le richieste rest) delle variabili d'ambiente -->
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>

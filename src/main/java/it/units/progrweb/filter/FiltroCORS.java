@@ -1,4 +1,4 @@
-package it.units.progrweb.rest.filter;
+package it.units.progrweb.filter;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;

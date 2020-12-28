@@ -1,4 +1,4 @@
-package it.units.progrweb.rest.api;
+package it.units.progrweb.api;
 
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.csrf.CsrfToken;
