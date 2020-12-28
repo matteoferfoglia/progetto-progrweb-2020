@@ -1,4 +1,4 @@
-package it.units.progrweb.utils.JWT.component.claim;
+package it.units.progrweb.utils.jwt.componenti.claim;
 
 /**
  * Classe per rappresentare il claim "Subject".
@@ -20,13 +20,6 @@ public class JwtSubjectClaim extends JwtClaim {
      */
     public JwtSubjectClaim(String subject) {
         super(JwtClaim.JWT_SUBJECT_CLAIM_NAME, subject);
-    }
-
-    public JwtSubjectClaim(JwtClaim jwtClaim) {
-        super(JwtClaim.JWT_SUBJECT_CLAIM_NAME, jwtClaim.getValue());
-        if(!jwtClaim.getName().equals(JwtClaim.JWT_SUBJECT_CLAIM_NAME))
-            throw new IllegalArgumentException("Impossibile creare un " + JwtSubjectClaim.class.getName()
-                    + ", perché è stato fornito un claim con nome " + jwtClaim.getName());
     }
 
 }

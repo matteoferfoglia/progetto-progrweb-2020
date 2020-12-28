@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 /** Classe di utilità per la generazione di token (es.: token CSRF).*/
-public class TokenGenerator {
+public class GeneratoreTokenCasuali {
     /**
      * Genera un token alfanumerico con un numero di caratteri
      * specificato nel parametro e presi dall'alfabeto definito
@@ -14,9 +14,8 @@ public class TokenGenerator {
      */
     public static String generaTokenAlfanumerico(int lunghezzaToken) {
         final String ALFABETO = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/"; // CSRF-token sarà composta da questi caratteri, presi casualmente
-        String token = new Random().ints(lunghezzaToken, 0, ALFABETO.length())
+        return new Random().ints(lunghezzaToken, 0, ALFABETO.length())
                 .mapToObj(indiceCasuale -> String.valueOf(ALFABETO.charAt(indiceCasuale)))
                 .collect(Collectors.joining());
-        return token;
     }
 }

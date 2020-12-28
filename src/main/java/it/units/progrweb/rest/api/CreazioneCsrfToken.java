@@ -1,12 +1,12 @@
 package it.units.progrweb.rest.api;
 
-import it.units.progrweb.utils.CsrfToken;
+import it.units.progrweb.utils.csrf.CsrfCookies;
+import it.units.progrweb.utils.csrf.CsrfToken;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -38,29 +38,26 @@ public class CreazioneCsrfToken {
      * Risponde con un cookie contenente il token JWT (firmato da questo
      * server) contenente nel payload il token CSRF
      * (<a href="https://stackoverflow.com/a/28004533">Fonte</a>).
-     * Inoltre, viene anche creato ed inviato un cookie il cui valore
-     * viene aggiunto nel payload del soprascritto token JWT, la cui
-     * funzionalità del cookie è la verifica dell'identità del client:
-     * il client che presenterà il JWT deve essere lo stesso
+     * Un ulteriore cookie è usato per l'identità del client.
+     * Vedere {@link CsrfToken} e {@link CsrfCookies} per i dettagli.
      */
     @GET
     @Path("/generaCSRFToken")
     @Produces(MediaType.TEXT_PLAIN)
-    public static Response creaCookieConCSRFTokenEdIdentificativoClient(){
+    public static Response creaCookiesConCsrfTokenEdIdentificativoClient(){
 
         try {
 
             CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH);
 
             // Creazione cookies
-            NewCookie cookieCSRF           = csrfToken.creaCookieContenenteJWTToken(),               // conterrà il JWT quale valore del cookie
-                    cookieVerificaIdentita = csrfToken.creaCookieContenenteIdentificativoClient();   // conterrà un identificativo per il client che ha fatto questa richiesta
+            CsrfCookies csrfCookies = csrfToken.creaCookiesPerCsrf();
 
             // Invia risposta positiva ed aggiungi il cookie creato sopra
             return Response .ok()
-                            .cookie(cookieCSRF)
-                            .cookie(cookieVerificaIdentita)
-                            .entity(csrfToken.getValoreCSRFToken())      // CSRF token anche nel body della response
+                            .cookie(csrfCookies.getCookieCSRF())
+                            .cookie(csrfCookies.getCookieVerificaIdentitaClient())
+                            .entity(csrfToken.getValoreCsrfToken())      // CSRF token anche nel body della response
                             .build();    // TODO: verificare se il cookie arriva
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {

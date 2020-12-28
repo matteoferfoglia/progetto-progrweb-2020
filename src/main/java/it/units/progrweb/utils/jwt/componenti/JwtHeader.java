@@ -1,6 +1,6 @@
-package it.units.progrweb.utils.JWT.component;
+package it.units.progrweb.utils.jwt.componenti;
 
-import it.units.progrweb.utils.JWT.component.claim.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
 
 import java.util.ArrayList;
 import java.util.Collection;

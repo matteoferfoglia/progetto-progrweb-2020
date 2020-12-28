@@ -21,6 +21,7 @@ public class RegistrazioneNuovoConsumer {
 }
 
 
+@SuppressWarnings("unused")
 class CampiFormRegistrazione {
 
     private String codiceFiscale;

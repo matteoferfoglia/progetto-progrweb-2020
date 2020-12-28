@@ -10,7 +10,7 @@ import java.security.*;
  * Fonte: https://docs.oracle.com/javase/tutorial/security/apisign/step1.html,
  * https://docs.oracle.com/javase/tutorial/security/apisign/step2.html .
  */
-public class SecurityManager {
+public class GestoreSicurezza {
 
     /** Algoritmo di cifratura da usare.
      * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyPairGenerator">Lista degli algoritmi possibili</a>
@@ -25,12 +25,12 @@ public class SecurityManager {
     private PublicKey publicKey;
     private PrivateKey privateKey;
 
-    private final static SecurityManager securityManager = new SecurityManager();   // TODO: da creare durante bootstrap del server
+    private final static GestoreSicurezza gestoreSicurezza = new GestoreSicurezza();   // TODO: da creare durante bootstrap del server
 
-    private SecurityManager() {
+    private GestoreSicurezza() {
         try{
             // TODO : rivedere questo metodo (la funzione KeyPairGenerator.getInstance() richiederebbe anche un provider)
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(CIPHERING_ALGORITHM);
             keyGen.initialize(KEY_NUMBER_OF_BITS); // TODO: cosa fa questo metodo?
             KeyPair keyPair = keyGen.generateKeyPair();
             this.publicKey = keyPair.getPublic();
@@ -41,10 +41,10 @@ public class SecurityManager {
     }
 
     public static PrivateKey getPrivateKey() {
-        return securityManager.privateKey;
+        return gestoreSicurezza.privateKey;
     }
     public static PublicKey getPublicKey() {
-        return securityManager.publicKey;
+        return gestoreSicurezza.publicKey;
     }
 
     /**
@@ -56,7 +56,7 @@ public class SecurityManager {
     public static String hmacSha256(String datiDaFirmare)
             throws NoSuchAlgorithmException, InvalidKeyException {
 
-        byte[] hash = securityManager.privateKey.getEncoded();
+        byte[] hash = gestoreSicurezza.privateKey.getEncoded();
 
         Mac sha256Hmac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(hash, "HmacSHA256");

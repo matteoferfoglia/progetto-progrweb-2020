@@ -1,4 +1,4 @@
-package it.units.progrweb.utils.JWT.component.claim;
+package it.units.progrweb.utils.jwt.componenti.claim;
 
 /**
  * Rappresentazione di un claim nel payload di un token JWT.

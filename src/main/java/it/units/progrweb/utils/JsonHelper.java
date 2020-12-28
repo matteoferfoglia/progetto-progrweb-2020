@@ -18,7 +18,7 @@ public class JsonHelper {
     public static Map<String,?> convertiStringaJsonToMappaProprieta(String stringaJSON) {
         JSONObject oggettoJSON = new JSONObject(stringaJSON);
         return oggettoJSON.keySet().stream()
-                .collect(Collectors.toMap(key -> key, key -> oggettoJSON.get(key)));
+                .collect(Collectors.toMap(key -> key, oggettoJSON::get));  //crea mappa "nomeProprietà: valoreProprietà"
     }
 
     /**

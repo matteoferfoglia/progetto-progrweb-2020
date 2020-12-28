@@ -1,6 +1,6 @@
 package it.units.progrweb.rest.api;
 
-import it.units.progrweb.utils.CsrfToken;
+import it.units.progrweb.utils.csrf.CsrfToken;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 
 import javax.ws.rs.*;
@@ -26,6 +26,7 @@ public class Login {
     }
 }
 
+@SuppressWarnings("unused")
 class CampiFormLogin {
     private String username;
     private String password;

@@ -1,7 +1,7 @@
-package it.units.progrweb.utils.JWT.component;
+package it.units.progrweb.utils.jwt.componenti;
 
 import it.units.progrweb.utils.Base64Helper;
-import it.units.progrweb.utils.JWT.component.claim.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
 import it.units.progrweb.utils.JsonHelper;
 
 import java.util.*;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class JwtClaimsSet {
 
     /** Lista di claim. */
-    private final Collection<JwtClaim> claimsSet;
+    private final Collection<JwtClaim> claimsSet = new HashSet<>();
 
     /**
      * Memorizza il claims set in formato JSON e codificato in
@@ -27,21 +27,16 @@ public class JwtClaimsSet {
     private String claimsSetInFormatJsonBase64UrlEncoded;
 
     public JwtClaimsSet() {
-        claimsSet = new HashSet<>();
     }
 
-    public JwtClaimsSet(JwtClaim singoloJwtClaim) {
+    public JwtClaimsSet(Collection<JwtClaim> jwtClaimSet) {
         this();
-        claimsSet.add(singoloJwtClaim);
-    }
-
-    public JwtClaimsSet(Collection<JwtClaim> JwtClaimSet) {
-        this();
-        claimsSet.addAll(JwtClaimSet);
+        claimsSet.addAll(jwtClaimSet);
     }
 
     protected JwtClaimsSet(JwtClaimsSet jwtClaimsSet) {
         this(jwtClaimsSet.claimsSet);
+        this.claimsSetInFormatJsonBase64UrlEncoded = jwtClaimsSet.claimsSetInFormatJsonBase64UrlEncoded;
     }
 
     /**
@@ -51,13 +46,6 @@ public class JwtClaimsSet {
         claimsSet.add(jwtClaim);
         if(is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato())
             calcolaClaimsSetInFormatJsonBase64UrlEncoded();
-    }
-
-    /**
-     * Aggiunge una collection di claim.
-     */
-    public void addAllClaims(Collection<? extends JwtClaim> collectionOfClaims) {
-        collectionOfClaims.forEach(claim -> claimsSet.add(claim));
     }
 
     /**
@@ -117,9 +105,12 @@ public class JwtClaimsSet {
     public static JwtClaimsSet convertiJSONToClaimsSet(String claimSetJSON) {
 
         JwtClaimsSet claimsSet = new JwtClaimsSet();
+
+        @SuppressWarnings("unchecked")
         Map<String, String> mappaProprietaOggettoJSON = (Map<String, String>) JsonHelper.convertiStringaJsonToMappaProprieta(claimSetJSON);
 
         mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.addClaim(new JwtClaim(nomeClaim, valoreClaim)));
+        claimsSet.calcolaClaimsSetInFormatJsonBase64UrlEncoded();
 
         return claimsSet;
     }

@@ -1,8 +1,9 @@
-package it.units.progrweb.utils.JWT;   // TODO rivedere tutte le classi in questo package che fanno uso di Gson: probabilmente bisogna tradurre in JSON a mano!
+package it.units.progrweb.utils.jwt;
 
-import it.units.progrweb.utils.JWT.component.*;
-import it.units.progrweb.utils.JWT.component.claim.JwtClaim;
-import it.units.progrweb.utils.JWT.component.claim.JwtExpirationTimeClaim;
+import it.units.progrweb.utils.GestoreSicurezza;
+import it.units.progrweb.utils.jwt.componenti.*;
+import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.Base64Helper;
 
 import java.security.InvalidKeyException;
@@ -25,8 +26,8 @@ public class JwtToken {
 
     /**
      * Crea una rappresentazione come oggetto di un token JWT.
-     * @throws InvalidKeyException generata da {@link it.units.progrweb.utils.SecurityManager#hmacSha256(String)}
-     * @throws NoSuchAlgorithmException generata da {@link it.units.progrweb.utils.SecurityManager#hmacSha256(String)}
+     * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
     public JwtToken(JwtPayload payload)
             throws NoSuchAlgorithmException, InvalidKeyException {
@@ -100,12 +101,6 @@ public class JwtToken {
                 + "." + signature.getSignature();
     }
 
-    /** Verifica che un token, in forma di stringa, sia valido. */
-    public static boolean isTokenValido(String JWTToken_StringDaVerificare) {
-        JwtToken jwtTokenDaVerificare = creaJwtTokenDaStringaCodificata(JWTToken_StringDaVerificare);
-        return jwtTokenDaVerificare.isTokenValido();
-    }
-
     /** Verifica la validità di questa istanza del token JWT.*/
     public boolean isTokenValido() {
 
@@ -127,10 +122,9 @@ public class JwtToken {
     private boolean isTokenScaduto() {
 
         boolean isTokenScaduto;
-        JwtExpirationTimeClaim expirationTimeClaim;
         try{
-            expirationTimeClaim = new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME));
-            isTokenScaduto = expirationTimeClaim.isScaduto();
+            isTokenScaduto = new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME))
+                                            .isScaduto();
         } catch(NoSuchElementException e) {
             // Se qui, non c'è Expiration Time nel token, quindi non è scaduto
             isTokenScaduto = false;

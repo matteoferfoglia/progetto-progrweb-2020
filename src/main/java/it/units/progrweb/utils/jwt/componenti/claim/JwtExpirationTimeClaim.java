@@ -1,4 +1,4 @@
-package it.units.progrweb.utils.JWT.component.claim;
+package it.units.progrweb.utils.jwt.componenti.claim;
 
 /**
  * Classe per rappresentare il claim "Expiration Time".

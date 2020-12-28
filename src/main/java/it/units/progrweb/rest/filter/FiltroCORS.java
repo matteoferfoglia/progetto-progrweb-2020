@@ -61,7 +61,7 @@ public class FiltroCORS implements Filter {
     public FiltroCORS() {
     }
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)

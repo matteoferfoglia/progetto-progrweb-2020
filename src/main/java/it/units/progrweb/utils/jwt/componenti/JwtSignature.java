@@ -1,6 +1,6 @@
-package it.units.progrweb.utils.JWT.component;
+package it.units.progrweb.utils.jwt.componenti;
 
-import it.units.progrweb.utils.SecurityManager;
+import it.units.progrweb.utils.GestoreSicurezza;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -16,13 +16,13 @@ public class JwtSignature {
 
     /**
      * Crea la signature per il token JWT a partire dai suoi header e payload.
-     * @throws InvalidKeyException generata da {@link it.units.progrweb.utils.SecurityManager#hmacSha256(String)}
-     *  @throws NoSuchAlgorithmException generata da {@link it.units.progrweb.utils.SecurityManager#hmacSha256(String)}
+     * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     *  @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
     public JwtSignature(JwtHeader jwtHeader, JwtPayload jwtPayload)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        this.signature = SecurityManager.hmacSha256(jwtHeader.getClaimsSetInFormatJsonBase64UrlEncoded()
+        this.signature = GestoreSicurezza.hmacSha256(jwtHeader.getClaimsSetInFormatJsonBase64UrlEncoded()
                 + "." + jwtPayload.getClaimsSetInFormatJsonBase64UrlEncoded() );
 
     }
