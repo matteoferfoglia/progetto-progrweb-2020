@@ -1,7 +1,7 @@
 package it.units.progrweb.utils.JWT.component;
 
 import it.units.progrweb.utils.JWT.component.claim.JwtClaim;
-import it.units.progrweb.utils.JSONHelper;
+import it.units.progrweb.utils.JsonHelper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,14 +67,14 @@ public class JwtClaimsSet {
      * Crea la rappresentazione JSON dell'insieme di claim.
      * @return rappresentazione JSON.
      */
-    public String convertiClaimsSetToJSON() {
+    public String convertiClaimsSetToJson() {
 
         Map<String, String> mappaProprietaOggetto;
         mappaProprietaOggetto = claimsSet.stream()
                 .map(claim -> new AbstractMap.SimpleEntry<>(claim.getName(),claim.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return JSONHelper.convertiMappaProprietaToJSONString(mappaProprietaOggetto);
+        return JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaOggetto);
 
     }
 
@@ -85,7 +85,7 @@ public class JwtClaimsSet {
     public static JwtClaimsSet convertiJSONToClaimsSet(String claimSetJSON) {
 
         JwtClaimsSet claimsSet = new JwtClaimsSet();
-        Map<String, String> mappaProprietaOggettoJSON = (Map<String, String>) JSONHelper.convertiStringaJsonToMap(claimSetJSON);
+        Map<String, String> mappaProprietaOggettoJSON = (Map<String, String>) JsonHelper.convertiStringaJsonToMappaProprieta(claimSetJSON);
 
         mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.addClaim(new JwtClaim(nomeClaim, valoreClaim)));
 

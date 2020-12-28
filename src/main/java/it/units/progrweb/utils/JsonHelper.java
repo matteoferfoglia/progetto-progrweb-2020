@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JSONHelper {
+public class JsonHelper {
 
     /**
      * Data una stringa corrispondente ad una rappresentazione JSON
@@ -15,7 +15,7 @@ public class JSONHelper {
      * sono di tipo primitivo (cioè non possono esserci altri oggetti JSON
      * annidati).
      */
-    public static Map<String,?> convertiStringaJsonToMap(String stringaJSON) {
+    public static Map<String,?> convertiStringaJsonToMappaProprieta(String stringaJSON) {
         JSONObject oggettoJSON = new JSONObject(stringaJSON);
         return oggettoJSON.keySet().stream()
                 .collect(Collectors.toMap(key -> key, key -> oggettoJSON.get(key)));
@@ -30,7 +30,7 @@ public class JSONHelper {
      * @param <K> è la classe per la chiave della mappa data come argomento.
      * @param <V> è la classe per il valore della mappa data come argomento.
      */
-    public static<K,V> String convertiMappaProprietaToJSONString(Map<K,V> mappaProprieta) {
+    public static<K,V> String convertiMappaProprietaToStringaJson(Map<K,V> mappaProprieta) {
 
         return "{"
                 +   mappaProprieta.entrySet().stream()

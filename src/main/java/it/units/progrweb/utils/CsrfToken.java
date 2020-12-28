@@ -71,7 +71,7 @@ public class CsrfToken {
 
         this.CSRFToken = generaTokenAlfanumerico(csrf_token_length);
         this.tokenIdentificativoClient = generaTokenAlfanumerico(id_client_length);
-        this.jwtToken = creaJWTToken();
+        this.jwtToken = creaJwtToken();
     }
 
 
@@ -83,7 +83,7 @@ public class CsrfToken {
      * @throws InvalidKeyException generata da {@link it.units.progrweb.utils.SecurityManager#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link it.units.progrweb.utils.SecurityManager#hmacSha256(String)}
      */
-    public JwtToken creaJWTToken()
+    public JwtToken creaJwtToken()
             throws InvalidKeyException, NoSuchAlgorithmException {
 
         JwtPayload jwtPayload;
@@ -175,7 +175,7 @@ public class CsrfToken {
     }
 
     public NewCookie creaCookieContenenteJWTToken() {
-        return creaCookie(NOME_COOKIE_CSRF, jwtToken.generaToken(),
+        return creaCookie(NOME_COOKIE_CSRF, jwtToken.generaTokenJson(),
                 "Cookie contenente un valore identificativo per il client");
     }
 

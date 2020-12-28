@@ -91,12 +91,12 @@ public class JwtToken {
     }
 
     /** Genera il token JWT, già firmato e nella codifica corretta (Base64 separato da punti).*/
-    public String generaToken() {
+    public String generaTokenJson() {
 
         // TODO : la codifica a base 64 viene già fatta quando si deve calcolare la firma: è uno spreco di risorse ricalcolarla qui!
 
-        return Base64Helper.encodeToBase64UrlEncoded(header.convertiClaimsSetToJSON())
-                + "." + Base64Helper.encodeToBase64UrlEncoded(payload.convertiClaimsSetToJSON())
+        return Base64Helper.encodeToBase64UrlEncoded(header.convertiClaimsSetToJson())
+                + "." + Base64Helper.encodeToBase64UrlEncoded(payload.convertiClaimsSetToJson())
                 + "." + signature.getSignature();
     }
 
