@@ -9,13 +9,15 @@ import axios from "axios";
  * Il seguente esempio mostra come ottenere il token CSRF utilizzando
  * questa funzione:
  * <code>let CSRF_token = await richiediCSRFTokenAlServer().then(valoreToken => valoreToken)</code>
- * @return {Promise<unknown>}
+ * @return il token csrf oppure Promise.reject(reason) se ci sono errori
+ * nel recupero del token.
  */
 export const richiediCSRFTokenAlServer = async () => {
     return await axios.get(process.env.VUE_APP_GET_CSRF_TOKEN_URL)
         .then(risposta => risposta.data)
-        .catch(err => {
-            console.error("Errore durante il recupero del token CSRF: " + err);
+        .catch(errore => {
+            console.error("Errore durante il recupero del token CSRF: " + errore);
+            return Promise.reject(errore);
             // TODO : gestire l'errore (invio mail ai gestori?)
         });
 }

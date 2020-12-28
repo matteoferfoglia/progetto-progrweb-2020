@@ -27,10 +27,14 @@ export default {
     }
   },
   created() {
-    this.CSRF_token = richiediCSRFTokenAlServer().then(valoreToken => {
+    this.CSRF_token = richiediCSRFTokenAlServer().then( valoreToken => {
       // "rendering is a synchronous process, it can’t wait for asynchronous code to finish"
-      this.isCaricato = true;
-      this.CSRF_token = valoreToken;
+      // Se qui, allora token csrf ricevuto
+        this.isCaricato = true;
+        this.CSRF_token = valoreToken;
+      }).catch( errore => {
+      // Errore durante la ricezione del token csrf
+      console.error("Errore in " + this.$options.name + ": " + errore);  // TODO : gestire questo errore
     });
   },
   methods: {
