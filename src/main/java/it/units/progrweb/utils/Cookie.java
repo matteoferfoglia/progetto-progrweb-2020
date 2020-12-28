@@ -124,8 +124,5 @@ public class Cookie extends NewCookie {
     }
 
     // TODO : usare questa classe per la creazione dei cookie (anziché NewCookie() e Cookie() sparso nel codice, usare questo helper)
-    // TODO : dopo aver creato questa classe, aggiungerla a git
-
-
 
 }

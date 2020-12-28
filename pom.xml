@@ -40,6 +40,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <version>2.1</version>
@@ -93,7 +98,14 @@
             <artifactId>jersey-hk2</artifactId>
             <version>2.28</version>
         </dependency>
-        <!--fine Jersey! -->
+        <!-- fine Jersey! -->
+
+        <!-- Objectify (per datastore) -->
+        <dependency>
+            <groupId>com.googlecode.objectify</groupId>
+            <artifactId>objectify</artifactId>
+            <version>5.1.24</version>
+        </dependency>
 
 
 
