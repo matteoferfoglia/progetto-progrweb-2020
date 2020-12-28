@@ -28,10 +28,10 @@ import java.security.NoSuchAlgorithmException;
 public class CreazioneCsrfToken {
 
     /** Numero di caratteri che formeranno il CSRF token. */
-    private static final short CSRF_TOKEN_LENGTH = 64;
+    private static final short CSRF_TOKEN_LENGTH = 64;      // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Numero di caratteri che formeranno il token identificativo per il client. */
-    private static final short CLIENT_ID_TOKEN_LENGTH = 64;
+    private static final short CLIENT_ID_TOKEN_LENGTH = 64; // TODO : creare variabile d'ambiente (parametrizzare)
 
 
     /**

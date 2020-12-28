@@ -1,5 +1,6 @@
 package it.units.progrweb.utils.JWT.component;
 
+import it.units.progrweb.utils.Base64Helper;
 import it.units.progrweb.utils.JWT.component.claim.JwtClaim;
 import it.units.progrweb.utils.JsonHelper;
 
@@ -14,6 +15,16 @@ public class JwtClaimsSet {
 
     /** Lista di claim. */
     private final Collection<JwtClaim> claimsSet;
+
+    /**
+     * Memorizza il claims set in formato JSON e codificato in
+     * Base64 Url-Encoded. Questo attributo permette di evitare
+     * calcoli duplicati, visto che il suo contenuto può tornare
+     * utile più colte durante la creazione di un token JWT.
+     * Idealmente: questo attributo verrà inizializzato appena
+     * quando qualche componente lo richiederà.
+     */
+    private String claimsSetInFormatJsonBase64UrlEncoded;
 
     public JwtClaimsSet() {
         claimsSet = new HashSet<>();
@@ -36,15 +47,17 @@ public class JwtClaimsSet {
     /**
      * Aggiunge un claim.
      */
-    public boolean addClaim(JwtClaim jwtClaim) {
-        return claimsSet.add(jwtClaim);
+    public void addClaim(JwtClaim jwtClaim) {
+        claimsSet.add(jwtClaim);
+        if(is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato())
+            calcolaClaimsSetInFormatJsonBase64UrlEncoded();
     }
 
     /**
      * Aggiunge una collection di claim.
      */
-    public boolean addAllClaims(Collection<? extends JwtClaim> collectionOfClaims) {
-        return claimsSet.addAll(collectionOfClaims);
+    public void addAllClaims(Collection<? extends JwtClaim> collectionOfClaims) {
+        collectionOfClaims.forEach(claim -> claimsSet.add(claim));
     }
 
     /**
@@ -64,18 +77,37 @@ public class JwtClaimsSet {
 
 
     /**
-     * Crea la rappresentazione JSON dell'insieme di claim.
-     * @return rappresentazione JSON.
+     * Crea la rappresentazione JSON e codificata in Base64
+     * Url-Encoded del claims set, quindi la memorizza
+     * nell'apposito attributo di questa classe
+     * ({@link #claimsSetInFormatJsonBase64UrlEncoded claimsSetInFormatJsonBase64UrlEncoded}).
      */
-    public String convertiClaimsSetToJson() {
+    private void calcolaClaimsSetInFormatJsonBase64UrlEncoded() {
 
         Map<String, String> mappaProprietaOggetto;
         mappaProprietaOggetto = claimsSet.stream()
                 .map(claim -> new AbstractMap.SimpleEntry<>(claim.getName(),claim.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaOggetto);
+        claimsSetInFormatJsonBase64UrlEncoded = Base64Helper.encodeToBase64UrlEncoded(JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaOggetto));
 
+    }
+
+    /**
+     * Restituisce la rappresentazione JSON e codificata in Base64
+     * Url-Encoded del claims set.
+     */
+    public String getClaimsSetInFormatJsonBase64UrlEncoded() {
+        if(! is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato())
+            calcolaClaimsSetInFormatJsonBase64UrlEncoded();
+
+        return claimsSetInFormatJsonBase64UrlEncoded;
+    }
+
+    /** Restituisce true se {@link #claimsSetInFormatJsonBase64UrlEncoded claimsSetInFormatJsonBase64UrlEncoded}
+     * è già stato inizializzato, false altrimenti.*/
+    private boolean is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato() {
+        return claimsSetInFormatJsonBase64UrlEncoded != null;
     }
 
     /**

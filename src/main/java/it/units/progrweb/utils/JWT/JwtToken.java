@@ -95,8 +95,8 @@ public class JwtToken {
 
         // TODO : la codifica a base 64 viene già fatta quando si deve calcolare la firma: è uno spreco di risorse ricalcolarla qui!
 
-        return Base64Helper.encodeToBase64UrlEncoded(header.convertiClaimsSetToJson())
-                + "." + Base64Helper.encodeToBase64UrlEncoded(payload.convertiClaimsSetToJson())
+        return header.getClaimsSetInFormatJsonBase64UrlEncoded()
+                + "." + payload.getClaimsSetInFormatJsonBase64UrlEncoded()
                 + "." + signature.getSignature();
     }
 

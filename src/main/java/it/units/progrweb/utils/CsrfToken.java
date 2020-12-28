@@ -36,16 +36,16 @@ import static it.units.progrweb.utils.TokenGenerator.generaTokenAlfanumerico;
 public class CsrfToken {
 
     /** Nome del cookie che si occuperà di trasmettere il token CSRF. {@link #creaCookieContenenteJWTToken()}. */
-    private static final String NOME_COOKIE_CSRF = "CSRF-TOKEN-JWT";
+    private static final String NOME_COOKIE_CSRF = "CSRF-TOKEN-JWT";       // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Nome del claim JWT il cui valore è il CSRF-token. */
-    private static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";
+    private static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";      // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Nome del del cookie mantenuto con questo server per verificare l'identità del client. */
-    private static final String NOME_COOKIE_CSRF_SUBJECT = "CSRF-TOKEN-SUBJECT";
+    private static final String NOME_COOKIE_CSRF_SUBJECT = "CSRF-TOKEN-SUBJECT";// TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Durata in secondi dei cookie e del token JWT. */
-    private static final int DURATA_TOKEN_IN_SECONDI = 30*60;
+    private static final int DURATA_TOKEN_IN_SECONDI = 30*60;               // TODO : creare variabile d'ambiente (parametrizzare)
 
 
     /** Valore di questa istanza di CSRF token.*/
@@ -193,7 +193,7 @@ public class CsrfToken {
         final String hostDomain = "";       // Host to which the cookie will be sent. If omitted, defaults to the host of the current document URL, not including subdomains.
         final int maxAge = DURATA_TOKEN_IN_SECONDI;
         final boolean secureCookie = false; // TODO : metterlo come variabile d'ambiente
-        final boolean httpOnly = true;
+        final boolean httpOnly = true;       // TODO : metterlo come variabile d'ambiente
 
         return new NewCookie(nomeCookie, valoreCookie, percorsoCookie, hostDomain,
                 descrizioneCookie, maxAge, secureCookie, httpOnly);
