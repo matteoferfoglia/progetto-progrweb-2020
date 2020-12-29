@@ -1,5 +1,7 @@
 package it.units.progrweb.utils.jwt.componenti.claim;
 
+import it.units.progrweb.utils.datetime.DateTime;
+
 /**
  * Classe per rappresentare il claim "Expiration Time".
  * <blockquote cite="https://tools.ietf.org/html/rfc7519#section-4.1.4>
@@ -23,7 +25,7 @@ public class JwtExpirationTimeClaim extends JwtClaim {
      */
     public JwtExpirationTimeClaim(int scadenzaInSecondiDaAdesso) {
         super(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME,
-                String.valueOf(scadenzaInSecondiDaAdesso+System.currentTimeMillis()/1000));
+                String.valueOf(scadenzaInSecondiDaAdesso+DateTime.currentTimeInSecondi()));
     }
 
     public JwtExpirationTimeClaim(JwtClaim jwtClaim) {
@@ -43,7 +45,7 @@ public class JwtExpirationTimeClaim extends JwtClaim {
      * @return true se il token a cui questo claim si riferisce è scaduto.
      */
     public boolean isScaduto() {
-        long tempoCorrenteInSecondi = System.currentTimeMillis()/1000;
+        long tempoCorrenteInSecondi = DateTime.currentTimeInSecondi();
         return tempoCorrenteInSecondi > Long.parseLong(this.getValue());
     }
 
