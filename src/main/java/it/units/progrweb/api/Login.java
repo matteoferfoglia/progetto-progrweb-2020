@@ -1,6 +1,6 @@
 package it.units.progrweb.api;
 
-import it.units.progrweb.entities.Attore;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.csrf.CsrfToken;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;

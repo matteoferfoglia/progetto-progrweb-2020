@@ -1,8 +1,8 @@
 package it.units.progrweb.listeners;
 
 import com.googlecode.objectify.ObjectifyService;
-import it.units.progrweb.entities.Administrator;
-import it.units.progrweb.entities.Attore;
+import it.units.progrweb.entities.attori.Administrator;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 
 import javax.servlet.ServletContextEvent;

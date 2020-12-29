@@ -1,6 +1,6 @@
 package it.units.progrweb.utils;
 
-import it.units.progrweb.entities.Attore;
+import it.units.progrweb.entities.attori.Attore;
 
 /**
  * Classe di utilità per gestire l'autenticazione degli utenti.
