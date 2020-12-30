@@ -31,7 +31,7 @@ import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanume
 public class CsrfToken {
 
     /** Nome del claim JWT il cui valore è il CSRF-token. */
-    private static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";      // TODO : creare variabile d'ambiente (parametrizzare)
+    public static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";      // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Durata in secondi del token JWT. */
     private static final int DURATA_TOKEN_IN_SECONDI = 30*60;               // TODO : creare variabile d'ambiente (parametrizzare)
