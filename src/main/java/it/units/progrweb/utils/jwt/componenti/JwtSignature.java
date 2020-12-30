@@ -51,8 +51,4 @@ public class JwtSignature {
         return signature.equals(((JwtSignature) o).signature);
     }
 
-    @Override
-    public int hashCode() {
-        return signature != null ? signature.hashCode() : 0;
-    }
 }

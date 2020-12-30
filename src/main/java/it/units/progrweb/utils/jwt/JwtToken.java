@@ -49,6 +49,8 @@ public class JwtToken {
     /** Data una stringa che codifica un token, crea un'istanza di questa classe. */
     public static JwtToken creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare) {
 
+        // TODO : test
+
         String[] componentiDelJwt = jwtToken_stringDaVerificare.split("\\.");
         if(componentiDelJwt.length != NUMERO_COMPONENTI_JWT)
             throw new IllegalArgumentException("Un token JWT dovrebbe essere costituito da"
@@ -151,6 +153,18 @@ public class JwtToken {
         return signature.equals(signatureCalcolata);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        // TODO : test
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JwtToken jwtToken = (JwtToken) o;
+
+        if (header != null ? !header.equals(jwtToken.header) : jwtToken.header != null) return false;
+        if (payload != null ? !payload.equals(jwtToken.payload) : jwtToken.payload != null) return false;
+        return signature != null ? signature.equals(jwtToken.signature) : jwtToken.signature == null;
+    }
 }
 
 

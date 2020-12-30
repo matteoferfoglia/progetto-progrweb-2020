@@ -110,6 +110,22 @@
 
 
         <!-- Test Dependencies -->
+        <dependency>    <!-- todo: serve? -->
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>    <!-- todo : serve ? -->
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>5.7.0</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+
+
+
         <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-testing</artifactId>

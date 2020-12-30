@@ -12,7 +12,7 @@ public class JwtClaim {
     public static final String JWT_SUBJECT_CLAIM_NAME = "sub";
 
     private final String name;
-    private final String value;
+    private String value;
 
     public JwtClaim(String name, String value) {
         this.name = name;
@@ -25,6 +25,10 @@ public class JwtClaim {
 
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }
 

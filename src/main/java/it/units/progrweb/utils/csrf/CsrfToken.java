@@ -75,22 +75,36 @@ public class CsrfToken {
     private JwtToken creaJwtToken()
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        JwtPayload jwtPayload;
-        {
-            // Creazione payload JWT
-            jwtPayload = new JwtPayload();
-            jwtPayload.addClaim(new JwtExpirationTimeClaim(DURATA_TOKEN_IN_SECONDI));
-            jwtPayload.addClaim(new JwtSubjectClaim(valoreIdentificativoClient));
-            jwtPayload.addClaim(new JwtClaim(NOME_CLAIM_CSRF_TOKEN, valoreCsrfToken));
-        }
-
+        JwtPayload jwtPayload = creaJwtPayload(valoreIdentificativoClient, valoreCsrfToken);
         return new JwtToken(jwtPayload);
+    }
+
+    /**
+     * Crea il JWT payload per {@link #creaJwtToken()}.
+     * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     */
+    private static JwtPayload creaJwtPayload(String valoreIdentificativoClient, String valoreCsrfToken) {
+        JwtPayload jwtPayload = new JwtPayload();
+
+        jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(DURATA_TOKEN_IN_SECONDI));
+        jwtPayload.aggiungiClaim(new JwtSubjectClaim(valoreIdentificativoClient));
+        jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_CSRF_TOKEN, valoreCsrfToken));
+
+        return jwtPayload;
     }
 
     public String getValoreCsrfToken() {
         return valoreCsrfToken;
     }
 
+    public JwtToken getJwtToken() {
+        return jwtToken;
+    }
+
+    public String getValoreIdentificativoClient() {
+        return valoreIdentificativoClient;
+    }
 
     /**
      * Verifica la validità del token CSRF, il quale è gestito tramite
@@ -109,8 +123,10 @@ public class CsrfToken {
      */
     public CsrfCookies creaCookiesPerCsrf() {
 
-        return new CsrfCookies( CsrfCookies.creaCookieContenenteJwtToken(jwtToken),
+        return new CsrfCookies(
+                CsrfCookies.creaCookieContenenteJwtToken(jwtToken),
                 CsrfCookies.creaCookieContenenteIdentificativoClient(valoreIdentificativoClient),
-                DURATA_TOKEN_IN_SECONDI );
+                DURATA_TOKEN_IN_SECONDI
+        );
     }
 }

@@ -17,7 +17,7 @@ public class GeneratoreTokenCasuali {
      * @return token alfanumerico di lunghezza data e caratteri arbitrari.
      */
     public static String generaTokenAlfanumerico(int lunghezzaToken) {
-        final String ALFABETO = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/"; // CSRF-token sarà composta da questi caratteri, presi casualmente
+        final String ALFABETO = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // CSRF-token sarà composta da questi caratteri, presi casualmente
         return new Random().ints(lunghezzaToken, 0, ALFABETO.length())
                 .mapToObj(indiceCasuale -> String.valueOf(ALFABETO.charAt(indiceCasuale)))
                 .collect(Collectors.joining());

@@ -25,7 +25,7 @@ public class JwtExpirationTimeClaim extends JwtClaim {
      */
     public JwtExpirationTimeClaim(int scadenzaInSecondiDaAdesso) {
         super(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME,
-                String.valueOf(scadenzaInSecondiDaAdesso+DateTime.currentTimeInSecondi()));
+                String.valueOf(scadenzaInSecondiDaAdesso + DateTime.currentTimeInSecondi()));
     }
 
     public JwtExpirationTimeClaim(JwtClaim jwtClaim) {

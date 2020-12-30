@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class JwtClaimsSet {
 
     /** Lista di claim. */
-    private final Collection<JwtClaim> claimsSet = new HashSet<>();
+    private final Collection<JwtClaim> claimsSet = new ArrayList<>();
 
     /**
      * Memorizza il claims set in formato JSON e codificato in
@@ -42,10 +42,35 @@ public class JwtClaimsSet {
     /**
      * Aggiunge un claim.
      */
-    public void addClaim(JwtClaim jwtClaim) {
-        claimsSet.add(jwtClaim);
+    public void aggiungiClaim(JwtClaim jwtClaimDaAggiungere) {
+        claimsSet.add(jwtClaimDaAggiungere);
         if(is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato())
             calcolaClaimsSetInFormatJsonBase64UrlEncoded();
+    }
+
+    /**
+     * Rimuove, se presente, il claim con il nome specificato.
+     * Se rimosso, restituisce true, altrimenti false.
+     */
+    public boolean rimuoviClaim(String nomeClaimDaRimuovere) {
+        try {
+            return claimsSet.remove(getClaimByName(nomeClaimDaRimuovere));
+        } catch(NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Modifica, se presente, il claim con il nome specificato.
+     * Se modificato, restituisce true, altrimenti false.
+     */
+    public boolean modificaValoreClaim(String nomeClaimDaModificare, String nuovoValore) {
+        try {
+            getClaimByName(nomeClaimDaModificare).setValue(nuovoValore);
+            return true;
+        } catch(NoSuchElementException e) {
+            return false;
+        }
     }
 
     /**
@@ -109,10 +134,46 @@ public class JwtClaimsSet {
         @SuppressWarnings("unchecked")
         Map<String, String> mappaProprietaOggettoJSON = (Map<String, String>) JsonHelper.convertiStringaJsonToMappaProprieta(claimSetJSON);
 
-        mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.addClaim(new JwtClaim(nomeClaim, valoreClaim)));
+        mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.aggiungiClaim(new JwtClaim(nomeClaim, valoreClaim)));
         claimsSet.calcolaClaimsSetInFormatJsonBase64UrlEncoded();
 
         return claimsSet;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        //TODO : test
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JwtClaimsSet that = (JwtClaimsSet) o;
+
+        if(claimsSet != null) {
+            boolean areClaimsSetsEquivalenti;
+
+            if(claimsSet.size()==that.claimsSet.size()){
+                // Ordina i claims per valore, li riunisce in una stringa e confronta le due stringhe
+                String stringaConTuttiIValoriDIUnClaim = ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa();
+                String stringaConTuttiIValoriDellAltroClaim = that.ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa();
+
+                return stringaConTuttiIValoriDIUnClaim.equals(stringaConTuttiIValoriDellAltroClaim);
+            }
+            return false;
+
+        } else {
+            return that.claimsSet == null;
+        }
+    }
+
+    /** Considera tutti i valori dei claim di quest'istanza, quindi
+     * li ordina alfabeticamente e li riunisce in una stringa, che restituisce.*/
+    private String ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa() {
+        return claimsSet.stream()
+                        .map(JwtClaim::getValue)
+                        .sorted()
+                        .collect(Collectors.joining("; "));
     }
 
 }

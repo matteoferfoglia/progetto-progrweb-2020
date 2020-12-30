@@ -24,7 +24,7 @@ public class CsrfCookies {
 
     /** Nome del del cookie mantenuto con questo server per verificare l'identità del client
      * ({@link #creaCookieContenenteIdentificativoClient(String)}).*/
-    private static final String NOME_COOKIE_CSRF_SUBJECT = "CSRF-TOKEN-SUBJECT";// TODO : creare variabile d'ambiente (parametrizzare)
+    public static final String NOME_COOKIE_CSRF_SUBJECT = "CSRF-TOKEN-SUBJECT";// TODO : creare variabile d'ambiente (parametrizzare)
 
 
     /** Conterrà il JWT token nel cui payload vi è il token CSRF ed un identificativo del client. */
