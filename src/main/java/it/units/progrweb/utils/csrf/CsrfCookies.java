@@ -3,6 +3,8 @@ package it.units.progrweb.utils.csrf;
 import it.units.progrweb.utils.Cookie;
 import it.units.progrweb.utils.jwt.JwtToken;
 
+import java.util.NoSuchElementException;
+
 import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodificata;
 
 /**
@@ -82,7 +84,7 @@ public class CsrfCookies {
                     identificativoClientOttenutoDaCookie,
                     nomeClaimCsrfTokenInJwtPayload
             );
-        } catch (Exception eccezioneCookieNonTrovati) {
+        } catch (NoSuchElementException eccezioneCookieNonTrovati) {
             // Restituisce false se non trova i cookie cercati
             return false;
         }
@@ -95,24 +97,24 @@ public class CsrfCookies {
      * client a cui quel CSRF token era stato rilasciato.
      * Si verifica anche la validità del token JWT.
      * @param valoreCsrfTokenDaVerificare Token CSRF da verificare.
-     * @param jwtTokenRicevutoContenenteValoreCrfEValoreIdentificativoClient Token JWT contenente nel payload il CSRF token e l'identificativo del client.
+     * @param jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient Token JWT contenente nel payload il CSRF token e l'identificativo del client.
      * @param valoreIdentificativoClientRicevuto Identificativo del client.
      * @param nomeClaimCsrfTokenInJwtPayload Nome del claim contenente il Csrf Token all'interno del token JWT.
      * @return true se il token specificato nel primo parametro è verificato
      * e valido, false altrimenti.
      */
     private static boolean isCsrfTokenValido(String valoreCsrfTokenDaVerificare,
-                                             JwtToken jwtTokenRicevutoContenenteValoreCrfEValoreIdentificativoClient,
+                                             JwtToken jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient,
                                              String valoreIdentificativoClientRicevuto,
                                              String nomeClaimCsrfTokenInJwtPayload) {
 
-        String valoreCsrfTokenDaJwt = jwtTokenRicevutoContenenteValoreCrfEValoreIdentificativoClient
+        String valoreCsrfTokenDaJwt = jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
 
-        String valoreIdentificativoClientDaJwt = jwtTokenRicevutoContenenteValoreCrfEValoreIdentificativoClient
+        String valoreIdentificativoClientDaJwt = jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getSubjectClaim();
 
-        return jwtTokenRicevutoContenenteValoreCrfEValoreIdentificativoClient.isTokenValido()
+        return jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient.isTokenValido()
                 && valoreCsrfTokenDaJwt.equals(valoreCsrfTokenDaVerificare)
                 && valoreIdentificativoClientDaJwt.equals(valoreIdentificativoClientRicevuto);
     }
