@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 
 import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodificata;
 
+// TODO : refactoring : separare meglio la parte di csrf token da jwt token da cookie
+
 /**
  * Classe per la rappresentazione dei cookie necessari
  * per il corretto utilizzo del token CSRF.

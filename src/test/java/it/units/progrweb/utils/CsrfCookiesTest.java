@@ -29,30 +29,35 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  */
 public class CsrfCookiesTest {
 
-    private static final int QUANTI_TEST_PER_OGNI_TIPO = 1000;  // numero di "iterazioni" di ogni test (con parametri diversi)
+    private static final int QUANTI_TEST_PER_OGNI_TIPO = 1000;  // numero di "iterazioni" di ogni test (con parametri diversi) // TODO : VARIABILE D'AMBIENTE
         // mantenere elevato il numero di test perché ci sono parametri aleatori (generati casualmente)
 
     /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String)}.
      * Viene generato il token CSRF e l'identificativo del client (allo stesso
-     * modo di quando lo richiede un client), da cui si crea il token JWT, quindi
-     * viene verificata la validità di quest'ultimo. */
-    @SuppressWarnings("JavadocReference")   // Anche se metodi inaccessibili da qui, questa classe serve solo per i test (non in produzione), non serve che mi segnali i warning di JavaDoc
+     * modo di quando un client ne fa richiesta), poi viene creato il token
+     * JWT (allo stesso modo di come verrebbe creato per il client), infine
+     * viene ricreato un nuovo token JWT nel server, con lo stesso payload
+     * e si verifica che i due token (quello creato per il client e quello
+     * ricreato nel server) siano uguali ({@link JwtToken#equals(Object)}).
+     * Questo test è necessario perché la verifica di un token JWT avviene
+     * in modo simile (vedere {@link CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String)}
+     * {@link JwtToken#isTokenValido()}, {@link JwtToken#isSignatureValida()})*/
     @RepeatedTest(QUANTI_TEST_PER_OGNI_TIPO) // questo test fa uso di valori casuali, quindi ripeterlo potrebbe portare a risultati diversi
     void test_verificaValiditaTokenCsrf() {
 
-        // TODO : rivedere questo metodo (la descrizione è coerente con ciò che fa?)
+        // TODO : rivedere questo metodo (la descrizione è coerente con ciò che fa? Serve?)
 
         try {
             CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH);
             String valoreCsrfTokenDaVerificare = csrfToken.getValoreCsrfToken();
             String valoreIdentificativoClientRicevuto =csrfToken.getValoreIdentificativoClient();
 
-            JwtToken jwtTokenDalClient;
+            JwtToken jwtTokenDelClient;
             {
                 // Creazione del token JWT, come verrebbe creato per un client
                 Method metodoCreaJwtToken = CsrfToken.class.getDeclaredMethod("creaJwtToken");
                 metodoCreaJwtToken.setAccessible(true);
-                jwtTokenDalClient = (JwtToken) metodoCreaJwtToken.invoke(csrfToken);
+                jwtTokenDelClient = (JwtToken) metodoCreaJwtToken.invoke(csrfToken);
             }
 
 
@@ -63,14 +68,15 @@ public class CsrfCookiesTest {
                 Method metodoCreaJwtPayload = CsrfToken.class.getDeclaredMethod("creaJwtPayload",
                         String.class, String.class);
                 metodoCreaJwtPayload.setAccessible(true);
-                JwtPayload jwtPayloadRicreato = (JwtPayload) metodoCreaJwtPayload.invoke(null, valoreIdentificativoClientRicevuto, valoreCsrfTokenDaVerificare);
+                JwtPayload jwtPayloadRicreato = (JwtPayload) metodoCreaJwtPayload.invoke(null,
+                        valoreIdentificativoClientRicevuto, valoreCsrfTokenDaVerificare);
 
                 {
                     // Imposta lo stesso ExpirationTimeClaim impostato nel token del client
 
                     Field jwtPayloadDelClientField = JwtToken.class.getDeclaredField("payload");
                     jwtPayloadDelClientField.setAccessible(true);
-                    JwtPayload jwtPayloadDelClient = (JwtPayload) jwtPayloadDelClientField.get(jwtTokenDalClient);
+                    JwtPayload jwtPayloadDelClient = (JwtPayload) jwtPayloadDelClientField.get(jwtTokenDelClient);
                     JwtClaim expirationTimeClaimClient = jwtPayloadDelClient.getClaimByName(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME);
 
                     jwtPayloadRicreato.modificaValoreClaim(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME, expirationTimeClaimClient.getValue());
@@ -79,7 +85,7 @@ public class CsrfCookiesTest {
                 jwtTokenRicreatoNelServer = new JwtToken(jwtPayloadRicreato);
             }
 
-            assertTrue(jwtTokenDalClient.equals(jwtTokenRicreatoNelServer));
+            assertTrue(jwtTokenDelClient.equals(jwtTokenRicreatoNelServer));
 
 
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchMethodException
@@ -98,7 +104,6 @@ public class CsrfCookiesTest {
      * @param isCsrfCookieValido_expected è il risultato atteso: true se il cookie con
      *                                    il token csrf è valido.
      */
-    @SuppressWarnings("JavadocReference")   // Anche se metodi inaccessibili da qui, questa classe serve solo per i test (non in produzione), non serve che mi segnali i warning di JavaDoc
     @ParameterizedTest
     @MethodSource("generaParametri")
     void test_verificaValiditaCookieCsrf(String valoreCsrfTokenDaVerificare,

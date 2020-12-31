@@ -11,8 +11,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
 
 /**
- * Classe per la gestione dei token JWT.
- * Fonte: https://metamug.com/article/security/jwt-java-tutorial-create-verify.html
+ * Classe per la gestione dei token JWT
+ * (<a href="https://metamug.com/article/security/jwt-java-tutorial-create-verify.html">Fonte</a>).
  */
 public class JwtToken {
 
