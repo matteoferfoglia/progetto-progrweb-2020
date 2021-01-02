@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 /**
  * Classe per la rappresentazione di un insieme di claim JWT,
  * cioè il JWT header o il JWT payload.
+ * @param <TipoValoreClaim>: i {@link JwtClaim} possono avere valori
+ *                           di tipo diverso: qua viene parametrizzato.
+ * @author Matteo Ferfoglia
  */
-public class JwtClaimsSet {
+public class JwtClaimsSet<TipoValoreClaim> {
 
     /** Lista di claim. */
     private final Collection<JwtClaim> claimsSet = new ArrayList<>();
@@ -34,6 +37,7 @@ public class JwtClaimsSet {
         claimsSet.addAll(jwtClaimSet);
     }
 
+    /** Crea un nuovo JwtClaimsSet a partire da uno dato.*/
     protected JwtClaimsSet(JwtClaimsSet jwtClaimsSet) {
         this(jwtClaimsSet.claimsSet);
         this.claimsSetInFormatJsonBase64UrlEncoded = jwtClaimsSet.claimsSetInFormatJsonBase64UrlEncoded;
@@ -64,7 +68,7 @@ public class JwtClaimsSet {
      * Modifica, se presente, il claim con il nome specificato.
      * Se modificato, restituisce true, altrimenti false.
      */
-    public boolean modificaValoreClaim(String nomeClaimDaModificare, String nuovoValore) {
+    public boolean modificaValoreClaim(String nomeClaimDaModificare, TipoValoreClaim nuovoValore) {
         try {
             getClaimByName(nomeClaimDaModificare).setValue(nuovoValore);
             return true;
@@ -94,13 +98,19 @@ public class JwtClaimsSet {
      * Url-Encoded del claims set, quindi la memorizza
      * nell'apposito attributo di questa classe
      * ({@link #claimsSetInFormatJsonBase64UrlEncoded claimsSetInFormatJsonBase64UrlEncoded}).
+     * @throws IllegalStateException se due claim hanno lo stesso nome.
      */
-    private void calcolaClaimsSetInFormatJsonBase64UrlEncoded() {
+    private void calcolaClaimsSetInFormatJsonBase64UrlEncoded()
+            throws IllegalStateException{
 
-        Map<String, String> mappaProprietaOggetto;
-        mappaProprietaOggetto = claimsSet.stream()
-                .map(claim -> new AbstractMap.SimpleEntry<>(claim.getName(),claim.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, Object> mappaProprietaOggetto = claimsSet.stream()
+                .collect(Collectors.toMap(
+                        jwtClaim -> jwtClaim.getName(),
+                        jwtClaim -> jwtClaim.getValue(),
+                        (k,v) -> {
+                            throw new IllegalStateException("Errore: due claim non possono avere lo stesso nome.");    // il nome del claim è la chiave di questa mappa
+                        },
+                        LinkedHashMap::new));  // mantiene l'ordine dei claim come in claimsSet (Fonte: https://stackoverflow.com/a/29090335)*/
 
         claimsSetInFormatJsonBase64UrlEncoded = Base64Helper.encodeToBase64UrlEncoded(JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaOggetto));
 
@@ -131,8 +141,8 @@ public class JwtClaimsSet {
 
         JwtClaimsSet claimsSet = new JwtClaimsSet();
 
-        @SuppressWarnings("unchecked")
-        Map<String, String> mappaProprietaOggettoJSON = (Map<String, String>) JsonHelper.convertiStringaJsonToMappaProprieta(claimSetJSON);
+        Map<String, Object> mappaProprietaOggettoJSON = JsonHelper.convertiStringaJsonToMappaProprieta(claimSetJSON);
+        // TODO : il json supporta anche formati non stringa (numero/null/booolean/array...): trovare il modo di salvare il claim con il tipo corretto, non come stringa
 
         mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.aggiungiClaim(new JwtClaim(nomeClaim, valoreClaim)));
         claimsSet.calcolaClaimsSetInFormatJsonBase64UrlEncoded();
@@ -151,7 +161,6 @@ public class JwtClaimsSet {
         JwtClaimsSet that = (JwtClaimsSet) o;
 
         if(claimsSet != null) {
-            boolean areClaimsSetsEquivalenti;
 
             if(claimsSet.size()==that.claimsSet.size()){
                 // Ordina i claims per valore, li riunisce in una stringa e confronta le due stringhe
@@ -171,7 +180,7 @@ public class JwtClaimsSet {
      * li ordina alfabeticamente e li riunisce in una stringa, che restituisce.*/
     private String ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa() {
         return claimsSet.stream()
-                        .map(JwtClaim::getValue)
+                        .map(jwtClaim -> String.valueOf(jwtClaim.getValue()))
                         .sorted()
                         .collect(Collectors.joining("; "));
     }

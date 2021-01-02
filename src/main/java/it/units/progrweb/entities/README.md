@@ -33,7 +33,7 @@ entità nel database.
 >
 >* `String` fields which store more than 500 characters (the GAE limit) are automatically
    > converted to `Text` internally.  Note that `Text` fields, like `Blob` fields, are never
-   > indexed (see [[Queries]]).
+   > indexed.
 >
 >* `byte[]` fields are automatically converted to `Blob` internally.  However, `Byte[]` is
    > persisted "normally" as an array of (potentially indexed) `Byte` objects.  Note that

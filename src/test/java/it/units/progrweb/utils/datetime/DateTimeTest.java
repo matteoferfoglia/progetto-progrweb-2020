@@ -305,8 +305,8 @@ public class DateTimeTest {
                                                               .collect(Collectors.toList());
 
         return generaParametri_Instant().limit(limiteNellaGenerazione)
-                                        .flatMap(argument -> {
-            Instant primoIstante = (Instant) argument.get()[0];
+                                        .flatMap(arguments -> {
+            Instant primoIstante = (Instant) arguments.get()[0];
             return listaIstanti.stream().map(secondoIstante -> arguments(primoIstante, secondoIstante));
         }).limit(LIMIT);
     }

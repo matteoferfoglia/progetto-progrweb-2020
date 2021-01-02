@@ -35,6 +35,11 @@ public class JwtSignature {
         this.signature = signature;
     }
 
+    /** Restituisce una nuova istanza di questa classe, copia di quella data nel parametro.*/
+    public JwtSignature(JwtSignature signatureDaCopiare) {
+        this.signature = signatureDaCopiare.signature;
+    }
+
     public String getSignature() {
         return signature;
     }

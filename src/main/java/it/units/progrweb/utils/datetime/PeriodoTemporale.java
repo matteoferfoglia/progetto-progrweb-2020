@@ -6,8 +6,6 @@ package it.units.progrweb.utils.datetime;
  */
 public class PeriodoTemporale {
 
-    // TODO : testare questa classe
-
     /**
      * Data iniziale del periodo temporale.
      */

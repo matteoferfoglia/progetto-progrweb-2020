@@ -13,8 +13,10 @@ import java.util.NoSuchElementException;
 /**
  * Classe per la gestione dei token JWT
  * (<a href="https://metamug.com/article/security/jwt-java-tutorial-create-verify.html">Fonte</a>).
+ * @param <TipoValoreClaim>: i {@link JwtClaim} possono avere valori
+ *                         di tipo diverso: qua viene parametrizzato.
  */
-public class JwtToken {
+public class JwtToken<TipoValoreClaim> {
 
     private final JwtHeader header;
     private final JwtPayload payload;
@@ -34,10 +36,17 @@ public class JwtToken {
 
         // TODO :  la creazione di un token JWT dovrebbe seguire l'iter descritto dalle specifiche (https://tools.ietf.org/html/rfc7519#section-7.2)
 
-        this.header = new JwtHeader(JwtSignature.getAlgoritmoHash());
-        this.payload = payload;
-        this.signature = new JwtSignature(this.header, this.payload);
+        this(   new JwtHeader(JwtSignature.getAlgoritmoHash()),
+                payload,
+                new JwtSignature(new JwtHeader(JwtSignature.getAlgoritmoHash()), payload)   );
+    }
 
+    /** Restituisce una nuova istanza di questa classe, copiando tutti gli
+     * attributi dell'istanza passata come parametro.*/
+    private JwtToken(JwtToken jwtTokenDaCopiare) {
+        this(new JwtHeader(jwtTokenDaCopiare.header),
+                new JwtPayload(jwtTokenDaCopiare.payload),
+                new JwtSignature(jwtTokenDaCopiare.signature));
     }
 
     private JwtToken(JwtHeader header, JwtPayload payload, JwtSignature signature) {
@@ -70,13 +79,13 @@ public class JwtToken {
      * Tale claim viene cercato sia nell'header sia nel payload.
      * @throws NoSuchElementException se non è presente alcun claim con il nome specificato.
      */
-    public String getValoreClaimByName(String nomeClaim){
-        String valoreClaim;
+    public TipoValoreClaim getValoreClaimByName(String nomeClaim){
+        TipoValoreClaim valoreClaim;
         try{
-            valoreClaim = header.getClaimByName(nomeClaim).getValue();
+            valoreClaim = (TipoValoreClaim) header.getClaimByName(nomeClaim).getValue();
         } catch (NoSuchElementException ne) {
             try {
-                valoreClaim = payload.getClaimByName(nomeClaim).getValue();
+                valoreClaim = (TipoValoreClaim) payload.getClaimByName(nomeClaim).getValue();
             } catch (NoSuchElementException ne2) {
                 throw new NoSuchElementException("Claim non trovato.");
             }
@@ -89,15 +98,12 @@ public class JwtToken {
      * @throws NoSuchElementException Se il claim cercato non è presente.
      * @return Il claim corrispondente al nome cercato.
      */
-    public String getSubjectClaim() {
+    public TipoValoreClaim getSubjectClaim() {
         return getValoreClaimByName(JwtClaim.JWT_SUBJECT_CLAIM_NAME);
     }
 
     /** Genera il token JWT, già firmato e nella codifica corretta (Base64 separato da punti).*/
-    public String generaTokenJson() {
-
-        // TODO : la codifica a base 64 viene già fatta quando si deve calcolare la firma: è uno spreco di risorse ricalcolarla qui!
-
+    public String generaTokenJsonCodificatoBase64UrlEncoded() {
         return header.getClaimsSetInFormatJsonBase64UrlEncoded()
                 + "." + payload.getClaimsSetInFormatJsonBase64UrlEncoded()
                 + "." + signature.getSignature();
@@ -121,7 +127,7 @@ public class JwtToken {
      * esso rappresentato è strettamente inferiore ai quella corrente
      * allora restituisce true.
      */
-    private boolean isTokenScaduto() {
+    public boolean isTokenScaduto() {
 
         boolean isTokenScaduto;
         try{
@@ -141,7 +147,7 @@ public class JwtToken {
      * firma viene ricalcolata e deve coincidere con quella di questa
      * istanza, altrimenti quest'istanza viene considerata invalida.
      */
-    private boolean isSignatureValida() {
+    public boolean isSignatureValida() {
 
         JwtSignature signatureCalcolata;
         try {

@@ -60,7 +60,7 @@ public class CsrfToken {
 
         this.valoreCsrfToken = generaTokenAlfanumerico(csrf_token_length);
         this.valoreIdentificativoClient = generaTokenAlfanumerico(id_client_length);
-        this.jwtToken = creaJwtToken();
+        this.jwtToken = creaJwtToken(); // TODO : questo dovrebbe essere un metodo statico di JwtToken
     }
 
 

@@ -67,6 +67,7 @@ public class DateTime implements Comparable<DateTime> {
         return new DateTime(Instant.now());
     }
 
+    /** Restituisce il numero di secondi trascorsi dal 1970-01-01T00:00:00Z*/
     public static long currentTimeInSecondi() {
         return adesso().istanteTemporale.getEpochSecond();
     }

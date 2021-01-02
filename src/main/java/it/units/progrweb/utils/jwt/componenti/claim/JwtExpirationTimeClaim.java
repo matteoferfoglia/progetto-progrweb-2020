@@ -25,7 +25,7 @@ public class JwtExpirationTimeClaim extends JwtClaim {
      */
     public JwtExpirationTimeClaim(int scadenzaInSecondiDaAdesso) {
         super(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME,
-                String.valueOf(scadenzaInSecondiDaAdesso + DateTime.currentTimeInSecondi()));
+                scadenzaInSecondiDaAdesso + DateTime.currentTimeInSecondi());
     }
 
     public JwtExpirationTimeClaim(JwtClaim jwtClaim) {
@@ -46,7 +46,11 @@ public class JwtExpirationTimeClaim extends JwtClaim {
      */
     public boolean isScaduto() {
         long tempoCorrenteInSecondi = DateTime.currentTimeInSecondi();
-        return tempoCorrenteInSecondi > Long.parseLong(this.getValue());
+        long tempoScadenzaQuestoTokenInSecondi = this.getValue() instanceof String ?
+                                                    Long.parseLong((String) this.getValue()) :
+                                                    (long)this.getValue();
+
+        return tempoCorrenteInSecondi > tempoScadenzaQuestoTokenInSecondi;
     }
 
 }

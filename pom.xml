@@ -56,13 +56,6 @@
             <version>0.8</version>
         </dependency>
 
-        <!-- JSON -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20201115</version>
-        </dependency>
-
         <!--Jersey! -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>

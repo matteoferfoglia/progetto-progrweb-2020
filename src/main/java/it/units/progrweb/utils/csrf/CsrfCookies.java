@@ -50,13 +50,13 @@ public class CsrfCookies {
 
 
     public static Cookie creaCookieContenenteJwtToken(JwtToken jwtToken) {
-        return new Cookie(NOME_COOKIE_CSRF, jwtToken.generaTokenJson(),
-                "Cookie contenente un valore identificativo per il client");
+        return new Cookie(NOME_COOKIE_CSRF, jwtToken.generaTokenJsonCodificatoBase64UrlEncoded(),
+                "Cookie contenente il token JWT il cui payload contiene il token CSRF");
     }
 
     public static Cookie creaCookieContenenteIdentificativoClient(String valoreIdentificativoClient) {
         return new Cookie(NOME_COOKIE_CSRF_SUBJECT, valoreIdentificativoClient,
-                "Cookie contenente il token JWT il cui payload contiene il token CSRF");
+                "Cookie contenente un valore identificativo per il client");
     }
 
     /**
@@ -72,7 +72,7 @@ public class CsrfCookies {
      */
     static boolean isCsrfTokenValido(String valoreTokenCsrfDaVerificare,
                                      String cookieHeader,
-                                     @SuppressWarnings("SameParameterValue") String nomeClaimCsrfTokenInJwtPayload) {
+                                     String nomeClaimCsrfTokenInJwtPayload) {
 
         try {
             Cookie[] cookies = Cookie.trovaCookiesDaHeader(cookieHeader);
@@ -110,10 +110,10 @@ public class CsrfCookies {
                                              String valoreIdentificativoClientRicevuto,
                                              String nomeClaimCsrfTokenInJwtPayload) {
 
-        String valoreCsrfTokenDaJwt = jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+        String valoreCsrfTokenDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
 
-        String valoreIdentificativoClientDaJwt = jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+        String valoreIdentificativoClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getSubjectClaim();
 
         return jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient.isTokenValido()
