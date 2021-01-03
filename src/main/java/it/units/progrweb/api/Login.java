@@ -2,10 +2,12 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.csrf.CsrfToken;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.csrf.CsrfToken;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -17,9 +19,12 @@ public class Login {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public String login(CampiFormLogin campiFormLogin, @HeaderParam("Cookie") String cookieHeader){
+    public String login(CampiFormLogin campiFormLogin,
+                        @HeaderParam("Cookie") String cookieHeader,
+                        @Context HttpServletRequest httpServletRequest){
         // TODO metodo e signature
-        if(CsrfToken.isCsrfTokenValido(campiFormLogin.getCsrfToken(), cookieHeader)) {
+        String indirizzoIPClient = httpServletRequest.getRemoteAddr();
+        if(CsrfToken.isCsrfTokenValido(campiFormLogin.getCsrfToken(), cookieHeader, indirizzoIPClient)) {
 
             Attore attore = Autenticazione.getAttoreDaCredenziali(campiFormLogin.getUsername(), campiFormLogin.getPassword());
             if(Autenticazione.isAttoreAutenticato(attore)) {

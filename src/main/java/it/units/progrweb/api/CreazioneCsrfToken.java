@@ -3,9 +3,11 @@ package it.units.progrweb.api;
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.InvalidKeyException;
@@ -42,15 +44,18 @@ public class CreazioneCsrfToken {
      * (<a href="https://stackoverflow.com/a/28004533">Fonte</a>).
      * Un ulteriore cookie è usato per l'identità del client.
      * Vedere {@link CsrfToken} e {@link CsrfCookies} per i dettagli.
+     * <a href="https://stackoverflow.com/a/14255549">Fonte
+     * (Recupero indirizzo IP del client in JAX-RS)</a>.
      */
     @GET
     @Path("/generaCSRFToken")
     @Produces(MediaType.TEXT_PLAIN)
-    public static Response creaCookiesConCsrfTokenEdIdentificativoClient(){
+    public static Response creaCookiesConCsrfTokenEdIdentificativoClient(@Context HttpServletRequest httpServletRequest){
 
         try {
 
-            CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH);
+            String IPClient = httpServletRequest.getRemoteAddr();
+            CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH, IPClient);
 
             // Creazione cookies
             CsrfCookies csrfCookies = csrfToken.creaCookiesPerCsrf();

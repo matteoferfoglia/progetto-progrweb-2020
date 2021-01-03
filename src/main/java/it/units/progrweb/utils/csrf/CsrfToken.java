@@ -25,13 +25,21 @@ import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanume
  * Quest'ultimo valore identificativo del client viene aggiunto anche
  * come claim del JWT token di cui sopra (così è possibile effettuare
  * una "verifica incrociata" sull'identità del client).
+ * All'interno del token JWT vi è anche un claim contenente l'indirizzo
+ * IP del client che ha richiesto il token CSRF: al momento della verifica
+ * del token CSRF, si verifica che venga utilizzato dal client con lo
+ * stesso indirizzo IP (è una misura di sicurezza aggiuntiva).
  *
  * @author Matteo Ferfoglia
  */
 public class CsrfToken {
 
     /** Nome del claim JWT il cui valore è il CSRF-token. */
-    public static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";      // TODO : creare variabile d'ambiente (parametrizzare)
+    public static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";        // TODO : creare variabile d'ambiente (parametrizzare)
+
+    /** Nome del claim JWT il cui valore è l'indirizzo IP
+     * del client a cui è stato rilasciato il token CSRF.*/
+    public static final String NOME_CLAIM_IP_CLIENT = "IP-CLIENT";          // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Durata in secondi del token JWT. */
     private static final int DURATA_TOKEN_IN_SECONDI = 30*60;               // TODO : creare variabile d'ambiente (parametrizzare)
@@ -43,6 +51,9 @@ public class CsrfToken {
     /** Valore identificativo per il client a cui questo CSRF token è stato rilasciato.*/
     private final String valoreIdentificativoClient;
 
+    /** Valore indirizzo IP del client a cui questo CSRF token è stato rilasciato.*/
+    private final String indirizzoIPClient;
+
     /** JWT token contenente il valore di questa istanza di CSRF token
      * e dell'identificativo del client che lo ha richiesto. */
     private final JwtToken jwtToken;
@@ -52,15 +63,18 @@ public class CsrfToken {
      * Crea il CSRF token.
      * @param csrf_token_length Lunghezza del token CSRF.
      * @param id_client_length Lunghezza dell'identificativo del client che ha richiesto il token CSRF.
+     * @param indirizzoIPClient Indirizzo IP del client che ha fatto richiesta del CSRF token.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
-    public CsrfToken(int csrf_token_length, int id_client_length)
+    public CsrfToken(int csrf_token_length, int id_client_length, String indirizzoIPClient)
             throws NoSuchAlgorithmException, InvalidKeyException {
 
         this.valoreCsrfToken = generaTokenAlfanumerico(csrf_token_length);
         this.valoreIdentificativoClient = generaTokenAlfanumerico(id_client_length);
+        this.indirizzoIPClient = indirizzoIPClient;
         this.jwtToken = creaJwtToken(); // TODO : questo dovrebbe essere un metodo statico di JwtToken
+            // TODO : rendere creaJwtToken() metodo statico di JWT token e passargli i claim del payload
     }
 
 
@@ -75,27 +89,35 @@ public class CsrfToken {
     private JwtToken creaJwtToken()
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        JwtPayload jwtPayload = creaJwtPayload(valoreIdentificativoClient, valoreCsrfToken);
+        JwtPayload jwtPayload = creaJwtPayload(valoreIdentificativoClient, valoreCsrfToken, indirizzoIPClient);
         return new JwtToken(jwtPayload);
     }
 
     /**
-     * Crea il JWT payload per {@link #creaJwtToken()}.
+     * Crea il JWT payload per {@link #creaJwtToken()} ()}.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
-    private static JwtPayload creaJwtPayload(String valoreIdentificativoClient, String valoreCsrfToken) {
+    private static JwtPayload creaJwtPayload(String valoreIdentificativoClient,
+                                             String valoreCsrfToken,
+                                             String indirizzoIPClient) {
+
         JwtPayload jwtPayload = new JwtPayload();
 
         jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(DURATA_TOKEN_IN_SECONDI));
         jwtPayload.aggiungiClaim(new JwtSubjectClaim(valoreIdentificativoClient));
         jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_CSRF_TOKEN, valoreCsrfToken));
+        jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_IP_CLIENT, indirizzoIPClient));
 
         return jwtPayload;
     }
 
     public String getValoreCsrfToken() {
         return valoreCsrfToken;
+    }
+
+    public String getValoreIPClient() {
+        return indirizzoIPClient;
     }
 
     public JwtToken getJwtToken() {
@@ -109,11 +131,14 @@ public class CsrfToken {
     /**
      * Verifica la validità del token CSRF, il quale è gestito tramite
      * cookie, quindi è la classe {@link CsrfCookies} ad occuparsene.
-     * Vedere{@link CsrfCookies#isCsrfTokenValido(String, String, String)}.
+     * Vedere{@link CsrfCookies#isCsrfTokenValido(String, String, String, String, String)}.
      */
-    public static boolean isCsrfTokenValido(String valoreTokenCsrf, String cookieHeader) {
+    public static boolean isCsrfTokenValido(String valoreTokenCsrf,
+                                            String cookieHeader,
+                                            String indirizzoIPClient) {
 
-        return CsrfCookies.isCsrfTokenValido(valoreTokenCsrf, cookieHeader, NOME_CLAIM_CSRF_TOKEN);
+        return CsrfCookies.isCsrfTokenValido(valoreTokenCsrf, cookieHeader, indirizzoIPClient,
+                                             NOME_CLAIM_CSRF_TOKEN, NOME_CLAIM_IP_CLIENT);
 
     }
 

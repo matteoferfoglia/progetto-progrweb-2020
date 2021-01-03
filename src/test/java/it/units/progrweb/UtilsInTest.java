@@ -2,6 +2,7 @@ package it.units.progrweb;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -39,4 +40,14 @@ public class UtilsInTest {
         System.out.println(daStampare); // TODO : temporaneo, da implementare
     }
 
+    /** Genera casualmente un indirizzo IPv4. */
+    public static String generaIndirizzoIP() {
+
+        final int NUMERO_BYTES_IPV4 = 4;
+        final int VALORE_MASSIMO_UN_BYTE = 255 ;
+        return IntStream.range(0,NUMERO_BYTES_IPV4)
+                        .mapToObj(contatoreByteIndirizzo -> String.valueOf((int)(Math.random()*VALORE_MASSIMO_UN_BYTE)))
+                        .collect(Collectors.joining("."));
+
+    }
 }

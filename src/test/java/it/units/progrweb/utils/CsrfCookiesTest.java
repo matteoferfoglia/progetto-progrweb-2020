@@ -32,7 +32,7 @@ public class CsrfCookiesTest {
     private static final int QUANTI_TEST_PER_OGNI_TIPO = 1000;  // numero di "iterazioni" di ogni test (con parametri diversi) // TODO : VARIABILE D'AMBIENTE
         // mantenere elevato il numero di test perché ci sono parametri aleatori (generati casualmente)
 
-    /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String)}.
+    /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
      * Viene generato il token CSRF e l'identificativo del client (allo stesso
      * modo di quando un client ne fa richiesta), poi viene creato il token
      * JWT (allo stesso modo di come verrebbe creato per il client), infine
@@ -40,7 +40,7 @@ public class CsrfCookiesTest {
      * e si verifica che i due token (quello creato per il client e quello
      * ricreato nel server) siano uguali ({@link JwtToken#equals(Object)}).
      * Questo test è necessario perché la verifica di un token JWT avviene
-     * in modo simile (vedere {@link CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String)}
+     * in modo simile (vedere {@link CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}
      * {@link JwtToken#isTokenValido()}, {@link JwtToken#isSignatureValida()})*/
     @RepeatedTest(QUANTI_TEST_PER_OGNI_TIPO) // questo test fa uso di valori casuali, quindi ripeterlo potrebbe portare a risultati diversi
     void test_verificaValiditaTokenCsrf() {
@@ -48,7 +48,10 @@ public class CsrfCookiesTest {
         // TODO : rivedere questo metodo (la descrizione è coerente con ciò che fa? Serve?)
 
         try {
-            CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH);
+
+            String indirizzoIPClient = UtilsInTest.generaIndirizzoIP();
+
+            CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH, indirizzoIPClient);
             String valoreCsrfTokenDaVerificare = csrfToken.getValoreCsrfToken();
             String valoreIdentificativoClientRicevuto =csrfToken.getValoreIdentificativoClient();
 
@@ -66,10 +69,10 @@ public class CsrfCookiesTest {
             JwtToken jwtTokenRicreatoNelServer;
             {
                 Method metodoCreaJwtPayload = CsrfToken.class.getDeclaredMethod("creaJwtPayload",
-                        String.class, String.class);
+                        String.class, String.class, String.class);
                 metodoCreaJwtPayload.setAccessible(true);
                 JwtPayload jwtPayloadRicreato = (JwtPayload) metodoCreaJwtPayload.invoke(null,
-                        valoreIdentificativoClientRicevuto, valoreCsrfTokenDaVerificare);
+                        valoreIdentificativoClientRicevuto, valoreCsrfTokenDaVerificare, indirizzoIPClient);
 
                 {
                     // Imposta lo stesso ExpirationTimeClaim impostato nel token del client
@@ -97,7 +100,7 @@ public class CsrfCookiesTest {
     }
 
 
-    /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(java.lang.String, it.units.progrweb.utils.jwt.JwtToken, java.lang.String, java.lang.String)}.
+    /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
      * @param valoreCsrfTokenDaVerificare è il token CSRF da verificare (ottenuto dal
      *                                    form in cui è stato usato)
      * @param cookieHeader è il cookie header (testuale) ricevuto dalla richiesta HTTP.
@@ -107,21 +110,25 @@ public class CsrfCookiesTest {
     @ParameterizedTest
     @MethodSource("generaParametri")
     void test_verificaValiditaCookieCsrf(String valoreCsrfTokenDaVerificare,
+                                         String indirizzoIPClient,
                                          String cookieHeader,
                                          boolean isCsrfCookieValido_expected ) {
 
         try {
-            Method metodoProtettoDaTestare = CsrfCookies.class.getDeclaredMethod("isCsrfTokenValido", String.class, String.class, String.class);
+            Method metodoProtettoDaTestare = CsrfCookies.class.getDeclaredMethod("isCsrfTokenValido",
+                    String.class, String.class, String.class, String.class, String.class);
             metodoProtettoDaTestare.setAccessible(true);
 
             boolean risultatoOttenuto = (boolean) metodoProtettoDaTestare.invoke(null,
-                    valoreCsrfTokenDaVerificare, cookieHeader, CsrfToken.NOME_CLAIM_CSRF_TOKEN );
+                    valoreCsrfTokenDaVerificare, cookieHeader, indirizzoIPClient,
+                    CsrfToken.NOME_CLAIM_CSRF_TOKEN, CsrfToken.NOME_CLAIM_IP_CLIENT );
 
             if(risultatoOttenuto!=isCsrfCookieValido_expected) {
                 UtilsInTest.testLog( "----- TEST FALLITO -----\n"
                         + "VALORE CSRF TOKEN DA VERIFICARE:\t" + valoreCsrfTokenDaVerificare + "\n"
                         + "COOKIE HEADER:\t" + cookieHeader + "\n"
                         + "NOME CLAIM CSRF TOKEN:\t" + CsrfToken.NOME_CLAIM_CSRF_TOKEN + "\n"
+                        + "NOME CLAIM IP CLIENT:\t" + CsrfToken.NOME_CLAIM_IP_CLIENT + "\n"
                         + "** RISULTATO ATTESO:\t" + isCsrfCookieValido_expected + "\n"
                         + "## RISULTATO OTTENUTO:\t" + risultatoOttenuto + "\n\n");
             }
@@ -136,7 +143,7 @@ public class CsrfCookiesTest {
 
     }
 
-    /** Genera i parametri per {@link #test_verificaValiditaCookieCsrf(String, String, boolean)}.*/
+    /** Genera i parametri per {@link #test_verificaValiditaCookieCsrf(String, String, String, boolean)}.*/
     private static Stream<Arguments> generaParametri() {
         final int QUANTI_TEST_POSITIVI = QUANTI_TEST_PER_OGNI_TIPO;    // specifica quanti arguments devono essere generati (un arguments per ogni test)
         final int QUANTI_TEST_NEGATIVI = QUANTI_TEST_PER_OGNI_TIPO;
@@ -145,27 +152,28 @@ public class CsrfCookiesTest {
             IntStream.range(0,QUANTI_TEST_POSITIVI)
                     .mapToObj(val -> {
                         String[] args = generaCsrfTokenValido();
-                        return arguments(args[0], args[1], true);
+                        return arguments(args[0], args[1], args[2], true);
                     }),
             IntStream.range(0,QUANTI_TEST_NEGATIVI)
                     .mapToObj(val -> {
                         String[] args = generaCsrfTokenInvalido();
-                        return arguments(args[0], args[1], false);
+                        return arguments(args[0], args[1], args[2], false);
                     })
         );
     }
 
 
 
-    /** Genera un CSRF token valido e restituisce un array di due stringhe:
+    /** Genera un CSRF token valido e restituisce un array di tre stringhe:
      * <ol>
      *     <li>token CSRF generato</li>
+     *     <li>indirizzo IP del client generato</li>
      *     <li>cookie header generato, contenente:
      *      <ul>
      *          <li>identificativo del client</li>
      *          <li>
      *              token JWT generato con (nel payload) l'identificativo del
-     *              ed client ed il csrf token
+     *              ed client ed il csrf token e l'indirizzo IP del client
      *          </li>
      *      </ul>
      *     </li>
@@ -173,11 +181,14 @@ public class CsrfCookiesTest {
      */
     private static String[] generaCsrfTokenValido() {
 
-        final String[] generato = new String[2];
+        final String[] generato = new String[3];
 
         try {
-            final CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CSRF_TOKEN_LENGTH);
+
+            final String indirizzoIPClient = UtilsInTest.generaIndirizzoIP();
+            final CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CSRF_TOKEN_LENGTH, indirizzoIPClient);
             generato[0] = csrfToken.getValoreCsrfToken();
+            generato[1] = csrfToken.getValoreIPClient();
 
             final String cookieHeader;
             {
@@ -193,7 +204,7 @@ public class CsrfCookiesTest {
                                 + cookieHeaderInventato;
             }
 
-            generato[1] = cookieHeader;
+            generato[2] = cookieHeader;
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
             fail("Eccezione: " + UtilsInTest.stringaConStackTrace(e));
         }
@@ -206,7 +217,10 @@ public class CsrfCookiesTest {
         String[] generato;
         // Genera parametri validi, poi li altera
         generato = generaCsrfTokenValido();
-        generato[0] = generato[0].replaceAll(String.valueOf(generato[0].charAt(10)), "=");
+        final int posizioneDiUnCarattereACasoDaAlterare = 10;
+        final String stringaSostitutiva = "=";
+        generato[0] = generato[0].replaceAll(String.valueOf(generato[0].charAt(posizioneDiUnCarattereACasoDaAlterare)),
+                                             stringaSostitutiva);
         return generato;
     }
 }
