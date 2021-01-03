@@ -9,7 +9,7 @@
  */
 
 import {mount} from "@vue/test-utils"
-import RegistrazioneNuovoConsumer from '../views/login/RegistrazioneNuovoConsumer';
+import RegistrazioneNuovoConsumer from '../views/autenticazione/RegistrazioneNuovoConsumer';
 
 
 // Setup: falsa implementazione di window.alert

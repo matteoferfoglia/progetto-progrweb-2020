@@ -33,7 +33,7 @@ export default {
   methods: {
     validaEdInviaForm() {
 
-      // TODO : questo metodo è presente anche nel form di login: refactoring per evitare duplicazione!
+      // TODO : questo metodo è presente anche nel form di autenticazione: refactoring per evitare duplicazione!
 
       const isFormValido = () => {
         return this.nomeCognome.length>0 &&

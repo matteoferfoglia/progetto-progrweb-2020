@@ -1,14 +1,11 @@
 <template>
   <h2>Login > Accedi</h2>
-  <div v-if="isCaricato">
-    <form @submit.prevent="validaEdInviaForm"> <!-- TODO: action del form da fare -->
+    <form @submit.prevent="validaEdInviaForm"> <!-- TODO : VERIRICARE protezione csrf -->
       <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
       <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
-      <input type="hidden" v-model="CSRF_token">
+      <input type="hidden"  style="display: none" v-model="CSRF_token">
       <input type="submit" value="Login">
     </form>
-  </div>
-  <div v-else></div>
 </template>
 
 <script>
@@ -22,23 +19,13 @@ export default {
     return {
       username: "",
       password: "",
-      isCaricato: false,  // modificato al termine della promise per il CSRF token
       CSRF_token: ""
     }
   },
-  created() {
-    this.CSRF_token = richiediCSRFTokenAlServer().then( valoreToken => {
-      // "rendering is a synchronous process, it can’t wait for asynchronous code to finish"
-      // Se qui, allora token csrf ricevuto
-        this.isCaricato = true;
-        this.CSRF_token = valoreToken;
-      }).catch( errore => {
-      // Errore durante la ricezione del token csrf
-      console.error("Errore in " + this.$options.name + ": " + errore);  // TODO : gestire questo errore
-    });
-  },
   methods: {
     validaEdInviaForm() {
+
+      // TODO : TESTARE e provare attacchi csrf
 
       const isFormValido = () => {
         return this.username.length>0 &&
@@ -53,8 +40,8 @@ export default {
       const loginRiuscito = () => this.$router.push("/");
 
       const loginFallito = ris => {
-        console.error("Errore durante il login: " + ris);
-        alert("Si è verificato un errore durante il login. Riprovare in seguito.");
+        console.error("Errore durante il autenticazione: " + ris);
+        alert("Si è verificato un errore durante il autenticazione. Riprovare in seguito.");
         // TODO notificare l'errore ai gestori (via mail ?)
       }
 
@@ -75,11 +62,19 @@ export default {
       };
 
 
-
       if(isFormValido()){
-        inviaForm();
+        richiediCSRFTokenAlServer().then( valoreToken => {  // todo : è sicuro da csrf?
+          // Se qui, allora token csrf ricevuto
+          this.CSRF_token = valoreToken;
+          inviaForm();
+
+        }).catch( errore => {
+          // Errore durante la ricezione del token csrf
+          console.error("Errore in " + this.$options.name + ": " + errore);  // TODO : gestire questo errore
+        });
       } else {
         informaUtenteFormInvalido();
+        // TODO : si potrebbe evidenziare i campi invalidi
       }
 
     }

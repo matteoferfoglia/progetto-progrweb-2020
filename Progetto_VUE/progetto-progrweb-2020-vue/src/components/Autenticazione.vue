@@ -1,8 +1,7 @@
-<!--suppress ALL -->
 <template>
 
   <header>
-    <router-link :to="PERCOROS_ROOT">
+    <router-link :to="PERCORSO_ROOT">
       <img class="logo" :src="PERCORSO_LOGO" alt=""/>
       {{NOME_APPLICAZIONE}}
     </router-link>
@@ -13,7 +12,12 @@
       </ul>
     </nav>
 
-    <h1>Benvenuto nella pagina di login</h1>
+    <h1>Benvenuto nella pagina di autenticazione</h1>
+
+    <slot></slot>
+
+    <router-view/> <!-- Nested router -->
+
   </header>
 
 </template>
@@ -21,12 +25,12 @@
 <script>
 
 export default {
-  name: 'Login',
+  name: 'Autenticazione',
   data() {
     return {
       NOME_APPLICAZIONE: process.env.VUE_APP_NOME_APPLICAZIONE,
       PERCORSO_LOGO: process.env.VUE_APP_PERCORSO_LOGO,
-      PERCOROS_ROOT: process.env.VUE_APP_ROUTER_ROOT_PATH,
+      PERCORSO_ROOT: process.env.VUE_APP_ROUTER_ROOT_PATH,
       PERCORSO_LOGIN: process.env.VUE_APP_ROUTER_LOGIN_PATH,
       PERCORSO_REGISTRAZIONE_CONSUMER: process.env.VUE_APP_ROUTER_REGISTRAZIONE_CONSUMER_PATH
     }

@@ -26,7 +26,7 @@ import {getCookieValueByName} from "./Cookie";
  * verificare anche l'autenticazione e l'autorizzazione del
  * client per vedere il contenuto richiesto-, altrimenti
  * (se il client mi dice di non essersi autenticato) gli mostro
- * la pagina di login).
+ * la pagina di autenticazione).
  *
  * @return true se l'utente è autenticato, false altrimenti.
  */
