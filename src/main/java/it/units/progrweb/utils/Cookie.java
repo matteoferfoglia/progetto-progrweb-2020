@@ -45,6 +45,9 @@ public class Cookie extends NewCookie {
     /** Flag <i>HttpOnly</i> usato di default per il cookie.*/
     final static boolean HTTP_ONLY_DEFAULT = true;       // TODO : metterlo come variabile d'ambiente
 
+    /** Valore <i>SameSite</i> usato di default per il cookie.*/
+    final static String SAME_SITE_VALUE = "Lax";       // TODO : metterlo come variabile d'ambiente
+
 
     /** Vedere {@link NewCookie#NewCookie(String, String, String, String, String, int, boolean, boolean) NewCookie}.*/
     private Cookie(String nomeCookie, String valoreCookie,
@@ -53,7 +56,9 @@ public class Cookie extends NewCookie {
                   boolean secureCookie, boolean httpOnly) {
 
         super(nomeCookie, valoreCookie, percorsoCookie, hostDomainCookie,
-                descrizioneCookie, maxAge, secureCookie, httpOnly);
+                descrizioneCookie + "\";SameSite="+SAME_SITE_VALUE+"; \"",
+                maxAge, secureCookie, httpOnly);
+        // Aggiunge SameSite (non disponibile nella super classe utilizzata, quindi aggiunto manualmente in coda alla descrizione del cookie)
     }
 
     public Cookie(String nomeCookie, String valoreCookie, String descrizioneCookie) {
