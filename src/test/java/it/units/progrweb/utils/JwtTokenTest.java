@@ -1,6 +1,5 @@
 package it.units.progrweb.utils;
 
-import it.units.progrweb.UtilsInTest;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtClaimsSet;
 import it.units.progrweb.utils.jwt.componenti.JwtHeader;
@@ -25,7 +24,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static it.units.progrweb.UtilsInTest.fallisciTestACausaDiEccezioneNonAttesa;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
@@ -127,10 +128,7 @@ public class JwtTokenTest {
 
                                  return arguments(jwtToken, stringaJsonCorrispondenteAlTokenCodificataBase64UrlEncoded);
                              } catch (NoSuchAlgorithmException|InvalidKeyException e) {
-                                 String messaggio = "Eccezione non attesa: " + e;
-                                 UtilsInTest.scriviNelLogDeiTest(messaggio);
-                                 fail(messaggio);
-                                 return null;
+                                 return (Arguments)fallisciTestACausaDiEccezioneNonAttesa(e);
                              }
                          });
     }
@@ -169,8 +167,7 @@ public class JwtTokenTest {
 
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
                 | InvocationTargetException | NoSuchFieldException e) {
-            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-            fail(e);
+            fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
 
@@ -241,8 +238,7 @@ public class JwtTokenTest {
                     jwtPayload = getPayload(jwtToken);
                 } catch (NoSuchFieldException|IllegalAccessException e) {
                     // Non dovrebbe mai succedere
-                    UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-                    fail(e);
+                    fallisciTestACausaDiEccezioneNonAttesa(e);
                 }
 
                 int differenzaInSecondiTraTempoAttualeEScadenzaDiQuestoToken = ((int)(Math.random()*Short.MAX_VALUE)   // il valore assoluto di questa differenza potrebbe essere qualsiasi (qua generato casualmente)
@@ -256,8 +252,7 @@ public class JwtTokenTest {
                     jwtToken = new JwtToken(jwtPayload);
                 } catch (NoSuchAlgorithmException|InvalidKeyException e) {
                     // Non dovrebbe mai succedere
-                    UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-                    fail(e);
+                    fallisciTestACausaDiEccezioneNonAttesa(e);
                 }
             }
 
@@ -293,8 +288,7 @@ public class JwtTokenTest {
 
         } catch (NoSuchFieldException|InstantiationException|IllegalAccessException
                 |InvocationTargetException|NoSuchMethodException e) {
-            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-            fail(e);
+            fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
     }
@@ -337,8 +331,7 @@ public class JwtTokenTest {
 
         } catch (InvocationTargetException|NoSuchMethodException|InstantiationException
                 |IllegalAccessException|NoSuchFieldException e) {
-            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-            fail(e);
+            fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
     }

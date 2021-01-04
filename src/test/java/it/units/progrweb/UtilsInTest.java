@@ -1,10 +1,14 @@
 package it.units.progrweb;
 
+import it.units.progrweb.utils.UtilitaInputOutput;
+
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Classe di utilità per i test.
@@ -43,5 +47,16 @@ public class UtilsInTest {
                         .mapToObj(contatoreByteIndirizzo -> String.valueOf((int)(Math.random()*VALORE_MASSIMO_UN_BYTE)))
                         .collect(Collectors.joining("."));
 
+    }
+
+    /** Metodo un utilizzabile nei test che devono gestire eccezioni non attese.
+     * Se invocato, questo metodo fa fallire il test.
+     * @param e L'eccezione non attesa.
+     * @return null.
+     */
+    public static Object fallisciTestACausaDiEccezioneNonAttesa(Exception e) {
+        UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
+        fail("Eccezione non attesa: " + UtilitaInputOutput.stringaConStackTrace(e));
+        return null;
     }
 }

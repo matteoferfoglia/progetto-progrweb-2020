@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static it.units.progrweb.UtilsInTest.fallisciTestACausaDiEccezioneNonAttesa;
 import static it.units.progrweb.api.CreazioneCsrfToken.CLIENT_ID_TOKEN_LENGTH;
 import static it.units.progrweb.api.CreazioneCsrfToken.CSRF_TOKEN_LENGTH;
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,8 +94,7 @@ public class CsrfCookiesTest {
 
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchMethodException
                 | IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {
-            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-            fail("Eccezione non attesa: " + UtilitaInputOutput.stringaConStackTrace(e));
+            fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
     }
@@ -138,7 +138,7 @@ public class CsrfCookiesTest {
             assertEquals(isCsrfCookieValido_expected, risultatoOttenuto);
 
         } catch (IllegalAccessException| InvocationTargetException |NoSuchMethodException e) {
-            fail("Eccezione non attesa: " + UtilitaInputOutput.stringaConStackTrace(e));
+            fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
     }
@@ -206,7 +206,7 @@ public class CsrfCookiesTest {
 
             generato[2] = cookieHeader;
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
-            fail("Eccezione: " + UtilitaInputOutput.stringaConStackTrace(e));
+            fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
         return generato;
