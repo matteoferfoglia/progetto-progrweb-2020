@@ -30,7 +30,7 @@ public class AuthenticationDatabaseEntry {
     /** Valore identificativo univoco per l'attore. */
     @Id
     @Index
-    private String identificativoAttore;
+    private Long identificativoAttore;
 
     /** Password, hashed e salted.*/
     private String hashedSaltedPassword;
@@ -42,7 +42,7 @@ public class AuthenticationDatabaseEntry {
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
-    public AuthenticationDatabaseEntry(String identificativoAttore, String passwordAttore)
+    public AuthenticationDatabaseEntry(Long identificativoAttore, String passwordAttore)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
         this.identificativoAttore = identificativoAttore;

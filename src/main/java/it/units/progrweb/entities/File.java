@@ -8,7 +8,6 @@ import it.units.progrweb.entities.attori.Uploader;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.datetime.DateTime;
 
-import javax.persistence.GeneratedValue;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -30,8 +29,7 @@ public class File {
 
     /** Identificativo per il file.*/
     @Id
-    @GeneratedValue
-    private long identificativoFile;
+    private Long identificativoFile;
 
     /** Uploader che ha caricato il file.*/
     @Index

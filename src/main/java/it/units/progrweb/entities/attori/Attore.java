@@ -5,7 +5,6 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.utils.RegexHelper;
 
-import javax.persistence.GeneratedValue;
 
 /**
  * Rappresentazione di un attore.
@@ -19,8 +18,7 @@ public abstract class Attore {
 
     /** Identificativo univoco per un attore. */
     @Id
-    @GeneratedValue
-    protected long identificativoAttore;
+    protected Long identificativoAttore;
 
     /** Username dell'attore.*/
     @Index  // TODO : non si può usare javax.* per evitare di essere vendor specific?
