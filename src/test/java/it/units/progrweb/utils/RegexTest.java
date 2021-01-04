@@ -1,6 +1,7 @@
 package it.units.progrweb.utils;
 
-import org.junit.Assert;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Classe di test per {@link RegexHelper}.
@@ -18,7 +19,7 @@ public class RegexTest {
         
         // TODO : metodo da scrivere 
         //Assert.assertEquals(RegexHelper.isEmailValida(email), isValida);
-        Assert.assertTrue(true);
+        assertTrue(true);
     }
 
 

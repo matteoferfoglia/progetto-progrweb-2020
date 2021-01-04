@@ -1,6 +1,5 @@
 package it.units.progrweb.utils;
 
-import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,6 +10,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Classe di test per la classe {@link JsonHelper}.
@@ -142,7 +143,7 @@ public class JsonHelperTest {
     @MethodSource("generaOggettiJsonAdUnSoloLivello")
     void convertiStringaJsonToMappaProprietaTest(String stringaJson, Map<String,Object> mappaProprieta_nome_valore_attesa) {
         Map<String, Object> mappaProprieta_calcolata = JsonHelper.convertiStringaJsonToMappaProprieta(stringaJson);
-        Assert.assertEquals(mappaProprieta_nome_valore_attesa, mappaProprieta_calcolata);
+        assertEquals(mappaProprieta_nome_valore_attesa, mappaProprieta_calcolata);
     }
 
 
@@ -162,8 +163,8 @@ public class JsonHelperTest {
             return stringaOutput;
         };
 
-        Assert.assertEquals(rimuoviSpaziTranneQuelliTraVirgolette.apply(stringaJson_attesa),
-                rimuoviSpaziTranneQuelliTraVirgolette.apply(stringaJson_calcolata));
+        assertEquals(rimuoviSpaziTranneQuelliTraVirgolette.apply(stringaJson_attesa),
+                     rimuoviSpaziTranneQuelliTraVirgolette.apply(stringaJson_calcolata));
 
     }
 

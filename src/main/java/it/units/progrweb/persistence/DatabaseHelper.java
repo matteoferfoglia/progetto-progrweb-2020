@@ -48,13 +48,4 @@ public abstract class DatabaseHelper {
         return true;
     }
 
-
-    /** Da invocare al bootstrap del server, per registrare
-     * un'entità che dovrà essere gestita dal database.
-     * Per Objectify, vedere {@link ObjectifyService#register(Class)} e
-     * {@link com.googlecode.objectify.ObjectifyFactory#register(Class) ObjectifyFactory#register(Class)}.*/
-     public static void registraEntitaGestitaDaDatabase(Class<?> enititaGestitaDaDatabase) {
-         ObjectifyService.register(enititaGestitaDaDatabase);
-     }
-
 }

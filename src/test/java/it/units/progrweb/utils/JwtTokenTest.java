@@ -7,7 +7,6 @@ import it.units.progrweb.utils.jwt.componenti.JwtPayload;
 import it.units.progrweb.utils.jwt.componenti.JwtSignature;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
-import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -48,7 +47,7 @@ public class JwtTokenTest {
     void generaTokenJsonTest(JwtToken token, String corrispondenteJsonCodificatoBase64UrlEncoded){
          // todo : rivedere questo test ed il metodo di generazione dei parametri
 
-        Assert.assertEquals(corrispondenteJsonCodificatoBase64UrlEncoded, token.generaTokenJsonCodificatoBase64UrlEncoded());
+        assertEquals(corrispondenteJsonCodificatoBase64UrlEncoded, token.generaTokenJsonCodificatoBase64UrlEncoded());
 
     }
 

@@ -4,6 +4,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import it.units.progrweb.UtilsInTest;
 import it.units.progrweb.listeners.StarterDatabase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -45,8 +47,14 @@ public class DatabaseTest {
     public void starterDatabase() {
         ObjectifyService.setFactory(new ObjectifyFactory());    // Specifico per Objectify (Fonte: https://stackoverflow.com/a/36247734)
         this.session = ObjectifyService.begin();    // Specifico per Objectify (Fonte: https://stackoverflow.com/a/36247734)
-        StarterDatabase.registraClassiDatabase();
-        this.helper.setUp();
+        try {
+            Method registrazioneClassiDatabase = StarterDatabase.class.getDeclaredMethod("registraClassiDatabase");
+            registrazioneClassiDatabase.setAccessible(true);
+            registrazioneClassiDatabase.invoke(null);
+            this.helper.setUp();
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            UtilsInTest.fallisciTestACausaDiEccezioneNonAttesa(e);
+        }
     }
 
     /** Chiusura. */
@@ -113,6 +121,7 @@ public class DatabaseTest {
 
             DatabaseHelper.salvaEntita(entita);
             DatabaseHelper.flush(); // svuota transazioni in corso
+
             assertEquals(1, DatabaseHelper.contaEntitaNelDatabase());
 
         }

@@ -1,9 +1,9 @@
 package it.units.progrweb.listeners;
 
+import com.googlecode.objectify.ObjectifyService;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Administrator;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.persistence.DatabaseHelper;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -28,18 +28,18 @@ public class StarterDatabase implements ServletContextListener {
 
     /**
      * Registra tutte le classi che dovranno essere gestite dal database.
-     * Vedere {@link DatabaseHelper#registraEntitaGestitaDaDatabase(Class)}.
+     * Attenzione: questo metodo è specifico solamente per Objectify.
+     * Vedere {@link ObjectifyService#register(Class)} e
+     * {@link com.googlecode.objectify.ObjectifyFactory#register(Class)}.
      */
     public static void registraClassiDatabase() {
         Arrays.stream(enititaGestiteDaDatabase)
-                .forEach(DatabaseHelper::registraEntitaGestitaDaDatabase);
+              .forEach(ObjectifyService::register);
     }
 
     public void contextInitialized(ServletContextEvent sce) {
         registraClassiDatabase();
     }
 
-    public void contextDestroyed(ServletContextEvent sce) {
-
-    }
+    public void contextDestroyed(ServletContextEvent sce) {}
 }
