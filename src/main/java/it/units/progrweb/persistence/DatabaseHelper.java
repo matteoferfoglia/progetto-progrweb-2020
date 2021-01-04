@@ -1,7 +1,9 @@
 package it.units.progrweb.persistence;
+
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.cache.PendingFutures;
 
 /**
  * Classe di utilità per interagire con il database.
@@ -43,8 +45,10 @@ public abstract class DatabaseHelper {
      * di questo metodo lo fa subito (in modo sincrono).
      *
      * @return true se l'esecuzione va a buon fine, false altrimenti.*/
-    public static boolean flush() {
+    public static boolean flush() {     // TODO : indagare meglio su questo metodo
+        PendingFutures.completeAllPendingFutures();
         database.flush();
+        database.clear();
         return true;
     }
 

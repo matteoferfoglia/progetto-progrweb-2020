@@ -1,12 +1,14 @@
 package it.units.progrweb.utils;
 
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.attori.Consumer;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
 
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -32,7 +34,23 @@ public class Autenticazione {
     public static Attore getAttoreDaCredenziali(String username, String password) {
         // TODO : cercare le credenziali nel database di autenticazione e restituire l'attore corrispondente
         // TODO : restituire ATTORE_NON_AUTENTICATO se credenziali invalide
-        return ATTORE_NON_AUTENTICATO;
+        // return ATTORE_NON_AUTENTICATO;
+
+         {
+             // Creazione di un consumer (ed imposto id non nullo) // TODO : cancellare questa parte (qua bisognerebbe prelevare utente da db, non crearlo)
+            Consumer consumer = new Consumer("username", "UtenteTest", "test@example.com");
+            {
+                try {
+                    Field idField = consumer.getClass().getSuperclass().getSuperclass() // field di Attore
+                                            .getDeclaredField("identificativoAttore");
+                    idField.setAccessible(true);
+                    Long valoreId = Long.valueOf(10);
+                    idField.set(consumer, valoreId);
+                } catch (NoSuchFieldException | IllegalAccessException e) {/* non dovrebbe mai capitare questa eccezione*/ }
+            }
+            return consumer;
+        }
+
     }
 
     /** Restituisce true se l'attore è autenticato, false altrimenti.*/
@@ -49,7 +67,7 @@ public class Autenticazione {
             try {
                 String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore);
                 return Response.ok()
-                        .header("Authorization", tokenAutenticazione)
+                        .header("Authorization: Bearer ", tokenAutenticazione)
                         .entity("Benvenuto " + attore.getNomeCognome())
                         .build();
             } catch (NoSuchAlgorithmException|InvalidKeyException e) {
@@ -58,9 +76,9 @@ public class Autenticazione {
             }
         }
 
-        return Response.status(401, "Unauthorized: credenziali invalide.")
-                .entity("Credenziali invalide")
-                .build();
+        return Response.status(Response.Status.UNAUTHORIZED)
+                       .entity("Credenziali invalide")
+                       .build();
     }
 
     /** Crea un Jwt Token che certifica l'autenticazione dell'attore indicato

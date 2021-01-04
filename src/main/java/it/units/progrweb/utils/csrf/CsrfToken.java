@@ -160,7 +160,7 @@ public class CsrfToken {
     /** Crea una {@link javax.ws.rs.core.Response} per segnalare
      * l'invalidità del token CSRF fornito.*/
     public static Response creaResponseCsrfTokenInvalido() {
-        return Response.status(403, "Forbidden: Token CSRF invalido.")
+        return Response.status(Response.Status.FORBIDDEN)
                        .entity("Token CSRF invalido. Ricaricare il form e riprovare.")
                        .build();
     }
