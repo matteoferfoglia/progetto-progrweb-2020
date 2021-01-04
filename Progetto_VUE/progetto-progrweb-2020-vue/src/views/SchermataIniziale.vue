@@ -1,7 +1,7 @@
 <template>
   <AreaRiservata v-if="isUtenteAutenticato()"></AreaRiservata>
   <Autenticazione v-else>
-    <LoginUtenteGiaRegistrato><!-- componente default da mostrare --></LoginUtenteGiaRegistrato>
+    <LoginUtenteGiaRegistrato><!-- componente da mostrare di default --></LoginUtenteGiaRegistrato>
   </Autenticazione>
 </template>
 
@@ -29,5 +29,4 @@ export default {
 </script>
 
 <style>
-
 </style>

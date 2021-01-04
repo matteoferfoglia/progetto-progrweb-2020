@@ -11,15 +11,12 @@
         <li><router-link :to="PERCORSO_REGISTRAZIONE_CONSUMER">Registrazione Consumer</router-link></li>
       </ul>
     </nav>
-
-    <h1>Benvenuto nella pagina di autenticazione</h1>
-
-    <slot></slot>
-
-    <router-view/> <!-- Nested router -->
-
   </header>
-
+  <main>
+    <h1>Benvenuto nella pagina di autenticazione</h1>
+    <slot></slot>
+    <router-view/> <!-- Nested router -->
+  </main>
 </template>
 
 <script>
@@ -39,4 +36,8 @@ export default {
 </script>
 
 <style>
+main {
+  /* TODO */
+  height: 200px;  /* impostando altezza fissa, si evita la modifica estetica della pagina dopo aver ricevuto csrf token*/
+}
 </style>
