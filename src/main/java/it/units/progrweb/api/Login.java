@@ -1,6 +1,5 @@
 package it.units.progrweb.api;
 
-import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.csrf.CsrfToken;
@@ -9,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Matteo Ferfoglia
@@ -16,27 +16,23 @@ import javax.ws.rs.core.MediaType;
 @Path("/login")
 public class Login {
 
+    /** Risponde alle richieste di login, rilasciando
+     * un'opportuna {@link Response} al client.
+     * Verifica anche la validità del token CSRF nel form
+     * di login.*/
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public String login(CampiFormLogin campiFormLogin,
-                        @HeaderParam("Cookie") String cookieHeader,
-                        @Context HttpServletRequest httpServletRequest){
-        // TODO metodo e signature
+    public Response login(CampiFormLogin campiFormLogin,
+                          @HeaderParam("Cookie") String cookieHeader,
+                          @Context HttpServletRequest httpServletRequest){
+
         String indirizzoIPClient = httpServletRequest.getRemoteAddr();
-        if(CsrfToken.isCsrfTokenValido(campiFormLogin.getCsrfToken(), cookieHeader, indirizzoIPClient)) {
 
-            Attore attore = Autenticazione.getAttoreDaCredenziali(campiFormLogin.getUsername(), campiFormLogin.getPassword());
-            if(Autenticazione.isAttoreAutenticato(attore)) {
-
-                // TODO : se procedura di login va a buon fine => impostare COOKIE-AUTENTICAZIONE
-                return "Benvenuto " + campiFormLogin.getUsername();
-            }
-
-            return "Credenziali invalide";
-        }
+        if(CsrfToken.isCsrfTokenValido(campiFormLogin.getCsrfToken(), cookieHeader, indirizzoIPClient))
+            return Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword());
         else
-            return "CsrfToken invalido";
+            return CsrfToken.creaResponseCsrfTokenInvalido();
     }
 }
 

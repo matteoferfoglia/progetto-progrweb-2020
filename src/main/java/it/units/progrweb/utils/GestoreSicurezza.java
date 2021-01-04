@@ -48,7 +48,8 @@ public class GestoreSicurezza {
             this.publicKey = keyPair.getPublic();
             this.privateKey = keyPair.getPrivate();
         } catch(NoSuchAlgorithmException e) {
-            System.err.println("Eccezione nella creazione della coppia di chiavi pubblica e privata: " + e.toString()); //TODO qua ci vuole il log
+            Logger.scriviEccezioneNelLog(this.getClass(),
+                                "Eccezione nella creazione della coppia di chiavi pubblica e privata: ", e);
         }
     }
 

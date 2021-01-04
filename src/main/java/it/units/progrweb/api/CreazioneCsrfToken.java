@@ -1,5 +1,6 @@
 package it.units.progrweb.api;
 
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
@@ -65,10 +66,10 @@ public class CreazioneCsrfToken {
                             .cookie(csrfCookies.getCookieCSRF())
                             .cookie(csrfCookies.getCookieVerificaIdentitaClient())
                             .entity(csrfToken.getValoreCsrfToken())      // CSRF token anche nel body della response
-                            .build();    // TODO: verificare se il cookie arriva
+                            .build();
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();    // TODO segnalare nel log l'errore dovuto alla firma se genera un'eccezione     Logger.getLogger(JWebToken.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+            Logger.scriviEccezioneNelLog(CreazioneCsrfToken.class,e.getMessage(), e);
         }
 
         return Response.serverError().build();

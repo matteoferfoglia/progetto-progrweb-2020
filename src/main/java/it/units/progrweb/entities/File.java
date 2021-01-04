@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.attori.Consumer;
 import it.units.progrweb.entities.attori.Uploader;
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import javax.persistence.GeneratedValue;
@@ -91,13 +92,13 @@ public class File {
         // TODO : da implementare e testare (pensare se meglio usare strategie diverse)
         Field[] attributiDiQuestoOggetto = this.getClass().getDeclaredFields();
 
-        Arrays.stream(attributiDiQuestoOggetto)
+        Arrays  .stream(attributiDiQuestoOggetto)
                 .forEach(attributo -> {
                     attributo.setAccessible(true);
                     try {
                         attributo.set(this, null);
                     } catch (IllegalAccessException exception) {
-                        exception.printStackTrace();
+                        Logger.scriviEccezioneNelLog(this.getClass(), exception);
                     }
                 });
 

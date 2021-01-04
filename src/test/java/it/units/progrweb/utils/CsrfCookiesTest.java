@@ -93,8 +93,8 @@ public class CsrfCookiesTest {
 
         } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchMethodException
                 | IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {
-            UtilsInTest.testLog(UtilsInTest.stringaConStackTrace(e));
-            fail("Eccezione non attesa: " + UtilsInTest.stringaConStackTrace(e));
+            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
+            fail("Eccezione non attesa: " + UtilitaInputOutput.stringaConStackTrace(e));
         }
 
     }
@@ -124,7 +124,7 @@ public class CsrfCookiesTest {
                     CsrfToken.NOME_CLAIM_CSRF_TOKEN, CsrfToken.NOME_CLAIM_IP_CLIENT );
 
             if(risultatoOttenuto!=isCsrfCookieValido_expected) {
-                UtilsInTest.testLog( "----- TEST FALLITO -----\n"
+                UtilsInTest.scriviNelLogDeiTest( "----- TEST FALLITO -----\n"
                         + "VALORE CSRF TOKEN DA VERIFICARE:\t" + valoreCsrfTokenDaVerificare + "\n"
                         + "COOKIE HEADER:\t" + cookieHeader + "\n"
                         + "NOME CLAIM CSRF TOKEN:\t" + CsrfToken.NOME_CLAIM_CSRF_TOKEN + "\n"
@@ -138,7 +138,7 @@ public class CsrfCookiesTest {
             assertEquals(isCsrfCookieValido_expected, risultatoOttenuto);
 
         } catch (IllegalAccessException| InvocationTargetException |NoSuchMethodException e) {
-            fail("Eccezione non attesa: " + UtilsInTest.stringaConStackTrace(e));
+            fail("Eccezione non attesa: " + UtilitaInputOutput.stringaConStackTrace(e));
         }
 
     }
@@ -206,7 +206,7 @@ public class CsrfCookiesTest {
 
             generato[2] = cookieHeader;
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
-            fail("Eccezione: " + UtilsInTest.stringaConStackTrace(e));
+            fail("Eccezione: " + UtilitaInputOutput.stringaConStackTrace(e));
         }
 
         return generato;

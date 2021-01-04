@@ -31,7 +31,6 @@ public class PeriodoTemporaleTest {
         try {
             PeriodoTemporale periodoTemporale = new PeriodoTemporale(dataInizio, dataFine);
             ottenuto = true;
-            //UtilsInTest.testLog(periodoTemporale.toString());
         } catch (IllegalArgumentException e) {
             ottenuto = false;
         }

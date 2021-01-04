@@ -1,5 +1,6 @@
 package it.units.progrweb;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -10,13 +11,6 @@ import java.util.stream.Stream;
  * @author Matteo Ferfoglia
  */
 public class UtilsInTest {
-
-    /** Restituisce una stringa con l'intero stacktrace. */
-    public static String stringaConStackTrace(Throwable throwable) {
-        return Arrays.stream(throwable.getStackTrace())
-                     .map(StackTraceElement::toString)
-                     .collect(Collectors.joining("\n\t"));
-    }
 
     /** Restituisce una stringa CSV creata da un array di stringhe.
      * NON esegue escape di tutti i caratteri speciali: le funzionalità
@@ -35,9 +29,9 @@ public class UtilsInTest {
     }
 
     /** Scrive nel log per i test. */
-    public static void testLog(String daStampare) {
-        // TODO : da implementare: dove deve scrivere??
-        System.out.println(daStampare); // TODO : temporaneo, da implementare
+    public static void scriviNelLogDeiTest(String daStampare) {
+        PrintStream outputTest = System.out;    // TODO : creare un file di log per i test
+        outputTest.println(daStampare);
     }
 
     /** Genera casualmente un indirizzo IPv4. */

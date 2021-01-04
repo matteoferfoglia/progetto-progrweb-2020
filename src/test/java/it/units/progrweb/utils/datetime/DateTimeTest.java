@@ -42,53 +42,53 @@ public class DateTimeTest {
 
         boolean corretto;
 
-        UtilsInTest.testLog(DateTime.adesso().toString());
-        UtilsInTest.testLog(Date.from(Instant.now()).toString());
+        UtilsInTest.scriviNelLogDeiTest(DateTime.adesso().toString());
+        UtilsInTest.scriviNelLogDeiTest(Date.from(Instant.now()).toString());
 
-        UtilsInTest.testLog("---");
+        UtilsInTest.scriviNelLogDeiTest("---");
 
         DateTime dateTime = new DateTime(31,8,2020,11,5,0);
-        UtilsInTest.testLog(dateTime.toString());
-        UtilsInTest.testLog(Date.from(LocalDateTime.of(2020, Month.AUGUST,31,11,5,0).toInstant(ZoneOffset.UTC)).toString());
-        UtilsInTest.testLog(String.valueOf(dateTime.getGiornoDelMese()));
+        UtilsInTest.scriviNelLogDeiTest(dateTime.toString());
+        UtilsInTest.scriviNelLogDeiTest(Date.from(LocalDateTime.of(2020, Month.AUGUST,31,11,5,0).toInstant(ZoneOffset.UTC)).toString());
+        UtilsInTest.scriviNelLogDeiTest(String.valueOf(dateTime.getGiornoDelMese()));
         String s = new DateTime("31/08/2020 11:05:00 Z",
                                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss X")).toString();
-        UtilsInTest.testLog(s);
+        UtilsInTest.scriviNelLogDeiTest(s);
         corretto = dateTime.toString().equals(s);
 
-        UtilsInTest.testLog("---");
+        UtilsInTest.scriviNelLogDeiTest("---");
 
         DateTime dateTime2 = new DateTime(31,12,2020,11,5,0);
-        UtilsInTest.testLog(dateTime2.toString());
-        UtilsInTest.testLog(Date.from(LocalDateTime.of(2020, Month.DECEMBER,31,11,5,0).toInstant(ZoneOffset.UTC)).toString());
-        UtilsInTest.testLog(String.valueOf(dateTime2.getGiornoDelMese()));
+        UtilsInTest.scriviNelLogDeiTest(dateTime2.toString());
+        UtilsInTest.scriviNelLogDeiTest(Date.from(LocalDateTime.of(2020, Month.DECEMBER,31,11,5,0).toInstant(ZoneOffset.UTC)).toString());
+        UtilsInTest.scriviNelLogDeiTest(String.valueOf(dateTime2.getGiornoDelMese()));
         String s2 = new DateTime("31/12/2020 11:05:00 Z",
                                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss X")).toString();
-        UtilsInTest.testLog(s2);
+        UtilsInTest.scriviNelLogDeiTest(s2);
         corretto = corretto && dateTime2.toString().equals(s2);
 
-        UtilsInTest.testLog("---");
+        UtilsInTest.scriviNelLogDeiTest("---");
 
         DateTime dateTime3 = new DateTime(1,8,2020,11,5,0);
-        UtilsInTest.testLog(dateTime3.toString());
-        UtilsInTest.testLog(Date.from(LocalDateTime.of(2020, Month.AUGUST,1,11,5,0).toInstant(ZoneOffset.UTC)).toString());
-        UtilsInTest.testLog(String.valueOf(dateTime3.getGiornoDelMese()));
+        UtilsInTest.scriviNelLogDeiTest(dateTime3.toString());
+        UtilsInTest.scriviNelLogDeiTest(Date.from(LocalDateTime.of(2020, Month.AUGUST,1,11,5,0).toInstant(ZoneOffset.UTC)).toString());
+        UtilsInTest.scriviNelLogDeiTest(String.valueOf(dateTime3.getGiornoDelMese()));
         String s3 = new DateTime("01/08/2020 11:05:00 Z",
                                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss X")).toString();
-        UtilsInTest.testLog(s3);
+        UtilsInTest.scriviNelLogDeiTest(s3);
         corretto = corretto && dateTime3.toString().equals(s3);
 
-        UtilsInTest.testLog("---");
-        UtilsInTest.testLog(DateTime.oggi().getData());
-        UtilsInTest.testLog(DateTime.oggi().getDataOra());
+        UtilsInTest.scriviNelLogDeiTest("---");
+        UtilsInTest.scriviNelLogDeiTest(DateTime.oggi().getData());
+        UtilsInTest.scriviNelLogDeiTest(DateTime.oggi().getDataOra());
 
-        UtilsInTest.testLog("---");
+        UtilsInTest.scriviNelLogDeiTest("---");
 
         String primoIstanteDiOggi = DateTime.oggi().getOraPrecisaAlSecondo();
-        UtilsInTest.testLog(primoIstanteDiOggi);
+        UtilsInTest.scriviNelLogDeiTest(primoIstanteDiOggi);
         corretto = corretto && DateTime.oggi().getOraPrecisaAlSecondo().equals("00:00:00 (UTC)");
 
-        UtilsInTest.testLog("------");
+        UtilsInTest.scriviNelLogDeiTest("------");
 
         assertTrue(corretto);
     }

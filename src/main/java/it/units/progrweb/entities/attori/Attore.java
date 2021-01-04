@@ -44,6 +44,13 @@ public abstract class Attore {
 
     protected Attore() {}
 
+    public long getIdentificativoAttore() {
+        return identificativoAttore;
+    }
+
+    public String getNomeCognome() {
+        return nomeCognome;
+    }
 
     protected void setEmail(String email) {
         if(!RegexHelper.isEmailValida(email))

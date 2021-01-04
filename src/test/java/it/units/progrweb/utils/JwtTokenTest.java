@@ -128,7 +128,7 @@ public class JwtTokenTest {
                                  return arguments(jwtToken, stringaJsonCorrispondenteAlTokenCodificataBase64UrlEncoded);
                              } catch (NoSuchAlgorithmException|InvalidKeyException e) {
                                  String messaggio = "Eccezione non attesa: " + e;
-                                 UtilsInTest.testLog(messaggio);
+                                 UtilsInTest.scriviNelLogDeiTest(messaggio);
                                  fail(messaggio);
                                  return null;
                              }
@@ -169,7 +169,7 @@ public class JwtTokenTest {
 
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
                 | InvocationTargetException | NoSuchFieldException e) {
-            UtilsInTest.testLog(UtilsInTest.stringaConStackTrace(e));
+            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
             fail(e);
         }
 
@@ -241,7 +241,7 @@ public class JwtTokenTest {
                     jwtPayload = getPayload(jwtToken);
                 } catch (NoSuchFieldException|IllegalAccessException e) {
                     // Non dovrebbe mai succedere
-                    UtilsInTest.testLog(UtilsInTest.stringaConStackTrace(e));
+                    UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
                     fail(e);
                 }
 
@@ -256,7 +256,7 @@ public class JwtTokenTest {
                     jwtToken = new JwtToken(jwtPayload);
                 } catch (NoSuchAlgorithmException|InvalidKeyException e) {
                     // Non dovrebbe mai succedere
-                    UtilsInTest.testLog(UtilsInTest.stringaConStackTrace(e));
+                    UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
                     fail(e);
                 }
             }
@@ -293,7 +293,7 @@ public class JwtTokenTest {
 
         } catch (NoSuchFieldException|InstantiationException|IllegalAccessException
                 |InvocationTargetException|NoSuchMethodException e) {
-            UtilsInTest.testLog(UtilsInTest.stringaConStackTrace(e));
+            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
             fail(e);
         }
 
@@ -337,7 +337,7 @@ public class JwtTokenTest {
 
         } catch (InvocationTargetException|NoSuchMethodException|InstantiationException
                 |IllegalAccessException|NoSuchFieldException e) {
-            UtilsInTest.testLog(UtilsInTest.stringaConStackTrace(e));
+            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
             fail(e);
         }
 

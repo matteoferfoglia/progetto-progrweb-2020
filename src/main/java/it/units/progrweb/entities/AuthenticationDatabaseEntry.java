@@ -6,6 +6,7 @@ import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.GeneratoreTokenCasuali;
 import it.units.progrweb.utils.GestoreSicurezza;
+import it.units.progrweb.utils.Logger;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -80,7 +81,7 @@ public class AuthenticationDatabaseEntry {
             // attore non trovato
             credenzialiValide = false;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();    // TODO : gestire quest'eccezione, notificare ai gestori? Stampare su log?
+            Logger.scriviEccezioneNelLog(AuthenticationDatabaseEntry.class, e);    // TODO : gestire quest'eccezione, notificare ai gestori? Stampare su log?
             credenzialiValide = false;  // errore del server durante la verifica delle credenziali
         }
 
