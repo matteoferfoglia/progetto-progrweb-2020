@@ -1,12 +1,69 @@
-<!--suppress JSUnusedGlobalSymbols -->
 <template>
-  <h1>Area riservata</h1>
+  <h1>Benvenuto nell'area riservata</h1>
+  <form @submit.prevent="logout">
+    <input type="hidden"  style="display: none" v-model="csrfToken">
+    <input type="submit" value="Logout">
+  </form>
 </template>
 
 <script>
 
+/** Form viene mostrato solo dopo aver ricevuto dal server il CSRF token.*/
+
+// TODO : QUESTO COMPONENTE è INTERAMENTE DA IMPLEMENTARE
+
+import {richiediCSRFTokenAlServer} from "../utils/CSRF";
+import {richiestaGet} from "../utils/httpUtils";
+
+// TODO : refactoring : molto di questo componente è in comune con LoginUtenteGiaRegistrato
+
 export default {
-  name: 'AreaRiservata'
+  name: 'AreaRiservata',
+  data: function () {
+    return {
+      csrfToken: undefined,
+      isCsrfTokenCaricato: false
+    }
+  },
+  created() {
+    // dati già disponibili e modificabili in questo hook
+
+    richiediCSRFTokenAlServer().then( valoreToken => {
+      // Se qui, allora token csrf ricevuto dal server
+      this.csrfToken = valoreToken;
+      this.isCsrfTokenCaricato = true;
+    }).catch( errore => {
+      // Errore durante la ricezione del token csrf
+      console.error("Errore in " +
+          /*Nome componente: */ this.$options.name + ": " + errore);  // TODO : gestire questo errore
+    });
+
+  },
+  methods: {
+    logout() {
+
+      // TODO : TESTARE e provare attacchi csrf
+
+      /** Se il logout va a buon fine, viene rimosso lo header <i>Authorization</i>
+       * per le successive richieste HTTP.
+       * Poi si viene reindirizzati alla pagina root di questa web application.
+       */
+      const logoutRiuscito = () => {
+
+        //this.$emit("logout");   // TODO : rivedere questa parte
+        this.$router.go(0);   // todo : funziona, ma avrei preferito con push (per evitare il reload dell'intera pagina, ma solo del componente)
+        //this.$router.push({ name : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE});// redirect a componente root togliendo il token di autenticazione
+
+      }
+
+
+      // Richiesta di logout al server
+      richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL)
+          .then( () => logoutRiuscito() )
+          .catch(risposta => console.log("Logout fallito !! " + risposta) );          // TODO : gestire il caso di logout fallito (può succedere??)
+
+    }
+  }
 }
 
 </script>

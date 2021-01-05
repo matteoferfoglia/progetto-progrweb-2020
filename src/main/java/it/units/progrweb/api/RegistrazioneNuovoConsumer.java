@@ -18,7 +18,7 @@ public class RegistrazioneNuovoConsumer {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public String registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
-        // TODO metodo e signature
+        // TODO metodo e signature (metodo da implementare !!!)
         return "Registrazione completata per " + campiFormRegistrazione.getCodiceFiscale();
     }
 }

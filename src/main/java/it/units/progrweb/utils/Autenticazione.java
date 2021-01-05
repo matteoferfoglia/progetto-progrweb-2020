@@ -7,6 +7,8 @@ import it.units.progrweb.utils.jwt.componenti.JwtPayload;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
@@ -34,9 +36,8 @@ public class Autenticazione {
     public static Attore getAttoreDaCredenziali(String username, String password) {
         // TODO : cercare le credenziali nel database di autenticazione e restituire l'attore corrispondente
         // TODO : restituire ATTORE_NON_AUTENTICATO se credenziali invalide
-        // return ATTORE_NON_AUTENTICATO;
 
-         {
+        if( password.equals("pippo") ) {  // TODO : questo metodo è da implementare !!!
              // Creazione di un consumer (ed imposto id non nullo) // TODO : cancellare questa parte (qua bisognerebbe prelevare utente da db, non crearlo)
             Consumer consumer = new Consumer("username", "UtenteTest", "test@example.com");
             {
@@ -49,17 +50,20 @@ public class Autenticazione {
                 } catch (NoSuchFieldException | IllegalAccessException e) {/* non dovrebbe mai capitare questa eccezione*/ }
             }
             return consumer;
+        } else {
+            return ATTORE_NON_AUTENTICATO;
         }
 
     }
 
     /** Restituisce true se l'attore è autenticato, false altrimenti.*/
     public static boolean isAttoreAutenticato(Attore attore) {
-        return attore != ATTORE_NON_AUTENTICATO;    // TODO : verificare corretto funzionamento di questo metodo
+        return attore!=null && !attore.equals(ATTORE_NON_AUTENTICATO);    // TODO : verificare corretto funzionamento di questo metodo
     }
 
     /** Date le credenziali, restituisce una {@link javax.ws.rs.core.Response}
-     * per un attore che si sta autenticando*/
+     * per un attore che si sta autenticando.
+     * Il token di autenticazione è trasmesso nel body della response.*/
     public static Response creaResponseAutenticazione(String username, String password) {
         Attore attore = Autenticazione.getAttoreDaCredenziali(username, password);
         if(Autenticazione.isAttoreAutenticato(attore)) {
@@ -67,18 +71,46 @@ public class Autenticazione {
             try {
                 String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore);
                 return Response.ok()
-                        .header("Authorization: Bearer ", tokenAutenticazione)
-                        .entity("Benvenuto " + attore.getNomeCognome())
-                        .build();
+                               .entity(tokenAutenticazione)
+                               .type(MediaType.APPLICATION_FORM_URLENCODED) // token non è propriamente application/json
+                               .build();
             } catch (NoSuchAlgorithmException|InvalidKeyException e) {
                 Logger.scriviEccezioneNelLog(Autenticazione.class,
                                     "Impossibile creare il token JWT di autenticazione.", e);
             }
+
         }
 
         return Response.status(Response.Status.UNAUTHORIZED)
-                       .entity("Credenziali invalide")
+                       .header("WWW-Authenticate","Bearer")   // invita il client ad autenticarsi
+                       .entity("Credenziali invalide")              // body della response
                        .build();
+    }
+
+    /** Verifica se il client è autenticato in base agli header della richiesta HTTP.
+     * La verifica dell'autenticazione è basata sul Bearer Token che dovrebbe essere
+     * presente nell'header <i>Authorization</i> della request.
+     * @return true se il clien è autenticato, false altrimenti.*/
+    public static boolean isClientAutenticato(HttpServletRequest httpServletRequest) {
+
+        String tokenAutenticazioneBearer = httpServletRequest.getHeader("Authorization");  // prende header con token
+        if( tokenAutenticazioneBearer==null )
+            return false;
+
+        tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (rimuove "Bearer ")
+        return isTokenAutenticazioneValido(tokenAutenticazioneBearer);
+
+    }
+
+    /** Verifica la validità del token di autenticazione presentato da un client.*/
+    private static boolean isTokenAutenticazioneValido(String tokenAutenticazione) {
+
+        boolean isStringaNonNullaNonVuota = ! (tokenAutenticazione==null || tokenAutenticazione.trim().isEmpty()) ;
+        if( isStringaNonNullaNonVuota ) {
+            JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
+            return jwtTokenAutenticazione.isTokenValido();
+        }
+        return false;
     }
 
     /** Crea un Jwt Token che certifica l'autenticazione dell'attore indicato

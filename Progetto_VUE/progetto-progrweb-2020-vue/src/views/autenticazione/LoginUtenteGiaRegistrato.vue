@@ -12,8 +12,9 @@
 
 /** Form viene mostrato solo dopo aver ricevuto dal server il CSRF token.*/
 
-import axios from "axios";
 import {richiediCSRFTokenAlServer} from "../../utils/CSRF";
+import {richiestaPost} from "../../utils/httpUtils";
+import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/httpUtils";
 
 export default {
   name: 'LoginUtenteGiaRegistrato',
@@ -34,7 +35,8 @@ export default {
       this.isCsrfTokenCaricato = true;
     }).catch( errore => {
       // Errore durante la ricezione del token csrf
-      console.error("Errore in " + this.$options.name + ": " + errore);  // TODO : gestire questo errore
+      console.error("Errore in " +
+          /*Nome componente: */ this.$options.name + ": " + errore);  // TODO : gestire questo errore
     });
 
   },
@@ -53,20 +55,35 @@ export default {
         this.password = "";
       }
 
-      const loginRiuscito = () => this.$router.push(process.env.VUE_APP_ROUTER_ROOT_PATH);
+      /** Se il login va a buon fine, viene impostato lo header <i>Authorization</i>
+       * per le successive richieste HTTP.
+       * Poi si viene reindirizzati alla pagina root di questa web application che
+       * provvederà a mostrare i contenuti corretti per l'utente.
+       * @param tokenAutenticazione è il token di autenticazione ricevuto.
+       */
+      const loginRiuscito = tokenAutenticazione => {
 
-      const loginFallito = response => {
-        const STATO_RISPOSTA_CREDENZIALI_INVALIDE = 401;
-        if(response.status === STATO_RISPOSTA_CREDENZIALI_INVALIDE)
+        const parametriRouterPush = {};   // oggetto con i parametri utilizzati da Vue Router
+        parametriRouterPush[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = tokenAutenticazione;
+        this.$router.push({
+          name   : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE,
+          params : parametriRouterPush
+        });  // redirect a componente root con parametro il token di autenticazione
+
+      }
+
+      const loginFallito = risposta => {
+        if(getHttpResponseStatus(risposta) === HTTP_STATUS_UNAUTHORIZED) {
           alert("Credenziali invalide");
-        else
+          this.password = "";   // pulisci campo password
+        } else {
           alert("Errore imprevisto durante l'autenticazione, riprovare in seguito.")
+        }
 
-        console.error("Errore durante l'autenticazione (" + response.status + " [" + response.statusText + "])");
+        console.error("Errore durante l'autenticazione (" + risposta.status + " [" + risposta.statusText + "])");
         // TODO notificare l'errore ai gestori (via mail ?)
         // TODO : refactoring : questo metodo c'è anche in RegistrazioneNuovoConsumer
 
-        this.$router.go(0);  // refresh della pagina (fonte: https://stackoverflow.com/a/47005895)
       }
 
       const inviaForm = () => {
@@ -80,9 +97,9 @@ export default {
           campiFormDaInviareAlServer[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME] = this.csrfToken;
         }
 
-        axios.post(process.env.VUE_APP_LOGIN_SERVER_URL, campiFormDaInviareAlServer)
-            .then(() =>   loginRiuscito() )
-            .catch(ris => loginFallito(ris.response) );
+        richiestaPost(process.env.VUE_APP_LOGIN_SERVER_URL, campiFormDaInviareAlServer)
+            .then( risposta => loginRiuscito(risposta.data) )     // risposta.data contiene il token di autenticazione
+            .catch(risposta => loginFallito(risposta) );          // risposta contiene response, status e statusText (Fonte: https://stackoverflow.com/a/39153411)
       };
 
 

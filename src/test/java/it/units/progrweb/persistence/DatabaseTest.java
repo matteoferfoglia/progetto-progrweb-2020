@@ -120,7 +120,7 @@ public class DatabaseTest {
             assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entita salvate all'inizializzazione del datastore
 
             DatabaseHelper.salvaEntita(entita);
-            DatabaseHelper.flush(); // svuota transazioni in corso
+            DatabaseHelper.flush(); // svuota transazioni in corso  // TODO : non funziona: a volte questo test fallisce
 
             assertEquals(1, DatabaseHelper.contaEntitaNelDatabase());
 

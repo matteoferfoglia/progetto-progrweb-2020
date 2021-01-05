@@ -35,7 +35,7 @@ public class GestoreSicurezzaTest {
         try {
             assertEquals(hashCalcolato, GestoreSicurezza.hmacSha256(stringaDaFirmare));
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
-            UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
+            UtilsInTest.scriviNelLogDeiTest(UtilitaGenerale.stringaConStackTrace(e));
         }
 
     }
@@ -52,7 +52,7 @@ public class GestoreSicurezzaTest {
                             try {
                                 hashCalcolato = GestoreSicurezza.hmacSha256(stringaCasuale);
                             } catch (NoSuchAlgorithmException|InvalidKeyException e) {
-                                UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
+                                UtilsInTest.scriviNelLogDeiTest(UtilitaGenerale.stringaConStackTrace(e));
                             }
                             return arguments(stringaCasuale, hashCalcolato);
                         });

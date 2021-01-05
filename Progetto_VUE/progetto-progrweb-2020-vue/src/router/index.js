@@ -12,20 +12,21 @@
  *  https://router.vuejs.org/guide/essentials/nested-routes.html
  */
 
+// TODO : rivedere ed eventualmente ristrutturare questo script
+
 import { createRouter, createWebHashHistory } from 'vue-router'
-import {isAutenticato} from "../utils/utils";
 
 const routes = [
   {
     path: process.env.VUE_APP_ROUTER_ROOT_PATH,
-    name: "SchermataIniziale",
+    name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE,
     component: () => import('../views/SchermataIniziale.vue')
   },
   {
     // Route non trovata (url invalido) (Fonte: https://router.vuejs.org/guide/essentials/redirect-and-alias.html#redirect)
     // todo : si potrebbe mostrare un alert prima di effettuare redirect
     path: '/:pathMatch(.*)*',
-    redirect: { name: "SchermataIniziale"}
+    redirect: { name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE}
   },
   {
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
@@ -60,28 +61,34 @@ const router = createRouter({
 });
 
 
-// Gestione delle richieste in base alla property "meta"
+/*
+// Gestione del routing
 router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    // route richiede autorizzazione
-    if(isAutenticato()) {
-      // per questa route: se autenticato, allora è autorizzato
-      next({
-        path: process.env.VUE_APP_ROUTER_AREA_RISERVATA_PATH
-      });
-    } else {
-      // non autorizzato
-      next({
-        path: process.env.VUE_APP_ROUTER_ROOT_PATH, // responsabilità di root
-        params: {
-          urlRichiesto: to.fullPath
-        }
-      })
+
+  if( to.matched.some(record => record.meta.requiresAuth) ) { // ture se la route richiesta ha la property "requiresAuth" in meta           // TODO rivedere
+    // gestione instradamento per route che richiede autorizzazione
+
+    const parametriRouter = {};  // oggetto con i parametri utilizzati da Vue Router per la prossima route di destinazione
+
+    const tokenAutenticazione = to.params[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE]; // dai parametri di vue router
+
+    if(tokenAutenticazione) { // truthy se token definito e non nullo
+      // Imposta token di autenticazione come parametro della route prima di inoltrare nella route richiesta
+      parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = tokenAutenticazione;
+    } else {  // non autorizzato ad accedere alla route richiesta
+      //parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = undefined;  // impostato ad undefined per "enforcement"  // TODO : serve ? Si può cancellare?
+      parametriRouter["urlRichiestoMaNonAutorizzato"] = to.path;  // url per cui il client aveva fatto richiesta
     }
+
+    next({params: parametriRouter});
+
+  } else if( to.matched.some(record => record.meta.requiresNotLoggedIn) ) {
+    // TODO : da implementare (se utente già loggato, evitare che possa tornare nel componente di autenticazione)
+    next();
   } else {
-    // route non richiede autorizzazione
+    // SE route non richiede autorizzazione, ALLORA instrada senza problemi (invia comunque i parametri di route)
     next();
   }
-});
+});*/
 
 export default router;

@@ -11,9 +11,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
+ * Classe per la gestione del login dei client.
  * @author Matteo Ferfoglia
  */
-@Path("/login")
+@Path("/login")     // TODO : path variabile d'ambiente
 public class Login {
 
     /** Risponde alle richieste di login, rilasciando

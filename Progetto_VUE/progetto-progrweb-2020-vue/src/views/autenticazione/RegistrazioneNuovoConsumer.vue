@@ -15,7 +15,7 @@
 
 // TODO in caso di errore (input inserito dall'utente non valido) evidenziare la casella di input invalida (selector css ":invalid")
 
-import axios from "axios";
+import {richiestaPost} from "../../utils/httpUtils";
 
 export default {
   name: 'RegistrazioneNuovoConsumer',
@@ -49,7 +49,7 @@ export default {
         this.confermaPassword = "";
       }
 
-      const registrazioneCompletata = () => this.$router.push("/");
+      const registrazioneCompletata = () => this.$router.push({name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE});   // redirect a schermata iniziale // TODO : cosa bisogna fare qui ?
 
       const registrazioneFallita = ris => {
         console.error("Errore durante la registrazione: " + ris);
@@ -67,18 +67,16 @@ export default {
           campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] = this.password;
         }
 
-        axios.post(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
-            .then(() =>   registrazioneCompletata() )
-            .catch(ris => registrazioneFallita(ris) );
+        richiestaPost(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
+            .then(  ()       => registrazioneCompletata() )
+            .catch( risposta => registrazioneFallita(risposta.data) );
       };
 
 
-
-      if(isFormValido()){
+      if(isFormValido())
         inviaForm();
-      } else {
+      else
         informaUtenteFormInvalido();
-      }
 
     }
   }

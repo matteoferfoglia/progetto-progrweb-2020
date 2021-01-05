@@ -9,7 +9,7 @@
 
 import Autenticazione from '../components/Autenticazione'
 import AreaRiservata from "../components/AreaRiservata";
-import {isAutenticato} from "../utils/utils";
+import {isAutenticato} from "../utils/autenticazione";
 import LoginUtenteGiaRegistrato from "./autenticazione/LoginUtenteGiaRegistrato";
 
 export default {
@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     isUtenteAutenticato(){
-      return isAutenticato();
+      return isAutenticato(this.$route);
     }
   }
 }

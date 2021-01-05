@@ -1,6 +1,6 @@
 package it.units.progrweb;
 
-import it.units.progrweb.utils.UtilitaInputOutput;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -55,8 +55,8 @@ public class UtilsInTest {
      * @return null.
      */
     public static Object fallisciTestACausaDiEccezioneNonAttesa(Exception e) {
-        UtilsInTest.scriviNelLogDeiTest(UtilitaInputOutput.stringaConStackTrace(e));
-        fail("Eccezione non attesa: " + UtilitaInputOutput.stringaConStackTrace(e));
+        UtilsInTest.scriviNelLogDeiTest(UtilitaGenerale.stringaConStackTrace(e));
+        fail("Eccezione non attesa: " + UtilitaGenerale.stringaConStackTrace(e));
         return null;
     }
 }
