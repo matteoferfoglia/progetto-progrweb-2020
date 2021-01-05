@@ -1,49 +1,36 @@
 <template>
   <h2>Login > Accedi</h2>
-    <form v-if="isCsrfTokenCaricato" @submit.prevent="validaEdInviaForm"> <!-- TODO : VERIRICARE protezione csrf -->
+    <Form @submit.prevent="validaEdInviaForm" @csrf-token-ricevuto="csrfToken = $event">
+      <div>
       <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
       <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
-      <input type="hidden"  style="display: none" v-model="csrfToken">
       <input type="submit" value="Login">
-    </form>
+      </div>
+    </Form>
+    <!-- TODO : VERIRICARE protezione csrf -->
 </template>
 
 <script>
 
 /** Form viene mostrato solo dopo aver ricevuto dal server il CSRF token.*/
 
-import {richiediCSRFTokenAlServer} from "../../utils/CSRF";
 import {richiestaPost} from "../../utils/httpUtils";
 import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/httpUtils";
+import Form from "../../components/FormConCsrfToken";
 
 export default {
   name: 'LoginUtenteGiaRegistrato',
+  components: {Form},
   data: function () {
     return {
       username: undefined,
       password: undefined,
       csrfToken: undefined,
-      isCsrfTokenCaricato: false
     }
   },
-  created() {
-    // dati già disponibili e modificabili in questo hook
-
-    richiediCSRFTokenAlServer().then( valoreToken => {
-      // Se qui, allora token csrf ricevuto dal server
-      this.csrfToken = valoreToken;
-      this.isCsrfTokenCaricato = true;
-    }).catch( errore => {
-      // Errore durante la ricezione del token csrf
-      console.error("Errore in " +
-          /*Nome componente: */ this.$options.name + ": " + errore);  // TODO : gestire questo errore
-    });
-
-  },
   methods: {
-    validaEdInviaForm() {
 
-      // TODO : TESTARE e provare attacchi csrf
+    validaEdInviaForm() {
 
       const isFormValido = () => {
         return this.username.length>0 &&
@@ -63,8 +50,9 @@ export default {
        */
       const loginRiuscito = tokenAutenticazione => {
 
-        const parametriRouterPush = {};   // oggetto con i parametri utilizzati da Vue Router
-        parametriRouterPush[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = tokenAutenticazione;
+        const parametriRouterPush = {   // oggetto con i parametri utilizzati da Vue Router
+          [process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] : tokenAutenticazione
+        };
         this.$router.push({
           name   : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE,
           params : parametriRouterPush
@@ -90,12 +78,11 @@ export default {
 
         // TODO: refactoring: questo stesso metodo c'è anche nel form di registrazione nuovo consumer: potrebbe essere astratto per evitare duplicazione di codice, creando un metodo che riceve l' oggetto campiFormDaInviareAlServer e l' indirizzo del server, quindi provvede all' invio.
 
-        let campiFormDaInviareAlServer = {};
-        {
-          campiFormDaInviareAlServer[process.env.VUE_APP_LOGIN_USERNAME_INPUT_FIELD_NAME] = this.username;
-          campiFormDaInviareAlServer[process.env.VUE_APP_LOGIN_PASSWORD_INPUT_FIELD_NAME] = this.password;
-          campiFormDaInviareAlServer[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME] = this.csrfToken;
-        }
+        const campiFormDaInviareAlServer = {
+          [process.env.VUE_APP_LOGIN_USERNAME_INPUT_FIELD_NAME] : this.username,
+          [process.env.VUE_APP_LOGIN_PASSWORD_INPUT_FIELD_NAME] : this.password,
+          [process.env.VUE_APP_CSRF_INPUT_FIELD_NAME] : this.csrfToken
+        };
 
         richiestaPost(process.env.VUE_APP_LOGIN_SERVER_URL, campiFormDaInviareAlServer)
             .then( risposta => loginRiuscito(risposta.data) )     // risposta.data contiene il token di autenticazione

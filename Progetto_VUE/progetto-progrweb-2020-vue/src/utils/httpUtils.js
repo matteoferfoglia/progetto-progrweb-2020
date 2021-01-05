@@ -86,8 +86,17 @@ export const getHttpResponseStatus = (responseHttp) => responseHttp.status;
  * @return una Promise con la risposta ricevuta: la promise è "thenable"
  *          se non ci sono stati errori, "catchable" altrimenti.
  */
-export const richiestaGet = url => {
-    return axios.get(url, configRichiesteHttp.getConfig())
+export const richiestaGet = (url,oggettoConParametri) => {
+
+    //Aggiunta degli eventuali parametri all'oggetto di configurazione
+    const cloneConfigRichiesteHttp = JSON.parse(JSON.stringify(configRichiesteHttp.getConfig()));   // clona oggetto di configurazione per non sovrascriverlo
+    if(oggettoConParametri &&   // controlla che non sia null or undefined
+        Object.keys(oggettoConParametri).length !== 0) { // se ci sono parametri vanno aggiunti alla request
+
+        cloneConfigRichiesteHttp["params"] = oggettoConParametri;   // aggiunge i parametri
+    }
+
+    return axios.get(url, cloneConfigRichiesteHttp)
                 .then(risposta => Promise.resolve(risposta) )
                 .catch(errore  => Promise.reject(errore) ) ;    //  errore contiene la property response
                                                                 //      Fonte: https://stackoverflow.com/a/39153411

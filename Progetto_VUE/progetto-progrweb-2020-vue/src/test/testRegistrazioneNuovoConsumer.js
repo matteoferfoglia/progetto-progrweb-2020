@@ -88,11 +88,12 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
             const urlAzioneForm = mockUrl_varGlobale;
             const datiJSONInviati = JSON.stringify(mockDatiInviati_varGlobale);
 
-            const datiAttesi = {};
-            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME] = codFisc;
-            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] = nomeCognome;
-            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME] = email;
-            datiAttesi[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] = password;
+            const datiAttesi = {
+                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME]     : codFisc,
+                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] : nomeCognome,
+                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME]       : email,
+                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME]    : password
+            }
             const datiJSONAttesi = JSON.stringify(datiAttesi);
 
             // console.log("Inviato: \t{url=" + urlAzioneForm + ", dati=" + datiJSONInviati + " }");

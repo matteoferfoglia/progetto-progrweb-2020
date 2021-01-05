@@ -1,9 +1,8 @@
 <template>
   <h1>Benvenuto nell'area riservata</h1>
-  <form @submit.prevent="logout">
-    <input type="hidden"  style="display: none" v-model="csrfToken">
+  <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfToken = $event">
     <input type="submit" value="Logout">
-  </form>
+  </Form>
 </template>
 
 <script>
@@ -12,37 +11,21 @@
 
 // TODO : QUESTO COMPONENTE è INTERAMENTE DA IMPLEMENTARE
 
-import {richiediCSRFTokenAlServer} from "../utils/CSRF";
 import {richiestaGet} from "../utils/httpUtils";
+import Form from "./FormConCsrfToken";
 
 // TODO : refactoring : molto di questo componente è in comune con LoginUtenteGiaRegistrato
 
 export default {
   name: 'AreaRiservata',
+  components: {Form},
   data: function () {
     return {
       csrfToken: undefined,
-      isCsrfTokenCaricato: false
     }
-  },
-  created() {
-    // dati già disponibili e modificabili in questo hook
-
-    richiediCSRFTokenAlServer().then( valoreToken => {
-      // Se qui, allora token csrf ricevuto dal server
-      this.csrfToken = valoreToken;
-      this.isCsrfTokenCaricato = true;
-    }).catch( errore => {
-      // Errore durante la ricezione del token csrf
-      console.error("Errore in " +
-          /*Nome componente: */ this.$options.name + ": " + errore);  // TODO : gestire questo errore
-    });
-
   },
   methods: {
     logout() {
-
-      // TODO : TESTARE e provare attacchi csrf
 
       /** Se il logout va a buon fine, viene rimosso lo header <i>Authorization</i>
        * per le successive richieste HTTP.
@@ -58,7 +41,8 @@ export default {
 
 
       // Richiesta di logout al server
-      richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL)
+      const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
+      richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL, parametriRichiestaGet)
           .then( () => logoutRiuscito() )
           .catch(risposta => console.log("Logout fallito !! " + risposta) );          // TODO : gestire il caso di logout fallito (può succedere??)
 

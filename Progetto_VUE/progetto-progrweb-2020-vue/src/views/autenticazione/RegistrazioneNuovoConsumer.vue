@@ -59,12 +59,11 @@ export default {
 
       const inviaForm = () => {
 
-        let campiFormDaInviareAlServer = {};
-        {
-          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME] = this.codiceFiscale;
-          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] = this.nomeCognome;
-          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME] = this.email;
-          campiFormDaInviareAlServer[process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] = this.password;
+        let campiFormDaInviareAlServer = {
+          [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME] : this.codiceFiscale,
+          [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] : this.nomeCognome,
+          [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME] : this.email,
+          [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] : this.password
         }
 
         richiestaPost(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
