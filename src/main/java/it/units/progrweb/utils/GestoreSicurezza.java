@@ -75,7 +75,16 @@ public class GestoreSicurezza {
     public static String hmacSha256(String datiDaFirmare)
             throws NoSuchAlgorithmException, InvalidKeyException {
 
-        byte[] hash = gestoreSicurezza.CHIAVE_SEGRETA_HS256.getBytes(StandardCharsets.UTF_8);
+        return hmacSha256(datiDaFirmare, gestoreSicurezza.CHIAVE_SEGRETA_HS256);
+
+    }
+
+    /** Come {@link #hmacSha256(String)}, ma qui si fornisce l'hash
+     * da utilizzare per firmare i dati. */
+    public static String hmacSha256(String datiDaFirmare, String hashDaUsarePerFirmare)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+
+        byte[] hash = hashDaUsarePerFirmare.getBytes(StandardCharsets.UTF_8);
 
         Mac sha256Hmac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(hash, "HmacSHA256");

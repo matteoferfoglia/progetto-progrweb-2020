@@ -98,8 +98,8 @@ public class JwtToken<TipoValoreClaim> {
      * @throws NoSuchElementException Se il claim cercato non è presente.
      * @return Il claim corrispondente al nome cercato.
      */
-    public TipoValoreClaim getSubjectClaim() {
-        return getValoreClaimByName(JwtClaim.JWT_SUBJECT_CLAIM_NAME);
+    public String getValoreSubjectClaim() {
+        return (String) getValoreClaimByName(JwtClaim.JWT_SUBJECT_CLAIM_NAME);
     }
 
     /** Genera il token JWT, già firmato e nella codifica corretta (Base64 separato da punti).*/

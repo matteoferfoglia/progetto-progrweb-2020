@@ -17,6 +17,7 @@ public class Logout {
     public String logout() {
 
         // TODO : metodo da implementare
+        // TODO : verifica CSRF
 
         return "";
 

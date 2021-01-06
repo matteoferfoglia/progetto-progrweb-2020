@@ -32,6 +32,9 @@ public class FiltroAutenticazione implements Filter {
     public void destroy() {}
 
 
+    /** Verifica che la richiesta in ingresso provenga da un client autenticato
+     * oppure che la risorsa richiesta non richieda l'autenticazione.
+     */
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
 
@@ -39,10 +42,11 @@ public class FiltroAutenticazione implements Filter {
             HttpServletRequest httpReq = (HttpServletRequest) req;
 
             if( isRisorsaAdAccessoLibero(httpReq)
-                || (isRichiestaApi(httpReq) && Autenticazione.isClientAutenticato(httpReq)) )
-                chain.doFilter(req, resp);
-            // attualmente, solo richieste api possibili
+                || (isRichiestaApi(httpReq) && Autenticazione.isClientAutenticato(httpReq)) ) {
 
+                chain.doFilter(req, resp);
+                // attualmente, solo richieste api possibili
+            }
         }
     }
 

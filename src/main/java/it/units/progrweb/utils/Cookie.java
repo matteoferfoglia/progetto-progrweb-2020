@@ -27,26 +27,26 @@ public class Cookie extends NewCookie {
      * and /docs/Web/HTTP will all match.
      * </blockquote>.
      */
-    private final static String PERCORSO_DEFAULT = "/";// TODO : metterlo come variabile d'ambiente
+    public final static String PERCORSO_DEFAULT = "/";// TODO : metterlo come variabile d'ambiente
 
     /**
      * Attributo <i>Host</i> usato di default per il cookie,
      * è l'host a cui verrà inviato il cookie.
      * Se omesso, è l'host del documento corrente.
      */
-    private final static String HOST_DOMAIN_DEFAULT = "";// TODO : metterlo come variabile d'ambiente
+    public final static String HOST_DOMAIN_DEFAULT = "";// TODO : metterlo come variabile d'ambiente
 
     /** Attributo <i>Max-Age</i> usato di default per il cookie, in secondi.*/
-    final static int MAX_AGE_DEFAULT = 3600; // in secondi // TODO : metterlo come variabile d'ambiente
+    public final static int MAX_AGE_DEFAULT = 3600; // in secondi // TODO : metterlo come variabile d'ambiente
 
     /**  Flag <i>Secure</i> usato di default per il cookie. */
-    final static boolean SECURE_DEFAULT = false; // TODO : metterlo come variabile d'ambiente
+    public final static boolean SECURE_DEFAULT = false; // TODO : metterlo come variabile d'ambiente
 
     /** Flag <i>HttpOnly</i> usato di default per il cookie.*/
-    final static boolean HTTP_ONLY_DEFAULT = true;       // TODO : metterlo come variabile d'ambiente
+    public final static boolean HTTP_ONLY_DEFAULT = true;       // TODO : metterlo come variabile d'ambiente
 
     /** Valore <i>SameSite</i> usato di default per il cookie.*/
-    final static String SAME_SITE_VALUE = "Lax";       // TODO : metterlo come variabile d'ambiente
+    public final static String SAME_SITE_VALUE = "Lax";       // TODO : metterlo come variabile d'ambiente
 
 
     /** Vedere {@link NewCookie#NewCookie(String, String, String, String, String, int, boolean, boolean) NewCookie}.*/
@@ -65,6 +65,13 @@ public class Cookie extends NewCookie {
         this(nomeCookie, valoreCookie,
                 PERCORSO_DEFAULT, HOST_DOMAIN_DEFAULT,
                 descrizioneCookie, MAX_AGE_DEFAULT,
+                SECURE_DEFAULT, HTTP_ONLY_DEFAULT);
+    }
+
+    public Cookie(String nomeCookie, String valoreCookie, int maxAge, String descrizioneCookie) {
+        this(nomeCookie, valoreCookie,
+                PERCORSO_DEFAULT, HOST_DOMAIN_DEFAULT,
+                descrizioneCookie, maxAge,
                 SECURE_DEFAULT, HTTP_ONLY_DEFAULT);
     }
 

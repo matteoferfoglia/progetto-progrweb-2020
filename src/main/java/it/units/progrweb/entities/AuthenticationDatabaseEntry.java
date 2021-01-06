@@ -3,6 +3,7 @@ package it.units.progrweb.entities;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.GeneratoreTokenCasuali;
 import it.units.progrweb.utils.GestoreSicurezza;
@@ -22,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
  */
 @Entity
 public class AuthenticationDatabaseEntry {
+
+    // TODO : refactoring : spostare tutti (o quasi) i metodi statici nella classe di utilita "Autenticazione"
 
     // TODO : implementare questa @Entity
 
@@ -59,6 +62,12 @@ public class AuthenticationDatabaseEntry {
     private static String calcolaHashedSaltedPassword(String passwordInChiaro, String salt)
             throws InvalidKeyException, NoSuchAlgorithmException {
         return GestoreSicurezza.hmacSha256(passwordInChiaro.concat(salt));
+    }
+
+    /** Dato un attore, restituisce la sua password (hashed e salted).*/
+    public static String getHashedSaltedPasswordDellAttore(Attore attore) {
+        // TODO : metodo da implementare
+        return "PippoHashedSalted";
     }
 
 

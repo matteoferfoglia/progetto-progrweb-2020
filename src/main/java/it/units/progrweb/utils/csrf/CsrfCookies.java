@@ -22,7 +22,7 @@ import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodifica
 public class CsrfCookies {
 
     /** Nome del cookie che si occuperà di trasmettere il token CSRF ({@link #creaCookieContenenteJwtToken(JwtToken)}). */
-    private static final String NOME_COOKIE_CSRF = "CSRF-TOKEN-JWT";       // TODO : creare variabile d'ambiente (parametrizzare)
+    public static final String NOME_COOKIE_CSRF = "CSRF-TOKEN-JWT";       // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Nome del del cookie mantenuto con questo server per verificare l'identità del client
      * ({@link #creaCookieContenenteIdentificativoClient(String)}).*/
@@ -55,7 +55,11 @@ public class CsrfCookies {
     }
 
     public static Cookie creaCookieContenenteIdentificativoClient(String valoreIdentificativoClient) {
-        return new Cookie(NOME_COOKIE_CSRF_SUBJECT, valoreIdentificativoClient,
+        return creaCookieContenenteIdentificativoClient(valoreIdentificativoClient, Cookie.MAX_AGE_DEFAULT);
+    }
+
+    public static Cookie creaCookieContenenteIdentificativoClient(String valoreIdentificativoClient, int maxAgeDelCookieInSecondi) {
+        return new Cookie(NOME_COOKIE_CSRF_SUBJECT, valoreIdentificativoClient, maxAgeDelCookieInSecondi,
                 "Cookie contenente un valore identificativo per il client");
     }
 
@@ -129,7 +133,7 @@ public class CsrfCookies {
                 .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
 
         String valoreIdentificativoClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
-                .getSubjectClaim();
+                .getValoreSubjectClaim();
 
         String valoreIndirizzoIPClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimIPClientInJwtPayload);

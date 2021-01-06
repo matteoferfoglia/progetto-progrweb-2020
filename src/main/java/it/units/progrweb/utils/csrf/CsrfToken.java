@@ -138,6 +138,7 @@ public class CsrfToken {
                                             String cookieHeader,
                                             String indirizzoIPClient) {
 
+        // TODO : refactoring (troppi "rimbalzi" per validare il token)
         return CsrfCookies.isCsrfTokenValido(valoreTokenCsrf, cookieHeader, indirizzoIPClient,
                                              NOME_CLAIM_CSRF_TOKEN, NOME_CLAIM_IP_CLIENT);
 

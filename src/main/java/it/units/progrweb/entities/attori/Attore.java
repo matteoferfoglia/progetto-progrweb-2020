@@ -70,6 +70,13 @@ public abstract class Attore {
         return true;
     }
 
+    /** Restituisce l'attore corrispondente all'id dato nel parametro,
+     * oppure null se non trovato.*/
+    public static Attore getAttoreById(Long identificativoAttore) {
+        // TODO : accedere al database e cercare l'attore
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         // Metodo generato automaticamente da IntelliJ

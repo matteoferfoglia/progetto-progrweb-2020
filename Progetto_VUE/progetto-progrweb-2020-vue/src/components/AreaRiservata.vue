@@ -27,24 +27,16 @@ export default {
   methods: {
     logout() {
 
-      /** Se il logout va a buon fine, viene rimosso lo header <i>Authorization</i>
-       * per le successive richieste HTTP.
-       * Poi si viene reindirizzati alla pagina root di questa web application.
-       */
-      const logoutRiuscito = () => {
-
-        //this.$emit("logout");   // TODO : rivedere questa parte
-        this.$router.go(0);   // todo : funziona, ma avrei preferito con push (per evitare il reload dell'intera pagina, ma solo del componente)
-        //this.$router.push({ name : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE});// redirect a componente root togliendo il token di autenticazione
-
-      }
-
-
       // Richiesta di logout al server
       const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
       richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL, parametriRichiestaGet)
-          .then( () => logoutRiuscito() )
-          .catch(risposta => console.log("Logout fallito !! " + risposta) );          // TODO : gestire il caso di logout fallito (può succedere??)
+          .catch(risposta => console.log("Logout fallito !! " + risposta) )          // TODO : gestire il caso di logout fallito (può succedere??)
+          .finally( () => this.$router.go(0) ); //  todo : funziona, ma avrei preferito con push (per evitare il reload dell'intera pagina, ma solo del componente)
+
+      // TODO : Alternative al refresh della pagina (nel finally):
+      //this.$emit("logout");   // TODO : rivedere questa parte
+      //this.$router.go(0);   //
+      //this.$router.push({ name : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE});// redirect a componente root togliendo il token di autenticazione
 
     }
   }
