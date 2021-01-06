@@ -13,6 +13,7 @@
 
 import {richiestaGet} from "../utils/httpUtils";
 import Form from "./FormConCsrfToken";
+import {eliminaTokenAutenticazione} from "../utils/autenticazione";
 
 // TODO : refactoring : molto di questo componente è in comune con LoginUtenteGiaRegistrato
 
@@ -31,7 +32,10 @@ export default {
       const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
       richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL, parametriRichiestaGet)
           .catch(risposta => console.log("Logout fallito !! " + risposta) )          // TODO : gestire il caso di logout fallito (può succedere??)
-          .finally( () => this.$router.go(0) ); //  todo : funziona, ma avrei preferito con push (per evitare il reload dell'intera pagina, ma solo del componente)
+          .finally( () => { // logout sul client
+            eliminaTokenAutenticazione();
+            this.$router.go(0)  //  todo : funziona, ma avrei preferito con push (per evitare il reload dell'intera pagina, ma solo del componente)
+          });
 
       // TODO : Alternative al refresh della pagina (nel finally):
       //this.$emit("logout");   // TODO : rivedere questa parte

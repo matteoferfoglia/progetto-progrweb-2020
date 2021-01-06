@@ -76,7 +76,7 @@ router.beforeEach((to, from, next) => {
       // Imposta token di autenticazione come parametro della route prima di inoltrare nella route richiesta
       parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = tokenAutenticazione;
     } else {  // non autorizzato ad accedere alla route richiesta
-      //parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = undefined;  // impostato ad undefined per "enforcement"  // TODO : serve ? Si può cancellare?
+      //parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = "";  // impostato ad undefined per "enforcement"  // TODO : serve ? Si può cancellare?
       parametriRouter["urlRichiestoMaNonAutorizzato"] = to.path;  // url per cui il client aveva fatto richiesta
     }
 

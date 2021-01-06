@@ -9,13 +9,11 @@ import java.io.IOException;
 /**
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroCORS", asyncSupported = true, urlPatterns = {"/api/*"})
+@WebFilter(filterName = "FiltroCORS", asyncSupported = true, urlPatterns = {"/api/*"})  // TODO: url pattern da rendere variabile d'ambiente (vedi anche UtilitaGenerale.API_URL_PATTERN)
 public class FiltroCORS implements Filter {
 
     // TODO questo filtro è da rivedere / implementare
 
-
-    // Parametri:
 
     /** Array di stringhe contenente le origini permesse dalla CORS policy (whitelist).*/
     private final static String[] CORS_ALLOWED_ORIGINS = {
@@ -58,6 +56,9 @@ public class FiltroCORS implements Filter {
      */
     private final static boolean CORS_ALLOW_CREDENTIALS = true;
 
+    /** Nome del metodo HTTP intercettato da questo filtro, nel
+     * caso di richieste verso l'url pattern gestito da questo filtro.*/
+    public final static String METODO_HTTP_INTERCETTATO = "OPTIONS";
 
 
 
@@ -79,7 +80,7 @@ public class FiltroCORS implements Filter {
         response.addHeader("Access-Control-Allow-Headers", String.join(", ",CORS_ALLOWED_HEADERS));
         response.addHeader("Access-Control-Allow-Credentials", String.valueOf(CORS_ALLOW_CREDENTIALS));
 
-        if(request.getMethod().equals("OPTIONS")){
+        if(request.getMethod().equals(METODO_HTTP_INTERCETTATO)){
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
         }else{
             chain.doFilter(request, response);

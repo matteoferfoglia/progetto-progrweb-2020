@@ -1,5 +1,6 @@
 package it.units.progrweb.utils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -47,6 +48,9 @@ public class Cookie extends NewCookie {
 
     /** Valore <i>SameSite</i> usato di default per il cookie.*/
     public final static String SAME_SITE_VALUE = "Lax";       // TODO : metterlo come variabile d'ambiente
+
+    /** Nelle richieste HTTP (client verso server), è il nome dell' header contenente i cookie.*/
+    public static final String NOME_HEADER_COOKIE = "Cookie";
 
 
     /** Vedere {@link NewCookie#NewCookie(String, String, String, String, String, int, boolean, boolean) NewCookie}.*/
@@ -114,6 +118,11 @@ public class Cookie extends NewCookie {
 
         return cookies;
 
+    }
+
+    /** Data una richiesta HTTP, restituisce il'array dei cookie presenti in quella richiesta.*/
+    public static Cookie[] getCookieDaRichiestaHttp(HttpServletRequest httpServletRequest) {
+        return trovaCookiesDaHeader(httpServletRequest.getHeader(NOME_HEADER_COOKIE));
     }
 
     /** Hiding di {@link NewCookie#valueOf(String)}.*/

@@ -11,6 +11,7 @@ import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
@@ -40,9 +41,25 @@ public class Autenticazione {
     /** Lunghezza del token CSRF associato al token di autenticazione di un client.*/
     private static final int LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE = 128;
 
-    /** Nome del claim contenente l'hash del token CSRF nel JWT di autenticazione.
+    /** Nome del claim contenente l'hash del token associato al client nel JWT di autenticazione.
      * Vedere anche {@link #creaJwtTokenAutenticazionePerAttore(Attore, String)}.*/
-    private static final String NOME_CLAIM_JWT_CON_HASH_CSRF_AUTENTICAZIONE = "hash-csrf-autenticazione";
+    private static final String NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE = "hash-csrf-autenticazione";
+
+    /** Nome del cookie contenente un token per il client. L'hash di questo valore
+     * è presente nel token di autenticazione del client, nel claim con nome specificato
+     * in {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE}.*/
+    private static final String NOME_COOKIE_CLIENT_TOKEN = "TOKEN-ID-CLIENT-AUTENTICAZIONE";
+
+    /** Nelle richieste HTTP, è il nome dell' header contenente il token di autenticazione.*/
+    private static final String NOME_HEADER_AUTHORIZATION = "Authorization";
+
+    /** Nelle risposte HTTP (server verso client), è il nome dell' header
+     * che richiede l'autenticazione del client.*/
+    private static final String NOME_HEADER_AUTHENTICATE = "WWW-Authenticate";
+
+    /** Tipo di Autenticazione HTTP richiesta.*/
+    private static final String TIPO_AUTENTICAZIONE_RICHIESTA = "Bearer";
+
 
 
     /** Restituisce l'attore corrispondente alle credenziali date
@@ -51,7 +68,7 @@ public class Autenticazione {
         // TODO : cercare le credenziali nel database di autenticazione e restituire l'attore corrispondente
         // TODO : restituire ATTORE_NON_AUTENTICATO se credenziali invalide
 
-        if( password.equals("pippo") ) {  // TODO : questo metodo è da implementare !!!
+        if( password.equals("pippo") ) {  // TODO : questo metodo è da implementare !!! (TUTTO!! )
              // Creazione di un consumer (ed imposto id non nullo) // TODO : cancellare questa parte (qua bisognerebbe prelevare utente da db, non crearlo)
             Consumer consumer = new Consumer("username", "UtenteTest", "test@example.com");
             {
@@ -59,7 +76,7 @@ public class Autenticazione {
                     Field idField = consumer.getClass().getSuperclass().getSuperclass() // field di Attore
                                             .getDeclaredField("identificativoAttore");
                     idField.setAccessible(true);
-                    Long valoreId = Long.valueOf(10);
+                    Long valoreId = Long.valueOf(10);   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     idField.set(consumer, valoreId);
                 } catch (NoSuchFieldException | IllegalAccessException e) {/* non dovrebbe mai capitare questa eccezione*/ }
             }
@@ -112,8 +129,24 @@ public class Autenticazione {
 
         // Autenticazione fallita
         return Response.status(Response.Status.UNAUTHORIZED)
-                       .header("WWW-Authenticate","Bearer")   // invita il client ad autenticarsi
-                       .entity("Credenziali invalide")              // body della response
+                       .header(NOME_HEADER_AUTHENTICATE, TIPO_AUTENTICAZIONE_RICHIESTA)   // invita il client ad autenticarsi
+                       .entity("Credenziali invalide")                                    // body della response
+                       .build();
+    }
+
+    /** Crea una risposta HTTP grazie alla quale sovrascrive il cookie il cui
+     * valore è necessario per validare il token di autenticazione (vedere
+     * {@link #creaResponseAutenticazione(String, String)}), rendendo
+     * quest'ultimo inutilizzabile dal client.
+     * Questo metodo non ha alcun effetto se il browser usato dal client non
+     * sovrascrive il cookie come prescritto dall'header <i>SetCookie</i>
+     * della risposta creata da questo metodo.*/    // TODO : creare db di token invalidi ed aggiungere un token quando si fa logout e mantenerlo in quel db finché non scade
+    public static Response creaResponseLogout() {
+
+        Cookie cookieIdClientSovrascritto = CsrfCookies.creaCookieContenenteIdentificativoClient(NOME_COOKIE_CLIENT_TOKEN, "deleted",0);
+
+        return Response.ok()
+                       .cookie(cookieIdClientSovrascritto)
                        .build();
     }
 
@@ -126,15 +159,17 @@ public class Autenticazione {
 
         try {
             String valoreTokenCsrfAutenticazione = generaTokenAlfanumerico(LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE);
-            Cookie cookieCsrfAutenticazione = CsrfCookies.creaCookieContenenteIdentificativoClient(valoreTokenCsrfAutenticazione,
-                                                                                                   TIMEOUT_AUTENTICAZIONE_IN_SECONDI);
+            Cookie cookieIdClientPerAutenticazione = CsrfCookies.creaCookieContenenteIdentificativoClient(NOME_COOKIE_CLIENT_TOKEN,
+                                                                                                          valoreTokenCsrfAutenticazione,
+                                                                                                          TIMEOUT_AUTENTICAZIONE_IN_SECONDI);
             String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore, valoreTokenCsrfAutenticazione);
 
             return Response.ok()
-                           .cookie(cookieCsrfAutenticazione)
+                           .cookie(cookieIdClientPerAutenticazione)
                            .entity(tokenAutenticazione)
                            .type(MediaType.APPLICATION_FORM_URLENCODED) // token non è propriamente application/json
                            .build();
+
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(Autenticazione.class,
                     "Impossibile creare il token JWT di autenticazione.", e);
@@ -148,35 +183,75 @@ public class Autenticazione {
     /** Verifica se il client è autenticato in base agli header della richiesta HTTP.
      * La verifica dell'autenticazione è basata sul Bearer Token che dovrebbe essere
      * presente nell'header <i>Authorization</i> della request.
+     * Inoltre, la request deve contenere il cookie il cui hash del valore corrisponde
+     * a quello indicato nel claim di nome specificato in
+     * {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE} contenuto nel payload
+     * del token appena verificato.
      * @return true se il client è autenticato, false altrimenti.*/
     public static boolean isClientAutenticato(HttpServletRequest httpServletRequest) {
 
-        String tokenAutenticazioneBearer = httpServletRequest.getHeader("Authorization");  // prende header con token
+        String tokenAutenticazioneBearer = httpServletRequest.getHeader(NOME_HEADER_AUTHORIZATION);  // prende header con token
         if( tokenAutenticazioneBearer==null )
             return false;
 
         tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (rimuove "Bearer ")
-        return isTokenAutenticazioneValido(tokenAutenticazioneBearer);
 
-    }
-
-    /** Verifica la validità del token di autenticazione presentato da un client.*/
-    private static boolean isTokenAutenticazioneValido(String tokenAutenticazione) {
-
-        boolean isStringaNonNullaNonVuota = ! (tokenAutenticazione==null || tokenAutenticazione.trim().isEmpty()) ;
-        if( isStringaNonNullaNonVuota ) {
-            JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
-            return jwtTokenAutenticazione.isTokenValido();
+        // Calcolo del JWT token ottenuto dall'authorization header
+        JwtToken jwtTokenAutenticazione = null;
+        {
+            boolean isStringaNonNullaNonVuota = ! (tokenAutenticazioneBearer==null
+                                                    || tokenAutenticazioneBearer.trim().isEmpty()) ;
+            if( isStringaNonNullaNonVuota )
+                jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazioneBearer);
         }
-        return false;
+
+        // Cookie ricevuti in questa richiesta HTTP
+        Cookie[] cookiesDaQuestaRichiestaHttp = Cookie.getCookieDaRichiestaHttp(httpServletRequest);
+
+        return jwtTokenAutenticazione!= null
+                && jwtTokenAutenticazione.isTokenValido()
+                && isStessoHashCookieIdNelToken(jwtTokenAutenticazione, cookiesDaQuestaRichiestaHttp);
+
     }
+
+    /** Verifica che l'hash (calcolato con la password del client) del valore del cookie
+     * contenente un token casuale associato al client (vedere
+     * {@link #creaResponseAutenticazione(String, String)}) corrisponda al valore indicato
+     * nel token di autenticazione.
+     * @param jwtTokenAutenticazione Il token ricevuto nell'header di autenticazione.
+     * @param cookies Array di cookie ricevuti dal client in questa richiesta HTTP.
+     * @return true se la verifica va a buon fine, false altrimenti.*/
+    private static boolean isStessoHashCookieIdNelToken(@NotNull JwtToken jwtTokenAutenticazione,
+                                                        Cookie[] cookies) {
+
+        String identificativoAttoreDaToken = jwtTokenAutenticazione.getValoreSubjectClaim();
+        String hashNelTokenAutenticazione = (String) jwtTokenAutenticazione.getValoreClaimByName(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE);
+        String valoreCookieId = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
+                                      .getValue();
+        Attore attoreCheStaAutenticandosi = Attore.getAttoreById(Long.valueOf(identificativoAttoreDaToken));
+
+        String hashPasswordClient = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attoreCheStaAutenticandosi);
+        String hashValoreCookieId;
+        try {
+            hashValoreCookieId = GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordClient);
+        } catch (NoSuchAlgorithmException|InvalidKeyException e) {
+            Logger.scriviEccezioneNelLog(Autenticazione.class, e);
+            return false;
+        }
+
+        return hashNelTokenAutenticazione.equals(hashValoreCookieId);
+
+    }
+
 
     /** Crea un Jwt Token che certifica l'autenticazione dell'attore indicato
      * nel parametro, quindi lo codifica in base64 url-encoded e lo restituisce.
+     * @param attore
+     * @param valoreCookieId è il valore del cookie associato all'attore che si sta autenticando.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}.
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}.*/
     private static String creaJwtTokenAutenticazionePerAttore(Attore attore,
-                                                              String valoreTokenCsrfAutenticazione)
+                                                              String valoreCookieId)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
         String hashPasswordAttore = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attore);
@@ -184,8 +259,8 @@ public class Autenticazione {
         JwtPayload jwtPayload = new JwtPayload();
         jwtPayload.aggiungiClaim(new JwtSubjectClaim(String.valueOf(attore.getIdentificativoAttore())));
         jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(TIMEOUT_AUTENTICAZIONE_IN_SECONDI));
-        jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_JWT_CON_HASH_CSRF_AUTENTICAZIONE,
-                                              GestoreSicurezza.hmacSha256(valoreTokenCsrfAutenticazione, hashPasswordAttore)) );
+        jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
+                                              GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
 
         return new JwtToken(jwtPayload).generaTokenJsonCodificatoBase64UrlEncoded();
         

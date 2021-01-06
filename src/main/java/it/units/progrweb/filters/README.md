@@ -12,3 +12,6 @@ Permette le richieste "Cross-Origin".
 In base ad una whitelist per gli url accessibili senza autenticazione,
 blocca o permette il regolare flusso della richiesta ricevuta in base
 che questa richieda o meno l'autenticazione.
+
+## Filtro CSRF
+Controlla il token CSRF, quando presente.

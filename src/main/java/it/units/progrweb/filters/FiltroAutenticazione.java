@@ -5,6 +5,8 @@ import it.units.progrweb.utils.Autenticazione;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 import static it.units.progrweb.utils.UtilitaGenerale.*;
@@ -21,7 +23,7 @@ import static it.units.progrweb.utils.UtilitaGenerale.*;
 public class FiltroAutenticazione implements Filter {
 
     /** Whitelist di uri accessibili senza autenticazione.*/
-    private static final String[] WHITE_LIST_URL_PATTERNS_AUTENTICAZIONE_NON_RICHIESTA = {
+    private static final String[] WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA = {
             "/api/login",
             "/api/logout",
             "/api/registrazioneNuovoConsumer",
@@ -42,11 +44,15 @@ public class FiltroAutenticazione implements Filter {
             HttpServletRequest httpReq = (HttpServletRequest) req;
 
             if( isRisorsaAdAccessoLibero(httpReq)
-                || (isRichiestaApi(httpReq) && Autenticazione.isClientAutenticato(httpReq)) ) {
+                || (isRichiestaApi(httpReq)
+                    && ( httpReq.getMethod().equals(FiltroCORS.METODO_HTTP_INTERCETTATO)   // "OPTIONS" per richieste "api" gestite dal filtro CORS
+                         || Autenticazione.isClientAutenticato(httpReq) ) ) ) {
 
                 chain.doFilter(req, resp);
-                // attualmente, solo richieste api possibili
+                // attualmente, solo richieste di tipo "api" possibili
             }
+        } else {
+            rispondiNonAutorizzato((HttpServletResponse) resp);
         }
     }
 
@@ -58,12 +64,20 @@ public class FiltroAutenticazione implements Filter {
 
     /** Restituisce true se la richiesta http passata come parametro
      * fa riferimento ad un url presente nella
-     * {@link #WHITE_LIST_URL_PATTERNS_AUTENTICAZIONE_NON_RICHIESTA
+     * {@link #WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA
      * whitelist}, altrimenti restituisce false.
      * @return true se <strong>non</strong> è richiesta l'autenticazione, false altrimenti.*/
     private static boolean isRisorsaAdAccessoLibero(HttpServletRequest httpReq) {
         return isPresenteNellArray( getUrlPattern(httpReq),
-                                    WHITE_LIST_URL_PATTERNS_AUTENTICAZIONE_NON_RICHIESTA );
+                WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA);
+    }
+
+
+    /** Invia una risposta al client indicando che non è autorizzato.*/
+    public static void rispondiNonAutorizzato(HttpServletResponse response)
+            throws IOException {
+        response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
+                            Response.Status.UNAUTHORIZED.getReasonPhrase() );
     }
 
 }

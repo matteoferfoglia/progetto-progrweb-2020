@@ -22,11 +22,11 @@ import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodifica
 public class CsrfCookies {
 
     /** Nome del cookie che si occuperà di trasmettere il token CSRF ({@link #creaCookieContenenteJwtToken(JwtToken)}). */
-    public static final String NOME_COOKIE_CSRF = "CSRF-TOKEN-JWT";       // TODO : creare variabile d'ambiente (parametrizzare)
+    public static final String NOME_COOKIE_CSRF = "CSRF-TOKEN-JWT";         // TODO : creare variabile d'ambiente (parametrizzare)
 
     /** Nome del del cookie mantenuto con questo server per verificare l'identità del client
      * ({@link #creaCookieContenenteIdentificativoClient(String)}).*/
-    public static final String NOME_COOKIE_CSRF_SUBJECT = "CSRF-TOKEN-SUBJECT";// TODO : creare variabile d'ambiente (parametrizzare)
+    public static final String NOME_COOKIE_ID_CLIENT = "TOKEN-ID-CLIENT-VERIFICA-CSRF";     // TODO : creare variabile d'ambiente (parametrizzare)
 
 
     /** Conterrà il JWT token nel cui payload vi è il token CSRF ed un identificativo del client. */
@@ -55,11 +55,12 @@ public class CsrfCookies {
     }
 
     public static Cookie creaCookieContenenteIdentificativoClient(String valoreIdentificativoClient) {
-        return creaCookieContenenteIdentificativoClient(valoreIdentificativoClient, Cookie.MAX_AGE_DEFAULT);
+        return creaCookieContenenteIdentificativoClient(NOME_COOKIE_ID_CLIENT, valoreIdentificativoClient, Cookie.MAX_AGE_DEFAULT);
     }
 
-    public static Cookie creaCookieContenenteIdentificativoClient(String valoreIdentificativoClient, int maxAgeDelCookieInSecondi) {
-        return new Cookie(NOME_COOKIE_CSRF_SUBJECT, valoreIdentificativoClient, maxAgeDelCookieInSecondi,
+    public static Cookie creaCookieContenenteIdentificativoClient(String nomeCookie, String valoreIdentificativoClient, int maxAgeDelCookieInSecondi) {
+        // TODO : usare il metodo della classe Cookie ? Sarebbe più pulito?
+        return new Cookie(nomeCookie, valoreIdentificativoClient, maxAgeDelCookieInSecondi,
                 "Cookie contenente un valore identificativo per il client");
     }
 
@@ -90,7 +91,7 @@ public class CsrfCookies {
             Cookie[] cookies = Cookie.trovaCookiesDaHeader(cookieHeader);
             Cookie cookieConJwtConCsrf = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CSRF, cookies);
             JwtToken jwtTokenOttenutoDaCookie = creaJwtTokenDaStringaCodificata( cookieConJwtConCsrf.getValue() );
-            String identificativoClientOttenutoDaCookie = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CSRF_SUBJECT, cookies).getValue();
+            String identificativoClientOttenutoDaCookie = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_ID_CLIENT, cookies).getValue();
 
             return isCsrfTokenValido(
                     valoreTokenCsrfDaVerificare,
@@ -132,7 +133,7 @@ public class CsrfCookies {
         String valoreCsrfTokenDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
 
-        String valoreIdentificativoClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+        String valoreIdentificativoClientDaJwt = jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreSubjectClaim();
 
         String valoreIndirizzoIPClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient

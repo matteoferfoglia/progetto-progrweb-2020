@@ -8,7 +8,7 @@
 
 import {
     getAuthorizationHeaderRichiesteHttp,
-    impostaAuthorizationHeaderInRichiesteHttp,
+    impostaAuthorizationHeaderInRichiesteHttp, rimuoviAuthorizationHeader,
 } from "./httpUtils";
 
 /**
@@ -40,21 +40,51 @@ export const isAutenticato = $route => {
 
 /**
  * Cerca nei parametri della route corrente il token di autenticazione
- * e, se presente, lo imposta per le successive richieste HTTP; inoltre
- * restituisce <code>true</code>. Altrimentri restituisce <code>false</code>.
- *
+ * e, se presente, lo salva per le successive richieste HTTP.
+ * Se il token di autenticazione è salvato, restituisce true, altrimenti
+ * false.
  * @param $route la property $route (this.$route) del componente che invoca questo metodo.
  * @return true se esiste il token di autenticazione, false altrimenti.
  */
 const impostaTokenDiAutenticazioneSeEsiste = $route => {
-    if($route) {    // controllo che sia definita
-        const tokenAutenticazione = $route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE];
-        if(tokenAutenticazione) // truthy se presente non nullo né vuoto
-            impostaAuthorizationHeaderInRichiesteHttp(tokenAutenticazione);
-        /* else        // altrimenti rimuovo (se presente) header di autenticazione (se non presente, non succede niente)
-            rimuoviAuthorizationHeader(); */ // TODO : se si aggiorna la pagina, si perde il token
+
+    // TODO : rivedere questo metodo
+
+    // Cerco token autenticazione nei parametri di Vue Router
+    if($route) {    // controllo che $route (parametro di questo metodo) sia definita
+        const tokenDaRoute = $route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE];
+        if(tokenDaRoute!=="undefined")   // TODO : rivedere (Vue converte undefined in stringa "undefined")
+            salvaTokenAutenticazione(tokenDaRoute);
     }
+
+    // Cerco token in local storage
+    const tokenAutenticazione = getTokenAutenticazione();
+
+    // Imposto header di autenticazione per richieste http
+    if(tokenAutenticazione && tokenAutenticazione!=="undefined") // truthy se token presente non nullo né stringa vuota né undefined // TODO : rivedere (Vue converte undefined in stringa "undefined")
+        impostaAuthorizationHeaderInRichiesteHttp(tokenAutenticazione);
+    else                    // altrimenti rimuovo (se presente) header di autenticazione (se non presente, non succede niente)
+        rimuoviAuthorizationHeader();
+
 
     return getAuthorizationHeaderRichiesteHttp() ?    // sia stringa vuota sia undefined sono falsy
                 true : false;
 }
+
+/** Nome della variabile nello storageLocale in cui è memorizzato il token di autenticazione.*/
+const nomeVariabileInCuiSalvareIlTokenAutenticazione = process.env.VUE_APP_NOME_VARIABILE_IN_LOCAL_STORAGE_CON_TOKEN_AUTENTICAZIONE;
+
+/** Salva il token di autenticazione nello storage locale.
+ * @param valoreTokenAutenticazione Il valore del token di autenticazione.*/
+export const salvaTokenAutenticazione = valoreTokenAutenticazione =>
+    localStorage.setItem(nomeVariabileInCuiSalvareIlTokenAutenticazione, valoreTokenAutenticazione);
+
+/** Legge il valore del token di autenticazione dallo storage
+ * locale e lo restituisce.*/
+export const getTokenAutenticazione = () =>
+    localStorage.getItem(nomeVariabileInCuiSalvareIlTokenAutenticazione);
+
+/** Elimina il token di autenticazione dallo storage locale.*/
+export const eliminaTokenAutenticazione = () =>
+    localStorage.removeItem(nomeVariabileInCuiSalvareIlTokenAutenticazione);
+

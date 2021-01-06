@@ -7,7 +7,6 @@ import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
 
-import javax.ws.rs.core.Response;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -155,15 +154,6 @@ public class CsrfToken {
                 CsrfCookies.creaCookieContenenteIdentificativoClient(valoreIdentificativoClient),
                 DURATA_TOKEN_IN_SECONDI
         );
-    }
-
-
-    /** Crea una {@link javax.ws.rs.core.Response} per segnalare
-     * l'invalidità del token CSRF fornito.*/
-    public static Response creaResponseCsrfTokenInvalido() {
-        return Response.status(Response.Status.FORBIDDEN)
-                       .entity("Token CSRF invalido. Ricaricare il form e riprovare.")
-                       .build();
     }
 
 }

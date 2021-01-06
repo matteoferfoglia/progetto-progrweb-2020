@@ -3,6 +3,7 @@ package it.units.progrweb.entities.attori;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.RegexHelper;
 
 
@@ -74,7 +75,8 @@ public abstract class Attore {
      * oppure null se non trovato.*/
     public static Attore getAttoreById(Long identificativoAttore) {
         // TODO : accedere al database e cercare l'attore
-        return null;
+        return Autenticazione.getAttoreDaCredenziali("Pippo", "pippo"); // TODO : questo metodo è ancora da implementare!!! Quest'istruzione è solo temporanea per far funzionare il resto intanto
+        // return null
     }
 
     @Override

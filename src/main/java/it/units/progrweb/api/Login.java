@@ -2,11 +2,8 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
-import it.units.progrweb.utils.csrf.CsrfToken;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,23 +15,16 @@ import javax.ws.rs.core.Response;
 public class Login {
 
     /** Risponde alle richieste di login, rilasciando
-     * un'opportuna {@link Response} al client.
-     * Verifica anche la validità del token CSRF nel form
-     * di login.*/
+     * un'opportuna {@link Response} al client.*/
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response login(CampiFormLogin campiFormLogin,
-                          @HeaderParam("Cookie") String cookieHeader,
-                          @Context HttpServletRequest httpServletRequest){
+    public Response login(CampiFormLogin campiFormLogin){
 
-        String indirizzoIPClient = httpServletRequest.getRemoteAddr();
-
-        if(CsrfToken.isCsrfTokenValido(campiFormLogin.getCsrfToken(), cookieHeader, indirizzoIPClient))
-            return Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword());
-        else
-            return CsrfToken.creaResponseCsrfTokenInvalido();
+        // TODO : verificare che CSRF token venga controllato e testare
+        return Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword());
     }
+
 }
 
 @SuppressWarnings("unused")
