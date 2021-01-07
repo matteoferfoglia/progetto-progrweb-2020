@@ -1,4 +1,4 @@
-package it.units.progrweb.entities;
+package it.units.progrweb.entities.file;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -14,15 +14,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Rappresentazione di un file, caricato da un
- * {@link it.units.progrweb.entities.attori.Uploader}
- * ed indirizzato ad un
- * {@link it.units.progrweb.entities.attori.Consumer}.
- *
  * @author Matteo Ferfoglia
  */
 @Entity
-public class File {
+public class FileStorage extends File {
 
     // TODO : implementare questa classe!!
 
@@ -39,18 +34,6 @@ public class File {
     @Index
     private Consumer consumer;  // TODO : questo campo serve qui o meglio altrove?
 
-    /** Nome del file.*/
-    @Index
-    private String nomeFile;
-
-    /** Data e ora di caricamento del file.*/
-    @Index
-    private DateTime dataOraCaricamento;
-
-    /** Data e ora di visualizzazione del file.*/
-    @Index  // TODO : è importante sapere la dataora di visualizzazione o non serve l'index?
-    private DateTime dataOraVisualizzazione;
-
     /** Indirizzo IP del consumer che ha visualizzato il file. */
     private InetAddress indirizzoIpVisualizzazione; // TODO : cambiare tipo??
 
@@ -62,14 +45,12 @@ public class File {
     private java.io.File documento;     // TODO : va bene usare java.io.File? Meglio usare byte[] ? Salvarlo nel db? Oppure salvarlo separatamente? O altrove? e qua mettere solo un link al documento?
 
 
-    private File(){}
+    private FileStorage(){}
 
     /** Crea un nuovo file, con nome ed hashtags specificati. */
-    public File(String nomeFile, String... hashtags) {
-        // TODO : test
-        this.nomeFile = nomeFile;
+    public FileStorage(String nomeFile, String... hashtags) {
+        super(nomeFile, DateTime.adesso());
         this.listaHashtag = Arrays.asList(hashtags);
-        this.dataOraCaricamento = DateTime.adesso();
     }
 
 
@@ -78,7 +59,7 @@ public class File {
      * il documento. */
     public java.io.File getFile(InetAddress indirizzoIpVisualizzazione) {
         // TODO : da implementare
-        this.dataOraVisualizzazione = DateTime.adesso();
+        this.dataEdOraDiVisualizzazione = DateTime.adesso();
         this.indirizzoIpVisualizzazione = indirizzoIpVisualizzazione;
         return this.documento;
     }
@@ -104,7 +85,7 @@ public class File {
 
     }
 
-
+    @Override
     public Consumer getConsumer() {
         return consumer;
     }

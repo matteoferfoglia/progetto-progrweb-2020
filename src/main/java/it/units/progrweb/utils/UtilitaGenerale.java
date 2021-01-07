@@ -1,6 +1,7 @@
 package it.units.progrweb.utils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 public class UtilitaGenerale {
 
     /** Inizio dell'URI delle richieste "api".*/
-    private static final String API_URL_PATTERN = "/api";       // TODO : variabile d'ambiente
+    private static final String API_URL_PATTERN = "/api";       // TODO : variabile d'ambiente (questa variabile NON dovrebbe essere in questa classe!!!)
 
     /** Restituisce true se l'array dato contiene l'oggetto
      * da cercare, false altrimenti. La classe dell'oggetto
@@ -51,6 +52,31 @@ public class UtilitaGenerale {
     public static String getUrlPattern(HttpServletRequest httpRequest) {
         // TODO : testare
         return httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
+    }
+
+    /** Metodo di conversione da una stringa CamelCase ad una
+     * in cui le parole sono separate da spazi
+     * (<a href="https://stackoverflow.com/a/2560017">Fonte</a>).*/
+    public static String splitCamelCase(String s) {
+
+        // TODO : rivedere e testare questo metodo
+
+        return s.replaceAll(
+                String.format("%s|%s|%s",
+                        "(?<=[A-Z])(?=[A-Z][a-z])",
+                        "(?<=[^A-Z])(?=[A-Z])",
+                        "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ),
+                " "
+        );
+
+    }
+
+    /** Metodo per rendere maiuscola la prima lettera della
+     * stringa passata come parametro.*/
+    public static String trasformaPrimaLetteraMaiuscola(@NotNull String stringaDaModificare) {
+        return stringaDaModificare.substring(0, 1).toUpperCase()
+                + stringaDaModificare.substring(1);
     }
 
 }

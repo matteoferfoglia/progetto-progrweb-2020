@@ -32,7 +32,7 @@ public class Uploader extends UtenteNonAdministrator {
     }
 
     /** Restituisce la lista dei documenti caricati da questo uploader nel periodo temporale specificato*/
-    public List<it.units.progrweb.entities.File> getDocumentiCaricatiNelPeriodo(PeriodoTemporale periodoTemporale) {
+    public List<it.units.progrweb.entities.file.File> getDocumentiCaricatiNelPeriodo(PeriodoTemporale periodoTemporale) {
         // TODO : interroga db è restituisci il numero di documenti caricati da questo uplaoder nel periodo indicato
         return new ArrayList<>();   // TODO !!!
     }
@@ -67,14 +67,14 @@ public class Uploader extends UtenteNonAdministrator {
 
     /** Crea un file per il consumer specificato.
      * Restituisce true se la procedura va a buon fine, false altrimenti. */
-    public boolean creaFilePerConsumer(it.units.progrweb.entities.File file, Consumer consumer) {
+    public boolean creaFilePerConsumer(it.units.progrweb.entities.file.File file, Consumer consumer) {
         // TODO : creare il file per il consumer
         return true;   // TODO !!!
     }
 
     /** Elimina il file specificato.
      * Restituisce true se la procedura va a buon fine, false altrimenti. */
-    public boolean eliminaFile(it.units.progrweb.entities.File fileDaEliminare) {
+    public boolean eliminaFile(it.units.progrweb.entities.file.File fileDaEliminare) {
         // TODO : eliminare il file specificato
         // TODO : pensare alla strategia di eliminazione: per i consumer che hanno già ricevuto il file? O già visualizzato?
         return true;   // TODO !!!

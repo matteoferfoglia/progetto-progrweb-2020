@@ -159,7 +159,7 @@ class ResocontoDiUnUploader {
     /** Documenti caricati dall' {@link #uploader Uploader} nel
      * {@link #periodoTemporaleDiRiferimento periodo temporale}
      * di riferimento per questo resoconto. */
-    private final List<it.units.progrweb.entities.File> listaDocumentiCaricati;
+    private final List<it.units.progrweb.entities.file.File> listaDocumentiCaricati;
 
     /** Numero di documenti caricati dall'uploader.*/
     private final long numeroDocumentiCaricati;
@@ -176,7 +176,7 @@ class ResocontoDiUnUploader {
         this.listaDocumentiCaricati = uploader.getDocumentiCaricatiNelPeriodo(periodoTemporale);
         this.numeroDocumentiCaricati = this.listaDocumentiCaricati.size();
         this.numeroConsumersDistintiCuiDocumentiCaricatiRiferiscono = this.listaDocumentiCaricati.stream()
-                .map(it.units.progrweb.entities.File::getConsumer)
+                .map(it.units.progrweb.entities.file.File::getConsumer)
                 .distinct()
                 .count();
     }
@@ -190,7 +190,7 @@ class ResocontoDiUnUploader {
         return periodoTemporaleDiRiferimento;
     }
 
-    public List<it.units.progrweb.entities.File> getListaDocumentiCaricati() {
+    public List<it.units.progrweb.entities.file.File> getListaDocumentiCaricati() {
         return listaDocumentiCaricati;
     }
 

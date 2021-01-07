@@ -1,7 +1,7 @@
 package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.annotation.Subclass;
-import it.units.progrweb.entities.File;
+import it.units.progrweb.entities.file.File;
 
 import java.util.ArrayList;
 import java.util.List;
