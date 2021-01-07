@@ -3,6 +3,7 @@
   <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfToken = $event">
     <input type="submit" value="Logout">
   </Form>
+  <Consumer/>
 </template>
 
 <script>
@@ -14,12 +15,13 @@
 import {richiestaGet} from "../utils/httpUtils";
 import Form from "./FormConCsrfToken";
 import {eliminaTokenAutenticazione} from "../utils/autenticazione";
+import Consumer from "../views/attori/Consumer";
 
 // TODO : refactoring : molto di questo componente è in comune con LoginUtenteGiaRegistrato
 
 export default {
   name: 'AreaRiservata',
-  components: {Form},
+  components: {Consumer, Form},
   data: function () {
     return {
       csrfToken: undefined,

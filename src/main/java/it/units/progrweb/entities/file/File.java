@@ -17,9 +17,6 @@ import java.util.Arrays;
  */
 public abstract class File {
 
-    // Utilizzo "abstract class" per avere gli attributi i cui nomi devono
-    //  essere pubblici, evitando duplicazione di codice.
-
     /** Nome del file.*/
     @Index
     protected String nomeFile;        // TODO : verificare in objectify che questi campi siano presenti nella subclass "@Entity" che estende questa class

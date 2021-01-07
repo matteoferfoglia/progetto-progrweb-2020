@@ -8,14 +8,21 @@ import it.units.progrweb.entities.attori.Consumer;
  */
 public class FileProxy extends File {
 
-    private final FileStorage fileStorage;
+    // NOTA : questa classe estende File, quindi ne eredita gli attributi "protected"
 
-    public FileProxy(String nomeFile, String... hashtags) {
-        this.fileStorage = new FileStorage(nomeFile, hashtags);
+    private final Consumer consumerDestinatarioFile;
+
+    /** Data un'istanza di {@link it.units.progrweb.entities.file.FileStorage},
+     * restituice un'istanza di questa classe, che funge da proxy per quella data.
+     * @param fileStorage Entità di cui creare il proxy.
+     */
+    public FileProxy(FileStorage fileStorage) {
+        this.consumerDestinatarioFile = fileStorage.getConsumer();
+
     }
 
     @Override
     public Consumer getConsumer() {
-        return fileStorage.getConsumer();
+        return consumerDestinatarioFile;
     }
 }
