@@ -48,8 +48,8 @@ public class FileStorage extends File {
     private FileStorage(){}
 
     /** Crea un nuovo file, con nome ed hashtags specificati. */
-    public FileStorage(String nomeFile, String... hashtags) {
-        super(nomeFile, DateTime.adesso());
+    public FileStorage(String nomeDocumento, String... hashtags) {
+        super(nomeDocumento, DateTime.adesso());
         this.listaHashtag = Arrays.asList(hashtags);
     }
 

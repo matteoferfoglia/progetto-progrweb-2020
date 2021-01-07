@@ -19,7 +19,7 @@ public abstract class File {
 
     /** Nome del file.*/
     @Index
-    protected String nomeFile;        // TODO : verificare in objectify che questi campi siano presenti nella subclass "@Entity" che estende questa class
+    protected String nomeDocumento;        // TODO : verificare in objectify che questi campi siano presenti nella subclass "@Entity" che estende questa class
 
     /** Data e ora di caricamento del file.*/
     @Index
@@ -31,8 +31,8 @@ public abstract class File {
 
     protected File(){}
 
-    protected File(String nomeFile, DateTime dataEdOraDiCaricamento) {
-        this.nomeFile = nomeFile;
+    protected File(String nomeDocumento, DateTime dataEdOraDiCaricamento) {
+        this.nomeDocumento = nomeDocumento;
         this.dataEdOraDiCaricamento = dataEdOraDiCaricamento;
     }
 

@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static it.units.progrweb.UtilsInTest.fallisciTestACausaDiEccezioneNonAttesa;
@@ -34,6 +35,9 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  * @author Matteo Ferfoglia
  */
 public class DatabaseTest {
+
+    /** Fattore di replicazione delle istanze di test create in {@link #generaEntitaDaSalvareNelDatabase()}.*/
+    final static int NUMERO_RIPETIZIONI_OGNI_TEST = 1000;
 
     // ------------ SETUP APPENGINE e OBJECTIFY ------------
 
@@ -86,6 +90,8 @@ public class DatabaseTest {
             Class[] classiGestiteDalDatabase = (Class[]) classiGestiteDaDatabase_field.get(null); // null perché la classe è statica
 
             return Arrays.stream(classiGestiteDalDatabase)
+                         .flatMap(classeEntita -> IntStream.range(0, NUMERO_RIPETIZIONI_OGNI_TEST)   // replica istanze
+                                                           .mapToObj(contatoreRipetizioni -> classeEntita) )
                          .map(classeEntita -> {
                              try {
 
@@ -120,7 +126,7 @@ public class DatabaseTest {
             assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entita salvate all'inizializzazione del datastore
 
             DatabaseHelper.salvaEntita(entita);
-            DatabaseHelper.flush(); // svuota transazioni in corso  // TODO : non funziona: a volte questo test fallisce
+            DatabaseHelper.completaOra(); // svuota transazioni in corso  // TODO : non funziona: a volte questo test fallisce
 
             assertEquals(1, DatabaseHelper.contaEntitaNelDatabase());
 
