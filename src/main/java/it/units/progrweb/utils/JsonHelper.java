@@ -1,5 +1,7 @@
 package it.units.progrweb.utils;
 
+import com.google.appengine.repackaged.com.google.gson.Gson;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -13,6 +15,14 @@ import java.util.stream.Collectors;
  * @author Matteo Ferfoglia
  */
 public class JsonHelper {
+
+    // TODO : rivedere questa classe se semplificabile (es. usando Google Gson())
+
+    /** Converte l'oggetto dato in formato JSON.*/
+    public static<T> String convertiOggettoInJson(T oggettoDaConvertireInJson) {
+        // TODO : testare questo metodo
+        return new Gson().toJson(oggettoDaConvertireInJson);
+    }
 
     /**
      * Data una stringa corrispondente ad una rappresentazione JSON
