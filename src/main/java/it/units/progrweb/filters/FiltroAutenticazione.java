@@ -27,7 +27,8 @@ public class FiltroAutenticazione implements Filter {
             "/api/login",
             "/api/logout",
             "/api/registrazioneNuovoConsumer",
-            "/api/CSRFToken/generaCSRFToken"
+            "/api/CSRFToken/generaCSRFToken",
+            "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo !!! // TODO : var ambiente solo di sviluppo // TODO : solo per sviluppo
     };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
 
 
