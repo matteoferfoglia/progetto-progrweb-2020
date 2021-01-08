@@ -15,7 +15,7 @@ import java.util.List;
  * @author Matteo Ferfoglia
  */
 @Entity
-public class FileStorage extends File {
+class FileStorage extends File {
 
     // TODO : implementare questa classe!!
 
