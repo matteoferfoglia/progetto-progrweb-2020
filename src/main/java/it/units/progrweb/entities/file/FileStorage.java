@@ -1,10 +1,8 @@
 package it.units.progrweb.entities.file;
 
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.*;
 import it.units.progrweb.entities.attori.Consumer;
-import it.units.progrweb.entities.attori.Uploader;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.datetime.DateTime;
 
@@ -22,27 +20,33 @@ public class FileStorage extends File {
     // TODO : implementare questa classe!!
 
 
-    /** Identificativo per il file.*/
-    @Id
-    private Long identificativoFile;
+    // ATTRIBUTI ENTITA
 
-    /** Uploader che ha caricato il file.*/
-    @Index
-    private Uploader uploader;  // TODO : questo campo serve qui o meglio altrove?
+        /** Identificativo per il file.*/
+        @Id
+        private Long identificativoFile;
 
-    /** Consumer a cui è indirizzato il file.*/
-    @Index
-    private Consumer consumer;  // TODO : questo campo serve qui o meglio altrove?
+        /** Indirizzo IP del consumer che ha visualizzato il file. */
+        private InetAddress indirizzoIpVisualizzatore; // TODO : cambiare tipo??
 
-    /** Indirizzo IP del consumer che ha visualizzato il file. */
-    private InetAddress indirizzoIpVisualizzazione; // TODO : cambiare tipo??
+        /** Lista di hashtag associati a questo file. */
+        @Index
+        private List<String> listaHashtag;
 
-    /** Lista di hashtag associati a questo file. */
-    @Index
-    private List<String> listaHashtag;
+        /** Il documento. */
+        private byte[] documento;   // byte[] automaticamente convertito in Blob nel datastore
 
-    /** Il documento. */
-    private java.io.File documento;     // TODO : va bene usare java.io.File? Meglio usare byte[] ? Salvarlo nel db? Oppure salvarlo separatamente? O altrove? e qua mettere solo un link al documento?
+
+
+    // RELAZIONI (usare getter e setter)
+        /** Consumer a cui è indirizzato il file.*/
+        @Index
+        @Load
+        private Ref<Consumer> consumer;
+
+
+
+    // METODI (a seguire)
 
 
     private FileStorage(){}
@@ -57,10 +61,10 @@ public class FileStorage extends File {
     /** Restituisce il documento associato a quest'istanza ed imposta
      * data ed ora di visualizzazione e l'indirizzo IP di chi ha visualizzato
      * il documento. */
-    public java.io.File getFile(InetAddress indirizzoIpVisualizzazione) {
+    public byte[] getFile(InetAddress indirizzoIpVisualizzazione) {
         // TODO : da implementare
         this.dataEdOraDiVisualizzazione = DateTime.adesso();
-        this.indirizzoIpVisualizzazione = indirizzoIpVisualizzazione;
+        this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
         return this.documento;
     }
 
@@ -87,7 +91,11 @@ public class FileStorage extends File {
 
     @Override
     public Consumer getConsumer() {
-        return consumer;
+        return consumer.get();
+    }
+
+    public void setConsumer(Consumer consumer) {
+        this.consumer = Ref.create(consumer);
     }
 
 }

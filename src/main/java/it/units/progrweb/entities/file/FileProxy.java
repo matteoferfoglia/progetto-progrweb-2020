@@ -10,6 +10,7 @@ public class FileProxy extends File {
 
     // NOTA : questa classe estende File, quindi ne eredita gli attributi "protected"
 
+    /** Vedere {@link File#getConsumer()}.*/
     private final Consumer consumerDestinatarioFile;
 
     /** Data un'istanza di {@link it.units.progrweb.entities.file.FileStorage},
@@ -18,7 +19,6 @@ public class FileProxy extends File {
      */
     public FileProxy(FileStorage fileStorage) {
         this.consumerDestinatarioFile = fileStorage.getConsumer();
-
     }
 
     @Override

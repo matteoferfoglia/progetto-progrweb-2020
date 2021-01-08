@@ -1,11 +1,14 @@
 package it.units.progrweb.entities.attori;
 
+import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Subclass;
+import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Rappresentazione di un Uploader.
@@ -15,25 +18,35 @@ import java.util.List;
 public class Uploader extends UtenteNonAdministrator {
 
     /** Logo dell'uploader.*/
-    private File immagineLogo;  // TODO : come salvare nel database ? Blob? byte[] ? File ? // TODO : salvare in db!! // TODO : meglio fare una classe a parte? Ad es. specificando i formati permessi??
+    private byte[] immagineLogo;  // byte[] automaticamente convertito in Blob nel datastore
+
+    /** File caricato da questo Uploader.*/
+    @Load
+    private List<Ref<File>> filesCaricatiDaQuestoUploader = new ArrayList<>();  // Relazione uno a molti
 
     // TODO : implementare questa classe
 
+
+    public List<File> getFilesCaricatiDaQuestoUploader() {
+        return filesCaricatiDaQuestoUploader.stream()
+                                            .map(fileRef -> fileRef.get())
+                                            .collect(Collectors.toList());
+    }
 
 
     private Uploader() {
         super();    // TODO
     }
 
-    public Uploader(String username, String nomeCognome, String email, File immagineLogo) {
+    public Uploader(String username, String nomeCognome, String email, byte[] immagineLogo) {
         // TODO
         super(username, nomeCognome, email);
         this.immagineLogo = immagineLogo;
     }
 
     /** Restituisce la lista dei documenti caricati da questo uploader nel periodo temporale specificato*/
-    public List<it.units.progrweb.entities.file.File> getDocumentiCaricatiNelPeriodo(PeriodoTemporale periodoTemporale) {
-        // TODO : interroga db è restituisci il numero di documenti caricati da questo uplaoder nel periodo indicato
+    public List<File> getDocumentiCaricatiNelPeriodo(PeriodoTemporale periodoTemporale) {
+        // TODO : interroga db è restituisci il numero di documenti caricati da questo uploadder nel periodo indicato
         return new ArrayList<>();   // TODO !!!
     }
 
@@ -67,14 +80,14 @@ public class Uploader extends UtenteNonAdministrator {
 
     /** Crea un file per il consumer specificato.
      * Restituisce true se la procedura va a buon fine, false altrimenti. */
-    public boolean creaFilePerConsumer(it.units.progrweb.entities.file.File file, Consumer consumer) {
+    public boolean creaFilePerConsumer(byte[] file, Consumer consumer) {
         // TODO : creare il file per il consumer
         return true;   // TODO !!!
     }
 
     /** Elimina il file specificato.
      * Restituisce true se la procedura va a buon fine, false altrimenti. */
-    public boolean eliminaFile(it.units.progrweb.entities.file.File fileDaEliminare) {
+    public boolean eliminaFile(byte[] fileDaEliminare) {
         // TODO : eliminare il file specificato
         // TODO : pensare alla strategia di eliminazione: per i consumer che hanno già ricevuto il file? O già visualizzato?
         return true;   // TODO !!!

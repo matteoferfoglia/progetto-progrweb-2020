@@ -4,7 +4,6 @@ import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.utils.datetime.DateTime;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ public class Administrator extends Attore {
 
 
     /** Crea un uploader con le proprietà specificate nei parametri.*/
-    public Uploader creaUploader(String username, String nomeCognome, String email, File immagineLogo) {
+    public Uploader creaUploader(String username, String nomeCognome, String email, byte[] immagineLogo) {
         return new Uploader(username, nomeCognome, email, immagineLogo);    // TODO
     }
 
@@ -178,7 +177,7 @@ class ResocontoDiUnUploader {
         this.numeroConsumersDistintiCuiDocumentiCaricatiRiferiscono = this.listaDocumentiCaricati.stream()
                 .map(it.units.progrweb.entities.file.File::getConsumer)
                 .distinct()
-                .count();
+                .count();   // TODO : rifare ! iterare sui consumer o aggiungere Key<Consumer> consumer in File per avere mapping bidirezionale
     }
 
 

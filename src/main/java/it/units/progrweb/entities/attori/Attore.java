@@ -6,6 +6,9 @@ import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.RegexHelper;
 
+import javax.security.auth.Subject;
+import java.nio.file.attribute.UserPrincipal;
+
 
 /**
  * Rappresentazione di un attore.
@@ -13,7 +16,7 @@ import it.units.progrweb.utils.RegexHelper;
  * @author Matteo Ferfoglia
  */
 @Entity
-public abstract class Attore {
+public abstract class Attore implements UserPrincipal {
 
     // TODO : implementare questa classe
 
@@ -79,9 +82,10 @@ public abstract class Attore {
         // return null
     }
 
+
+
     @Override
     public boolean equals(Object o) {
-        // Metodo generato automaticamente da IntelliJ
 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -91,6 +95,39 @@ public abstract class Attore {
         if (identificativoAttore != attore.identificativoAttore) return false;
         if (username != null ? !username.equals(attore.username) : attore.username != null) return false;
         if (nomeCognome != null ? !nomeCognome.equals(attore.nomeCognome) : attore.nomeCognome != null) return false;
+
         return email != null ? email.equals(attore.email) : attore.email == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = identificativoAttore.hashCode();
+        result = 31 * result + username.hashCode();
+        result = 31 * result + nomeCognome.hashCode();
+        result = 31 * result + email.hashCode();
+        return result;
+    }
+
+
+
+    @Override
+    public String getName() {
+        return username;
+    }
+
+    /** Restituisce sempre false.*/
+    @Override
+    public boolean implies(Subject subject) {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Attore{" +
+                "identificativoAttore=" + identificativoAttore +
+                ", username='" + username + '\'' +
+                ", nomeCognome='" + nomeCognome + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

@@ -1,7 +1,10 @@
 package it.units.progrweb.entities.attori;
 
+import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.persistence.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,10 @@ public class Consumer extends UtenteNonAdministrator {
         super();
     }
 
+    /** File caricato da questo Uploader.*/
+    @Load
+    private List<Ref<File>> filesDestinatiAQuestoConsumer = new ArrayList<>();  // Relazione uno a molti
+
     public Consumer(String username, String nomeCognome, String email) {
         super(username, nomeCognome, email);
     }
@@ -30,4 +37,7 @@ public class Consumer extends UtenteNonAdministrator {
         return new ArrayList<>();   // TODO : non ancora implementato!!
     }
 
+    public List<File> getFilesDestinatiAQuestoConsumer() {
+        return DatabaseHelper.getListaEntita(filesDestinatiAQuestoConsumer);    // TODO : metodo da testare
+    }
 }
