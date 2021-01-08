@@ -22,7 +22,7 @@ public class UtilitaGenerale {
         return Arrays.stream(array).anyMatch(oggettoDaCercare::equals);
     }
 
-    /** Restituisc true se la richiesta è di tipo "api" (Ajax), false altrimenti.*/
+    /** Restituisce true se la richiesta è di tipo "api" (Ajax), false altrimenti.*/
     public static boolean isRichiestaApi(HttpServletRequest httpReq) {
         return getUrlPattern(httpReq).startsWith(API_URL_PATTERN);
     }
