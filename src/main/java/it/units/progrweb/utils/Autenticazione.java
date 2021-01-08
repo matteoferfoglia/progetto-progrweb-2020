@@ -29,9 +29,9 @@ import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanume
  */
 public class Autenticazione {
 
-    // TODO implementare questa classe
-
-    /** Rappresentazione di un attore non autenticato (es. credenziali non valide)*/
+    /** Rappresentazione di un attore non presente nel database
+     * di autenticazione (es. se credenziali non sono valide),
+     * oppure di un attore non autenticato.*/
     private static final Attore ATTORE_NON_AUTENTICATO = null;
 
     /** Tempo in secondi durante il quale ad un attore che si è autenticato
@@ -190,11 +190,10 @@ public class Autenticazione {
      * @return true se il client è autenticato, false altrimenti.*/
     public static boolean isClientAutenticato(HttpServletRequest httpServletRequest) {
 
-        String tokenAutenticazioneBearer = httpServletRequest.getHeader(NOME_HEADER_AUTHORIZATION);  // prende header con token
-        if( tokenAutenticazioneBearer==null )
-            return false;
+        String tokenAutenticazioneBearer = getTokenAutenticazioneBearer(httpServletRequest);
 
-        tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (rimuove "Bearer ")
+        if (tokenAutenticazioneBearer == null)
+            return false;
 
         // Calcolo del JWT token ottenuto dall'authorization header
         JwtToken jwtTokenAutenticazione = null;
@@ -212,6 +211,17 @@ public class Autenticazione {
                 && jwtTokenAutenticazione.isTokenValido()
                 && isStessoHashCookieIdNelToken(jwtTokenAutenticazione, cookiesDaQuestaRichiestaHttp);
 
+    }
+
+    /** Data una HttpServletRequest, restituisce il token di autenticazione
+     * se presente, null altrimenti.*/
+    private static String getTokenAutenticazioneBearer(HttpServletRequest httpServletRequest) {
+        String tokenAutenticazioneBearer = httpServletRequest.getHeader(NOME_HEADER_AUTHORIZATION);  // prende header con token
+        if( tokenAutenticazioneBearer==null )
+            return null;
+
+        tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (rimuove "Bearer ")
+        return tokenAutenticazioneBearer;
     }
 
     /** Verifica che l'hash (calcolato con la password del client) del valore del cookie
@@ -243,7 +253,6 @@ public class Autenticazione {
 
     }
 
-
     /** Crea un Jwt Token che certifica l'autenticazione dell'attore indicato
      * nel parametro, quindi lo codifica in base64 url-encoded e lo restituisce.
      * @param attore
@@ -266,21 +275,32 @@ public class Autenticazione {
         
     }
 
-    /** Ricerca l'attore nel database in base all'authorization header
+    /** Ricerca l'attore nel database in base al token di autenticazione
      * della richiesta giunta dal client: se trova l'attore nel database,
-     * lo restituisce, altrimenti restituisce null.*/
-    public static Attore getAttoreDaAuthorizationHeader(String authorizationHeader) {
+     * lo restituisce, altrimenti restituisce {@link #ATTORE_NON_AUTENTICATO}.*/
+    public static Attore getAttoreDaTokenAutenticazione(@NotNull String tokenAutenticazione) {
 
         // TODO : da testare
 
-        if(authorizationHeader==null)
-            return null;
-
-        String tokenAutorizzazioneComeString = authorizationHeader.replaceAll(".+ ", "");
-        JwtToken tokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutorizzazioneComeString);
-        String idAttore = tokenAutenticazione.getValoreSubjectClaim();
+        JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
+        String idAttore = jwtTokenAutenticazione.getValoreSubjectClaim();
         Attore attore = Attore.getAttoreById(Long.valueOf(idAttore));
 
         return attore;
+    }
+
+    /** Data una HttpServletRequest, restituisce l'attore autenticato
+     * per quella HttpServletRequest. Se la richiesta proviene da un client
+     * che non si è autenticato oppure se l'autenticazione non è valida,
+     * allora restituisce {@link #ATTORE_NON_AUTENTICATO}.*/
+    public static Attore getAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
+
+        // TODO : da testare
+
+        String tokenAutenticazione = getTokenAutenticazioneBearer(httpServletRequest);
+        Attore attore = getAttoreDaTokenAutenticazione(tokenAutenticazione);
+
+        return attore;
+
     }
 }
