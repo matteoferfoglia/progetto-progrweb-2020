@@ -6,7 +6,6 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 import static it.units.progrweb.utils.UtilitaGenerale.*;
@@ -53,7 +52,7 @@ public class FiltroAutenticazione implements Filter {
                 // attualmente, solo richieste di tipo "api" possibili
             }
         } else {
-            rispondiNonAutorizzato((HttpServletResponse) resp);
+            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
         }
     }
 
@@ -71,14 +70,6 @@ public class FiltroAutenticazione implements Filter {
     private static boolean isRisorsaAdAccessoLibero(HttpServletRequest httpReq) {
         return isPresenteNellArray( getUrlPattern(httpReq),
                 WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA);
-    }
-
-
-    /** Invia una risposta al client indicando che non è autorizzato.*/
-    public static void rispondiNonAutorizzato(HttpServletResponse response)
-            throws IOException {
-        response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
-                            Response.Status.UNAUTHORIZED.getReasonPhrase() );
     }
 
 }

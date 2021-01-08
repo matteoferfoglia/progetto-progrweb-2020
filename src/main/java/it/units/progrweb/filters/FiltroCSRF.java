@@ -1,5 +1,6 @@
 package it.units.progrweb.filters;
 
+import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Cookie;
 import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
@@ -118,7 +119,7 @@ public class FiltroCSRF implements Filter {
 
                 } else {
                     // Problemi con CSRF
-                    FiltroAutenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+                    Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
                 }
 
             } else {

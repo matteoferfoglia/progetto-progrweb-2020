@@ -11,9 +11,11 @@ import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -302,5 +304,12 @@ public class Autenticazione {
 
         return attore;
 
+    }
+
+    /** Invia una risposta al client indicando che non è autorizzato.*/
+    public static void rispondiNonAutorizzato(HttpServletResponse response)
+            throws IOException {
+        response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
+                            Response.Status.UNAUTHORIZED.getReasonPhrase() );
     }
 }
