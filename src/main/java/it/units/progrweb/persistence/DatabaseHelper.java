@@ -3,20 +3,47 @@ package it.units.progrweb.persistence;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cache.AsyncCacheFilter;
+import com.googlecode.objectify.cmd.Query;
 import it.units.progrweb.utils.Logger;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Classe di utilità per interagire con il database.
+ * (<a href="https://github.com/objectify/objectify/wiki">Fonte</a>).
  *
  * @author Matteo Ferfoglia
  */
 public abstract class DatabaseHelper {
 
+    // TODO : eliminare i metodi che hanno Key in ingresso o in uscita oppure creare una classe wrapper "Key"
+
     /** Astrazione del database. */
     private static final Objectify database = ObjectifyService.ofy();
+
+    /** Enum delle operazioni possibili nelle query
+     * (<a href="https://github.com/objectify/objectify/wiki/Queries#executing-queries">Fonte</a>).
+     */
+    public enum OperatoreQuery {
+        MAGGIORE        (" >")  ,
+        MAGGIOREOUGUALE (" >=") ,
+        MINORE          (" <")  ,
+        MINOREOUGUALE   (" <=") ,
+        UGUALE          ("")    ;
+        // Attualmente Objectify 6+ non supporta nè "IN" nè "!="
+
+
+        private final String operatore;
+        private OperatoreQuery(String operatore) {
+            this.operatore = operatore;
+        }
+        public String operatore() { return operatore; }
+
+    }
 
     /** Salva un'entità nel database. */
     public static<Entita> void salvaEntita(Entita entita) {
@@ -34,11 +61,120 @@ public abstract class DatabaseHelper {
         return database.load().key(key).now();
     }
 
-    /** Restituisce il numero di entità nel datastore.*/
+    /** Restituisce la lista delle chiavi di tutte le entità della classe specificata.
+     * Può essere utile per le cancellazioni per chiave (vedere*/
+    public static<Entita> List<Key<Entita>> getTutteLeChiavi(Class classe) {
+        return (List<Key<Entita>>) database.load().type(classe).keys(); // TODO : testare
+    }
+
+    /** Restituisce la lista delle chiavi di tutte le entità nel database.
+     * Vedere {@link #getTutteLeChiavi(Class)}.*/
+    public static List<Key<Object>> getTutteLeChiavi() {
+        return (List<Key<Object>>) database.load().type(Object.class).keys(); // TODO : testare
+    }
+
+    /** Elimina tutte le entità corrispondenti alle chiavi date.
+     * Il metodo è asincrono, invocare {@link #completaOra()} di
+     * seguito per eseguire subito.*/
+    public static void cancellaEntitaDaChiavi(List<Key<?>> listaChiaviCorrispondentiAdEntitaDaEliminare) {
+        database.delete().keys(listaChiaviCorrispondentiAdEntitaDaEliminare);
+    }
+
+    /** Elimina l'entità corrispondente alla chiave data.
+     * Il metodo è asincrono, invocare {@link #completaOra()} di
+     * seguito per eseguire subito.*/
+    public static void cancellaEntitaDaChiave(Key<?> chiaveCorrispondenteAdEntitaDaEliminare) {
+        database.delete().key(chiaveCorrispondenteAdEntitaDaEliminare);
+    }
+
+    /** Elimina tutte le entità passate nella lista come parametro.
+     * Il metodo è asincrono, invocare {@link #completaOra()} di
+     * seguito per eseguire subito.*/
+    public static void cancellaEntita(List<?> listaEntitaDaEliminare) {
+        database.delete().entities(listaEntitaDaEliminare);
+    }
+
+    /** Elimina l'entità specificata
+     * Il metodo è asincrono, invocare {@link #completaOra()} di
+     * seguito per eseguire subito.*/
+    public static<Entita> void cancellaEntita(Entita entitaDaEliminare) {
+        database.delete().entity(entitaDaEliminare);
+    }
+
+    /** Restituisce il numero di entità nel database.*/
     public static int contaEntitaNelDatabase() {
         return database.load().count();
     }
 
+    /** Restituisce il numero di entità di una data classe.*/
+    public static int contaEntitaNelDatabase(Class classe) {
+        return database.load().type(classe).count();    // TODO : testare
+    }
+
+
+    /** Esegue la query e restituisce una lista in cui ogni elemento è
+     * un'occorrenza del risultato della query.
+     * Esempio: l'istruzione SQL <pre><code>SELECT * FROM Car WHERE year>1999</code></pre>
+     * corrisponde all'istruzione   // TODO : vedere se funziona
+     * <pre><code>DatabaseHelper.query(Car.class, "year", OperatoreQuery.MAGGIORE, 1999)</code></pre>
+     * Vedere {@link com.googlecode.objectify.cmd.Query#filter(String, Object)}.
+     * @param classeEntita La classe dell'entità su cui eseguire la query.
+     * @param nomeAttributoCondizione Il nome dell'attributo della classe specificata
+     *                                  su cui valutare la condizione della query
+     * @param operatoreCondizione L'operatore della condizione della query.
+     * @param valoreCondizione Il valore della condizione della query.
+     * @param <Attributo> La classe dell'attributo su cui valutare la condizione
+     *                      della query
+     */
+    public static<Attributo> List<?> query(Class classeEntita,
+                                           String nomeAttributoCondizione,
+                                           OperatoreQuery operatoreCondizione,
+                                           Attributo valoreCondizione) {
+
+        // TODO : metodo da testare
+        // TODO : risultato richiede cast?
+
+        return queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione).list();
+
+    }
+
+    /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma restituisce
+     * la lista delle chiavi anziché delle entità.*/
+    public static<Attributo> List<?> queryKey(Class classeEntita,
+                                              String nomeAttributoCondizione,
+                                              OperatoreQuery operatoreCondizione,
+                                              Attributo valoreCondizione) {
+
+        // TODO : metodo da testare
+        // TODO : risultato richiede cast?
+
+        return queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione)
+                .keys()
+                .list();
+
+    }
+
+    /** Classe di supporto per {@link #query(Class, String, OperatoreQuery, Object)}
+     * e {@link #query(Class, String, OperatoreQuery, Object)}
+     * effettua l'interrogazione al database e restituisce un oggetto {@link Query}.*/
+    private static <Attributo, T> Query<T> queryERestituisciQuery(Class classeEntita,
+                                                                  String nomeAttributoCondizione,
+                                                                  OperatoreQuery operatoreCondizione,
+                                                                  Attributo valoreCondizione) {
+        // TODO : testare
+        String condizioneQuery = nomeAttributoCondizione + operatoreCondizione.operatore ;
+        return database.load().type(classeEntita).filter(condizioneQuery, valoreCondizione);
+
+    }
+
+    /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma senza
+     * specificare la classe dell'entità. Il risultato sarà una lista di {@link Object}.*/
+    public static<Attributo> List<Object> query(String nomeAttributoCondizione,
+                                           OperatoreQuery operatoreCondizione,
+                                           Attributo valoreCondizione) {
+        // TODO : metodo da testare
+        return (List<Object>) query(Object.class, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+    }
 
     /**
      * Porta a termine <em>adesso</em> tutte le operazioni differite nel database.
@@ -65,6 +201,38 @@ public abstract class DatabaseHelper {
                                     " nel database, eccezione generata dal ritardo imposto nel codice", e);
         }
         return true;
+    }
+
+    /** Data una lista di riferimenti ad entità salvate nel database,
+     * restituisce la lista di entità.*/
+    public static<Entita> List<Entita> getListaEntita(List<Ref<Entita>> listaRiferimenti) {
+        return listaRiferimenti.stream()
+                               .map(entitaRef -> entitaRef.get())
+                               .collect(Collectors.toList());
+    }
+
+    /** Data una lista di entita (salvate nel database), crea e restituisce
+     * una lista di riferimenti a tali entità.
+     * Utilizzabile nei metodi setter delle entità di che presentano dei
+     * riferimenti.*/
+    public static<Entita> List<Ref<Entita>> setListaRiferimentiEntita(List<Entita> listaEntita) {
+        return listaEntita.stream()
+                          .map(entita -> Ref.create(entita))
+                          .collect(Collectors.toList());
+    }
+
+    /** Dato il riferimento ad un'entità salvata nel database,
+     * restituisce l'entità. */
+    public static<Entita> Entita getEntita(Ref<Entita> riferimentoEntita) {
+        return riferimentoEntita.get();
+    }
+
+    /** Data un'entità (salvata nel database), crea e restituisce
+     * un riferimento a tale entità.
+     * Utilizzabile nei metodi setter delle entità di che presentano dei
+     * riferimenti.*/
+    public static<Entita> Ref<Entita> setRiferimentoEntita(Entita entita) {
+        return Ref.create(entita);
     }
 
 }

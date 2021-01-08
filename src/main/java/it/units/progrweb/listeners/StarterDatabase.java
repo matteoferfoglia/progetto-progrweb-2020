@@ -2,8 +2,8 @@ package it.units.progrweb.listeners;
 
 import com.googlecode.objectify.ObjectifyService;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
-import it.units.progrweb.entities.attori.Administrator;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.file.FileStorage;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -22,7 +22,10 @@ public class StarterDatabase implements ServletContextListener {
     /** Array delle classi corrispondenti alle entità registrate nel database.*/
     private final static Class<?>[] enititaGestiteDaDatabase = {
             Attore.class,
-            Administrator.class,
+            //Administrator.class,
+            //Uploader.class,
+            //Consumer.class,
+            FileStorage.class,
             AuthenticationDatabaseEntry.class
     };
 
