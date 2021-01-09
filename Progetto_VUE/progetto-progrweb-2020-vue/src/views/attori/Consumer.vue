@@ -1,7 +1,7 @@
-<template> <!-- TODO : componente ancora da implementare -->
+<template>
 <main>
 
-  <ListaDocumenti/><!-- TODO : temporaneo, questo componente è ancora da implementare -->
+  <ListaDocumenti/>
 
 </main>
 </template>

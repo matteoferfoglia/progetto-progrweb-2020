@@ -1,4 +1,4 @@
-import {richiestaGet} from "./httpUtils";
+import {richiestaGet} from "./http";
 
 /**
  * Script JavaScript per la gestione del CSRF token.

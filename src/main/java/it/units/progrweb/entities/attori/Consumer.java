@@ -38,6 +38,6 @@ public class Consumer extends UtenteNonAdministrator {
     }
 
     public List<File> getFilesDestinatiAQuestoConsumer() {
-        return DatabaseHelper.getListaEntita(filesDestinatiAQuestoConsumer);    // TODO : metodo da testare
+        return DatabaseHelper.getListaEntitaDaListaReference(filesDestinatiAQuestoConsumer);    // TODO : metodo da testare
     }
 }

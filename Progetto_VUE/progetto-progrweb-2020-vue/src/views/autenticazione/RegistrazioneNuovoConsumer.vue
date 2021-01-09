@@ -15,7 +15,7 @@
 
 // TODO in caso di errore (input inserito dall'utente non valido) evidenziare la casella di input invalida (selector css ":invalid")
 
-import {richiestaPost} from "../../utils/httpUtils";
+import {richiestaPost} from "../../utils/http";
 
 export default {
   name: 'RegistrazioneNuovoConsumer',

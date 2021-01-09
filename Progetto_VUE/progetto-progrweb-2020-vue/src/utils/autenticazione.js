@@ -9,7 +9,7 @@
 import {
     getAuthorizationHeaderRichiesteHttp,
     impostaAuthorizationHeaderInRichiesteHttp, rimuoviAuthorizationHeader,
-} from "./httpUtils";
+} from "./http";
 
 /**
  * Funzione per verificare se un utente è già autenticato.

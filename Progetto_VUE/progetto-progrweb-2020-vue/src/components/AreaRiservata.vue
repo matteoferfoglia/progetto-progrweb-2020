@@ -12,7 +12,7 @@
 
 // TODO : QUESTO COMPONENTE è INTERAMENTE DA IMPLEMENTARE
 
-import {richiestaGet} from "../utils/httpUtils";
+import {richiestaGet} from "../utils/http";
 import Form from "./FormConCsrfToken";
 import {eliminaTokenAutenticazione} from "../utils/autenticazione";
 import Consumer from "../views/attori/Consumer";
