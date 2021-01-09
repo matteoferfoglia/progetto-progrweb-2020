@@ -5,14 +5,14 @@ import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.Autenticazione;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Classe per rispondere alla richiesta di documenti destinati
@@ -32,89 +32,63 @@ public class RichiestaDocumenti {
     @Path("/arrayNomiProprietaOgniDocumento")  // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.APPLICATION_JSON)       // TODO : cercare tutti i Produces e Consumes ed usare MediaType
-    public String[] getNomiProprietaFile() {
-        return File.nomiProprietaFile();
+    public String[] getNomiProprietaFileInAnteprima() {
+        return File.anteprimaNomiProprietaFile();
     }
 
-    /** Restituisce un array (JSON) in cui ogni elemento è un'astrazione
-     * di un documento destinato al Consumer da cui proviene la richiesta.
-     * Ogni elemento è un oggetto rappresentato come insieme di proprietà
-     * nella forma "nome-valore" e contiene tutte e sole le proprietà
-     * date da {@link File#getProprietaFile()}.*/
+    /** Restituisce un oggetto (JSON) in cui ogni property è un'astrazione
+     * di un documento destinato al Consumer da cui proviene la richiesta:
+     * ogni property ha per nome l'identificativo del documento e per valore
+     * l'oggetto che rappresenta il documento (descritto in base ai suoi
+     * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile()}.*/
     @Path("/elencoDocumenti")     // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String[] getElencoDocumenti(@Context HttpServletRequest httpServletRequest) {
+    public Map<String, ?> getElencoDocumenti(@Context HttpServletRequest httpServletRequest) {
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getFilesDestinatiAQuestoConsumer();
 
         // Ogni elemento dell'array contiene la descrizione JSON di un file:
-        String[] arrayJsonDescrizioniFile = listaFile.stream()
-                                                     .map(file -> file.toJson())
-                                                     .toArray(String[]::new);
-
-        return arrayJsonDescrizioniFile;
+        return listaFile.stream()
+                        .collect(Collectors.toMap(
+                                File::getIdentificativoFile,
+                                File::toMap_nomeProprieta_valoreProprieta
+                            )
+                        );
     }
 
-    /** Restituisce un oggetto JSON in cui ogni property
-     * è un hashtag ed il corrispettivo valore è un array
-     * contenente tutti i file (rappresentati da un
-     * identificativo). In pratica, viene restituito
-     * un indice dei file, indicizzati in base all'hashtag.
-     * Gli hashtag <strong>non</strong> sono (in generale)
-     * ordinati.
-     * Esempio (solo per illustrare questo metodo, l'esempio
-     * è scorrelato dal o dal linguaggio di programmazione).
-     * Si consideri il seguente array di valori proveniente
-     * dalla richiesta del client:
-     * <code>[25,27,9]</code>.
-     * Tali valori corrispono a dei file secondo una mappatura
-     * nota al server e siano le seguenti le rappresentazioni
-     * dei file associati agli identificatori ottenuti dalla
-     * richiesta del client:
-     * <ol>
-     *     <li><code>{"identificativo": 25, "nomeFile": "Fattura123", "hashtags": ["fattura","pagare","soldi"]}</code></li>
-     *     <li><code>{"identificativo": 27, "nomeFile": "PreventivoA26", "hashtags": ["pagare"]}</code></li>
-     *     <li><code>{"identificativo": 9, "nomeFile": "Bonifico", "hashtags": ["guadagno","soldi"]}</code></li>
-     * </ol>
-     * Allora, questo metodo restituirà (a meno dell'ordine
-     * delle property, oppure dei valori numerici -
-     * <strong>non</strong> necessariamente ordinati) il
-     * seguente oggetto JSON:
-     * <pre><code>
-     *     {
-     *         "fattura":[25],
-     *         "pagare":[25,27],
-     *         "soldi":[25,9],
-     *         "guadagno":[9]
-     *     }
-     * </code></pre>
-     *
-     * @param identificativiFile Array degli identificativi dei file
-     *                           per i quali si vuole l'indicizzazione
-     *                           rispetto agli hashtag.
-     * @return L'indice dei file, indicizzati in base agli hashtag
-     *          che essi contengono.
-     */
+    /** Restituisce il nome dell'attributo di un {@link File} che
+     * contiene l'array di hashtag riferiti a quel {@link File}.
+     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest)
+     * metodo di invio dei file ai client}.*/
+    @Path("/nomePropHashtags")     // TODO : variabile d'ambiente
     @GET
-    @Path("/{arrayIdentificativiFile}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getListaHashtags(long[] identificativiFile) {
-
-        // TODO : rivedere questo metodo e la sua descrizione
-
-        // TODO : testare : deserializzazione corretta ??? Meglio usare @PathParam ? @QueryParam ?
-
-        return rispostaOkContenutoJson(""); // TODO
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeAttributoContenenteHashtagNeiFile() {
+        return File.getNomeAttributoContenenteHashtagNeiFile();
     }
 
-    /** Costruisce una risposta, con contenuto in formato JSON.*/
-    private static Response rispostaOkContenutoJson(String contenutoJsonResponse) {
-        return Response.ok()
-                       .type(MediaType.APPLICATION_JSON)
-                       .entity(contenutoJsonResponse)
-                       .build();
+    /** Restituisce il nome dell'attributo di un {@link File} che
+     * contiene la data di caricamento di quel {@link File}.
+     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest)
+     * metodo di invio dei file ai client}.*/
+    @Path("/nomePropDataCaricamento")     // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeAttributoContenenteDataCaricamentoFile() {
+        return File.getNomeAttributoContenenteDataCaricamentoFile();
+    }
+
+    /** Restituisce il nome dell'attributo di un {@link File} che
+     * contiene la data di visualizzazione di quel {@link File}
+     * da parte del Consumer.
+     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest)
+     * metodo di invio dei file ai client}.*/
+    @Path("/nomePropDataVisualizzazione")     // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeAttributoContenenteDataVisualizzazioneFile() {
+        return File.getNomeAttributoContenenteDataVisualizzazioneFile();
     }
 }
