@@ -8,6 +8,8 @@ import com.googlecode.objectify.cache.AsyncCacheFilter;
 import com.googlecode.objectify.cmd.Query;
 import it.units.progrweb.utils.Logger;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -134,7 +136,8 @@ public abstract class DatabaseHelper {
         // TODO : metodo da testare
         // TODO : risultato richiede cast?
 
-        return queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione).list();
+        Query query = queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        return query==null ? query.list() : new ArrayList<>(0);
 
     }
 
@@ -148,22 +151,45 @@ public abstract class DatabaseHelper {
         // TODO : metodo da testare
         // TODO : risultato richiede cast?
 
-        return queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione)
-                .keys()
-                .list();
+        Query query = queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        return query==null ? query.keys().list() : new ArrayList<>(0);
 
     }
 
     /** Classe di supporto per {@link #query(Class, String, OperatoreQuery, Object)}
      * e {@link #query(Class, String, OperatoreQuery, Object)}
-     * effettua l'interrogazione al database e restituisce un oggetto {@link Query}.*/
+     * effettua l'interrogazione al database e restituisce un oggetto {@link Query}.
+     * @return null se non esite l'attributo su cui si esegue la query,
+     *          altrimenti restituisce la {@link Query} risultante
+     *          dall'interrogazione al database.*/
     private static <Attributo, T> Query<T> queryERestituisciQuery(Class classeEntita,
                                                                   String nomeAttributoCondizione,
                                                                   OperatoreQuery operatoreCondizione,
                                                                   Attributo valoreCondizione) {
         // TODO : testare
-        String condizioneQuery = nomeAttributoCondizione + operatoreCondizione.operatore ;
-        return database.load().type(classeEntita).filter(condizioneQuery, valoreCondizione);
+
+        try {
+
+            // Verifica che l'attributo esista nella classe indicata (altrimenti genera eccezione)
+            Field attributoCondizione = classeEntita.getDeclaredField(nomeAttributoCondizione);
+
+            // Verifica che l'attributo sia dello stesso tipo di quello con  cui deve essere confrontato
+            if(attributoCondizione.getType().equals(valoreCondizione.getClass())) {
+                // TODO : testare che .getClass() sull'attributo il cui tipo è indovinato non restituisca cose strane
+
+                String condizioneQuery = nomeAttributoCondizione + operatoreCondizione.operatore ;
+                return database.load().type(classeEntita).filter(condizioneQuery, valoreCondizione);
+            } else {
+                throw new NoSuchFieldException("Il field " + nomeAttributoCondizione + " è di tipo "
+                                                + attributoCondizione.getType() + " ma il valore" +
+                                                " della condizione è di tipo " + valoreCondizione.getClass() );
+            }
+        } catch (NoSuchFieldException e) {
+            Logger.scriviEccezioneNelLog(DatabaseHelper.class,
+                    "Il field " + nomeAttributoCondizione + " non risulta nella classe " + classeEntita.getName(),
+                    e);
+            return null;    // TODO : testare (forse è necessario restituire un'istanza di Query)
+        }
 
     }
 
@@ -205,7 +231,7 @@ public abstract class DatabaseHelper {
 
     /** Data una lista di riferimenti ad entità salvate nel database,
      * restituisce la lista di entità.*/
-    public static<Entita> List<Entita> getListaEntita(List<Ref<Entita>> listaRiferimenti) {
+    public static<Entita> List<Entita> getListaEntitaDaListaReference(List<Ref<Entita>> listaRiferimenti) {
         return listaRiferimenti.stream()
                                .map(entitaRef -> entitaRef.get())
                                .collect(Collectors.toList());
@@ -215,7 +241,7 @@ public abstract class DatabaseHelper {
      * una lista di riferimenti a tali entità.
      * Utilizzabile nei metodi setter delle entità di che presentano dei
      * riferimenti.*/
-    public static<Entita> List<Ref<Entita>> setListaRiferimentiEntita(List<Entita> listaEntita) {
+    public static<Entita> List<Ref<Entita>> setListaRiferimentiEntitaPerListaEntita(List<Entita> listaEntita) {
         return listaEntita.stream()
                           .map(entita -> Ref.create(entita))
                           .collect(Collectors.toList());

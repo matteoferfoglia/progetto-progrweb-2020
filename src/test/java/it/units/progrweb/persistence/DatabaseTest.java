@@ -6,6 +6,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import it.units.progrweb.UtilsInTest;
 import it.units.progrweb.listeners.StarterDatabase;
+import it.units.progrweb.utils.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 
 import static it.units.progrweb.UtilsInTest.fallisciTestACausaDiEccezioneNonAttesa;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
@@ -85,9 +87,19 @@ public class DatabaseTest {
     private static Stream<Arguments> generaEntitaDaSalvareNelDatabase() {
 
         try {
-            Field classiGestiteDaDatabase_field = StarterDatabase.class.getDeclaredField("enititaGestiteDaDatabase");
-            classiGestiteDaDatabase_field.setAccessible(true);
-            Class[] classiGestiteDalDatabase = (Class[]) classiGestiteDaDatabase_field.get(null); // null perché la classe è statica
+            Field nomiEntitaGestiteDalDatabase_field = StarterDatabase.class.getDeclaredField("nomiEntitaGestiteDalDatabase");
+            nomiEntitaGestiteDalDatabase_field.setAccessible(true);
+            String[] nomiClassiGestiteDalDatabase = (String[]) nomiEntitaGestiteDalDatabase_field.get(null); // null perché la classe è statica
+
+            Class[] classiGestiteDalDatabase = Arrays.stream(nomiClassiGestiteDalDatabase)
+                                                               .map(nomeClasse -> {
+                                                                   try { return Class.forName(nomeClasse); }
+                                                                   catch (ClassNotFoundException e) {
+                                                                       Logger.scriviEccezioneNelLog(DatabaseTest.class,e);
+                                                                       fail("Nome classe \"" + nomeClasse + "\" non trovato", e);
+                                                                       return null;
+                                                                   }
+                                                               }).toArray(Class[]::new);
 
             return Arrays.stream(classiGestiteDalDatabase)
                          .flatMap(classeEntita -> IntStream.range(0, NUMERO_RIPETIZIONI_OGNI_TEST)   // replica istanze
