@@ -2,16 +2,13 @@ package it.units.progrweb.entities.file;
 
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.attori.Consumer;
-import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Rappresentazione di un file, caricato da un
@@ -42,62 +39,89 @@ public abstract class File {
         this.dataEdOraDiCaricamento = dataEdOraDiCaricamento;
     }
 
+    /** Restituisce il nome dell'attributo che contiene la lista
+     * degli hashtag di un file in formato Human-Readable.*/
+    public static String getNomeAttributoContenenteHashtagNeiFile() {
+
+        final String NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE = "listaHashtag";
+        return getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE));
+    }
+
+    /** Restituisce il nome dell'attributo che contiene data di
+     * caricamento di un file in formato Human-Readable.*/
+    public static String getNomeAttributoContenenteDataCaricamentoFile() {
+
+        final String NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE = "dataEdOraDiCaricamento";
+        return getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE));
+
+    }
+
+    /** Restituisce il nome dell'attributo che contiene data di
+     * visualizzazione di un file in formato Human-Readable.*/
+    public static String getNomeAttributoContenenteDataVisualizzazioneFile() {
+
+        final String NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE = "dataEdOraDiVisualizzazione";
+        return getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE));
+
+    }
+
+    /** Controlla che dato un nome esista un attributo con quel nome
+     * in {@link File questa classe} oppure nella classe {@link FileStorage}.
+     * Se non trova tale attributo, viene riportata un'eccezione, in questo
+     * modo, se venisse modificato il nome dell'attributo nella classe,
+     * questo metodo se ne accorgerebbe nel caso in cui venisse invocato
+     * con parametro il vecchio dell'attributo.
+     * @return Il field corrispondente al nome dato, se trovato, altrimenti null.*/
+    private static Field getFieldDaNome(String nomeAttributoDiCuiVerificareEsistenza) {
+        try {
+            return File.class.getDeclaredField(nomeAttributoDiCuiVerificareEsistenza);
+        } catch (NoSuchFieldException ne) {
+            try {   // Ritenta la ricerca nell'altra classe
+                return FileStorage.class.getDeclaredField(nomeAttributoDiCuiVerificareEsistenza);
+            } catch (NoSuchFieldException e) {
+                Logger.scriviEccezioneNelLog(File.class, "Attributo di nome " +
+                        nomeAttributoDiCuiVerificareEsistenza + " non trovato.", e);
+                return null;
+            }
+        }
+    }
+
     /** Restituisce il Consumer a cui è destinato questo file.*/
-     public abstract Consumer getConsumer();
+    public abstract Consumer getConsumer();
 
 
     /**
      * Restituisce un array contenente i nomi degli attributi
      * di {@link File questa} classe.
      */
-    public static String[] nomiProprietaFile() {
+    public static String[] anteprimaNomiProprietaFile() {
         // TODO : testare questa classe
-        return Arrays.stream(getProprietaFile())
-                     .map(field -> {
-                         // Formattazione dei nomi prima di restituirli
-                         String nomeAttributo = field.getName();
-                         nomeAttributo = UtilitaGenerale.splitCamelCase(nomeAttributo.trim());
-                         return UtilitaGenerale.trasformaPrimaLetteraMaiuscola(nomeAttributo.toLowerCase());
-                     })
+        return Arrays.stream(getAnteprimaProprietaFile())
+                     .map(File::getNomeAttributoInFormatoHumanReadable)
                      .toArray(String[]::new);
     }
 
+    /** Dato un field, il cui nome generalmente è in notazione CamelCase,
+     * restituisce la versione Human Readable del suo nome.*/
+     protected static String getNomeAttributoInFormatoHumanReadable(Field field) {
+        String nomeAttributo = field.getName();
+        nomeAttributo = UtilitaGenerale.splitCamelCase(nomeAttributo.trim());
+        return UtilitaGenerale.trasformaPrimaLetteraMaiuscola(nomeAttributo.toLowerCase());
+    }
+
     /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.*/
-    public static Field[] getProprietaFile() {
+    public static Field[] getAnteprimaProprietaFile() {
         return File.class.getDeclaredFields();
     }
 
-    /** Restituisce la mappa nome-valore degli attributi restituiti
-     * dal metodo {@link #getProprietaFile()}, nello stesso ordine,
-     * rappresentati in formato JSON.*/
-    public String toJson(){     // TODO : testare
-        Map<String,?> mappaNomeValoreProprieta;
-        try {
-            mappaNomeValoreProprieta =Arrays.stream(getProprietaFile())
-                                            .collect(Collectors.toMap(
-                                                    Field::getName,
-                                                    field -> {
-                                                        try {
-                                                            field.setAccessible(true);
-                                                            return field.get(this);
-                                                        } catch (IllegalAccessException exception) {
-                                                            Logger.scriviEccezioneNelLog(this.getClass(), exception);
-                                                            return exception;
-                                                        }
-                                                    },
-                                                    (k,v) -> {
-                                                        Exception e = new IllegalStateException("");
-                                                        Logger.scriviEccezioneNelLog(this.getClass(), e);
-                                                        return e;
-                                                    },
-                                                    LinkedHashMap::new
-                                            ));
-        } catch (NullPointerException e) {
-            // Se gli attributi in cui si cerca di leggere sono null
-            mappaNomeValoreProprieta = new LinkedHashMap<>();
-        }
+    /** Restituisce l'identificativo del file.*/
+    public abstract String getIdentificativoFile();
 
-        return JsonHelper.convertiMappaProprietaToStringaJson(mappaNomeValoreProprieta);
-    }
+    /** Restituisce la mappa nome-valore degli attributi di un file
+     * ritenuti rilevanti dalla classe concreta che implementa questo
+     * metodo.
+     * @return
+     */
+    public abstract Map<String, ?> toMap_nomeProprieta_valoreProprieta();
 
 }
