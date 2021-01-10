@@ -25,6 +25,7 @@ public class FiltroAutenticazione implements Filter {
     private static final String[] WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA = {
             "/api/login",
             "/api/logout",
+            "/api/verificaTokenAutenticazione",
             "/api/registrazioneNuovoConsumer",
             "/api/CSRFToken/generaCSRFToken",
             "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo !!! // TODO : var ambiente solo di sviluppo // TODO : solo per sviluppo

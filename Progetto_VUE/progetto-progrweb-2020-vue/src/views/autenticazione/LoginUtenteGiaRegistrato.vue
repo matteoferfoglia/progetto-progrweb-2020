@@ -25,7 +25,7 @@ export default {
     return {
       username: undefined,
       password: undefined,
-      csrfToken: undefined,
+      csrfToken: undefined
     }
   },
   methods: {
@@ -50,13 +50,20 @@ export default {
        */
       const loginRiuscito = tokenAutenticazione => {
 
-        const parametriRouterPush = {   // oggetto con i parametri utilizzati da Vue Router
-          [process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] : tokenAutenticazione
+        const parametriRouter = {
+          [process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE]: tokenAutenticazione,
+
+          // Login probabilmente richiesto perché utente ha tentato di accedere a risorsa protetta
+          // Quindi aggiungo tutti i params che mi arrivano su routes, così l'utente può riprende
+          // a lavorare da dove si era interrotto prima del login:  // TODO : un oggetto simile è creato anche nell'index di router: estrarre un metodo che faccia solo questo !
+          [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
+          [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA])
         };
-        this.$router.push({
-          name   : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE,
-          params : parametriRouterPush
-        });  // redirect a componente root con parametro il token di autenticazione
+
+        this.$router.push({ // inoltro con parametri
+          name   : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
+          params : parametriRouter
+        });
 
       }
 

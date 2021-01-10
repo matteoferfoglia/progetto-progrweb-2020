@@ -15,29 +15,23 @@
 // TODO : rivedere ed eventualmente ristrutturare questo script
 
 import { createRouter, createWebHashHistory } from 'vue-router'
+import {verificaAutenticazione} from "../utils/autenticazione";
+
 
 const routes = [
-  {
-    path: process.env.VUE_APP_ROUTER_ROOT_PATH,
-    name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE,
-    component: () => import('../views/SchermataIniziale.vue')
-  },
   {
     // Route non trovata (url invalido) (Fonte: https://router.vuejs.org/guide/essentials/redirect-and-alias.html#redirect)
     // todo : si potrebbe mostrare un alert prima di effettuare redirect
     path: '/:pathMatch(.*)*',
-    redirect: { name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE}
+    redirect: { name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}
   },
   {
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
     component: () => import('../components/Autenticazione'),
-    meta: {
-      requiresNotLoggedIn: true // pagina di autenticazione accessibile solo se non già loggato
-    },
     children: [ // Nested routes (fonte: https://router.vuejs.org/guide/essentials/nested-routes.html)
       {
         path: process.env.VUE_APP_ROUTER_LOGIN_PATH,
-        alias: "",  // questo è il default child
+        name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_LOGIN,
         component: () => import('../views/autenticazione/LoginUtenteGiaRegistrato')
       },
       {
@@ -48,6 +42,7 @@ const routes = [
   },
   {
     path: process.env.VUE_APP_ROUTER_AREA_RISERVATA_PATH,
+    name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
     component: () => import('../components/AreaRiservata'),                // lazy-loading
     meta: {
       requiresAuth: true
@@ -61,34 +56,68 @@ const router = createRouter({
 });
 
 
-/*
 // Gestione del routing
-router.beforeEach((to, from, next) => {
+router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
-  if( to.matched.some(record => record.meta.requiresAuth) ) { // ture se la route richiesta ha la property "requiresAuth" in meta           // TODO rivedere
-    // gestione instradamento per route che richiede autorizzazione
+  if( routeDestinazione.matched.some(route => route.meta.requiresAuth) ) {
+    // Gestione instradamento per route che richiede autenticazione
 
-    const parametriRouter = {};  // oggetto con i parametri utilizzati da Vue Router per la prossima route di destinazione
+    verificaAutenticazione(routeDestinazione)
+        .then( isUtenteAutenticato => {
 
-    const tokenAutenticazione = to.params[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE]; // dai parametri di vue router
+          // Permette di gestire il caso "utente richiede risorsa senza autenticazione,
+          // lo mando alla pagina di login, poi lo rimando alla pagina che stava visitando"
+          const MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE = "NON AUTENTICATO";
+          const NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN = "motivoRedirectionVersoLogin";
 
-    if(tokenAutenticazione) { // truthy se token definito e non nullo
-      // Imposta token di autenticazione come parametro della route prima di inoltrare nella route richiesta
-      parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = tokenAutenticazione;
-    } else {  // non autorizzato ad accedere alla route richiesta
-      //parametriRouter[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE] = "";  // impostato ad undefined per "enforcement"  // TODO : serve ? Si può cancellare?
-      parametriRouter["urlRichiestoMaNonAutorizzato"] = to.path;  // url per cui il client aveva fatto richiesta
-    }
+          if(isUtenteAutenticato) {
+            // Autenticato
 
-    next({params: parametriRouter});
+            if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_COMPONENTE_LOGIN                   &&
+                routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
+                routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE ) {
+              // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
+              // ed era stato mandato al login, ora redirect alla pagina che stava usando
+              // con tutti i parametri che aveva prima del redirect
+              let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
+              parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1,parametriVecchiaRoute.length-1));  // TODO : testare correttezza
+                                                          // substring() rimuove "" aggiunte all'inizio ed alla fine
+              const routeRichiestaPrima = {
+                fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
+                params: parametriVecchiaRoute
+              };
+              next(routeRichiestaPrima);
 
-  } else if( to.matched.some(record => record.meta.requiresNotLoggedIn) ) {
-    // TODO : da implementare (se utente già loggato, evitare che possa tornare nel componente di autenticazione)
-    next();
+            } else {
+              next();
+
+            }
+          } else {
+            // Non autenticato
+
+            next({
+              name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_LOGIN, // redirect a login
+              params: {
+                // memorizzo la route richiesta e la passo al componente di login così può fare redirect dopo il login a ciò che aveva richiesto
+                [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: routeDestinazione.fullPath,
+                [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(routeDestinazione.params),
+                      // JSON perché devono essere stringhe (altrimenti gli oggetti annidati vengono passati come "[Object object]")
+
+                [NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN]: MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE
+              }
+            });
+
+          }
+
+        })
+        .catch(console.error);
+
   } else {
-    // SE route non richiede autorizzazione, ALLORA instrada senza problemi (invia comunque i parametri di route)
+    // SE route non richiede autorizzazione, ALLORA instrada senza problemi
     next();
+
   }
-});*/
+
+});
 
 export default router;
