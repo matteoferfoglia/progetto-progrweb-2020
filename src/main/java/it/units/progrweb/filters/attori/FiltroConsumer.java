@@ -27,8 +27,8 @@ public class FiltroConsumer implements Filter {
             Attore attore = Autenticazione.getAttoreDaHttpServletRequest((HttpServletRequest) req);
             if(attore instanceof Consumer)
                 chain.doFilter(req, resp);
-        } else {
-            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+            else
+                Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
         }
     }
 

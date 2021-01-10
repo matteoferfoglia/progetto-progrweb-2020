@@ -50,9 +50,9 @@ public class FiltroAutenticazione implements Filter {
 
                 chain.doFilter(req, resp);
                 // attualmente, solo richieste di tipo "api" possibili
+            } else {
+                Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
             }
-        } else {
-            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
         }
     }
 
