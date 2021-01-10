@@ -3,6 +3,7 @@ package it.units.progrweb.api.consumer;
 import it.units.progrweb.entities.attori.Consumer;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.JsonHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -10,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,19 +45,26 @@ public class RichiestaDocumenti {
      * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile()}.*/
     @Path("/elencoDocumenti")     // TODO : variabile d'ambiente
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> getElencoDocumenti(@Context HttpServletRequest httpServletRequest) {
+    // Response costruita senza @Produces per serializzare i dati in modo personalizzato
+    public Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest) {
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getFilesDestinatiAQuestoConsumer();
 
-        // Ogni elemento dell'array contiene la descrizione JSON di un file:
-        return listaFile.stream()
+        Map<String,String> mappa_idFile_propFileInJson =
+               listaFile.stream()
                         .collect(Collectors.toMap(
                                 File::getIdentificativoFile,
-                                File::toMap_nomeProprieta_valoreProprieta
+                                file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta()) // Ogni elemento dello stream contiene la descrizione JSON di un file
                             )
                         );
+
+        // Costruzione della response
+        return Response.ok()
+                       .type(MediaType.APPLICATION_JSON)
+                       .entity(JsonHelper.convertiMappaProprietaToStringaJson(mappa_idFile_propFileInJson))
+                       .build();
+
     }
 
     /** Restituisce il nome dell'attributo di un {@link File} che
