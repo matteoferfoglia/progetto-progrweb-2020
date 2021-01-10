@@ -65,10 +65,12 @@ public class FiltroCSRF implements Filter {
 
                 // Copio la httpRequest perché getInputStream() può essere invocato una volta sola (e verrà
                 // usato dai servizi REST), altrimenti: java.lang.IllegalStateException: READER .
-                // Questo codice esegue parsing del body della request, quindi usa getInputStream()
+                // Questo codice esegue parsing del body della request, quindi usa getInputStream(), per
+                // cercare CSRF token nel body della request.
                 HttpServletRequest copiaHttpReq = new HttpRequestWrapper(httpReq);
 
                 if(contentType != null) {   // null se non c'è content-type nella request
+                    // Cerca CSRF nel body della request
 
                     if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
 
