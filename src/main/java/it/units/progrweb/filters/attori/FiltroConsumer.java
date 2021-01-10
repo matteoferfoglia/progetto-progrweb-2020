@@ -15,7 +15,7 @@ import java.io.IOException;
  * che siano tali (e non ad esempio Uploader).
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroConsumer", asyncSupported = true, urlPatterns = {"/api/consumer/*"})  // TODO : url pattern variabile d'ambiente
+@WebFilter(filterName = "FiltroConsumer", asyncSupported = true)  // TODO : url pattern variabile d'ambiente
 public class FiltroConsumer implements Filter {
 
     public void destroy() {}

@@ -7,6 +7,28 @@
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
+  <!-- Url-pattern dei filtri definiti in web.xml (non con @WebFilter) per poter specificare l'ordine di esecuzione -->
+  <filter-mapping>
+    <filter-name>FiltroCORS</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>FiltroCSRF</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>FiltroObjectify</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>FiltroAutenticazione</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>FiltroConsumer</filter-name>
+    <url-pattern>/api/consumer/*</url-pattern>
+  </filter-mapping>
+
   <servlet>
     <servlet-name>SinglePageApplication_api</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>

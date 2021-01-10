@@ -18,7 +18,7 @@ import static it.units.progrweb.utils.UtilitaGenerale.*;
  * e non l'<em>autorizzazione</em> del client.
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroAutenticazione", asyncSupported = true, urlPatterns = {"/*"})
+@WebFilter(filterName = "FiltroAutenticazione", asyncSupported = true)
 public class FiltroAutenticazione implements Filter {
 
     /** Whitelist di uri accessibili senza autenticazione.*/

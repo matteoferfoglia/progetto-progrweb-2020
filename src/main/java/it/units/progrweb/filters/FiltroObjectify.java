@@ -14,5 +14,5 @@ import javax.servlet.annotation.WebFilter;
  *
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroObjectify", urlPatterns = {"/*"})
+@WebFilter(filterName = "FiltroObjectify")
 public class FiltroObjectify extends ObjectifyFilter {}

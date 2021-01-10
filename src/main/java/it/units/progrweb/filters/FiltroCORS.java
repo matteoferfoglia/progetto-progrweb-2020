@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroCORS", asyncSupported = true, urlPatterns = {"/api/*"})  // TODO: url pattern da rendere variabile d'ambiente (vedi anche UtilitaGenerale.API_URL_PATTERN)
+@WebFilter(filterName = "FiltroCORS", asyncSupported = true)  // TODO: url pattern da rendere variabile d'ambiente (vedi anche UtilitaGenerale.API_URL_PATTERN)
 public class FiltroCORS implements Filter {
 
     // TODO questo filtro è da rivedere / implementare
