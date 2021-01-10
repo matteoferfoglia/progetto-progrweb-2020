@@ -44,7 +44,7 @@ public class RichiestaDocumenti {
     @Path("/elencoDocumenti")     // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, ?> getElencoDocumenti(@Context HttpServletRequest httpServletRequest) {
+    public Map<String, Object> getElencoDocumenti(@Context HttpServletRequest httpServletRequest) {
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getFilesDestinatiAQuestoConsumer();
