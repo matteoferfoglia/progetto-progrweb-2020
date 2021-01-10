@@ -53,7 +53,7 @@ const impostaTokenDiAutenticazioneSeEsiste = $route => {
     // Cerco token autenticazione nei parametri di Vue Router
     if($route) {    // controllo che $route (parametro di questo metodo) sia definita
         const tokenDaRoute = $route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE];
-        if(tokenDaRoute!=="undefined")   // TODO : rivedere (Vue converte undefined in stringa "undefined")
+        if(tokenDaRoute)
             salvaTokenAutenticazione(tokenDaRoute);
     }
 
@@ -61,7 +61,7 @@ const impostaTokenDiAutenticazioneSeEsiste = $route => {
     const tokenAutenticazione = getTokenAutenticazione();
 
     // Imposto header di autenticazione per richieste http
-    if(tokenAutenticazione && tokenAutenticazione!=="undefined") // truthy se token presente non nullo né stringa vuota né undefined // TODO : rivedere (Vue converte undefined in stringa "undefined")
+    if(tokenAutenticazione) // truthy se token presente non nullo né stringa vuota né undefined
         impostaAuthorizationHeaderInRichiesteHttp(tokenAutenticazione);
     else                    // altrimenti rimuovo (se presente) header di autenticazione (se non presente, non succede niente)
         rimuoviAuthorizationHeader();
