@@ -1,7 +1,7 @@
 package it.units.progrweb.filters.attori;
 
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.utils.Autenticazione;
 
 import javax.servlet.*;
@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  * Intercetta le richieste per i Consumer e verifica
- * che siano tali (e non ad esempio Uploader).
+ * che siano tali (e non ad esempio UploaderStorage).
  * @author Matteo Ferfoglia
  */
 @WebFilter(filterName = "FiltroConsumer", asyncSupported = true)  // TODO : url pattern variabile d'ambiente

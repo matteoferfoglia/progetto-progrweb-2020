@@ -2,7 +2,9 @@ package it.units.progrweb.utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -79,4 +81,41 @@ public class UtilitaGenerale {
                 + stringaDaModificare.substring(1);
     }
 
+    /** Dato un field il cui nome è espresso in notazione CamelCase,
+     * restituisce la versione Human Readable del suo nome.*/
+     public static String getNomeAttributoInFormatoHumanReadable(Field field) {
+        String nomeAttributo = field.getName();
+        nomeAttributo = splitCamelCase(nomeAttributo.trim());
+        return trasformaPrimaLetteraMaiuscola(nomeAttributo.toLowerCase());
+    }
+
+    /** Crea una mappa (nome->valore) con i Field dati nel parametro.
+     * Se un attributo (tra i field dati) dell'oggetto dato è null,
+     * allora il corrispettivo valore della mappa sarà una stringa vuota.
+     * @param campiDaMostrareNellaMappa Entries che devono essere presenti nella mappa prodotta.
+     * @param oggetto Oggetto da cui estrarre i valori.
+     * @param <T> Classe dell'oggetto.
+     * @return Mappa { nomeField[in formato HumanReadable] -> Valore field per l'oggetto dato }.
+     */
+    public static<T> Map<String, Object> getMappaNomeValoreProprieta(Field[] campiDaMostrareNellaMappa, T oggetto) {
+
+        return Arrays.stream(campiDaMostrareNellaMappa)
+                .collect(
+                        Collectors.toMap(
+                                UtilitaGenerale::getNomeAttributoInFormatoHumanReadable,
+                                field -> {
+                                    try {
+                                        field.setAccessible(true);
+                                        Object valore = field.get(oggetto);
+                                        return valore == null ? "" : valore;    // stringa vuota se attributo nullo
+                                    } catch (IllegalAccessException exception) {
+                                        Logger.scriviEccezioneNelLog(oggetto.getClass(), exception);
+                                        return exception;
+                                    }
+                                }
+
+                        )
+                );
+
+    }
 }

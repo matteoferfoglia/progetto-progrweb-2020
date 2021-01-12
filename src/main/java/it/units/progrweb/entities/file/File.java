@@ -1,7 +1,10 @@
 package it.units.progrweb.entities.file;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import it.units.progrweb.entities.attori.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
@@ -12,13 +15,19 @@ import java.util.Map;
 
 /**
  * Rappresentazione di un file, caricato da un
- * {@link it.units.progrweb.entities.attori.Uploader}
+ * {@link Uploader}
  * ed indirizzato ad un
- * {@link it.units.progrweb.entities.attori.Consumer}.
+ * {@link Consumer}.
  *
  * @author Matteo Ferfoglia
  */
+@Entity
 public abstract class File {
+
+    /** Identificativo per il file.*/
+    @Id
+    @Index
+    protected Long identificativoFile;
 
     /** Nome del file.*/
     @Index
@@ -44,7 +53,7 @@ public abstract class File {
     public static String getNomeAttributoContenenteHashtagNeiFile() {
 
         final String NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE = "listaHashtag";
-        return getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE));
+        return UtilitaGenerale.getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE));
     }
 
     /** Restituisce il nome dell'attributo che contiene data di
@@ -52,7 +61,7 @@ public abstract class File {
     public static String getNomeAttributoContenenteDataCaricamentoFile() {
 
         final String NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE = "dataEdOraDiCaricamento";
-        return getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE));
+        return UtilitaGenerale.getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE));
 
     }
 
@@ -61,7 +70,7 @@ public abstract class File {
     public static String getNomeAttributoContenenteDataVisualizzazioneFile() {
 
         final String NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE = "dataEdOraDiVisualizzazione";
-        return getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE));
+        return UtilitaGenerale.getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE));
 
     }
 
@@ -97,16 +106,8 @@ public abstract class File {
     public static String[] anteprimaNomiProprietaFile() {
         // TODO : testare questa classe
         return Arrays.stream(getAnteprimaProprietaFile())
-                     .map(File::getNomeAttributoInFormatoHumanReadable)
+                     .map(UtilitaGenerale::getNomeAttributoInFormatoHumanReadable)
                      .toArray(String[]::new);
-    }
-
-    /** Dato un field, il cui nome generalmente è in notazione CamelCase,
-     * restituisce la versione Human Readable del suo nome.*/
-     protected static String getNomeAttributoInFormatoHumanReadable(Field field) {
-        String nomeAttributo = field.getName();
-        nomeAttributo = UtilitaGenerale.splitCamelCase(nomeAttributo.trim());
-        return UtilitaGenerale.trasformaPrimaLetteraMaiuscola(nomeAttributo.toLowerCase());
     }
 
     /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.*/

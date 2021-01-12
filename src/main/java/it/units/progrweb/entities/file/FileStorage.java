@@ -1,12 +1,10 @@
 package it.units.progrweb.entities.file;
 
 import com.googlecode.objectify.Ref;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
-import it.units.progrweb.entities.attori.Consumer;
+import com.googlecode.objectify.annotation.*;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import java.lang.reflect.Field;
@@ -14,23 +12,17 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Matteo Ferfoglia
  */
-@Entity
+@Subclass(index = true)
 class FileStorage extends File {
 
     // TODO : implementare questa classe!!
 
 
     // ATTRIBUTI ENTITA
-
-        /** Identificativo per il file.*/
-        @Id
-        @Index
-        private Long identificativoFile;
 
         /** Indirizzo IP del consumer che ha visualizzato il file. */
         private InetAddress indirizzoIpVisualizzatore; // TODO : cambiare tipo??
@@ -104,25 +96,7 @@ class FileStorage extends File {
     public Map<String, ?> toMap_nomeProprieta_valoreProprieta() {
         Map<String, Object> mappaNomeValoreProprieta;
 
-        mappaNomeValoreProprieta = Arrays.stream(getAnteprimaProprietaFile())
-                .collect(
-                    Collectors.toMap(
-
-                        File::getNomeAttributoInFormatoHumanReadable,
-
-                        field -> {
-                            try {
-                                field.setAccessible(true);
-                                Object valore = field.get(this);
-                                return valore == null ? "" : valore;    // stringa vuota se attributo nullo
-                            } catch (IllegalAccessException exception) {
-                                Logger.scriviEccezioneNelLog(this.getClass(), exception);
-                                return exception;
-                            }
-                        }
-
-                    )
-                );
+        mappaNomeValoreProprieta = UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(), this);
 
         // Aggiunge attributi rilevanti da questa classe
         // Accesso con reflection, così se campo non presente (es. se cambia nome) è subito individuato da un'eccezione

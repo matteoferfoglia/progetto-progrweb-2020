@@ -1,4 +1,6 @@
-package it.units.progrweb.entities.attori;
+package it.units.progrweb.entities.attori.nonAdministrator;
+
+import it.units.progrweb.entities.attori.Attore;
 
 /**
  * Rappresentazione di un utente non Administrator.

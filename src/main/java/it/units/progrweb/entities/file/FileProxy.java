@@ -1,6 +1,6 @@
 package it.units.progrweb.entities.file;
 
-import it.units.progrweb.entities.attori.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 
 import java.util.List;
 import java.util.Map;

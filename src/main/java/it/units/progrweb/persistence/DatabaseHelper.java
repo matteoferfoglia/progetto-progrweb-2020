@@ -227,7 +227,7 @@ public abstract class DatabaseHelper {
      * @return true se l'esecuzione va a buon fine.*/
     public static boolean completaOra() {     // TODO : indagare meglio su questo metodo
 
-        final long MILLISECONDI_RITARDO_FORZATO = 25;   // TODO : verificare tempi di accesso richiesti dal Datastore reale
+        final long MILLISECONDI_RITARDO_FORZATO = 30;   // TODO : verificare tempi di accesso richiesti dal Datastore reale
 
         AsyncCacheFilter.complete();    // Fonte: https://groups.google.com/g/objectify-appengine/c/a4CaFbZdqh0/m/Ih_vEaoBRCEJ
         try {

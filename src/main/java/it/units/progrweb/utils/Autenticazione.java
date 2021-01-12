@@ -2,7 +2,8 @@ package it.units.progrweb.utils;
 
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
@@ -72,7 +73,7 @@ public class Autenticazione {
 
         if( password.equals("pippo") ) {  // TODO : questo metodo è da implementare !!! (TUTTO!! )
              // Creazione di un consumer (ed imposto id non nullo) // TODO : cancellare questa parte (qua bisognerebbe prelevare utente da db, non crearlo)
-            Consumer consumer = new Consumer("username", "UtenteTest", "test@example.com");
+            Consumer consumer = new ConsumerProxy("username", "UtenteTest", "test@example.com");
             {
                 try {
                     Field idField = consumer.getClass().getSuperclass().getSuperclass() // field di Attore

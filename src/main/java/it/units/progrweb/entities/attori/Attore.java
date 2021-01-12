@@ -56,6 +56,13 @@ public abstract class Attore implements UserPrincipal {
         this.email = email;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
 
     /** Restituisce true se la password viene correttamente modificata, false altrimenti.*/
     protected boolean modificaPropriaPassword(String nuovaPassword) {
