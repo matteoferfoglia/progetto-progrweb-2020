@@ -136,7 +136,7 @@ public abstract class DatabaseHelper {
         // TODO : metodo da testare
         // TODO : risultato richiede cast?
 
-        Query query = queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        Query query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
         return query==null ? query.list() : new ArrayList<>(0);
 
     }
@@ -151,7 +151,7 @@ public abstract class DatabaseHelper {
         // TODO : metodo da testare
         // TODO : risultato richiede cast?
 
-        Query query = queryERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        Query query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
         return query==null ? query.keys().list() : new ArrayList<>(0);
 
     }
@@ -162,10 +162,10 @@ public abstract class DatabaseHelper {
      * @return null se non esite l'attributo su cui si esegue la query,
      *          altrimenti restituisce la {@link Query} risultante
      *          dall'interrogazione al database.*/
-    private static <Attributo, T> Query<T> queryERestituisciQuery(Class classeEntita,
-                                                                  String nomeAttributoCondizione,
-                                                                  OperatoreQuery operatoreCondizione,
-                                                                  Attributo valoreCondizione) {
+    private static <Attributo, T> Query<T> creaERestituisciQuery(Class classeEntita,
+                                                                 String nomeAttributoCondizione,
+                                                                 OperatoreQuery operatoreCondizione,
+                                                                 Attributo valoreCondizione) {
         // TODO : testare
 
         try {
@@ -193,6 +193,22 @@ public abstract class DatabaseHelper {
 
     }
 
+
+    /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma permette
+     * di filtrare tramite AND la condizione.*/
+    public static<Attributo> List<?> queryAnd(Class classeEntita,
+                                   String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                   String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
+
+        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri.
+
+        Query query = creaERestituisciQuery(classeEntita, nomeAttributo1, operatoreCondizione1, valoreCondizione1)
+                                      .filter(nomeAttributo2+operatoreCondizione2.operatore, valoreCondizione2);
+
+        return query==null ? query.list() : new ArrayList<>(0);
+
+    }
+
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma senza
      * specificare la classe dell'entità. Il risultato sarà una lista di {@link Object}.*/
     public static<Attributo> List<Object> query(String nomeAttributoCondizione,
@@ -211,7 +227,7 @@ public abstract class DatabaseHelper {
      * @return true se l'esecuzione va a buon fine.*/
     public static boolean completaOra() {     // TODO : indagare meglio su questo metodo
 
-        final long MILLISECONDI_RITARDO_FORZATO = 10;
+        final long MILLISECONDI_RITARDO_FORZATO = 25;   // TODO : verificare tempi di accesso richiesti dal Datastore reale
 
         AsyncCacheFilter.complete();    // Fonte: https://groups.google.com/g/objectify-appengine/c/a4CaFbZdqh0/m/Ih_vEaoBRCEJ
         try {

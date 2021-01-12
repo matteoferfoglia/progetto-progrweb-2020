@@ -1,12 +1,9 @@
 package it.units.progrweb.entities.attori;
 
-import com.googlecode.objectify.annotation.Subclass;
-
 /**
  * Rappresentazione di un utente non Administrator.
  * @author Matteo Ferfoglia
  */
-@Subclass(index=true) // TODO : index?
 public abstract class UtenteNonAdministrator extends Attore {
 
     // TODO : implementare questa classe

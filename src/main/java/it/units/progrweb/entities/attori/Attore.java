@@ -1,8 +1,6 @@
 package it.units.progrweb.entities.attori;
 
-import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.RegexHelper;
 
@@ -15,7 +13,6 @@ import java.nio.file.attribute.UserPrincipal;
  *
  * @author Matteo Ferfoglia
  */
-@Entity
 public abstract class Attore implements UserPrincipal {
 
     // TODO : implementare questa classe
@@ -25,8 +22,6 @@ public abstract class Attore implements UserPrincipal {
     protected Long identificativoAttore;
 
     /** Username dell'attore.*/
-    @Index  // TODO : non si può usare javax.* per evitare di essere vendor specific?
-            // TODO : quando usare index?
     protected String username;
 
     /** Nome e cognome dell'attore.*/

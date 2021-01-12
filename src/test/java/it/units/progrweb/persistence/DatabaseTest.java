@@ -135,7 +135,7 @@ public class DatabaseTest {
 
         if(! classeEntita.equals(Object.class)) {   // il @MethodSource genera Object in caso di classi astratte, ma non sono entità (evitate con questo if)
 
-            assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entita salvate all'inizializzazione del datastore
+            assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entità salvate all'inizializzazione del datastore
 
             DatabaseHelper.salvaEntita(entita);
             DatabaseHelper.completaOra(); // svuota transazioni in corso  // TODO : non funziona: a volte questo test fallisce

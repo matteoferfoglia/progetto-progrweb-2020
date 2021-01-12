@@ -1,36 +1,42 @@
 package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Load;
-import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Rappresentazione di un Uploader.
  * @author Matteo Ferfoglia
  */
-@Subclass(index=true) // TODO : index?
+@Entity
 public class Uploader extends UtenteNonAdministrator {
+
+    // TODO : implementare questa classe
 
     /** Logo dell'uploader.*/
     private byte[] immagineLogo;  // byte[] automaticamente convertito in Blob nel datastore
 
-    /** File caricato da questo Uploader.*/
+    /** File caricati da questo Uploader.*/
     @Load
-    private List<Ref<File>> filesCaricatiDaQuestoUploader = new ArrayList<>();  // Relazione uno a molti
+    private List<Ref<File>> filesCaricatiDaQuestoUploader = new ArrayList<>();          // Relazione uno a molti
 
-    // TODO : implementare questa classe
+    /** Consumer serviti da questo Uploader.*/
+    @Load
+    private List<Ref<Consumer>> consumerServitiDaQuestoUploader = new ArrayList<>();    // Relazione uno a molti
 
 
     public List<File> getFilesCaricatiDaQuestoUploader() {
-        return filesCaricatiDaQuestoUploader.stream()
-                                            .map(fileRef -> fileRef.get())
-                                            .collect(Collectors.toList());
+        return DatabaseHelper.getListaEntitaDaListaReference(filesCaricatiDaQuestoUploader);
+    }
+
+    public List<Consumer> getConsumerServitiDaQuestoUploader() {
+        return DatabaseHelper.getListaEntitaDaListaReference(consumerServitiDaQuestoUploader);
     }
 
 

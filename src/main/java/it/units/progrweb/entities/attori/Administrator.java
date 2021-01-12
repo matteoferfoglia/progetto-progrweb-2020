@@ -1,6 +1,6 @@
 package it.units.progrweb.entities.attori;
 
-import com.googlecode.objectify.annotation.Subclass;
+import com.googlecode.objectify.annotation.Entity;
 import it.units.progrweb.utils.datetime.DateTime;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * Rappresentazione di un attore con il ruolo di Administrator.
  * @author Matteo Ferfoglia
  */
-@Subclass(index=true) // TODO : index?
+@Entity
 public class Administrator extends Attore {
 
     // TODO : implementare questa classe
