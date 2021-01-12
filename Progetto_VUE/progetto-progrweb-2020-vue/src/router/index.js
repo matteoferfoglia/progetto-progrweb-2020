@@ -30,20 +30,28 @@ const routes = [
     component: () => import('../components/Autenticazione'),
     children: [ // Nested routes (fonte: https://router.vuejs.org/guide/essentials/nested-routes.html)
       {
-        path: process.env.VUE_APP_ROUTER_LOGIN_PATH,
-        name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_LOGIN,
+        path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
+        name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN,
         component: () => import('../views/autenticazione/LoginUtenteGiaRegistrato')
       },
       {
-        path: process.env.VUE_APP_ROUTER_REGISTRAZIONE_CONSUMER_PATH,
+        path: process.env.VUE_APP_ROUTER_PATH_REGISTRAZIONE_CONSUMER,
         component: () => import('../views/autenticazione/RegistrazioneNuovoConsumer'),  // lazy-loading
       }
     ]
   },
   {
-    path: process.env.VUE_APP_ROUTER_AREA_RISERVATA_PATH,
+    path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
     name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
+    // TODO : children : suddividere in Administrator / Uploader / Consumer
     component: () => import('../components/AreaRiservata'),                // lazy-loading
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
+    component: () => import('../views/attori/ListaDocumenti'),
     meta: {
       requiresAuth: true
     }
@@ -73,7 +81,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           if(isUtenteAutenticato) {
             // Autenticato
 
-            if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_COMPONENTE_LOGIN                   &&
+            if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN                   &&
                 routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
                 routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE ) {
               // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
@@ -96,7 +104,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
             // Non autenticato
 
             next({
-              name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_LOGIN, // redirect a login
+              name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN, // redirect a login
               params: {
                 // memorizzo la route richiesta e la passo al componente di login così può fare redirect dopo il login a ciò che aveva richiesto
                 [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: routeDestinazione.fullPath,

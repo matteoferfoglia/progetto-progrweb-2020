@@ -1,17 +1,127 @@
 <template>
-<main>
+  <main v-if="layoutCaricato">
 
-  <ListaDocumenti/>
+    <!-- Nel caso in cui il Consumer abbia ricevuto documenti da più uploaders,
+          mostra la lista degli Uploaders che gli hanno inviato documenti (logo +
+          descrizione); cliccando su uno di essi, appare la lista dei documenti
+          caricati da questi. -->
+    <div class="schermataSceltaUploader" v-if="mappa_uploaders.size > 1">
+      <ol  v-for="uploader in Array.from(mappa_uploaders.entries())" :key="uploader[0]/*Id dell'uploader*/" >
+        <li>
+          <router-link :to="{ path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
+                              params: { [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[0] } }">
+            <img href="{{ process.env.VUE_APP_GET_LOGO_UPLOADER + '/' + uploader[0] }}" alt=""> <!-- Richiede logo al server -->
+            <!-- TODO : verificare che tutte le immagine siano caricate prima di mostrare https://vuejsexamples.com/a-vue-js-2-0-directive-to-detect-images-loading/ -->
+            {{ uploader[1][NOME_PROP_NOME_UPLOADER] }}                                          <!-- Nome uplooader -->
+          </router-link>
+        </li>
+      </ol>
+    </div>
 
-</main>
+    <!-- Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,
+          mostra direttamente la lista dei documenti caricati da questi. -->
+    <!-- TODO : verificare che questo div si carichi solo quando c'è esattamente un consumer (cioè controlla che il v-else-if faccia il suo lavoro) -->
+    <div v-else-if="mappa_uploaders>0" @load="$router.push({
+                                                                path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
+                                                                params: { [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: mappa_uploaders.keys().next().value }
+                                                            })" />
+
+  </main>
 </template>
 
 <script>
-import ListaDocumenti from "../../components/ListaDocumenti";
+import {richiestaGet} from "../../utils/http";
 export default {
-name: "Consumer",
-  components: {ListaDocumenti}
+  name: "Consumer",
+  data() {
+    return {
+
+      /** Flag, true quando il layout del componente è stato caricato.*/
+      layoutCaricato: false,
+
+      /** Mappa con chiave l'id di un Uploader e valore
+       * la lista degli identificativi dei file che ha
+       * caricato per questo Consumer.*/
+      mappa_uploader_documenti: new Map(),
+
+      /** Mappa con chiave l'id di un Uploader e valore il suo nome.*/
+      mappa_uploaders: new Map(),
+
+      /** Nome della proprietà contenente il nome dell'uploader
+       * all'interno dell'oggetto nei valori della {@link #mappa_uploaders}.*/
+      NOME_PROP_NOME_UPLOADER: "logoUploader"
+
+    }
+  },
+  created() {
+
+    const caricaQuestoComponente = async () => {
+      await getIdentificativi_uploader_file()
+              .then( mappa => { this.mappa_uploader_documenti = mappa; return mappa} )
+              .then( mappa => getInfoUploaders( Array.from(mappa.keys()), this.NOME_PROP_NOME_UPLOADER ) )
+              .then( mappa => this.mappa_uploaders = new Map( [...mappa.entries()].sort((a,b) => a[1][this.NOME_PROP_NOME_UPLOADER] - b[1][this.NOME_PROP_NOME_UPLOADER]) ) );  // salva la mappa con le entry in ordine alfabetico rispetto a NOME_PROP_NOME_UPLOADER // TODO : verificare
+    }
+
+    caricaQuestoComponente().then( () => this.layoutCaricato = true );
+
+
+
+  }
 }
+
+/** Richiede al server una mappa avente per chiave l'identificativo
+ * di un Uploader e come valore corrispondente la lista degli
+ * identificativi dei file prodotti da quell'Uploader e destinati
+ * al consumer autenticato da cui è originata questa richiesta.
+ * Se la richiesta va a buon fine, tale mappa viene restituita come
+ * valore di una promise risolta.*/
+const getIdentificativi_uploader_file = async () => {
+  return richiestaGet(process.env.VUE_APP_GET_ID_UPLOADER_FILE_PER_QUESTO_CONSUMER)
+      .then(  risposta       => {
+        return new Map(Object.entries(risposta.data));
+      })
+      .catch( rispostaErrore => {
+        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+        // TODO : gestire l'errore (invio mail ai gestori?)
+        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+      });
+}
+
+/** Richiede al server le informazioni sugli uploader i cui identificativi
+ * sono passati in un array come parametro a questa funzione: viene costruita
+ * una mappa avente per chiave l'identificativo dell'uploader e come valore
+ * corrispondente un oggetto con la proprietà contenente il nome dell'Uploader.
+ * Se la richiesta va a buon fine, tale mappa viene restituita come
+ * valore di una promise risolta.
+ * @param NOME_PROP_NOME_UPLOADER il nome della proprietà in cui salvare
+ *                                il nome dell'uploader nei valori della
+ *                                mappa risultante.
+ * @param arrayIdUploader Array con gli identificativi degli Uploaders di
+ *                        cui si vogliono ottenere le informazioni.
+ */
+const getInfoUploaders = async (arrayIdUploader, NOME_PROP_NOME_UPLOADER) => {
+
+  // TODO : verificare correttezza
+
+  // Richiede al server info su ogni Uploader nell'array
+  //  (una Promise per ogni Uploader).
+  return Promise.all( arrayIdUploader.map( idUploader => {   // Fonte: https://stackoverflow.com/a/31414472
+
+    return richiestaGet( process.env.VUE_APP_GET_ELENCO_UPLOADER_NOME_PROP_NOME_UPLOADER + "/" + idUploader ) // richiesta nome uploader
+              .then( rispostaConNomeUploader => [ idUploader, { [NOME_PROP_NOME_UPLOADER]: rispostaConNomeUploader.data } ] );
+
+  }))
+  .then( arrayDaTutteLePromise => new Map(arrayDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
+  .catch( rispostaErrore => {
+    console.error("Errore durante il caricamento delle informazioni sugli Uploader: " + rispostaErrore );
+    return Promise.reject(rispostaErrore);
+    // TODO : gestire l'errore (invio mail ai gestori?)
+    // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+  });
+
+}
+
 </script>
 
 <style scoped>

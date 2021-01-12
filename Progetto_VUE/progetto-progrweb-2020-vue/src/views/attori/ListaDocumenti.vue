@@ -44,8 +44,8 @@
  * (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">Fonte</a>),
  * in quanto ne ha semplificato l'implementazione.*/
 
-import {richiestaGet} from "../utils/http";
-import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../utils/documenti";
+import {richiestaGet} from "../../utils/http";
+import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../../utils/documenti";
 
 // TODO : Vanno inoltre mostrati i documenti sotto forma di tabella, ordinati dal più recente al meno recente,
 // TODO :  avendo comunque in cima sempre quelli non ancora letti);
@@ -230,7 +230,7 @@ const getIntestazioneTabella = async () => {
  * in cui ogni entry è un documento ed ogni entry
  * ha come chiave l'identificativo del documento e come valore
  * il documento (rappresentato come oggetto). */
-const getElencoDocumentiPerQuestoConsumer = async () => {
+const getElencoDocumentiPerQuestoConsumer = async () => {           // TODO : passare come parametro l'id dell'Uploader e richiedere documenti solo da quell'Uploader
   return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER)
         .then(  risposta       => {
           // Conversione da oggetto a mappa (Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries#converting_an_object_to_a_map)
