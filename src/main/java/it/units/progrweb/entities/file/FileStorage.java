@@ -1,14 +1,15 @@
 package it.units.progrweb.entities.file;
 
 import com.googlecode.objectify.Ref;
-import com.googlecode.objectify.annotation.*;
+import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import java.lang.reflect.Field;
-import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,29 +23,22 @@ class FileStorage extends File {
     // TODO : implementare questa classe!!
 
 
-    // ATTRIBUTI ENTITA
 
-        /** Indirizzo IP del consumer che ha visualizzato il file. */
-        private InetAddress indirizzoIpVisualizzatore; // TODO : cambiare tipo??
+    /** Indirizzo IP del consumer che ha visualizzato il file. */
+    private String indirizzoIpVisualizzatore; // TODO : cambiare tipo??
 
-        /** Lista di hashtag associati a questo file. */
-        @Index
-        private List<String> listaHashtag;
+    /** Lista di hashtag associati a questo file. */
+    @Index
+    private List<String> listaHashtag;
 
-        /** Il documento. */
-        private byte[] documento;   // byte[] automaticamente convertito in Blob nel datastore
-
+    /** Il documento. */
+    private byte[] documento;   // byte[] automaticamente convertito in Blob nel datastore
 
 
-    // RELAZIONI (usare getter e setter)
-        /** Consumer a cui è indirizzato il file.*/
-        @Index
-        @Load
-        private Ref<Consumer> consumer;
-
-
-
-    // METODI (a seguire)
+    /** Ref del {@link Consumer} a cui è indirizzato il file.*/
+    @Index
+    @Load
+    private Ref<Consumer> consumer; // TODO : quando si crea un file, ricordarsi di impostare il consumer destinatario
 
 
     private FileStorage(){}
@@ -58,8 +52,9 @@ class FileStorage extends File {
 
     /** Restituisce il documento associato a quest'istanza ed imposta
      * data ed ora di visualizzazione e l'indirizzo IP di chi ha visualizzato
-     * il documento. */
-    public byte[] getFile(InetAddress indirizzoIpVisualizzazione) {
+     * il documento.
+     * @param indirizzoIpVisualizzazione*/
+    public byte[] getFile(String indirizzoIpVisualizzazione) {
         // TODO : da implementare
         this.dataEdOraDiVisualizzazione = DateTime.adesso();
         this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
