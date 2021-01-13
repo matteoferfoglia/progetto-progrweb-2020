@@ -5,6 +5,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage;
 import it.units.progrweb.entities.file.File;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,8 +42,14 @@ class UploaderStorage extends Uploader {
     }
 
     @Override
-    public Map<String, Object> getMappaAttributi_Nome_Valore() {
-        return null;
+    public Map<String, ?> getMappaAttributi_Nome_Valore() {
+
+         Map<String, String> mappa_nomeAttributo_valore = new HashMap<>(2);
+         mappa_nomeAttributo_valore.put(Uploader.getNomeFieldNomeUploader(), getNomeUploader());
+         mappa_nomeAttributo_valore.put(Uploader.getNomeFieldLogoUploader(), getImmagineLogoBase64());
+
+         return mappa_nomeAttributo_valore;
+
     }
 
     public byte[] getImmagineLogoBytes() {

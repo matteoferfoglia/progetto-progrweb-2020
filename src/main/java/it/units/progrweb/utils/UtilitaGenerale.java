@@ -118,4 +118,36 @@ public class UtilitaGenerale {
                 );
 
     }
+
+    /** Verifica l'esistenza dell'attributo il cui nome è dato nel parametro
+     * nella classe data.
+     * @return true se l'attributo esiste, false altrimenti.
+     */
+    public static boolean esisteAttributoInClasse(String nomeAttributo, Class classe) {
+
+        try {
+            classe.getDeclaredField(nomeAttributo);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
+        }
+
+    }
+
+    /** Verifica l'esistenza di un field nella classe data, dato il suo nome
+     * come parametro.
+     * @return Il nome stesso se il field esiste, stringa vuota altrimenti.
+     */
+    public static String ricercaFieldPerNomeInQuestaClasse( String nomeField, Class classeInCuiCercareField ) {
+
+        if ( esisteAttributoInClasse(nomeField, classeInCuiCercareField) ) {
+            return nomeField;
+        } else {
+            Logger.scriviEccezioneNelLog(classeInCuiCercareField,
+                    "Field di nome " + nomeField + " non trovato nella classe.",
+                    new NoSuchFieldException(""));
+            return "";
+        }
+
+    }
 }

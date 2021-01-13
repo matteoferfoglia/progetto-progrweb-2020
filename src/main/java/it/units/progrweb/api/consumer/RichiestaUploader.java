@@ -1,0 +1,80 @@
+package it.units.progrweb.api.consumer;
+
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import java.util.Map;
+
+/**
+ * Servizi per richiedere le informazioni sugli Uploader.
+ * @author Matteo Ferfoglia
+ */
+@Path("/consumer")                          // TODO : variabile d'ambiente
+public class RichiestaUploader {
+
+
+
+    /** In base all'header della richiesta, capisce da quale
+     * Consumer essa provenga, quindi cerca tutti gli Uploader
+     * che hanno caricato almeno un documento per quel Consumer
+     * e li restituisce in un oggetto JSON in cui ogni property
+     * ha come nome l'identificativo dell'Uploader e come
+     * valore l'array contenente gli identificativi di tutti i
+     * file caricati dall'Uploader identificato dal nome della
+     * property e destinati al Consumer da cui proviene la
+     * richiesta.
+     */
+    @Path("/mappaId-uploader-files")        // TODO : variabile d'ambiente
+    @GET
+    // Response costruita senza @Produces per serializzare i dati in modo personalizzato
+    public String getMappa_idUploader_fileInviatiAlConsumer(@Context HttpServletRequest httpServletRequest) {
+
+        // TODO metodo da implementare
+
+        Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+        return "";  // TODO : metodo da implementare
+
+    }
+
+    /** Dato l'identificativo di un Uploader, restituisce l'oggetto JSON
+     * con le properties di quell'Uploader.*/
+    @Path("/proprietaUploader/{identificativoUploader}")        // TODO : variabile d'ambiente
+    @GET
+    // Produces omesso perché la serializzazione in JSON è personalizzata
+    public String getUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
+
+        Uploader uploader = Uploader.cercaUploaderById(identificativoUploader);
+        Map<String,?> mappaProprietaUploader_nome_valore = uploader.getMappaAttributi_Nome_Valore();
+        return JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaUploader_nome_valore);
+
+    }
+
+    /** Con riferimento a {@link #getUploader(Long)}, questo metodo restituisce
+     * il nome della proprietà contenente il nome dell'Uploader.*/
+    @Path("/nomeProprietaNomeUploader")        // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeFieldNomeUploader() {
+        return Uploader.getNomeFieldNomeUploader();
+    }
+
+    /** Con riferimento a {@link #getUploader(Long)}, questo metodo restituisce
+     * il nome della proprietà contenente il logo dell'Uploader.*/
+    @Path("/nomeProprietaLogoUploader")        // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeFieldLogoUploader() {
+        return Uploader.getNomeFieldLogoUploader();
+    }
+
+
+}

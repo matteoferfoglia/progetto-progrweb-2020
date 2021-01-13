@@ -32,10 +32,14 @@
       <tr v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione"
           :key="numeroColonnaQuestaTabella"
           id="{{idDocumento}}">
-        <td>{{ documento[propertyQuestaColonna] }}</td>
+        <td v-if="propertyQuestaColonna===NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI">
+          <a href="{{ documento[propertyQuestaColonna] }}">Download</a> <!-- Link download documento -->
+        </td>
+        <td v-else>{{ documento[propertyQuestaColonna] }}</td>
       </tr>
     </tbody>
   </table>
+
   <p v-else>Nessun documento disponibile.</p>
 
 </template>

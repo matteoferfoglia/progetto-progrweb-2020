@@ -57,10 +57,18 @@ public abstract class DatabaseHelper {
         database.save().entity(entita).now();
     }
 
-    /** Restituisce un'entità, cercata per chiave. */
-    public static<Entita> Entita getByKey(String identificativoEntita) {
-        Key<Entita> key = Key.create(identificativoEntita);
-        return database.load().key(key).now();
+    /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
+     * {@link NotFoundException} se non trova l'entità.*/
+    public static Object getById(Long identificativoEntita, Class classeEntita)
+            throws NotFoundException {
+
+        Key<?> key = Key.create(classeEntita, identificativoEntita);
+        try {
+            return database.load().key(key).now();
+        } catch (Exception e) {
+            throw new NotFoundException();
+        }
+
     }
 
     /** Restituisce la lista delle chiavi di tutte le entità della classe specificata.
@@ -137,7 +145,7 @@ public abstract class DatabaseHelper {
         // TODO : risultato richiede cast?
 
         Query query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
-        return query==null ? query.list() : new ArrayList<>(0);
+        return query!=null ? query.list() : new ArrayList<>(0);
 
     }
 
@@ -152,7 +160,7 @@ public abstract class DatabaseHelper {
         // TODO : risultato richiede cast?
 
         Query query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
-        return query==null ? query.keys().list() : new ArrayList<>(0);
+        return query!=null ? query.keys().list() : new ArrayList<>(0);
 
     }
 
@@ -200,12 +208,13 @@ public abstract class DatabaseHelper {
                                    String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                    String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
 
-        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri.
+        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
+        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
 
         Query query = creaERestituisciQuery(classeEntita, nomeAttributo1, operatoreCondizione1, valoreCondizione1)
                                       .filter(nomeAttributo2+operatoreCondizione2.operatore, valoreCondizione2);
 
-        return query==null ? query.list() : new ArrayList<>(0);
+        return query!=null ? query.list() : new ArrayList<>(0);
 
     }
 

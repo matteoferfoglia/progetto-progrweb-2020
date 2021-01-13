@@ -27,7 +27,7 @@ public class FileProxy extends File {
 
 
     /** Data un'istanza di {@link it.units.progrweb.entities.file.FileStorage},
-     * restituice un'istanza di questa classe, che funge da proxy per quella data.
+     * restituisce un'istanza di questa classe, che funge da proxy per quella data.
      * @param fileStorage Entità di cui creare il proxy.
      */
     public FileProxy(FileStorage fileStorage) {

@@ -14,8 +14,8 @@ public class UploaderProxy extends Uploader {
     /** Immagine logo dell'uploader codificato in base 64.*/
     private final String logoUploaderBase64;
 
-    /** Vedere {@link it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader#getMappaAttributi_Nome_Valore()} .*/
-    private final Map<String,Object> mappaAttributiUploader_nome_valore;
+    /** Vedere {@link Uploader#getMappaAttributi_Nome_Valore()} .*/
+    private final Map<String, ?> mappaAttributiUploader_nome_valore;
 
     public UploaderProxy(UploaderStorage uploaderStorage) {
         this.nomeUploader = uploaderStorage.getNomeCognome();
@@ -34,7 +34,7 @@ public class UploaderProxy extends Uploader {
     }
 
     @Override
-    public Map<String, Object> getMappaAttributi_Nome_Valore() {
+    public Map<String, ?> getMappaAttributi_Nome_Valore() {
         return mappaAttributiUploader_nome_valore;
     }
 

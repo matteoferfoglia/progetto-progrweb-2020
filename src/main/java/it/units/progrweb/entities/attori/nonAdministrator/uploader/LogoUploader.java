@@ -24,10 +24,11 @@ class LogoUploader {
     }
 
     /**
-     * Restituisce la rappresentazione Base64 dell'immagine, come stringa.
+     * Restituisce la rappresentazione Base64 dell'immagine, come Data URL
+     * (<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Fonte</a>).
      */
     public String getLogo_base64() {
-        return "data:" + getMediaTypeLogo() + ";base64," + Base64Helper.encodeToBase64UrlEncoded(logo);
+        return "data:" + getMediaTypeLogo() + ";base64," + Base64Helper.encodeToBase64UrlEncoded(logo); // TODO : verificare che sia corretto usare la versione url encoded del base64
     }
 
     /**

@@ -9,6 +9,8 @@ import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -31,8 +33,8 @@ class FileStorage extends File {
     @Index
     private List<String> listaHashtag;
 
-    /** Il documento. */
-    private byte[] documento;   // byte[] automaticamente convertito in Blob nel datastore
+    /** Il file. */
+    private byte[] file;   // byte[] automaticamente convertito in Blob nel datastore
 
 
     /** Ref del {@link Consumer} a cui è indirizzato il file.*/
@@ -50,15 +52,23 @@ class FileStorage extends File {
     }
 
 
-    /** Restituisce il documento associato a quest'istanza ed imposta
-     * data ed ora di visualizzazione e l'indirizzo IP di chi ha visualizzato
-     * il documento.
-     * @param indirizzoIpVisualizzazione*/
-    public byte[] getFile(String indirizzoIpVisualizzazione) {
+    /** Vedere {@link #getContenutoFile(File, String)}.*/
+    static InputStream getContenutoFile(FileStorage file, String indirizzoIpVisualizzazione) {
+        return file.getContenutoFile(indirizzoIpVisualizzazione);
+    }
+
+    /** Vedere {@link #getContenutoFile(File, String)}.*/
+    private InputStream getContenutoFile(String indirizzoIpVisualizzazione) {
         // TODO : da implementare
-        this.dataEdOraDiVisualizzazione = DateTime.adesso();
-        this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
-        return this.documento;
+        if( this.dataEdOraDiVisualizzazione == null ) {
+            // Si tiene traccia solo del primo accesso al file
+            this.dataEdOraDiVisualizzazione = DateTime.adesso();
+            this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
+        }
+
+        // Conversione da byte[]
+        return new ByteArrayInputStream(file);
+
     }
 
 

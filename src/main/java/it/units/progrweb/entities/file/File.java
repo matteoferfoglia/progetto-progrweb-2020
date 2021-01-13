@@ -5,10 +5,13 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.persistence.DatabaseHelper;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -95,6 +98,27 @@ public abstract class File {
         }
     }
 
+    /** Dato l'identificativo di un {@link File}, scarica
+     * dal database il {@link File} corrispondente.
+     * @throws NotFoundException se l'entità non si trova.*/
+    public static File getEntitaFromDbById(Long idFile)
+            throws NotFoundException {
+
+        return  (File) DatabaseHelper.getById(idFile, File.class);
+
+    }
+
+    /** Se il file dato nel parametro è un'istanza di {@link FileStorage},
+     * allora restituisce il documento associato a quest'istanza ed imposta
+     * data ed ora di visualizzazione e l'indirizzo IP di chi ha visualizzato
+     * il documento, altrimenti restituisce null.*/
+    public static InputStream getContenutoFile(File file, String indirizzoIpVisualizzazione) {
+        if( file instanceof FileStorage)
+            return FileStorage.getContenutoFile((FileStorage) file, indirizzoIpVisualizzazione);
+        else
+            return null;
+    }
+
     /** Restituisce il Consumer a cui è destinato questo file.*/
     public abstract Consumer getConsumer();
 
@@ -125,4 +149,7 @@ public abstract class File {
      */
     public abstract Map<String, ?> toMap_nomeProprieta_valoreProprieta();
 
+    public String getNomeDocumento() {
+        return nomeDocumento;
+    }
 }

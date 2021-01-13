@@ -76,7 +76,7 @@ public class Autenticazione {
             Consumer consumer = new ConsumerProxy("username", "UtenteTest", "test@example.com");
             {
                 try {
-                    Field idField = consumer.getClass().getSuperclass().getSuperclass() // field di Attore
+                    Field idField = consumer.getClass().getSuperclass().getSuperclass().getSuperclass() // field di Attore
                                             .getDeclaredField("identificativoAttore");
                     idField.setAccessible(true);
                     Long valoreId = Long.valueOf(10);   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
@@ -131,6 +131,10 @@ public class Autenticazione {
             return creaResponseAutenticazionePerAttoreAutenticato(attore);
 
         // Autenticazione fallita
+        return creaResponseUnauthorized();
+    }
+
+    public static Response creaResponseUnauthorized() {
         return Response.status(Response.Status.UNAUTHORIZED)
                        .header(NOME_HEADER_AUTHENTICATE, TIPO_AUTENTICAZIONE_RICHIESTA)   // invita il client ad autenticarsi
                        .entity("Credenziali invalide")                                    // body della response

@@ -3,6 +3,7 @@ package it.units.progrweb.entities.attori;
 import com.googlecode.objectify.annotation.Id;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.RegexHelper;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
 import java.nio.file.attribute.UserPrincipal;
@@ -17,6 +18,7 @@ public abstract class Attore implements UserPrincipal {
 
     // TODO : implementare questa classe
 
+
     /** Identificativo univoco per un attore. */
     @Id
     protected Long identificativoAttore;
@@ -30,6 +32,19 @@ public abstract class Attore implements UserPrincipal {
     /** Email dell'attore. */
     protected String email;
 
+    /** Restituisce il nome del field contenente l'identificativo
+     * di un attore, per la ricerca nel database.*/
+    public static String getNomeFieldIdentificativoAttore() {
+        final String nomeField = "identificativoAttore";
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
+    }
+
+    /** Restituisce il nome del field contenente il nome
+     * di un attore.*/
+    public static String getNomeFieldNomeAttore() {
+        final String nomeField = "nomeCognome";
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
+    }
 
 
     protected Attore(String username, String nomeCognome, String email) {
@@ -50,7 +65,7 @@ public abstract class Attore implements UserPrincipal {
     }
 
     protected void setEmail(String email) {
-        if(!RegexHelper.isEmailValida(email))
+        if( ! RegexHelper.isEmailValida(email) )
             throw new IllegalArgumentException("Formato email non valido.");
 
         this.email = email;

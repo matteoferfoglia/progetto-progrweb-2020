@@ -1,7 +1,7 @@
 <template>
   <main v-if="layoutCaricato">
 
-    <!-- Nel caso in cui il Consumer abbia ricevuto documenti da più uploaders,
+    <!-- Nel caso in cui il Consumer abbia ricevuto documenti da più Uploaders,
           mostra la lista degli Uploaders che gli hanno inviato documenti (logo +
           descrizione); cliccando su uno di essi, appare la lista dei documenti
           caricati da questi. -->
@@ -113,9 +113,7 @@ export default {
  * valore di una promise risolta.*/
 const getIdentificativi_uploader_file = async () => {
   return richiestaGet(process.env.VUE_APP_GET_ID_UPLOADER_FILE_PER_QUESTO_CONSUMER)
-      .then(  risposta       => {
-        return new Map(Object.entries(risposta.data));
-      })
+      .then(  risposta       =>  new Map(Object.entries(risposta.data)) )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
