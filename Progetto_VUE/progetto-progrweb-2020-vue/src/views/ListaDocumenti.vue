@@ -1,6 +1,8 @@
 <template v-if="layoutCaricato">
 
   <header>
+    <img class="logoUploader" src="{{ this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] }}" alt="Logo dell'Uploader">
+
     <!-- Mostra hashtag associati ai documenti mostrati e permette di filtrare -->
     <form v-if=" mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
       <!-- Form per filtraggio documenti rispetto ad hashtag -->
@@ -18,14 +20,15 @@
     </form>
   </header>
 
-  <table v-if="elencoDocumenti.size > 0">   <!-- Ogni riga è un documento -->
-    <!-- Mostra documenti -->
+  <table v-if="elencoDocumenti.size > 0">
+    <!-- Tabella dei documenti -->
     <thead>
       <tr v-for="nomeColonna in nomiColonneIntestazione" :key="nomeColonna">
         <td>{{ nomeColonna }}</td>
       </tr>
     </thead>
     <tbody v-for="(idDocumento, documento) in Object.fromEntries(elencoDocumentiDaMostrare)" :key="idDocumento">
+      <!-- Ogni riga è un documento -->
       <tr v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione"
           :key="numeroColonnaQuestaTabella"
           id="{{idDocumento}}">
@@ -33,6 +36,7 @@
       </tr>
     </tbody>
   </table>
+  <p v-else>Nessun documento disponibile.</p>
 
 </template>
 
@@ -42,15 +46,14 @@
  * <cite>Lista Documenti - Consumers</cite>.
  * Nota: questo componente fa spesso uso del tipo Map
  * (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">Fonte</a>),
- * in quanto ne ha semplificato l'implementazione.*/
+ * in quanto ne ha semplificato l'implementazione.
+ * Questo componente è deputato alla visualizzazione della Lista Documenti
+ * caricati da un Uploader (il cui identificativo è un parametro per questo
+ * componente, cercato nei parametri di this.$route), per il Consumer
+ * attualmente autenticato.*/
 
-import {richiestaGet} from "../../utils/http";
-import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../../utils/documenti";
-
-// TODO : Vanno inoltre mostrati i documenti sotto forma di tabella, ordinati dal più recente al meno recente,
-// TODO :  avendo comunque in cima sempre quelli non ancora letti);
-// TODO : Questa maschera mostra anche la lista degli hashtag collegati ai documenti presenti, e l’utente può
-// TODO :  filtrarli selezionando l’hash tag corrispondente
+import {richiestaGet} from "../utils/http";
+import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../utils/documenti";
 
 export default {
 
@@ -61,9 +64,9 @@ export default {
       layoutCaricato: false,  // diventa true quando il layout è caricato
       nomiColonneIntestazione: [],
 
-      /** Oggetto di tipo Map ha come chiave
+      /** Oggetto di tipo Map in cui ogni entry ha come chiave
        * l'identificativo del documento e come valore la sua
-       * rappresentazione come oggetto.
+       * rappresentazione come oggetto (in base alle sue property).
        * Le entry sono ordinate in base alla data del documento:
        * dal più recente al meno recente.*/
       elencoDocumenti: new Map(),
@@ -75,6 +78,11 @@ export default {
       /** Nella rappresentazione di un documento, questo attributo
        * è il nome della property contenente la lista di hashtag.*/
       nomeProprietaHashtagInListaDocumenti: undefined, // nome da richiedere al server
+
+      /** Nella rappresentazione di un documento, questo attributo
+       * è il nome della property contenente l'url per il download
+       * del documento.*/
+      NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI: "Link download",
 
       /** Lista di hashtag risultanti dal filtraggio: i documenti
        * mostrati all'utente contengono (per poter essere mostrati
@@ -139,9 +147,11 @@ export default {
     const caricaContenuto = async () => {   // Grazie ad async, restituisce una Promise (usata dopo)
 
       await getIntestazioneTabella()
-              .then( intestazione => this.nomiColonneIntestazione = intestazione );
+              .then( intestazione =>
+                  this.nomiColonneIntestazione = intestazione.push(this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI) );
 
-      await getElencoDocumentiPerQuestoConsumer() // Promise restituisce mappa { idDocumento => documento }
+      await getElencoDocumentiPerQuestoConsumer( this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] )
+            // Promise restituisce mappa { idDocumento => documento }
 
               .then( elencoDocumenti => {    // Crea l'indice degli hashtag
                 getNomePropertyHashtagsDeiDocumenti()
@@ -184,7 +194,11 @@ export default {
                 return new Map([...documentiNonLetti, ...elencoDocumenti]); // Fonte: https://stackoverflow.com/a/32000937
               })
 
-              .then( elencoDocumenti => {         // Salva l'elenco dei documenti risultante (correttamente ordinati)
+              .then( elencoDocumenti => {         // Aggiunge la property "link per download documento"
+                                                  // e salva l'elenco dei documenti risultante (correttamente ordinati)
+                elencoDocumenti.forEach( (propsDocumento, idDocumento) =>
+                    propsDocumento[this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO + "/" + idDocumento );
+
                 this.elencoDocumenti = elencoDocumenti;
                 return elencoDocumenti;
               });
@@ -211,6 +225,7 @@ export default {
 /** Richiede al server l'intestazione della tabella dei documenti
  * e la restituisce come valore di una promise.*/
 const getIntestazioneTabella = async () => {
+
   return richiestaGet(process.env.VUE_APP_GET_INTESTAZIONE_TABELLA_DOCUMENTI)
     .then(  risposta       => risposta.data )
     .catch( rispostaErrore => {
@@ -219,6 +234,7 @@ const getIntestazioneTabella = async () => {
       // TODO : gestire l'errore (invio mail ai gestori?)
       // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
     });
+
 }
 
 /** Richiede al server tutti i documenti destinati al Consumer
@@ -229,9 +245,12 @@ const getIntestazioneTabella = async () => {
  * restituisce una Promise risolta che ha per valore una mappa
  * in cui ogni entry è un documento ed ogni entry
  * ha come chiave l'identificativo del documento e come valore
- * il documento (rappresentato come oggetto). */
-const getElencoDocumentiPerQuestoConsumer = async () => {           // TODO : passare come parametro l'id dell'Uploader e richiedere documenti solo da quell'Uploader
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER)
+ * il documento (rappresentato come oggetto).
+ * @param idUploader L'identificativo dell'Uploader di cui
+ *                    mostrare i documenti.*/
+const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // TODO : passare come parametro l'id dell'Uploader e richiedere documenti solo da quell'Uploader
+
+  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER + "/" + idUploader)
         .then(  risposta       => {
           // Conversione da oggetto a mappa (Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries#converting_an_object_to_a_map)
           return new Map(Object.entries(risposta.data));
@@ -242,6 +261,7 @@ const getElencoDocumentiPerQuestoConsumer = async () => {           // TODO : pa
           // TODO : gestire l'errore (invio mail ai gestori?)
           // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
         });
+
 }
 
 /** Con riferimento a {@link #getElencoDocumentiPerQuestoConsumer},
@@ -254,6 +274,7 @@ const getElencoDocumentiPerQuestoConsumer = async () => {           // TODO : pa
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyHashtagsDeiDocumenti = async () => {
+
   return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER_NOME_PROP_HAHSTAGS)
         .then(  risposta       => risposta.data )
         .catch( rispostaErrore => {
@@ -263,6 +284,7 @@ const getNomePropertyHashtagsDeiDocumenti = async () => {
           // TODO : gestire l'errore (invio mail ai gestori?)
           // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
         });
+
 }
 
 /** Con riferimento a {@link #getElencoDocumentiPerQuestoConsumer},
@@ -272,6 +294,7 @@ const getNomePropertyHashtagsDeiDocumenti = async () => {
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyDataCaricamentoDocumenti = async () => {
+
   return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER_NOME_PROP_DATA_CARICAMENTO)
         .then(  risposta       => risposta.data )
         .catch( rispostaErrore => {
@@ -281,6 +304,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
           // TODO : gestire l'errore (invio mail ai gestori?)
           // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
         });
+
 }
 
 /** Con riferimento a {@link #getElencoDocumentiPerQuestoConsumer},
@@ -290,6 +314,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyDataVisualizzazioneDocumenti = async () => {
+
   return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER_NOME_PROP_DATA_VISUALIZZAZIONE)
         .then(  risposta       => risposta.data )
         .catch( rispostaErrore => {
@@ -299,8 +324,8 @@ const getNomePropertyDataVisualizzazioneDocumenti = async () => {
           // TODO : gestire l'errore (invio mail ai gestori?)
           // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
         });
-}
 
+}
 
 </script>
 

@@ -14,7 +14,6 @@
   </header>
   <main>
     <h1>Benvenuto nella pagina di autenticazione</h1>
-    <slot></slot>
     <router-view/> <!-- Nested router -->
   </main>
 </template>

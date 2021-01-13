@@ -31,6 +31,7 @@ const routes = [
     children: [ // Nested routes (fonte: https://router.vuejs.org/guide/essentials/nested-routes.html)
       {
         path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
+        alias: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,  // default
         name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN,
         component: () => import('../views/autenticazione/LoginUtenteGiaRegistrato')
       },
@@ -51,7 +52,7 @@ const routes = [
   },
   {
     path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
-    component: () => import('../views/attori/ListaDocumenti'),
+    component: () => import('../views/ListaDocumenti'),
     meta: {
       requiresAuth: true
     }
@@ -118,7 +119,10 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           }
 
         })
-        .catch(console.error);
+        .catch(error => {
+          console.error(error);
+          next({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
+        });
 
   } else {
     // SE route non richiede autorizzazione, ALLORA instrada senza problemi
