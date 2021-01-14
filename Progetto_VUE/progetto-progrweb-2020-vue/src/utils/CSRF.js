@@ -1,5 +1,8 @@
 import {richiestaGet} from "./http";
 
+// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
+
+
 /**
  * Script JavaScript per la gestione del CSRF token.
  */

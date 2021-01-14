@@ -6,6 +6,9 @@ import axios from "axios";
 
 // TODO : non funziona: quando si aggiorna la pagina, i dati sono persi ! Pssare il token di autenticazione in cookie, così viene inviato automaticamente
 
+// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
+
+
 /** Stato della risposta HTTP: credenziali invalide.*/
 export const HTTP_STATUS_UNAUTHORIZED = 401;
 

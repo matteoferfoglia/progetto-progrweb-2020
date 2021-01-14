@@ -4,7 +4,7 @@
  * di codice.
  */
 
-// TODO : rivedere ed eventualmente ristrutturare questo script
+// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
 
 import {
     impostaAuthorizationHeaderInRichiesteHttp,

@@ -1,6 +1,9 @@
 /**
  * Classe per rappresentare un cookie come oggetto.
  */
+
+// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
+
 export default class Cookie {
     constructor(nomeCookie, valoreCookie) {
 

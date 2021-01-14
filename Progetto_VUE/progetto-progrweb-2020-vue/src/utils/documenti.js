@@ -2,6 +2,9 @@
  * che prescindono dal particolare componente in cui vengono
  * utilizzati.*/
 
+// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
+
+
 import {isArray} from "./utilitaGenerale";
 
 /** Dato l'elenco dei documenti (formato di questo parametro
