@@ -22,6 +22,16 @@ import javax.ws.rs.core.Response;
 @Path("")
 public class LoginLogout {
 
+    /** Restituisce il nome dell'attore attualmente autenticato.*/
+    @Path("/nomeDiQuestoAttore")    // TODO : path variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String nomeDiQuestoAttoreAutenticato(@Context HttpServletRequest httpServletRequest) {
+        // TODO : aggiungerlo al token di autenticazione per evitare accessi nel database
+        Attore attore = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+        return attore!=null ? EncoderPrevenzioneXSS.encodeForHTMLContent(attore.getNomeCognome()) : "";     // TODO : aggiungere EncoderPrevenzioneXSS in tutti i metodi che restituiscono qualcosa al client
+    }
+
     /** Risponde alle richieste di login, rilasciando
      * un'opportuna {@link Response} al client.*/
     @Path("/login")     // TODO : path variabile d'ambiente

@@ -1,5 +1,8 @@
-<template>
-  <main v-if="layoutCaricato">
+<template v-if="layoutCaricato">
+  <header>
+    <h1>Benvenuto {{ nomeAttoreAttualmenteAutenticato }}</h1>
+  </header>
+  <main>
 
     <!-- Nel caso in cui il Consumer abbia ricevuto documenti da più Uploaders,
           mostra la lista degli Uploaders che gli hanno inviato documenti (logo +
@@ -52,6 +55,9 @@ export default {
       /** Flag, true quando il layout del componente è stato caricato.*/
       layoutCaricato: false,
 
+      /** Nome dell'attore attualmente autenticato.*/ // TODO : duplicazione!! c'è questa prop anche negli altri attori, quindi spostare il nome in un componente padre
+      nomeAttoreAttualmenteAutenticato: undefined,
+
       /** Mappa con chiave l'id di un Uploader e valore
        * la lista degli identificativi dei file che ha
        * caricato per questo Consumer.*/
@@ -74,6 +80,9 @@ export default {
   created() {
 
     const caricaQuestoComponente = async () => {
+
+      await getNomeConsumerAttualmenteAutenticato()
+            .then( nome => this.nomeConsumerAttualmenteAutenticato = nome );
 
       await getNomePropNomeUploader() // Richiede nomi delle properties negli oggetti ricevuti dal server
             .then( nomePropNomeUploader => this.NOME_PROP_NOME_UPLOADER = nomePropNomeUploader )
@@ -103,6 +112,19 @@ export default {
     caricaQuestoComponente().then( () => this.layoutCaricato = true );
 
   }
+}
+
+/** Restituisce il nome del consumer attualmente autenticato.*/
+const getNomeConsumerAttualmenteAutenticato = async () => {
+  // TODO aggiungerlo al token o a qualcosa che sia visibile dal client senza sprecare una richiesta al server (tra l'altro, se non c'è il nome nel token, il server dovrà cercarlo nel db e gli accessi costano).
+  return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
+      .then(  risposta       =>  risposta.data )
+      .catch( rispostaErrore => {
+        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+        // TODO : gestire l'errore (invio mail ai gestori?)
+        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+      });
 }
 
 /** Richiede al server una mappa avente per chiave l'identificativo
