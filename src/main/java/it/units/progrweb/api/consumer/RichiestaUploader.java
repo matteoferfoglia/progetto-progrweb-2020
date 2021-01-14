@@ -53,10 +53,10 @@ public class RichiestaUploader {
             List<RelazioneUploaderConsumerFile> risultatoQuery =
                     RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getIdentificativoAttore());
 
-            Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricati =
-                    RelazioneUploaderConsumerFile.mappa_idUploader_arrayIdFileCaricati(risultatoQuery);
+            Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
+                    RelazioneUploaderConsumerFile.mappa_idUploader_arrayIdFile(risultatoQuery);
 
-            return UtilitaGenerale.rispostaJsonConMappa(mappa_idUploader_arrayIdFileCaricati);
+            return UtilitaGenerale.rispostaJsonConMappa(mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer);
 
         } else {
             return Autenticazione.creaResponseForbidden("Servizio riservato ai Consumer autenticati.");
