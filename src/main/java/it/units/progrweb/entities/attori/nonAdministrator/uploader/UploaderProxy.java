@@ -1,5 +1,6 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,6 +22,15 @@ public class UploaderProxy extends Uploader {
         this.nomeUploader = uploaderStorage.getNomeCognome();
         this.logoUploaderBase64 = uploaderStorage.getImmagineLogoBase64();
         this.mappaAttributiUploader_nome_valore = uploaderStorage.getMappaAttributi_Nome_Valore();
+    }
+
+    public UploaderProxy( String nomeUploader, String emailUploader, String logoBase64 ) {
+        // TODO : cancellare questo metodo, utilizzato solo in sviluppo per fare delle prove
+
+        this.nomeUploader = nomeUploader;
+        super.email = emailUploader;
+        this.logoUploaderBase64 = logoBase64;
+        this.mappaAttributiUploader_nome_valore = new HashMap<>();
     }
 
     @Override
