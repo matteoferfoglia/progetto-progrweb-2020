@@ -1,7 +1,8 @@
 package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.annotation.Id;
-import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.persistence.DatabaseHelper;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -94,9 +95,11 @@ public abstract class Attore implements UserPrincipal {
     /** Restituisce l'attore corrispondente all'id dato nel parametro,
      * oppure null se non trovato.*/
     public static Attore getAttoreById(Long identificativoAttore) {
-        // TODO : accedere al database e cercare l'attore
-        return Autenticazione.getAttoreDaCredenziali("Pippo", "pippo"); // TODO : questo metodo è ancora da implementare!!! Quest'istruzione è solo temporanea per far funzionare il resto intanto
-        // return null
+        try {
+            return  (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
+        } catch (NotFoundException e) {
+            return null;
+        }
     }
 
 
