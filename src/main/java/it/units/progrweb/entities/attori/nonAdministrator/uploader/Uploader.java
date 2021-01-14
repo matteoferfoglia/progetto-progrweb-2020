@@ -41,9 +41,8 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * di un'istanza di questa classe. L'attributo con l'immagine logo
      * deve avere come nome quello restituito da {@link #getNomeFieldLogoUploader()}
      * e come valore la codifica Base64 dell'immagine. L'attributo con
-     * il nome deve avere come nome quello restituito da {@link #getNomeFieldNomeUploader()}.
-     * @return*/
-    abstract public Map<String, ?> getMappaAttributi_Nome_Valore();
+     * il nome deve avere come nome quello restituito da {@link #getNomeFieldNomeUploader()}.*/
+    abstract public Map<String, ?> getMappaAttributi_Nome_Valore(); // TODO : metodo analogo anche in Consumer : si può mettere nella classe padre?
 
     /** Costruttore.
      * @param username

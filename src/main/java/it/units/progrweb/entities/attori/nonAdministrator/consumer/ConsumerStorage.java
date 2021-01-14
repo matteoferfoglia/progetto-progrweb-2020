@@ -6,7 +6,9 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,14 @@ public class ConsumerStorage extends Consumer {
                                 .filter( Objects::nonNull )
                                 .collect( Collectors.toList() );
 
+    }
+
+    @Override
+    public Map<String, ?> getMappaAttributi_Nome_Valore() {
+        Map<String, String> mappa = new HashMap<>();
+        mappa.put("Nominativo", this.getNomeCognome());
+        mappa.put("Email", this.getEmail());
+        return mappa;
     }
 
 }
