@@ -10,8 +10,11 @@ import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Classe di comodo utilizzata per creare una relazione
@@ -90,5 +93,63 @@ public class RelazioneUploaderConsumerFile {
         return new ArrayList<>();   // nessun risultato dalla query
 
     }
+
+    /** Interroga il database e restituisce le occorrenze di questa entità
+     * che risultano destinate al {@link Consumer} il cui identificativo è
+     * specificato come parametro.
+     */
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerConsumer(Long idConsumer) {
+
+        // TODO : verificare che funzioni
+
+        // Parametri query
+        String nomeAttributo = "idConsumer";
+
+
+        if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo, RelazioneUploaderConsumerFile.class)) {
+
+            return (List<RelazioneUploaderConsumerFile>)
+                    DatabaseHelper.query(RelazioneUploaderConsumerFile.class,
+                                         nomeAttributo, DatabaseHelper.OperatoreQuery.UGUALE, idConsumer );
+
+        } else {
+            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
+                    "Field \"" + nomeAttributo + "\" non trovato.",
+                    new NoSuchFieldException());
+        }
+
+        return new ArrayList<>();   // nessun risultato dalla query
+
+    }
+
+    /** Data una lista in cui ogni elemento è un'istanza di
+     * {@link RelazioneUploaderConsumerFile}, restituisce una
+     * mappa che ha come chiave l'identificativo di un {@link Uploader}
+     * e come valore corrispondente l'array degli identificativi
+     * dei {@link File} inviati da quell'{@link Uploader} il cui
+     * identificativo è specificato nella chiave.
+     */
+    public static Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricati(List<RelazioneUploaderConsumerFile> listaRelazioni) {
+        return listaRelazioni
+                .stream()
+                .collect( Collectors.groupingBy(RelazioneUploaderConsumerFile::getIdUploader) )   // raggruppa in base agli uploader
+
+                // Ora che è raggruppato, crea mappa { uploader => arrayFilesCaricatiDaUploader }
+                .entrySet()
+                .stream()
+                .map( entry -> {
+                    Long chiave = entry.getKey();
+                    Long[] arrayIdFiles = entry.getValue()
+                            .stream()
+                            .map(RelazioneUploaderConsumerFile::getIdFile)
+                            .toArray(Long[]::new);
+                    return new AbstractMap.SimpleEntry(chiave, arrayIdFiles);
+                })
+                .collect( Collectors.toMap(
+                        entry -> (Long) entry.getKey(),
+                        entry -> (Long[]) entry.getValue() )
+                );
+    }
+
 
 }

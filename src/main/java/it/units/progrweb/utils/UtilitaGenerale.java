@@ -2,6 +2,8 @@ package it.units.progrweb.utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -149,5 +151,19 @@ public class UtilitaGenerale {
             return "";
         }
 
+    }
+
+    /** Data una mappa, crea la stringa JSON corrispondente e la
+     * inserisce nella entity di una {@link Response} di tipo "ok",
+     * che restituisce dopo aver costruito.
+     * @param mappa
+     * @return {@link Response} costruita.
+     */
+    public static Response rispostaJsonConMappa(Map<?,?> mappa) {
+        // Costruzione della response
+        return Response.ok()
+                       .type(MediaType.APPLICATION_JSON)
+                       .entity(JsonHelper.convertiMappaProprietaToStringaJson(mappa))
+                       .build();
     }
 }

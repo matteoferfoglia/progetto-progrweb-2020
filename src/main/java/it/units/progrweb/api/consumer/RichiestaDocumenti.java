@@ -5,6 +5,7 @@ import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.JsonHelper;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -51,8 +52,8 @@ public class RichiestaDocumenti {
     @Path("/elencoDocumenti/{identificativoUploader}")     // TODO : variabile d'ambiente
     @GET
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
-    public Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
-                                       @PathParam("identificativoUploader") Long identificativoUploader) {
+    public static Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
+                                              @PathParam("identificativoUploader") Long identificativoUploader) {
 
         // TODO : verificare
 
@@ -67,11 +68,7 @@ public class RichiestaDocumenti {
                             )
                         );
 
-        // Costruzione della response
-        return Response.ok()
-                       .type(MediaType.APPLICATION_JSON)
-                       .entity(JsonHelper.convertiMappaProprietaToStringaJson(mappa_idFile_propFileInJson))
-                       .build();
+        return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFileInJson);
 
     }
 

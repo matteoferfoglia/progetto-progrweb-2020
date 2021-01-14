@@ -134,11 +134,17 @@ public class Autenticazione {
         return creaResponseUnauthorized();
     }
 
-    public static Response creaResponseUnauthorized() {
+    public static Response creaResponseUnauthorized() { // TODO : c'è anche il metodo rispondiNonAutorizzato() ... servono entrambi?
         return Response.status(Response.Status.UNAUTHORIZED)
                        .header(NOME_HEADER_AUTHENTICATE, TIPO_AUTENTICAZIONE_RICHIESTA)   // invita il client ad autenticarsi
                        .entity("Credenziali invalide")                                    // body della response
                        .build();
+    }
+
+    public static Response creaResponseForbidden(String messaggio) {
+        return Response.status(Response.Status.FORBIDDEN)
+                .entity(messaggio)
+                .build();
     }
 
     /** Crea una risposta HTTP grazie alla quale sovrascrive il cookie il cui

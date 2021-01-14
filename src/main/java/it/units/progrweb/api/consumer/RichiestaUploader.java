@@ -1,9 +1,12 @@
 package it.units.progrweb.api.consumer;
 
+import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.JsonHelper;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -12,6 +15,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,12 +41,26 @@ public class RichiestaUploader {
     @Path("/mappaId-uploader-files")        // TODO : variabile d'ambiente
     @GET
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
-    public String getMappa_idUploader_fileInviatiAlConsumer(@Context HttpServletRequest httpServletRequest) {
+    public Response getMappa_idUploader_fileInviatiAlConsumer(@Context HttpServletRequest httpServletRequest) {
 
-        // TODO metodo da implementare
+        // TODO : verificare correttezza
 
-        Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-        return "";  // TODO : metodo da implementare
+        Attore attore = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+        if( attore instanceof Consumer ) {
+
+            Consumer consumer = (Consumer) attore;
+
+            List<RelazioneUploaderConsumerFile> risultatoQuery =
+                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getIdentificativoAttore());
+
+            Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricati =
+                    RelazioneUploaderConsumerFile.mappa_idUploader_arrayIdFileCaricati(risultatoQuery);
+
+            return UtilitaGenerale.rispostaJsonConMappa(mappa_idUploader_arrayIdFileCaricati);
+
+        } else {
+            return Autenticazione.creaResponseForbidden("Servizio riservato ai Consumer autenticati.");
+        }
 
     }
 
