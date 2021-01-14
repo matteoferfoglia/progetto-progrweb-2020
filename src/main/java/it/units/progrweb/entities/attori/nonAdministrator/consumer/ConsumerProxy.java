@@ -15,7 +15,7 @@ public class ConsumerProxy extends Consumer {
         this.mappaAttributiUploader_nome_valore = consumerStorage.getMappaAttributi_Nome_Valore();
     }
 
-    public ConsumerProxy(String username, String nomeCognome, String email) {
+    public ConsumerProxy(String username, String nomeCognome, String email) {   // TODO : serve questo metodo ??
         super(username, nomeCognome, email);
     }
 

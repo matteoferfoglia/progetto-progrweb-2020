@@ -48,10 +48,14 @@ public class ConsumerStorage extends Consumer {
 
     @Override
     public Map<String, ?> getMappaAttributi_Nome_Valore() {
+
         Map<String, String> mappa = new HashMap<>();
-        mappa.put("Nominativo", this.getNomeCognome());
-        mappa.put("Email", this.getEmail());
+        mappa.put(getNomeFieldNomeConsumer(), getNomeCognome());
+        mappa.put(getNomeFieldEmailConsumer(), getEmail());
+        mappa.put(getNomeFieldUsernameConsumer(), getUsername());
+
         return mappa;
+
     }
 
 }

@@ -19,9 +19,6 @@ class UploaderStorage extends Uploader {
 
     // TODO : implementare questa classe
 
-    /** Logo dell'uploader.*/
-    private LogoUploader immagineLogo;
-
     private UploaderStorage() {
         super();    // TODO
     }
@@ -33,7 +30,7 @@ class UploaderStorage extends Uploader {
      }
 
     public String getImmagineLogoBase64() {
-        return immagineLogo.getLogo_base64();
+        return immagineLogoUploader.getLogo_base64();
     }
 
     @Override
@@ -53,7 +50,7 @@ class UploaderStorage extends Uploader {
     }
 
     public byte[] getImmagineLogoBytes() {
-        return immagineLogo.getLogo();
+        return immagineLogoUploader.getLogo();
     }
 
     /** Restituisce true se la modifica del logo va a buon fine, false altrimenti.*/
