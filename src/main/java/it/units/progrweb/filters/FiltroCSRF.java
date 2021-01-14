@@ -1,9 +1,6 @@
 package it.units.progrweb.filters;
 
-import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.Cookie;
-import it.units.progrweb.utils.JsonHelper;
-import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.*;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
 import javax.servlet.*;
@@ -17,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static it.units.progrweb.utils.UtilitaGenerale.getUrlPattern;
-import static it.units.progrweb.utils.UtilitaGenerale.isPresenteNellArray;
 
 /**
  * Filtro per verificare la correttezza del token CSRF.
@@ -34,7 +30,8 @@ public class FiltroCSRF implements Filter {
     /** Blacklist di uri accessibili solo dopo il controllo CSRF.*/
     private static final String[] LISTA_URL_DA_CONTROLLARE_CSRF = {
             "/api/login",
-            "/api/logout"
+            "/api/logout",
+            "/api/uploader/cancellaConsumerPerQuestoUploader"
     };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
 
     /** Nome del parametro che nella richiesta HTTP (proveniente dal client)
@@ -54,7 +51,7 @@ public class FiltroCSRF implements Filter {
         if(req instanceof HttpServletRequest) {     // TODO : creare un filtro per NON istanze di HttpRervletRequest
             HttpServletRequest httpReq = (HttpServletRequest) req;
 
-            if( isPresenteNellArray( getUrlPattern(httpReq), LISTA_URL_DA_CONTROLLARE_CSRF) ) {
+            if( UtilitaGenerale.isStessoPrefissoNellArray( getUrlPattern(httpReq), LISTA_URL_DA_CONTROLLARE_CSRF) ) {
 
                 String indirizzoIPClient = httpReq.getRemoteAddr();
                 String cookieHeader = httpReq.getHeader(Cookie.NOME_HEADER_COOKIE);
