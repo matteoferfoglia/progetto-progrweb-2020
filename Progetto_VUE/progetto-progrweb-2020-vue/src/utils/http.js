@@ -91,13 +91,7 @@ export const getHttpResponseStatus = (responseHttp) => responseHttp.status;
  */
 export const richiestaGet = (url,oggettoConParametri) => {
 
-    //Aggiunta degli eventuali parametri all'oggetto di configurazione
-    const cloneConfigRichiesteHttp = JSON.parse(JSON.stringify(configRichiesteHttp.getConfig()));   // clona oggetto di configurazione per non sovrascriverlo
-    if(oggettoConParametri &&   // controlla che non sia null or undefined
-        Object.keys(oggettoConParametri).length !== 0) { // se ci sono parametri vanno aggiunti alla request
-
-        cloneConfigRichiesteHttp["params"] = oggettoConParametri;   // aggiunge i parametri
-    }
+    const cloneConfigRichiesteHttp = aggiungiParametriAllaRequest(oggettoConParametri);
 
     return axios.get(url, cloneConfigRichiesteHttp)
                 .then(risposta => Promise.resolve(risposta) )
@@ -116,4 +110,40 @@ export const richiestaPost = (url, dati) => {
     return axios.post(url, dati, configRichiesteHttp.getConfig())
                 .then(risposta => Promise.resolve(risposta) )
                 .catch(errore  => Promise.reject(errore.response) ) ;
+}
+
+
+/** Clona l'oggetto di configurazione per le richieste e vi aggiunge
+ * come parametri le properties dell'oggetto dato come parametro a
+ * questo metodo. Infine restituisce l'oggetto di configurazione
+ * ottenuta. I parametri passati a questo metodo NON diventano
+ * "definitivi" per tutte le future richieste, ma solo per quelle
+ * in cui si usa l'oggetto di configurazione restituito.
+ */
+const aggiungiParametriAllaRequest = oggettoConParametri => {
+
+    //Aggiunta degli eventuali parametri all'oggetto di configurazione
+    const cloneConfigRichiesteHttp = JSON.parse(JSON.stringify(configRichiesteHttp.getConfig()));   // clona oggetto di configurazione per non sovrascriverlo
+    if (oggettoConParametri &&   // controlla che non sia null or undefined
+        Object.keys(oggettoConParametri).length !== 0) { // se ci sono parametri vanno aggiunti alla request
+
+        cloneConfigRichiesteHttp["params"] = oggettoConParametri;   // aggiunge i parametri
+    }
+    return cloneConfigRichiesteHttp;
+}
+
+/** Effettua una richiesta DELETE.
+ * @param url è l'url della risorsa da eliminare.
+ * @param oggettoConParametri Oggetto in cui ogni property è
+ *                            un parametro per la richiesta.
+ * @return una Promise con l'eventuale corpo della risposta,
+ *          oppure una Promise rigettata in caso di errore.
+ */
+export const richiestaDelete = (url, oggettoConParametri) => {
+
+    const cloneConfigRichiesteHttp = aggiungiParametriAllaRequest(oggettoConParametri);
+
+    return axios.delete(url, cloneConfigRichiesteHttp)
+        .then(risposta => Promise.resolve(risposta) )
+        .catch(errore  => Promise.reject(errore.response) ) ;
 }
