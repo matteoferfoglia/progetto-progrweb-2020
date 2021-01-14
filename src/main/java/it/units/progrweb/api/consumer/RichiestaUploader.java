@@ -5,7 +5,6 @@ import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,11 +68,11 @@ public class RichiestaUploader {
     @Path("/proprietaUploader/{identificativoUploader}")        // TODO : variabile d'ambiente
     @GET
     // Produces omesso perché la serializzazione in JSON è personalizzata
-    public String getUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
+    public Response getUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
 
         Uploader uploader = Uploader.cercaUploaderById(identificativoUploader);
         Map<String,?> mappaProprietaUploader_nome_valore = uploader.getMappaAttributi_Nome_Valore();
-        return JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaUploader_nome_valore);
+        return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
     }
 
