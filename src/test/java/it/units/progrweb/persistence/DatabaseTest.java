@@ -5,6 +5,8 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import it.units.progrweb.UtilsInTest;
+import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.listeners.StarterDatabase;
 import it.units.progrweb.utils.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -77,6 +79,9 @@ public class DatabaseTest {
     // ------------ Fine setup ------------
 
 
+    /** Valore usato in {@link #generaEntitaDaSalvareNelDatabase()} per creare
+     * gli id delle entità.*/
+    private static long valoreIdIncrementale = 0;
 
     /**
      * Genera un oggetto per ognuna delle entità registrate nel database.
@@ -111,9 +116,22 @@ public class DatabaseTest {
                                  costruttore.setAccessible(true);
                                  Object nuovaEntita = costruttore.newInstance();
 
+                                 // Per gli attori, bisogna impostare ID (String non automaticamente impostato da Objectify)
+                                 if( classeEntita.getName().contains("attori") ) {
+                                     Field id_field = Attore.class.getDeclaredField("username");
+                                     id_field.setAccessible(true);
+                                     id_field.set(nuovaEntita, String.valueOf(valoreIdIncrementale++));
+                                 }
+                                 if( classeEntita.getName().contains("AuthenticationDatabaseEntry") ) {
+                                     Field id_field = AuthenticationDatabaseEntry.class.getDeclaredField("username");
+                                     id_field.setAccessible(true);
+                                     id_field.set(nuovaEntita, String.valueOf(valoreIdIncrementale++));
+                                 }
+
+
                                  return arguments(classeEntita, nuovaEntita);
 
-                             } catch (NoSuchMethodException |
+                             } catch (NoSuchMethodException | NoSuchFieldException |
                                      IllegalAccessException | InvocationTargetException e) {
                                  return (Arguments)fallisciTestACausaDiEccezioneNonAttesa(e);
                              } catch (InstantiationException e) {

@@ -48,17 +48,17 @@ public class RichiestaDocumenti {
      * l'oggetto che rappresenta il documento (descritto in base ai suoi
      * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile()}.
      * @param httpServletRequest La richiesta HTTP.
-     * @param identificativoUploader Identificativo dell'Uploader. */
-    @Path("/elencoDocumenti/{identificativoUploader}")     // TODO : variabile d'ambiente
+     * @param  usernameUploader Username dell'Uploader. */
+    @Path("/elencoDocumenti/{usernameUploader}")     // TODO : variabile d'ambiente
     @GET
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
     public static Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
-                                              @PathParam("identificativoUploader") Long identificativoUploader) {
+                                              @PathParam("usernameUploader") String usernameUploader) {
 
         // TODO : verificare
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-        List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);
+        List<File> listaFile = consumer.getAnteprimaFiles(usernameUploader);
 
         Map<String,String> mappa_idFile_propFileInJson =
                listaFile.stream()
@@ -102,7 +102,7 @@ public class RichiestaDocumenti {
 
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene l'array di hashtag riferiti a quel {@link File}.
-     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,Long)
+     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,String)
      * metodo di invio dei file ai client}.*/
     @Path("/nomePropHashtags")     // TODO : variabile d'ambiente
     @GET
@@ -113,7 +113,7 @@ public class RichiestaDocumenti {
 
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene la data di caricamento di quel {@link File}.
-     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,Long)
+     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,String)
      * metodo di invio dei file ai client}.*/
     @Path("/nomePropDataCaricamento")     // TODO : variabile d'ambiente
     @GET
@@ -125,7 +125,7 @@ public class RichiestaDocumenti {
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene la data di visualizzazione di quel {@link File}
      * da parte del Consumer.
-     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,Long)
+     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,String)
      * metodo di invio dei file ai client}.*/
     @Path("/nomePropDataVisualizzazione")     // TODO : variabile d'ambiente
     @GET

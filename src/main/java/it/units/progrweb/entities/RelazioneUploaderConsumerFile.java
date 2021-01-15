@@ -59,11 +59,11 @@ public class RelazioneUploaderConsumerFile {
 
     /** Interroga il database e restituisce le occorrenze di questa entità
      * che risultano caricate dall'{@link Uploader} e destinate al {@link
-     * Consumer} i cui identificativi sono specificati come parametri.
+     * Consumer} i cui username sono specificati come parametri.
      * @return
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploaderEConsumer(Long idUploader,
-                                                                                                Long idConsumer) {
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploaderEConsumer(String idUploader,
+                                                                                                String idConsumer) {
 
         // TODO : verificare che funzioni
 
@@ -95,10 +95,10 @@ public class RelazioneUploaderConsumerFile {
     }
 
     /** Interroga il database e restituisce le occorrenze di questa entità
-     * che risultano destinate al {@link Consumer} il cui identificativo è
+     * che risultano destinate al {@link Consumer} il cui username è
      * specificato come parametro.
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerConsumer(Long idConsumer) {
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerConsumer(String idConsumer) {
 
         // TODO : verificare che funzioni
         return queryRelazioneUploaderConsumerFiles("idConsumer", idConsumer);
@@ -106,10 +106,10 @@ public class RelazioneUploaderConsumerFile {
     }
 
     /** Interroga il database e restituisce le occorrenze di questa entità
-     * che risultano caricate dall'{@link Uploader} il cui identificativo è
+     * che risultano caricate dall'{@link Uploader} il cui username è
      * specificato come parametro.
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploader(Long idUploader) {
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploader(String idUploader) {
 
         // TODO : verificare che funzioni
         return queryRelazioneUploaderConsumerFiles("idUploader", idUploader);
@@ -121,7 +121,7 @@ public class RelazioneUploaderConsumerFile {
      * restituisce la lista di tutte le occorrenza in cui l'attributo il
      * cui nome è specificato nel parametro ha il valore specificato nel
      * parametro corrispondente.*/
-    private static List<RelazioneUploaderConsumerFile> queryRelazioneUploaderConsumerFiles(String nomeAttributo, Long valoreAttributo) {
+    private static List<RelazioneUploaderConsumerFile> queryRelazioneUploaderConsumerFiles(String nomeAttributo, String valoreAttributo) {
         if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo, RelazioneUploaderConsumerFile.class)) {
 
             return (List<RelazioneUploaderConsumerFile>)

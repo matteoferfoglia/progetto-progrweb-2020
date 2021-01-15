@@ -33,7 +33,7 @@ public class CsrfCookiesTest {
     private static final int QUANTI_TEST_PER_OGNI_TIPO = 1000;  // numero di "iterazioni" di ogni test (con parametri diversi) // TODO : VARIABILE D'AMBIENTE
         // mantenere elevato il numero di test perché ci sono parametri aleatori (generati casualmente)
 
-    /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
+    /** Test per {@link CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
      * Viene generato il token CSRF e l'identificativo del client (allo stesso
      * modo di quando un client ne fa richiesta), poi viene creato il token
      * JWT (allo stesso modo di come verrebbe creato per il client), infine

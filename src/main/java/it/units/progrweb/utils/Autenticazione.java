@@ -81,7 +81,7 @@ public class Autenticazione {
             {
                 try {
                     Field idField = consumer.getClass().getSuperclass().getSuperclass().getSuperclass() // field di Attore
-                                            .getDeclaredField("identificativoAttore");
+                                            .getDeclaredField("username");
                     idField.setAccessible(true);
                     Long valoreId = Long.valueOf(10);   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     idField.set(consumer, valoreId);
@@ -94,7 +94,7 @@ public class Autenticazione {
             {
                 try {
                     Field idField = uploader.getClass().getSuperclass().getSuperclass().getSuperclass() // field di Attore
-                            .getDeclaredField("identificativoAttore");
+                            .getDeclaredField("username");
                     idField.setAccessible(true);
                     Long valoreId = Long.valueOf(20);   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     idField.set(uploader, valoreId);
@@ -268,7 +268,7 @@ public class Autenticazione {
         String hashNelTokenAutenticazione = (String) jwtTokenAutenticazione.getValoreClaimByName(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE);
         String valoreCookieId = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
                                       .getValue();
-        Attore attoreCheStaAutenticandosi = Attore.getAttoreById(Long.valueOf(identificativoAttoreDaToken));
+        Attore attoreCheStaAutenticandosi = Attore.getAttoreById(String.valueOf(identificativoAttoreDaToken));
 
         String hashPasswordClient = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attoreCheStaAutenticandosi);
         String hashValoreCookieId;
@@ -296,7 +296,7 @@ public class Autenticazione {
         String hashPasswordAttore = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attore);
 
         JwtPayload jwtPayload = new JwtPayload();
-        jwtPayload.aggiungiClaim(new JwtSubjectClaim(String.valueOf(attore.getIdentificativoAttore())));
+        jwtPayload.aggiungiClaim(new JwtSubjectClaim(String.valueOf(attore.getUsername())));
         jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(TIMEOUT_AUTENTICAZIONE_IN_SECONDI));
         jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
                                               GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
@@ -314,7 +314,7 @@ public class Autenticazione {
 
         JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
         String idAttore = jwtTokenAutenticazione.getValoreSubjectClaim();
-        Attore attore = Attore.getAttoreById(Long.valueOf(idAttore));
+        Attore attore = Attore.getAttoreById(String.valueOf(idAttore));
 
         return attore;
     }

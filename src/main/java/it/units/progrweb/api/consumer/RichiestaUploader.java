@@ -31,7 +31,7 @@ public class RichiestaUploader {
      * Consumer essa provenga, quindi cerca tutti gli Uploader
      * che hanno caricato almeno un documento per quel Consumer
      * e li restituisce in un oggetto JSON in cui ogni property
-     * ha come nome l'identificativo dell'Uploader e come
+     * ha come nome lo username dell'Uploader e come
      * valore l'array contenente gli identificativi di tutti i
      * file caricati dall'Uploader identificato dal nome della
      * property e destinati al Consumer da cui proviene la
@@ -50,7 +50,7 @@ public class RichiestaUploader {
             Consumer consumer = (Consumer) attore;
 
             List<RelazioneUploaderConsumerFile> risultatoQuery =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getIdentificativoAttore());
+                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getUsername());
 
             Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
                     RelazioneUploaderConsumerFile.mappa_idUploader_arrayIdFile(risultatoQuery);
@@ -63,20 +63,20 @@ public class RichiestaUploader {
 
     }
 
-    /** Dato l'identificativo di un Uploader, restituisce l'oggetto JSON
+    /** Dato lo username di un Uploader, restituisce l'oggetto JSON
      * con le properties di quell'Uploader.*/
-    @Path("/proprietaUploader/{identificativoUploader}")        // TODO : variabile d'ambiente
+    @Path("/proprietaUploader/{usernameUploader}")        // TODO : variabile d'ambiente
     @GET
     // Produces omesso perché la serializzazione in JSON è personalizzata
-    public Response getUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
+    public Response getUploader(@PathParam("usernameUploader") String usernameUploader) {
 
-        Uploader uploader = Uploader.cercaUploaderById(identificativoUploader);
+        Uploader uploader = Uploader.cercaUploaderDaUsername(usernameUploader);
         Map<String,?> mappaProprietaUploader_nome_valore = uploader.getMappaAttributi_Nome_Valore();
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
     }
 
-    /** Con riferimento a {@link #getUploader(Long)}, questo metodo restituisce
+    /** Con riferimento a {@link #getUploader(String)}, questo metodo restituisce
      * il nome della proprietà contenente il nome dell'Uploader.*/
     @Path("/nomeProprietaNomeUploader")        // TODO : variabile d'ambiente
     @GET
@@ -85,7 +85,7 @@ public class RichiestaUploader {
         return Uploader.getNomeFieldNomeUploader();
     }
 
-    /** Con riferimento a {@link #getUploader(Long)}, questo metodo restituisce
+    /** Con riferimento a {@link #getUploader(String)}, questo metodo restituisce
      * il nome della proprietà contenente il logo dell'Uploader.*/
     @Path("/nomeProprietaLogoUploader")        // TODO : variabile d'ambiente
     @GET

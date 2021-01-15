@@ -42,7 +42,7 @@ public class GestioneConsumer {
         if( ( uploader = isUploader(httpServletRequest) ) != null ) {
 
             List<RelazioneUploaderConsumerFile> risultatoQuery =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploader(uploader.getIdentificativoAttore());
+                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploader(uploader.getUsername());
 
             Map<Long, Long[]> mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader =
                     RelazioneUploaderConsumerFile.mappa_idConsumer_arrayIdFile(risultatoQuery);
@@ -55,21 +55,21 @@ public class GestioneConsumer {
 
     }
 
-    /** Dato l'identificativo di un {@link Consumer} come @PathParam
+    /** Dato lo username di un {@link Consumer} come @PathParam
      * restituisce l'oggetto JSON in cui ogni proprietà dell'oggetto
      * rappresenta un {@link Consumer} ed il corrispettivo valore è
      * un oggetto con le proprietà di quel {@link Consumer}.
      */
-    @Path("/proprietaConsumer/{identificativoConsumer}")
+    @Path("/proprietaConsumer/{usernameConsumer}")
     @GET
     // Risposta costruita in modo personalizzato
-    public Response getConsumer(@PathParam("identificativoConsumer") Long identificativoConsumer) {
+    public Response getConsumer(@PathParam("usernameConsumer") String usernameConsumer) {
 
         // TODO : verificare correttezza
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaUploader
 
-        Consumer consumer = Consumer.cercaConsumerById(identificativoConsumer);
+        Consumer consumer = Consumer.cercaConsumerDaUsername(usernameConsumer);
         Map<String,?> mappaProprietaUploader_nome_valore = consumer.getMappaAttributi_Nome_Valore();
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
@@ -77,23 +77,23 @@ public class GestioneConsumer {
 
     /** Eliminazione di un Consumer dalla lista di quelli serviti
      * dall'Uploader che ne ha fatto richiesta. */
-    @Path("/cancellaConsumerPerQuestoUploader/{identificativoConsumerDaEliminare}")
+    @Path("/cancellaConsumerPerQuestoUploader/{usernameConsumerDaEliminare}")
     @DELETE
-    public Response eliminaConsumer(@PathParam("identificativoConsumerDaEliminare") Long identificativoConsumerDaEliminare,
+    public Response eliminaConsumer(@PathParam("usernameConsumerDaEliminare") String usernameConsumerDaEliminare,
                                     @Context HttpServletRequest httpServletRequest) {
 
         Uploader uploader;
         if( ( uploader = isUploader(httpServletRequest) ) != null ) {
 
             List<RelazioneUploaderConsumerFile> occorrenzeDaEliminare =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploaderEConsumer(uploader.getIdentificativoAttore(), identificativoConsumerDaEliminare);
+                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploaderEConsumer(uploader.getUsername(), usernameConsumerDaEliminare);
 
             DatabaseHelper.cancellaEntita(occorrenzeDaEliminare);
 
             // TODO : elimare la relazione tra consumer ed uploader
 
             return Response.ok()
-                           .entity("Consumer " + identificativoConsumerDaEliminare + "eliminato")
+                           .entity("Consumer " + usernameConsumerDaEliminare + "eliminato")
                            .build();
 
         } else {

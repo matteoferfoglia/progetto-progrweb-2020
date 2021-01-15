@@ -1,7 +1,6 @@
 package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.RegexHelper;
@@ -20,13 +19,8 @@ public abstract class Attore implements UserPrincipal {
 
     // TODO : implementare questa classe
 
-
-    /** Identificativo univoco per un attore. */
-    @Id
-    protected Long identificativoAttore;
-
     /** Username dell'attore.*/
-    @Index
+    @Id
     protected String username;
 
     /** Nome e cognome dell'attore.*/
@@ -35,10 +29,10 @@ public abstract class Attore implements UserPrincipal {
     /** Email dell'attore. */
     protected String email;
 
-    /** Restituisce il nome del field contenente l'identificativo
+    /** Restituisce il nome del field contenente lo username
      * di un attore, per la ricerca nel database.*/
-    public static String getNomeFieldIdentificativoAttore() {
-        final String nomeField = "identificativoAttore";
+    public static String getNomeFieldUsernameAttore() {
+        final String nomeField = "username";
         return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
     }
 
@@ -58,10 +52,6 @@ public abstract class Attore implements UserPrincipal {
     }
 
     protected Attore() {}
-
-    public long getIdentificativoAttore() {
-        return identificativoAttore;
-    }
 
     public String getNomeCognome() {
         return nomeCognome;
@@ -94,11 +84,11 @@ public abstract class Attore implements UserPrincipal {
         return true;
     }
 
-    /** Restituisce l'attore corrispondente all'id dato nel parametro,
+    /** Restituisce l'attore corrispondente allo username dato nel parametro,
      * oppure null se non trovato.*/
-    public static Attore getAttoreById(Long identificativoAttore) {
+    public static Attore getAttoreById(String usernameAttore) {
         try {
-            return  (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
+            return  (Attore) DatabaseHelper.getById(usernameAttore, Attore.class);
         } catch (NotFoundException e) {
             return null;
         }
@@ -114,7 +104,6 @@ public abstract class Attore implements UserPrincipal {
 
         Attore attore = (Attore) o;
 
-        if (identificativoAttore != attore.identificativoAttore) return false;
         if (username != null ? !username.equals(attore.username) : attore.username != null) return false;
         if (nomeCognome != null ? !nomeCognome.equals(attore.nomeCognome) : attore.nomeCognome != null) return false;
 
@@ -123,8 +112,7 @@ public abstract class Attore implements UserPrincipal {
 
     @Override
     public int hashCode() {
-        int result = identificativoAttore.hashCode();
-        result = 31 * result + username.hashCode();
+        int result = username.hashCode();
         result = 31 * result + nomeCognome.hashCode();
         result = 31 * result + email.hashCode();
         return result;
@@ -146,8 +134,7 @@ public abstract class Attore implements UserPrincipal {
     @Override
     public String toString() {
         return "Attore{" +
-                "identificativoAttore=" + identificativoAttore +
-                ", username='" + username + '\'' +
+                "username='" + username + '\'' +
                 ", nomeCognome='" + nomeCognome + '\'' +
                 ", email='" + email + '\'' +
                 '}';

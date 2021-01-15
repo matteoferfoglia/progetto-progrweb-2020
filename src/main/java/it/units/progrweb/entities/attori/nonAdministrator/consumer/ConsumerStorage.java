@@ -29,7 +29,7 @@ public class ConsumerStorage extends Consumer {
      * Consumer} il cui identificativo è dato come parametro.
      * Infine, restituisce i {@link File} scaricati.
      */
-    static List<File> getAnteprimaFiles(Long idConsumer, Long idUploader) {
+    static List<File> getAnteprimaFiles(String idConsumer, String idUploader) {
         // TODO     ed a marcarli come letti (a meno che non lo siano già - scritture nel DB costano!)
         // TODO : come implementare questo metodo ? Che cosa deve fare ? Che cosa ci si aspetta in outuput??
 

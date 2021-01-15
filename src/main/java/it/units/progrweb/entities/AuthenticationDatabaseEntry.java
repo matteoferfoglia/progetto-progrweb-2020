@@ -30,11 +30,8 @@ public class AuthenticationDatabaseEntry {
 
     private final static int SALT_LENGTH = 15;
 
-    /** Valore identificativo univoco per l'attore. */
-    @Id
-    private Long identificativoAttore;
-
     /** Username.*/
+    @Id
     @Index
     private String username;
 

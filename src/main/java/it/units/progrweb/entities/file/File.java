@@ -144,9 +144,7 @@ public abstract class File {
 
     /** Restituisce la mappa nome-valore degli attributi di un file
      * ritenuti rilevanti dalla classe concreta che implementa questo
-     * metodo.
-     * @return
-     */
+     * metodo.*/
     public abstract Map<String, ?> toMap_nomeProprieta_valoreProprieta();
 
     public String getNomeDocumento() {

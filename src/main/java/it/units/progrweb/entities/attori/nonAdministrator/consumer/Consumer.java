@@ -28,12 +28,12 @@ public abstract class Consumer extends UtenteNonAdministrator {
     }
 
     /** Restituisce l'entità {@link Consumer} cercata nel database
-     * in base all'identificativo fornito.
+     * in base allo username fornito.
      * @return Il consumer cercato, oppure null in caso di errore.*/
-    public static Consumer cercaConsumerById( Long identificativoConsumer ) {
+    public static Consumer cercaConsumerDaUsername(String usernameConsumer ) {
         // TODO : metodo simile anche in Uploader: valutare se creare un metodo direttamente nella classe padre e passrvi Uploader.class / Consumer.class
         try{
-            return (Consumer) DatabaseHelper.getById(identificativoConsumer, Consumer.class);
+            return (Consumer) DatabaseHelper.getById(usernameConsumer, Consumer.class);
         } catch ( NotFoundException notFoundException) {
             return null;
         }
@@ -66,12 +66,12 @@ public abstract class Consumer extends UtenteNonAdministrator {
     /** Dato l'identificativo di un {@link Uploader}, carica dal database
      * tutti i {@link File} caricati da quell'{@link Uploader} per questo
      * {@link Consumer} e li restituisce.
-     * @param identificativoUploader Identifocativo dell'{@link Uploader}
-     *                               dei {@link File} da restituire.
+     * @param usernameUploader Username dell'{@link Uploader} associato
+     *                         ai {@link File} da restituire.
      */
-    public List<File> getAnteprimaFiles(Long identificativoUploader) {
-        Long identificativoQuestoConsumer = getIdentificativoAttore();
-        return ConsumerStorage.getAnteprimaFiles(identificativoQuestoConsumer, identificativoUploader);
+    public List<File> getAnteprimaFiles(String usernameUploader) {
+        String usernameQuestoConsumer = getUsername();
+        return ConsumerStorage.getAnteprimaFiles(usernameQuestoConsumer, usernameUploader);
     }
 
 }
