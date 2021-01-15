@@ -272,9 +272,9 @@ const getMappa_idConsumer_arrayIdFiles = async () => {
 
 /** Richiede le informazioni relative al consumer il cui identificativo
  * è passato come parametro. Se la richiesta va a buon fine, viene
- * restituito un array di due elementi, in cui il primo contiene
- * l'identificativo del Consumer ed il secondo contiene un oggetto
- * in cui ogni property è una proprietà del Consumer.*/
+ * restituita una Promise risolta contenente un array di due elementi,
+ * in cui il primo contiene l'identificativo del Consumer ed il secondo
+ * contiene un oggetto in cui ogni property è una proprietà del Consumer.*/
 const getInfoConsumer = idConsumer =>
     richiestaGet( process.env.VUE_APP_GET_INFO_CONSUMER + "/" + idConsumer )
         .then( rispostaConProprietaConsumer => [ idConsumer, rispostaConProprietaConsumer.data ] ) ;
@@ -291,7 +291,7 @@ const getMappa_idConsumer_proprietaConsumer = async arrayIdConsumer => {
 
   // Richiede al server info su ogni Consumer nell'array
   //  (una Promise per ogni Consumer).  // TODO : si può evitare duplicazione di codice ? Stesso pattern usato anche in Consumer
-  return Promise.all( arrayIdConsumer.map( idConsumer => getInfoConsumer( idConsumer ) ))
+  return Promise.all( arrayIdConsumer.map( idConsumer => getInfoConsumer( idConsumer ) )) // TODO : verificare che cosa restituisce getInfoConsumer
                 .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
                 .catch( rispostaErrore => {
                   console.error("Errore durante il caricamento delle informazioni sui Consumer: " + rispostaErrore );
