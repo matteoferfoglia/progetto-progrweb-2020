@@ -41,20 +41,19 @@ public class FiltroAutenticazione implements Filter {
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
 
-        if(req instanceof HttpServletRequest) {
-            HttpServletRequest httpReq = (HttpServletRequest) req;
+        HttpServletRequest httpReq = (HttpServletRequest) req;
 
-            if( isRisorsaAdAccessoLibero(httpReq)
-                || (isRichiestaApi(httpReq)
-                    && ( httpReq.getMethod().equals(FiltroCORS.METODO_HTTP_INTERCETTATO)   // "OPTIONS" per richieste "api" gestite dal filtro CORS
-                         || Autenticazione.isClientAutenticato(httpReq) ) ) ) {
+        if( isRisorsaAdAccessoLibero(httpReq)
+            || (isRichiestaApi(httpReq)
+                && ( httpReq.getMethod().equals(FiltroCORS.METODO_HTTP_INTERCETTATO)   // "OPTIONS" per richieste "api" gestite dal filtro CORS
+                     || Autenticazione.isClientAutenticato(httpReq) ) ) ) {
 
-                chain.doFilter(req, resp);
-                // attualmente, solo richieste di tipo "api" possibili
-            } else {
-                Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
-            }
+            chain.doFilter(req, resp);
+            // attualmente, solo richieste di tipo "api" possibili
+        } else {
+            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
         }
+
     }
 
 

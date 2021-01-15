@@ -1,7 +1,7 @@
 package it.units.progrweb.filters.attori;
 
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.utils.Autenticazione;
 
 import javax.servlet.*;
@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Intercetta le richieste per i Consumer e verifica
- * che siano tali (e non ad esempio Uploader).
+ * Intercetta le richieste per gli Administrator e verifica
+ * che siano tali.
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroConsumer", asyncSupported = true)
-public class FiltroConsumer implements Filter {
+@WebFilter(filterName = "FiltroAdministrator", asyncSupported = true)
+public class FiltroAdministrator implements Filter {
 
     public void destroy() {}
 
@@ -24,7 +24,7 @@ public class FiltroConsumer implements Filter {
             throws ServletException, IOException {
 
         Attore attore = Autenticazione.getAttoreDaHttpServletRequest((HttpServletRequest) req);
-        if(attore instanceof Consumer)
+        if(attore instanceof Administrator)
             chain.doFilter(req, resp);
         else
             Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);

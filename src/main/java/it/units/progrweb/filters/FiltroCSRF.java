@@ -48,83 +48,81 @@ public class FiltroCSRF implements Filter {
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
 
-        if(req instanceof HttpServletRequest) {     // TODO : creare un filtro per NON istanze di HttpRervletRequest
-            HttpServletRequest httpReq = (HttpServletRequest) req;
+        HttpServletRequest httpReq = (HttpServletRequest) req;
 
-            if( UtilitaGenerale.isStessoPrefissoNellArray( getUrlPattern(httpReq), LISTA_URL_DA_CONTROLLARE_CSRF) ) {
+        if( UtilitaGenerale.isStessoPrefissoNellArray( getUrlPattern(httpReq), LISTA_URL_DA_CONTROLLARE_CSRF) ) {
 
-                String indirizzoIPClient = httpReq.getRemoteAddr();
-                String cookieHeader = httpReq.getHeader(Cookie.NOME_HEADER_COOKIE);
+            String indirizzoIPClient = httpReq.getRemoteAddr();
+            String cookieHeader = httpReq.getHeader(Cookie.NOME_HEADER_COOKIE);
 
-                // Cerca parametro CSRF
-                String csrfToken = null;    //inizializzazione
-                String contentType = httpReq.getContentType();
+            // Cerca parametro CSRF
+            String csrfToken = null;    //inizializzazione
+            String contentType = httpReq.getContentType();
 
-                // Copio la httpRequest perché getInputStream() può essere invocato una volta sola (e verrà
-                // usato dai servizi REST), altrimenti: java.lang.IllegalStateException: READER .
-                // Questo codice esegue parsing del body della request, quindi usa getInputStream(), per
-                // cercare CSRF token nel body della request.
-                HttpServletRequest copiaHttpReq = new HttpRequestWrapper(httpReq);
+            // Copio la httpRequest perché getInputStream() può essere invocato una volta sola (e verrà
+            // usato dai servizi REST), altrimenti: java.lang.IllegalStateException: READER .
+            // Questo codice esegue parsing del body della request, quindi usa getInputStream(), per
+            // cercare CSRF token nel body della request.
+            HttpServletRequest copiaHttpReq = new HttpRequestWrapper(httpReq);
 
-                if(contentType != null) {   // null se non c'è content-type nella request
-                    // Cerca CSRF nel body della request
+            if(contentType != null) {   // null se non c'è content-type nella request
+                // Cerca CSRF nel body della request
 
-                    if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
+                if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
 
-                        // Parsing del body della request per trovare il csrfToken se presente (Fonte: https://stackoverflow.com/a/3831791 e adattato)
-                        StringBuffer requestBody = new StringBuffer();
+                    // Parsing del body della request per trovare il csrfToken se presente (Fonte: https://stackoverflow.com/a/3831791 e adattato)
+                    StringBuffer requestBody = new StringBuffer();
 
-                        try {
+                    try {
 
-                            // TODO : rivedere questa parte e refactoring (estrarre un metodo che faccia solo il parsing della richiesta JSON)
+                        // TODO : rivedere questa parte e refactoring (estrarre un metodo che faccia solo il parsing della richiesta JSON)
 
-                            ServletInputStream reader = copiaHttpReq.getInputStream();
+                        ServletInputStream reader = copiaHttpReq.getInputStream();
 
-                            // readLine(): https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
-                            int byteLetti = 0;                                              // integer specifying the character at which this method begins reading
-                            final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
-                            byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
-                            while( (byteLetti = reader.readLine(arrayByteLettura,           // array di lettura "buffer"
-                                                            0,                          // in lettura, occupiamo l'array (primo parametro) dal primo elemento
-                                                                DIMENSIONE_ARRAY_LETTURA)   // massimo spazio disponibile nell'array
-                                    ) != -1) {    // TODO : rivedere questa parte
-                                // Lettura di una linea alla volta
-                                String line = new String(arrayByteLettura, StandardCharsets.UTF_8);    // TODO : cercare tutte le occorrenza di UTF-8 e renderla variabile d'ambiente
-                                requestBody.append(line);
-                            }
-
-                            Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonToMappaProprieta(requestBody.toString());
-                            csrfToken = (String) mappaProprietaValori.get(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
-
-                        } catch (Exception e) {
-                            Logger.scriviEccezioneNelLog(this.getClass(), "Errore nella lettura del body della request", e);
-                            ((HttpServletResponse)resp).sendError(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-                                    Response.Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
+                        // readLine(): https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
+                        int byteLetti = 0;                                              // integer specifying the character at which this method begins reading
+                        final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
+                        byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
+                        while( (byteLetti = reader.readLine(arrayByteLettura,           // array di lettura "buffer"
+                                                        0,                          // in lettura, occupiamo l'array (primo parametro) dal primo elemento
+                                                            DIMENSIONE_ARRAY_LETTURA)   // massimo spazio disponibile nell'array
+                                ) != -1) {    // TODO : rivedere questa parte
+                            // Lettura di una linea alla volta
+                            String line = new String(arrayByteLettura, StandardCharsets.UTF_8);    // TODO : cercare tutte le occorrenza di UTF-8 e renderla variabile d'ambiente
+                            requestBody.append(line);
                         }
 
+                        Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonToMappaProprieta(requestBody.toString());
+                        csrfToken = (String) mappaProprietaValori.get(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
+
+                    } catch (Exception e) {
+                        Logger.scriviEccezioneNelLog(this.getClass(), "Errore nella lettura del body della request", e);
+                        ((HttpServletResponse)resp).sendError(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                                Response.Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
                     }
 
-                } else {
-                    // Parametri form / query string leggibili con getParameter
-                    csrfToken = httpReq.getParameter(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
-                }
-
-
-                if (csrfToken != null               // se esiste il token csrf
-                        && cookieHeader != null     // se esiste l'header coi cookie
-                        && CsrfToken.isCsrfTokenValido(csrfToken, cookieHeader, indirizzoIPClient)) {
-
-                    chain.doFilter(copiaHttpReq, resp);
-
-                } else {
-                    // Problemi con CSRF
-                    Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
                 }
 
             } else {
-                // Questo ramo dell' IF se la richiesta non ha CSRF token da controllare
-                chain.doFilter(req, resp);
+                // Parametri form / query string leggibili con getParameter
+                csrfToken = httpReq.getParameter(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
             }
+
+
+            if (csrfToken != null               // se esiste il token csrf
+                    && cookieHeader != null     // se esiste l'header coi cookie
+                    && CsrfToken.isCsrfTokenValido(csrfToken, cookieHeader, indirizzoIPClient)) {
+
+                chain.doFilter(copiaHttpReq, resp);
+
+            } else {
+                // Problemi con CSRF
+                Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+            }
+
+        } else {
+            // Questo ramo dell' IF se la richiesta non ha CSRF token da controllare
+            chain.doFilter(req, resp);
         }
 
     }

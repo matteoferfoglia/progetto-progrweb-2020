@@ -9,6 +9,10 @@
 
   <!-- Url-pattern dei filtri definiti in web.xml (non con @WebFilter) per poter specificare l'ordine di esecuzione -->
   <filter-mapping>
+    <filter-name>FiltroHttpServletRequest</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>FiltroCORS</filter-name>
     <url-pattern>/api/*</url-pattern>
   </filter-mapping>
@@ -27,6 +31,14 @@
   <filter-mapping>
     <filter-name>FiltroConsumer</filter-name>
     <url-pattern>/api/consumer/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>FiltroUploader</filter-name>
+    <url-pattern>/api/uploader/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>FiltroAdministrator</filter-name>
+    <url-pattern>/api/administrator/*</url-pattern>
   </filter-mapping>
 
   <servlet>
