@@ -160,7 +160,7 @@ public class RelazioneUploaderConsumerFile {
      */
     public static Map<Long, Long[]> mappa_idConsumer_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
 
-        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdUploader";
+        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdConsumer";
         return mappa_idAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
     }
@@ -174,9 +174,12 @@ public class RelazioneUploaderConsumerFile {
     private static Map<Long, Long[]> mappa_idAttore_arrayIdFiles(List<RelazioneUploaderConsumerFile> listaRelazioni,
                                                                  String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze) {
 
+        // TODO : restituire List<Long> anziché Long[]
+
         try {
 
-            Method getter_metodoRaggruppamentoOccorrenze = RelazioneUploaderConsumerFile.class.getDeclaredMethod(nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
+            Method getter_metodoRaggruppamentoOccorrenze = RelazioneUploaderConsumerFile
+                    .class.getDeclaredMethod(nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
             return listaRelazioni
                     .stream()
@@ -187,7 +190,7 @@ public class RelazioneUploaderConsumerFile {
                             Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class, e);
                             return null;
                         }
-                    }))   // raggruppa in base agli uploader
+                    }))   // raggruppa in base all'attore ( quale attore dipende dal metodo usato )
 
                     // Ora che è raggruppato, crea mappa { uploader => arrayFilesCaricatiDaUploader }
                     .entrySet()
@@ -198,6 +201,7 @@ public class RelazioneUploaderConsumerFile {
                         Long[] arrayIdFiles = entry.getValue()
                                 .stream()
                                 .map(RelazioneUploaderConsumerFile::getIdFile)
+                                .filter( Objects::nonNull ) // evita le occorrenze in cui il file è null
                                 .toArray(Long[]::new);
                         return new AbstractMap.SimpleEntry(chiave, arrayIdFiles);
                     })
