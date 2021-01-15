@@ -32,8 +32,11 @@ public class AuthenticationDatabaseEntry {
 
     /** Valore identificativo univoco per l'attore. */
     @Id
-    @Index
     private Long identificativoAttore;
+
+    /** Username.*/
+    @Index
+    private String username;
 
     /** Password, hashed e salted.*/
     private String hashedSaltedPassword;
@@ -45,10 +48,10 @@ public class AuthenticationDatabaseEntry {
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
-    public AuthenticationDatabaseEntry(Long identificativoAttore, String passwordAttore)
+    public AuthenticationDatabaseEntry(String username , String passwordAttore)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        this.identificativoAttore = identificativoAttore;
+        this.username  = username ;
         this.salt = GeneratoreTokenCasuali.generaTokenAlfanumerico(SALT_LENGTH);
         this.hashedSaltedPassword = calcolaHashedSaltedPassword(passwordAttore, this.salt);
     }
@@ -71,16 +74,16 @@ public class AuthenticationDatabaseEntry {
     }
 
 
-    /** Dati identificativoAttore e password, restituisce true se tali
+    /** Dati username  e password, restituisce true se tali
      * credenziali sono valide, false altrimenti. */
-    public static boolean verificaCredenziali(String identificativoAttore, String passwordInChiaro) {
+    public static boolean verificaCredenziali(String username , String passwordInChiaro) {
         // TODO : implementare questa classe
 
         boolean credenzialiValide;
         AuthenticationDatabaseEntry authenticationEntry;
                 
         try {
-            authenticationEntry = cercaAttore(identificativoAttore);
+            authenticationEntry = cercaAttore(username);
 
             // Se qui, allora attore trovato
             credenzialiValide = calcolaHashedSaltedPassword(passwordInChiaro, authenticationEntry.salt)
@@ -97,12 +100,12 @@ public class AuthenticationDatabaseEntry {
         return credenzialiValide;
     }
 
-    /** Cerca l' identificativoAttore dato nell'AuthDB.
+    /** Cerca l'attore in base allo username nell'AuthDB.
      * Se lo trova, restituisce l'entry corrispondente,
      * altrimenti lancia un'eccezione.
-     * @throws NotFoundException se non trova nell'AuthDB l' identificativoAttore cercato.
+     * @throws NotFoundException se non trova nell'AuthDB lo username  cercato.
      */
-    private static AuthenticationDatabaseEntry cercaAttore(String identificativoAttore)
+    private static AuthenticationDatabaseEntry cercaAttore(String username )
             throws NotFoundException {
         throw new NotFoundException();  // TODO : metodo da implementare!
     }

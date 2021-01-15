@@ -1,6 +1,7 @@
 package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.RegexHelper;
@@ -25,6 +26,7 @@ public abstract class Attore implements UserPrincipal {
     protected Long identificativoAttore;
 
     /** Username dell'attore.*/
+    @Index
     protected String username;
 
     /** Nome e cognome dell'attore.*/
