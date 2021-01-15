@@ -84,9 +84,10 @@ export default {
       await getNomeConsumerAttualmenteAutenticato()
             .then( nome => this.nomeConsumerAttualmenteAutenticato = nome );
 
-      await getNomePropNomeUploader() // Richiede nomi delle properties negli oggetti ricevuti dal server
+            // Richiede nomi delle properties negli oggetti ricevuti dal server
+      await getNomePropNomeUploader()         // richiede nome prop con nome uploader
             .then( nomePropNomeUploader => this.NOME_PROP_NOME_UPLOADER = nomePropNomeUploader )
-            .then( getNomePropLogoUploader )
+            .then( getNomePropLogoUploader )  // richiede nome prop con logo uploader
             .then( nomePropLogoUploader => this.NOME_PROP_LOGO_UPLOADER = nomePropLogoUploader )
 
             // Richiede identificativi uploader e corrispondenti identificativi dei file
