@@ -7,8 +7,9 @@
     <form v-if=" mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
       <!-- Form per filtraggio documenti rispetto ad hashtag -->
       <p>Hashtags: </p>
-      <ol v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()" :key="hashtag">
-        <li>
+      <ol>
+        <li v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
+            :key="hashtag">
           <p>
             <input type="checkbox"
                    @change="mostraDocumentiConHashtagFiltrato(hashtag, this.checked)/* Se cliccato, mostra documenti con questo hashtag */"
@@ -23,19 +24,25 @@
   <table v-if="elencoDocumenti.size > 0">
     <!-- Tabella dei documenti -->
     <thead>
-      <tr v-for="nomeColonna in nomiColonneIntestazione" :key="nomeColonna">
-        <td>{{ nomeColonna }}</td>
+      <tr>
+        <td v-for="nomeColonna in nomiColonneIntestazione"
+            :key="nomeColonna">
+          {{ nomeColonna }}
+        </td>
       </tr>
     </thead>
-    <tbody v-for="(idDocumento, documento) in Object.fromEntries(elencoDocumentiDaMostrare)" :key="idDocumento">
+    <tbody>
       <!-- Ogni riga è un documento -->
-      <tr v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione"
-          :key="numeroColonnaQuestaTabella"
-          id="{{idDocumento}}">
-        <td v-if="propertyQuestaColonna===NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI">
-          <a href="{{ documento[propertyQuestaColonna] }}">Download</a> <!-- Link download documento -->
+      <tr v-for="(idDocumento, documento) in Object.fromEntries(elencoDocumentiDaMostrare)"
+          :key="idDocumento">
+        <td v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna !== NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI )"
+            :key="numeroColonnaQuestaTabella"
+            id="{{idDocumento}}">
+          {{ documento[propertyQuestaColonna] }}
         </td>
-        <td v-else>{{ documento[propertyQuestaColonna] }}</td>
+        <td>
+          <a href="{{ documento[NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] }}">Download</a> <!-- Link download documento -->
+        </td>
       </tr>
     </tbody>
   </table>

@@ -16,6 +16,11 @@
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import {verificaAutenticazione} from "../utils/autenticazione";
+import {richiestaGet} from "../utils/http";
+
+
+/** Nelle route, nome del parametro con l'identificativo del consumer.*/
+const NOME_PARAM_ID_CONSUMER = "idConsumer";
 
 
 const routes = [
@@ -51,10 +56,22 @@ const routes = [
     }
   },
   {
-    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI,
     component: () => import('../views/ListaDocumenti'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
+      requiresLogoUploader: true// logo Uploader
+    }
+  },
+  {
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER + "/:" + NOME_PARAM_ID_CONSUMER,
+    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER,
+    component: () => import('../views/ListaDocumentiVisualizzatiDaConsumer'),
+    meta: {
+      requiresAuth: true,
+      requiresIdConsumer: true // per sapere la lista di documenti destinata a quale Consumer
     }
   }
 ]
@@ -82,7 +99,41 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           if(isUtenteAutenticato) {
             // Autenticato
 
-            if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN                   &&
+            if( routeDestinazione.matched.some(route => route.meta.requiresIdUploader) ) {
+
+              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]) {
+                // Se qui, nella route manca il parametro dell'uploader
+                console.error("Parametro " + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER +
+                    " mancante nella route.");
+                next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
+              } else if ( !routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) {
+                // Se qui, nella route manca il logo dell'uploader
+
+                richiestaGet(process.env.VUE_APP_GET_LOGO_UPLOADER + "/" +
+                    routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) // Richiede il logo dell'Uploader al server
+                    .then( logoBase64 => {
+                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] = logoBase64.data ;
+                      next();
+                    })
+                    .catch( errore => {
+                      console.error(errore);
+                      next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
+                    });
+
+              } else {
+                next(); // instrada senza problemi se ci sono tutti i parametri
+              }
+
+            } else if ( routeDestinazione.matched.some(route => route.meta.requiresIdConsumer) ) {    // TODO : da verificare
+
+              if( routeDestinazione.params[ NOME_PARAM_ID_CONSUMER ] ) {
+                next();
+              } else {
+                next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});
+              }
+
+
+            } else if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN                 &&
                 routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
                 routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE ) {
               // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
@@ -124,7 +175,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           next({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
         });
 
-  } else {
+  } else  {
     // SE route non richiede autorizzazione, ALLORA instrada senza problemi
     next();
 

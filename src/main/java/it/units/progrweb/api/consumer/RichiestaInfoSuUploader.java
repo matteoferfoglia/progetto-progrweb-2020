@@ -1,9 +1,10 @@
 package it.units.progrweb.api.consumer;
 
 import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
-import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.persistence.DatabaseHelper;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -23,8 +24,29 @@ import java.util.Map;
  * @author Matteo Ferfoglia
  */
 @Path("/consumer")                          // TODO : variabile d'ambiente
-public class RichiestaUploader {
+public class RichiestaInfoSuUploader {
 
+    /** Dato come @PathParam lo username di un Uploader, restituisce
+     * la rappresentazione codificata in base64 del suo logo.*/
+    @Path("/logoUploader/{usernameUploader}")
+    @GET
+    public Response getLogoUploaderBase64(@PathParam("usernameUploader") String usernameUploader) {
+
+        // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
+
+        try {
+            Uploader uploader = (Uploader) DatabaseHelper.getById( usernameUploader, Uploader.class );
+            return Response.ok()
+                           .entity( uploader.getImmagineLogoBase64() )
+                           .build();
+
+        } catch (NotFoundException notFoundException) {
+            return Response.status( Response.Status.NOT_FOUND )
+                           .entity( "Uploader non trovato." )
+                           .build();
+        }
+
+    }
 
 
     /** In base all'header della richiesta, capisce da quale
@@ -44,22 +66,15 @@ public class RichiestaUploader {
 
         // TODO : verificare correttezza
 
-        Attore attore = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-        if( attore instanceof Consumer ) {
+        Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
 
-            Consumer consumer = (Consumer) attore;
+        List<RelazioneUploaderConsumerFile> risultatoQuery =
+                RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getUsername());
 
-            List<RelazioneUploaderConsumerFile> risultatoQuery =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getUsername());
+        Map<String, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
+                RelazioneUploaderConsumerFile.mappa_usernameUploader_arrayIdFile(risultatoQuery);
 
-            Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
-                    RelazioneUploaderConsumerFile.mappa_idUploader_arrayIdFile(risultatoQuery);
-
-            return UtilitaGenerale.rispostaJsonConMappa(mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer);
-
-        } else {
-            return Autenticazione.creaResponseForbidden("Servizio riservato ai Consumer autenticati.");
-        }
+        return UtilitaGenerale.rispostaJsonConMappa(mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer);
 
     }
 

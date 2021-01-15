@@ -51,7 +51,7 @@ class CampiFormRegistrazione {
     }
 
     public void setCodiceFiscale(String codiceFiscale) {
-        this.codiceFiscale =  EncoderPrevenzioneXSS.encodeForJava(codiceFiscale);
+        this.codiceFiscale =  EncoderPrevenzioneXSS.encodeForJava(codiceFiscale.toLowerCase()); // salvato in minuscolo
     }
 
     public void setNomeCognome(String nomeCognome) {

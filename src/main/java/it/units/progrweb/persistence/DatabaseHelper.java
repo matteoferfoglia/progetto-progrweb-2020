@@ -135,6 +135,13 @@ public abstract class DatabaseHelper {
         return database.load().type(classe).count();    // TODO : testare
     }
 
+    /** Restituisce true se la query cercata produce almeno
+     * un risultato.
+     */
+    public static boolean esisteNelDatabase(Class classe, Query query) {
+        return query.limit(1).list().size() == 1;
+    }
+
 
     /** Esegue la query e restituisce una lista in cui ogni elemento è
      * un'occorrenza del risultato della query.
@@ -215,6 +222,14 @@ public abstract class DatabaseHelper {
 
     }
 
+    /** Crea e restituisce una Query, date due condizioni poste in AND.*/
+    public static<Attributo> Query<?> creaERestituisciQueryAnd(Class classeEntita,
+                                                    String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                                    String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
+        return creaERestituisciQuery(classeEntita, nomeAttributo1, operatoreCondizione1, valoreCondizione1)
+                .filter(nomeAttributo2+operatoreCondizione2.operatore, valoreCondizione2);
+    }
+
 
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma permette
      * di filtrare tramite AND la condizione.*/
@@ -225,8 +240,29 @@ public abstract class DatabaseHelper {
         // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
         // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
 
-        Query query = creaERestituisciQuery(classeEntita, nomeAttributo1, operatoreCondizione1, valoreCondizione1)
-                                      .filter(nomeAttributo2+operatoreCondizione2.operatore, valoreCondizione2);
+        Query query = creaERestituisciQueryAnd(classeEntita,
+                nomeAttributo1, operatoreCondizione1, valoreCondizione1,
+                nomeAttributo2, operatoreCondizione2, valoreCondizione2);
+
+
+        return query!=null ? query.list() : new ArrayList<>(0);
+
+    }
+
+    /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma permette
+     * di filtrare tramite AND la condizione e specifica il massimo numero di
+     * entità da restiture.*/
+    public static<Attributo> List<?> queryAnd(Class classeEntita, int maxNumeroEntitaDaRestituire,
+                                              String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                              String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
+
+        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
+        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
+
+        Query query = creaERestituisciQueryAnd(classeEntita,
+                nomeAttributo1, operatoreCondizione1, valoreCondizione1,
+                nomeAttributo2, operatoreCondizione2, valoreCondizione2).limit(maxNumeroEntitaDaRestituire);
+
 
         return query!=null ? query.list() : new ArrayList<>(0);
 

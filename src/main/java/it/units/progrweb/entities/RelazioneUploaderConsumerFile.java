@@ -11,6 +11,7 @@ import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -34,21 +35,32 @@ public class RelazioneUploaderConsumerFile {
 
     /** Identificativo per {@link Uploader}.*/
     @Index
-    private Long idUploader;
+    private String usernameUploader;
 
     /** Identificativo per {@link Consumer}.*/
     @Index
-    private Long idConsumer;
+    private String usernameConsumer;
 
     /** Identificativo per {@link File}.*/
     private Long idFile;
 
-    public Long getIdUploader() {
-        return idUploader;
+    /** Dissocia il {@link Consumer} il cui username è dato
+     * dall'{link {@link Uploader}} il cui username è dato.*/
+    public static void dissociaConsumerDaUploader(String usernameConsumerDaDissociare, String usernameUploader) {
+        List<RelazioneUploaderConsumerFile> occorrenzeDaEliminare =
+                getOccorrenzeFiltratePerUploaderEConsumer(usernameUploader, usernameConsumerDaDissociare);
+
+        DatabaseHelper.cancellaEntita(occorrenzeDaEliminare);
+
+        // TODO : elimare la relazione tra consumer ed uploader
     }
 
-    public Long getIdConsumer() {
-        return idConsumer;
+    public String getusernameUploader() {
+        return usernameUploader;
+    }
+
+    public String getusernameConsumer() {
+        return usernameConsumer;
     }
 
     public Long getIdFile() {
@@ -57,27 +69,33 @@ public class RelazioneUploaderConsumerFile {
 
     public RelazioneUploaderConsumerFile() {}
 
+    private RelazioneUploaderConsumerFile( String usernameConsumer, String usernameUploader, Long idFile ) {
+        this.usernameConsumer = usernameConsumer;
+        this.usernameUploader = usernameUploader;
+        this.idFile = idFile;
+    }
+
     /** Interroga il database e restituisce le occorrenze di questa entità
      * che risultano caricate dall'{@link Uploader} e destinate al {@link
      * Consumer} i cui username sono specificati come parametri.
      * @return
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploaderEConsumer(String idUploader,
-                                                                                                String idConsumer) {
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploaderEConsumer(String usernameUploader,
+                                                                                                String usernameConsumer) {
 
         // TODO : verificare che funzioni
 
         // Parametri query
-        String nomeAttributo1 = "idUploader";
-        String nomeAttributo2 = "idConsumer";
+        String nomeAttributo1 = "usernameUploader";
+        String nomeAttributo2 = "usernameConsumer";
 
         if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo1, RelazioneUploaderConsumerFile.class) ) {
             if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo2, RelazioneUploaderConsumerFile.class)) {
 
                 return (List<RelazioneUploaderConsumerFile>)
                         DatabaseHelper.queryAnd(RelazioneUploaderConsumerFile.class,
-                                nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, idUploader,
-                                nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, idConsumer);
+                                nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, usernameUploader,
+                                nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, usernameConsumer);
 
             } else {
                 Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
@@ -98,10 +116,10 @@ public class RelazioneUploaderConsumerFile {
      * che risultano destinate al {@link Consumer} il cui username è
      * specificato come parametro.
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerConsumer(String idConsumer) {
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerConsumer(String usernameConsumer) {
 
         // TODO : verificare che funzioni
-        return queryRelazioneUploaderConsumerFiles("idConsumer", idConsumer);
+        return queryRelazioneUploaderConsumerFiles("usernameConsumer", usernameConsumer);
 
     }
 
@@ -109,10 +127,10 @@ public class RelazioneUploaderConsumerFile {
      * che risultano caricate dall'{@link Uploader} il cui username è
      * specificato come parametro.
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploader(String idUploader) {
+    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploader(String usernameUploader) {
 
         // TODO : verificare che funzioni
-        return queryRelazioneUploaderConsumerFiles("idUploader", idUploader);
+        return queryRelazioneUploaderConsumerFiles("usernameUploader", usernameUploader);
 
     }
 
@@ -144,10 +162,10 @@ public class RelazioneUploaderConsumerFile {
      * dei {@link File} inviati da quell'{@link Uploader} il cui
      * identificativo è specificato nella chiave.
      */
-    public static Map<Long, Long[]> mappa_idUploader_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
+    public static Map<String, Long[]> mappa_usernameUploader_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
 
-        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdUploader";
-        return mappa_idAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
+        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getusernameUploader";
+        return mappa_usernameAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
     }
 
@@ -158,10 +176,10 @@ public class RelazioneUploaderConsumerFile {
      * dei {@link File} inviati al {@link Consumer} il cui
      * identificativo è specificato nella chiave.
      */
-    public static Map<Long, Long[]> mappa_idConsumer_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
+    public static Map<String, Long[]> mappa_usernameConsumer_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
 
-        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdConsumer";
-        return mappa_idAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
+        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getusernameConsumer";
+        return mappa_usernameAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
     }
 
@@ -171,10 +189,10 @@ public class RelazioneUploaderConsumerFile {
      * di identificativi di {@link File} associati all'{@link Attore} il cui identificativo
      * è specificato nella chiave dell'entry: in questo modo, la lista di occorrenze date
      * viene raggruppata in base all'{@link Attore} specificato dal soprascritto metodo getter.*/
-    private static Map<Long, Long[]> mappa_idAttore_arrayIdFiles(List<RelazioneUploaderConsumerFile> listaRelazioni,
-                                                                 String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze) {
+    private static Map<String, Long[]> mappa_usernameAttore_arrayIdFiles(List<RelazioneUploaderConsumerFile> listaRelazioni,
+                                                                         String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze) {
 
-        // TODO : restituire List<Long> anziché Long[]
+        // TODO : restituire List<Long> anziché Long[] ??
 
         try {
 
@@ -197,7 +215,7 @@ public class RelazioneUploaderConsumerFile {
                     .stream()
                     .filter(Objects::nonNull)
                     .map(entry -> {
-                        Long chiave = (Long) entry.getKey();
+                        String chiave = (String) entry.getKey();
                         Long[] arrayIdFiles = entry.getValue()
                                 .stream()
                                 .map(RelazioneUploaderConsumerFile::getIdFile)
@@ -206,7 +224,7 @@ public class RelazioneUploaderConsumerFile {
                         return new AbstractMap.SimpleEntry(chiave, arrayIdFiles);
                     })
                     .collect(Collectors.toMap(
-                            entry -> (Long) entry.getKey(),
+                            entry -> (String) entry.getKey(),
                             entry -> (Long[]) entry.getValue())
                     );
         } catch (NoSuchMethodException e) {
@@ -215,6 +233,37 @@ public class RelazioneUploaderConsumerFile {
                                             e );
             return new HashMap<>(); // mappa vuota
         }
+    }
+
+    /** Restituisce true se il consumer con username dato risulta attualmente
+     * servito dall'uploader con username dato, false altrimenti.*/
+    public static boolean isConsumerServitoDaUploader( String usernameUploader, String usernameConsumer ) {
+        // TODO : verificare funzioni
+        try {
+            Field uploader_field = RelazioneUploaderConsumerFile.class.getDeclaredField("usernameUploader");  // eccezione se non esiste questo field
+            Field consumer_field = RelazioneUploaderConsumerFile.class.getDeclaredField("usernameConsumer");  // eccezione se non esiste questo field
+            
+            return DatabaseHelper.esisteNelDatabase(
+                    RelazioneUploaderConsumerFile.class,
+                    DatabaseHelper.creaERestituisciQueryAnd( RelazioneUploaderConsumerFile.class,
+                                     uploader_field.getName(), DatabaseHelper.OperatoreQuery.UGUALE, usernameUploader,
+                                     consumer_field.getName(), DatabaseHelper.OperatoreQuery.UGUALE, usernameConsumer ) );
+
+        } catch (NoSuchFieldException e) {
+            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
+                                         "Attributo non trovato nella classe, forse è stato modificato il nome.",
+                                         e);
+            return false;
+        }
+    }
+
+    /** Associa il consumer il cui username è dato all'Uploader
+     * con username dato. Restituisce true se la richiesta va
+     * a buon fine, false altrimenti.*/
+    public static void aggiungiConsumerAdUploader(String usernameConsumer, String usernameUploader) {
+
+        DatabaseHelper.salvaEntita( new RelazioneUploaderConsumerFile(usernameConsumer, usernameUploader, null) );
+
     }
 
 }

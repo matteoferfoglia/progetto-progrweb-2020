@@ -3,29 +3,44 @@
     <h1>Benvenuto Uploader {{ nomeAttoreAttualmenteAutenticato }} <!-- TODO : spostarlo in un componente padre, perché questa proprietà ci sarà anche negli altri Attori --> </h1>
   </header>
   <main class="listaConsumer">
+
     <p>Lista dei <i>Consumer</i></p>
-    <Form @csrf-token-ricevuto="csrfToken = $event">
-      <ol  v-for="consumer in Array.from(mappa_idConsumer_proprietaConsumer.entries())" :key="consumer[0]/*Id del consumer*/" >
-        <li id="{{ consumer[0] }}">
-          <ol>
-            <li>{{ NOME_PROP_NOME_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}</span></li>
-            <li>{{ NOME_PROP_EMAIL_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}</span></li>
-            <li>{{ NOME_PROP_USERNAME_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }}</span></li>
-          </ol>
-          <input type="button" value="Elimina" @click="eliminaConsumer(consumer[0])">
+    <Form @csrf-token-ricevuto.stop="csrfToken = $event">
+      <ol>
+        <li id="{{ consumer[0] }}"
+            v-for="consumer in Array.from(mappa_idConsumer_proprietaConsumer.entries())"
+            :key="consumer[0]/*Id del consumer*/">
+
+          <router-link :to="{ path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER + '/' + consumer[0] }">
+            <ol>
+              <li>{{ NOME_PROP_NOME_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}</span></li>
+              <li>{{ NOME_PROP_EMAIL_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}</span></li>
+              <li>{{ NOME_PROP_USERNAME_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }}</span></li>
+            </ol>
+          </router-link>
+
+          <input type="button" value="Elimina" @click.stop="eliminaConsumer(consumer[0])">
         </li>
       </ol>
 
       <p>
-        Aggiungi un Consumer    <!-- TODO : parte di aggiunta nuovo consumer da implementare !!! Si potrebbe fare un menu a tendina cosicché i campi possano essere scelti tra quelli disponibili richiesti al server-->
+        Aggiungi un Consumer
+        <input type="text" v-model="usernameNuovoConsumer"
+               name="{{ NOME_PROP_USERNAME_CONSUMER }}"
+               placeholder="Username"
+               @click.stop=" mostraOpzioniAutocompletamento = true " />
+        <datalist @keyup.stop="autocompletamentoUsername(usernameNuovoConsumer)"> <!-- TODO : menu a tendina DA VERIFICARE IL FUNZIONAMENTO -->
+          <option @input="usernameDaAggiungereScelto(usernameNuovoConsumer)"
+                  v-for="usernameDaAggiungere in suggerimentiAutocompletamentoUsernameConsumerDaAggiungere"
+                  :key="usernameDaAggiungere">
+            {{ usernameDaAggiungere }}
+          </option>
+        </datalist>
+
         <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" />
         <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="Email" />
-        <input type="text" v-model="usernameNuovoConsumer" name="{{ NOME_PROP_USERNAME_CONSUMER }}" placeholder="Username" />
 
-        <!-- TODO : questo input dovrebbe in qualche modo restituire l'identificativo del consumer da aggiungere, così da passarlo al metodo di aggiunta
-                altrimenti passare al metodo i parametri e poi che se la veda il server -->
-
-        <input type="button" value="Aggiungi" @click="aggiungiConsumer( /* TODO  */ )" /><!-- TODO !!! -->
+        <input type="button" value="Aggiungi" @click="aggiungiConsumer" />
       </p>
     </Form>
   </main>
@@ -35,6 +50,7 @@
 // TODO : componente Consumer interamente da implementare
 import {richiestaDelete, richiestaGet, richiestaPost} from "../../utils/http";
 import Form from "../../components/FormConCsrfToken";
+import {unisciOggetti} from "../../utils/utilitaGenerale";
 
 export default {
   name: "Uploader",
@@ -48,10 +64,18 @@ export default {
       /** Nome dell'attore attualmente autenticato.*/
       nomeAttoreAttualmenteAutenticato: undefined,
 
+      /** Array con i suggerimenti degli username nel form di
+       * aggiunta nuovo Consumer.*/
+      suggerimentiAutocompletamentoUsernameConsumerDaAggiungere: [],
+
+      /** Flag per mostrare le opzioni di autocompletamento
+       * username del Consumer da aggiungere.*/
+      mostraOpzioniAutocompletamento: false,
+
       // Parametri in v-model col form per aggiunta nuovo Consumer
+      usernameNuovoConsumer: "",
       nominativoNuovoConsumer: "",
       emailNuovoConsumer: "",
-      usernameNuovoConsumer: "",
 
       /** Mappa { idConsumer => arrayConIdFilesPerConsumerDaQuestoUploader }.*/
       mappa_idConsumer_arrayIdFiles: new Map(),
@@ -125,7 +149,7 @@ export default {
   },
   methods: {
 
-    /** Metodo per l'eliminazione del Consumer con
+    /** Funzione per l'eliminazione del Consumer con
      * identificativo specificato nel parametro.*/
     eliminaConsumer( idConsumer ) {
 
@@ -144,34 +168,73 @@ export default {
         });
     },
 
-    /** Metodo per aggiungere un Consumer, dato il suo identificativo,
-     * a quelli gestiti da questo Uploader.*/
-    aggiungiConsumer( idConsumerDaAggiungere ) {
+    /** Funzione per aggiungere un Consumer. I dati del consumer da
+     * aggiungere sono presi dalle variabili di questo componente.*/
+    aggiungiConsumer() {
 
-      const parametriRichiesta = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
+      const proprietaConsumerDaAggiungere = {
+        [this.NOME_PROP_USERNAME_CONSUMER]:          this.usernameNuovoConsumer,
+        [this.NOME_PROP_NOME_CONSUMER]:              this.nominativoNuovoConsumer,
+        [this.NOME_PROP_EMAIL_CONSUMER]:             this.emailNuovoConsumer
+      }
 
       // Richiesta di aggiunta consumer
-      richiestaPost( process.env.VUE_APP_ADD_CONSUMER_PER_QUESTO_UPLOADER + "/" + idConsumerDaAggiungere, parametriRichiesta )
+      richiestaPost( process.env.VUE_APP_ADD_CONSUMER_PER_QUESTO_UPLOADER,
+                     unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken}) )
+        .then( () => {
 
-          // TODO : il server potrebbe restituire le proprietà del consumer, evitando un ulteriore richiesta
-          // TODO   oppure se l'idConsumer è stato ottenuto da un menu a tendina a completamento (quindi già
-          // TODO   si conoscono le proprietà del consumer) si potrebbe passare a questo metodo l'intero consumer
-          // TODO   anziché solo l'id   [ bisogna aggiungere le sue info alla mappa dei consumer in questo componente ]
+            // Aggiungi le info del consumer alla mappa in questo componente
+            this.mappa_idConsumer_proprietaConsumer.set(this.usernameNuovoConsumer, proprietaConsumerDaAggiungere);
 
-          // Richiesta delle informazioni del consumer
-          .then( () => getInfoConsumer(idConsumerDaAggiungere) )
+            // Aggiungi il consumer alla mappa dei file (per ora vuota, visto che il Consumer è appena stato creato)
+            this.mappa_idConsumer_arrayIdFiles.set( this.usernameNuovoConsumer, [] );  // valore aggiunto è un array vuoto (non ci sono ancora file per questo Consumer)
 
-          // Aggiungi le info del consumer alla mappa in questo componente
-          .then( entry_idConsumer_oggettoConPropConsumer =>
-              this.mappa_idConsumer_proprietaConsumer.set(entry_idConsumer_oggettoConPropConsumer[0], entry_idConsumer_oggettoConPropConsumer[1]) )
+            // Procedura completata
+            alert("Aggiunto " + this.mappa_idConsumer_proprietaConsumer.get(this.usernameNuovoConsumer)[this.NOME_PROP_NOME_CONSUMER] + "!" );
 
-          // Aggiungi il consumer alla mappa dei file (per ora vuota, visto che il Consumer è appena stato creato)
-          .then( () => this.mappa_idConsumer_arrayIdFiles.set(idConsumerDaAggiungere, [] ) )  // valore aggiunto è un array vuoto (non ci sono ancora file per questo Consumer)
+        })
+        .catch( errore => {
+          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer );
+          console.error( "Errore durante la procedura di aggiunta nuovo Consumer: " + errore );
+        });
 
-          // Procedura completata
-          .then( () => alert("Aggiunto " + this.mappa_idConsumer_proprietaConsumer.get(idConsumerDaAggiungere)[this.NOME_PROP_NOME_CONSUMER] + "!" ) )
+      // Pulisci campi del form input
+      this.usernameNuovoConsumer = "";
+      this.nominativoNuovoConsumer = "";
+      this.emailNuovoConsumer = "";
 
-          .catch( errore => console.error( "Errore durante la procedura di aggiunta nuovo Consumer: " + errore ) );
+    },
+
+    /** Funzione di autocompletamento dell'identificativo di
+     * un Consumer da aggiungere.
+     * @param caratteriDigitati Caratteri digitati dall'utente.
+     */
+    autocompletamentoUsername( caratteriDigitati ) {
+
+      // Chiedere al server la lista degli identificativi dei consumer il cui username inizia con i caratteri digitati
+      richiestaGet(process.env.VUE_APP_GET_ID_CONSUMER_INIZIANTE_CON + "/" + caratteriDigitati)
+        .then( risposta => {
+          this.suggerimentiAutocompletamentoUsernameConsumerDaAggiungere = risposta.data;
+        })
+        .catch( console.error );
+
+    },
+
+    /** Funzione da eseguire quando l'utente clicca su una delle option
+     * di autocompletamento proposte, nel form di aggiunta nuovo consumer.*/
+    usernameDaAggiungereScelto( usernameSelezionato ) {
+
+      // Autocompleta gli altri input del form
+      getInfoConsumer( usernameSelezionato )
+        .then( risposta => {
+          const infoConsumer = risposta[1];
+          this.usernameNuovoConsumer   = infoConsumer[this.NOME_PROP_USERNAME_CONSUMER];
+          this.emailNuovoConsumer      = infoConsumer[this.NOME_PROP_EMAIL_CONSUMER];
+          this.nominativoNuovoConsumer = infoConsumer[this.NOME_PROP_NOME_CONSUMER];
+
+          this.mostraOpzioniAutocompletamento = false;  // TODO : verificare correttezza (che sparisca il datalist)
+        })
+        .catch(console.error);
 
     }
 

@@ -2,16 +2,17 @@
   <header>
     <h1>Benvenuto {{ nomeAttoreAttualmenteAutenticato }}</h1>
   </header>
-  <main>
+  <main> <!-- TODO : semanticamente corretto main? -->
 
     <!-- Nel caso in cui il Consumer abbia ricevuto documenti da più Uploaders,
           mostra la lista degli Uploaders che gli hanno inviato documenti (logo +
           descrizione); cliccando su uno di essi, appare la lista dei documenti
           caricati da questi. -->
     <div class="schermataSceltaUploader" v-if="mappa_uploaders.size > 1">
-      <ol  v-for="uploader in Array.from(mappa_uploaders.entries())" :key="uploader[0]/*Id dell'uploader*/" >
-        <li>
-          <router-link :to="{ path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
+      <ol>
+        <li v-for="uploader in Array.from(mappa_uploaders.entries())"
+            :key="uploader[0]/*Id dell'uploader*/">
+          <router-link :to="{ name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI,
                               params: {
                                 [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[0],                           // id uploader
                                 [process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[1][NOME_PROP_LOGO_UPLOADER] // logo uploader
@@ -81,7 +82,7 @@ export default {
 
     const caricaQuestoComponente = async () => {
 
-      await getNomeConsumerAttualmenteAutenticato()
+      await getNomeAttoreAttualmenteAutenticato()
             .then( nome => this.nomeConsumerAttualmenteAutenticato = nome );
 
             // Richiede nomi delle properties negli oggetti ricevuti dal server
@@ -115,8 +116,9 @@ export default {
   }
 }
 
-/** Restituisce il nome del consumer attualmente autenticato.*/
-const getNomeConsumerAttualmenteAutenticato = async () => {
+
+/** Restituisce il nome dell'attore attualmente autenticato.*/
+const getNomeAttoreAttualmenteAutenticato = async () => {
   // TODO aggiungerlo al token o a qualcosa che sia visibile dal client senza sprecare una richiesta al server (tra l'altro, se non c'è il nome nel token, il server dovrà cercarlo nel db e gli accessi costano).
   return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
       .then(  risposta       =>  risposta.data )
@@ -163,16 +165,16 @@ const getInfoUploaders = async arrayIdUploader => {
   return Promise.all( arrayIdUploader.map( idUploader => {   // Fonte: https://stackoverflow.com/a/31414472
 
     return richiestaGet( process.env.VUE_APP_GET_INFO_UPLOADER + "/" + idUploader ) // richiesta info uploader
-              .then( rispostaConNomeUploader => [ idUploader, rispostaConNomeUploader.data ] );
+        .then( rispostaConNomeUploader => [ idUploader, rispostaConNomeUploader.data ] );
 
   }))
-  .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
-  .catch( rispostaErrore => {
-    console.error("Errore durante il caricamento delle informazioni sugli Uploader: " + rispostaErrore );
-    return Promise.reject(rispostaErrore);
-    // TODO : gestire l'errore (invio mail ai gestori?)
-    // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-  });
+      .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
+      .catch( rispostaErrore => {
+        console.error("Errore durante il caricamento delle informazioni sugli Uploader: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+        // TODO : gestire l'errore (invio mail ai gestori?)
+        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+      });
 
 }
 
