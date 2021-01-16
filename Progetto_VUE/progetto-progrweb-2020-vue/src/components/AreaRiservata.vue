@@ -1,5 +1,5 @@
 <template>
-  <h1>Benvenuto nell'area riservata</h1>
+  <h1>Area riservata</h1>
 
   <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfToken = $event">
     <input type="submit" value="Logout">
@@ -23,8 +23,6 @@ import {eliminaTokenAutenticazione} from "../utils/autenticazione";
 import Consumer from "../views/attori/Consumer";
 import Uploader from "../views/attori/Uploader";
 import Administrator from "../views/attori/Administrator";
-
-// TODO : refactoring : molto di questo componente è in comune con LoginUtenteGiaRegistrato
 
 export default {
   name: 'AreaRiservata',

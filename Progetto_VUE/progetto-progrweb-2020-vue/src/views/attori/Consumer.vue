@@ -83,7 +83,7 @@ export default {
     const caricaQuestoComponente = async () => {
 
       await getNomeAttoreAttualmenteAutenticato()
-            .then( nome => this.nomeConsumerAttualmenteAutenticato = nome );
+            .then( nome => this.nomeAttoreAttualmenteAutenticato = nome );
 
             // Richiede nomi delle properties negli oggetti ricevuti dal server
       await getNomePropNomeUploader()         // richiede nome prop con nome uploader

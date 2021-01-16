@@ -67,12 +67,16 @@ public class RichiestaInfoSuUploader {
         // TODO : verificare correttezza
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+        Map<String, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer = null;
 
-        List<RelazioneUploaderConsumerFile> risultatoQuery =
-                RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getUsername());
+        if ( consumer != null) {
+            List<RelazioneUploaderConsumerFile> risultatoQuery =
+                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getUsername());
 
-        Map<String, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
-                RelazioneUploaderConsumerFile.mappa_usernameUploader_arrayIdFile(risultatoQuery);
+           mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
+                    RelazioneUploaderConsumerFile.mappa_usernameUploader_arrayIdFile(risultatoQuery);
+
+        }
 
         return UtilitaGenerale.rispostaJsonConMappa(mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer);
 
