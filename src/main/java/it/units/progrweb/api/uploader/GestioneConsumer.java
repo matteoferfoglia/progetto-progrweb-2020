@@ -38,7 +38,7 @@ public class GestioneConsumer {
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        String usernameUploader = Autenticazione.getUsernameAttoreDaHttpServletRequest(httpServletRequest);
+        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
 
         List<RelazioneUploaderConsumerFile> risultatoQuery =
                 RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploader( usernameUploader );
@@ -117,7 +117,7 @@ public class GestioneConsumer {
                                      @Context HttpServletRequest httpServletRequest) {
 
         String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
-        String usernameUploader = Autenticazione.getUsernameAttoreDaHttpServletRequest( httpServletRequest );
+        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
 
         try {
 
@@ -166,7 +166,7 @@ public class GestioneConsumer {
                                     @Context HttpServletRequest httpServletRequest) {
 
 
-        String usernameUploader = Autenticazione.getUsernameAttoreDaHttpServletRequest(httpServletRequest);
+        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
         RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(usernameConsumerDaEliminare, usernameUploader);
 
         return Response

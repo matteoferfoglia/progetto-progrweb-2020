@@ -125,6 +125,12 @@ public abstract class DatabaseHelper {
         database.delete().entity(entitaDaEliminare);
     }
 
+    /** Elimina l'entità corrispondente all'identificativo specificato
+     * come parametro.*/
+    public static void cancellaEntitaById(Long idEntitaDaEliminare, Class classeEntita) {
+        database.delete().type(classeEntita).id(idEntitaDaEliminare);
+    }
+
     /** Restituisce il numero di entità nel database.*/
     public static int contaEntitaNelDatabase() {
         return database.load().count();

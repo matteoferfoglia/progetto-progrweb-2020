@@ -3,14 +3,20 @@ package it.units.progrweb.entities.file;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
+import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -149,5 +155,44 @@ public abstract class File {
 
     public String getNomeDocumento() {
         return nomeDocumento;
+    }
+
+    /** Restituisce il {@link File} (cioè il suo contenuto), il cui identificativo
+     * è specificato nel parametro, in una {@link Response}
+     * (<a href="https://stackoverflow.com/a/12251265">Fonte (restituzione file tramite JAX-RS)</a>).
+     * E' richiesta la HttpServletRequest che ha richiesto il {@link File}
+     * per venire a conoscenza dell'indirizzo IP del client a cui il
+     * file verrà recapitato.
+     * Prima di restituire il file, si verifica che l'{@link Attore} che lo ha
+     * richiesto sia in relazione con quel file (o {@link Consumer} o
+     * {@link Uploader}) (non si possono recuperare i file di altri utenti).*/
+    public static Response creaResponseConFile(Long identificativoFile, HttpServletRequest httpServletRequest) {
+
+        // TODO : verifica che questo metodo funzioni
+
+        String usernameAttoreDaHttpServletRequest =
+                Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
+
+        try {
+
+            RelazioneUploaderConsumerFile relazioneFileAttore = RelazioneUploaderConsumerFile
+                    .attorePuoAccedereAFile( usernameAttoreDaHttpServletRequest, identificativoFile );
+
+            if( relazioneFileAttore != null ) {
+
+                File file = File.getEntitaFromDbById(identificativoFile);
+                InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr());
+                return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
+                        .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
+                        .build();
+
+            } else {
+                return Autenticazione.creaResponseForbidden("Accesso al file vietato.");
+            }
+
+        } catch (NotFoundException notFoundException) {
+            return NotFoundException.creaResponseNotFound("File non trovato.");
+        }
+
     }
 }

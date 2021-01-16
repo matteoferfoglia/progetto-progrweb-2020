@@ -347,7 +347,7 @@ public class Autenticazione {
 
     /** Restituisce lo username dell'{@link Attore} in base alle informazioni contenute
      * nel token JWT. */
-    public static String getUsernameAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
+    public static String getUsernameAttoreDaTokenAutenticazione(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
         return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_SUBJECT_CLAIM_NAME );
     }

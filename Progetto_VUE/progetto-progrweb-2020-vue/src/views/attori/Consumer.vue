@@ -137,7 +137,7 @@ const getNomeAttoreAttualmenteAutenticato = async () => {
  * Se la richiesta va a buon fine, tale mappa viene restituita come
  * valore di una promise risolta.*/
 const getIdentificativi_uploader_file = async () => {
-  return richiestaGet(process.env.VUE_APP_GET_ID_UPLOADER_FILE_PER_QUESTO_CONSUMER)
+  return richiestaGet(process.env.VUE_APP_GET_MAPPA_FILE_PER_QUESTO_CONSUMER)
       .then(  risposta       =>  new Map(Object.entries(risposta.data)) )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );

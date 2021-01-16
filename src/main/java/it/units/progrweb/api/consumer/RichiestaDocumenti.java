@@ -2,7 +2,6 @@ package it.units.progrweb.api.consumer;
 
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
-import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
@@ -15,7 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,20 +80,7 @@ public class RichiestaDocumenti {
     public Response getFileById(@PathParam("identificativoFile") Long identificativoFile,
                                 @Context HttpServletRequest httpServletRequest) {
 
-        // TODO : verifica che questo metod funzioni
-
-        try {
-
-            File file = File.getEntitaFromDbById(identificativoFile);
-            InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr());
-            return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
-                           .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"" )
-                           .build();
-
-        } catch (NotFoundException notFoundException) {
-            return Response.status(Response.Status.NOT_FOUND)
-                           .build();
-        }
+        return File.creaResponseConFile(identificativoFile, httpServletRequest);
 
     }
 

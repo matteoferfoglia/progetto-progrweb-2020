@@ -8,6 +8,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.DatabaseHelper;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -29,9 +30,9 @@ import java.util.stream.Collectors;
 @Entity
 public class RelazioneUploaderConsumerFile {
 
-    /** Id per un'occorrenza.*/
     @Id
-    private Long idRelazione;
+    /** Identificativo per {@link File}.*/
+    private Long idFile;
 
     /** Identificativo per {@link Uploader}.*/
     @Index
@@ -40,9 +41,6 @@ public class RelazioneUploaderConsumerFile {
     /** Identificativo per {@link Consumer}.*/
     @Index
     private String usernameConsumer;
-
-    /** Identificativo per {@link File}.*/
-    private Long idFile;
 
     /** Dissocia il {@link Consumer} il cui username è dato
      * dall'{link {@link Uploader}} il cui username è dato.*/
@@ -55,11 +53,59 @@ public class RelazioneUploaderConsumerFile {
         // TODO : elimare la relazione tra consumer ed uploader
     }
 
-    public String getusernameUploader() {
+    /** Se l'attore il cui username è dato come parametro può accedere
+     * al file il cui identificativo è dato come parametro, restituisce
+     * l'occorrenza di {@link RelazioneUploaderConsumerFile} corrispondente
+     * al file cercato. Altrimenti restituisce null.
+     * Se il file non esiste, genera un'eccezione {@link NotFoundException}.*/
+    public static RelazioneUploaderConsumerFile attorePuoAccedereAFile(String usernameAttoreDaHttpServletRequest,
+                                                                       Long identificativoFile)
+            throws NotFoundException {
+
+        // TODO : verificare questo metodo
+
+        RelazioneUploaderConsumerFile relazioneUploaderConsumerFile = (RelazioneUploaderConsumerFile)
+                    DatabaseHelper.getById(identificativoFile, RelazioneUploaderConsumerFile.class);
+
+        if ( relazioneUploaderConsumerFile.getUsernameConsumer().equals( usernameAttoreDaHttpServletRequest )
+                || relazioneUploaderConsumerFile.getUsernameUploader().equals( usernameAttoreDaHttpServletRequest ) )
+            return relazioneUploaderConsumerFile;
+
+        else return null;
+
+    }
+
+    /** Se l'{@link Uploader} dato nel parametro è associato al
+     * {@link File} di cui si sta chiedendo l'eliminazione, il cui
+     * identificativo è specificato nel parametro, elimina il file
+     * e restituisce true. Altrimenti restituisce false e non elimina
+     * il file.
+     * Se il file non esiste, genera un'eccezione {@link NotFoundException}.*/
+    public static boolean eliminaFileDiUploader(Long idFileDaEliminare, String usernameUploader)
+            throws NotFoundException {
+
+        // TODO : verificare questo metodo
+
+        RelazioneUploaderConsumerFile relazioneUploaderConsumerFile =
+                attorePuoAccedereAFile( usernameUploader, idFileDaEliminare );
+
+        if( relazioneUploaderConsumerFile != null ) {
+
+            DatabaseHelper.cancellaEntitaById(idFileDaEliminare, RelazioneUploaderConsumerFile.class);
+            DatabaseHelper.cancellaEntitaById(idFileDaEliminare, File.class);   // elimina a cascata anche il file
+
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public String getUsernameUploader() {
         return usernameUploader;
     }
 
-    public String getusernameConsumer() {
+    public String getUsernameConsumer() {
         return usernameConsumer;
     }
 
@@ -164,7 +210,7 @@ public class RelazioneUploaderConsumerFile {
      */
     public static Map<String, Long[]> mappa_usernameUploader_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
 
-        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getusernameUploader";
+        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getUsernameUploader";
         return mappa_usernameAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
     }
@@ -178,7 +224,7 @@ public class RelazioneUploaderConsumerFile {
      */
     public static Map<String, Long[]> mappa_usernameConsumer_arrayIdFile(List<RelazioneUploaderConsumerFile> listaRelazioni) {
 
-        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getusernameConsumer";
+        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getUsernameConsumer";
         return mappa_usernameAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
     }

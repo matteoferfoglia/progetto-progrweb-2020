@@ -41,9 +41,7 @@ public class RichiestaInfoSuUploader {
                            .build();
 
         } catch (NotFoundException notFoundException) {
-            return Response.status( Response.Status.NOT_FOUND )
-                           .entity( "Uploader non trovato." )
-                           .build();
+            return NotFoundException.creaResponseNotFound("Uploader non trovato.");
         }
 
     }

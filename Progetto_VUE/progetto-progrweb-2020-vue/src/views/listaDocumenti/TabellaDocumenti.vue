@@ -15,7 +15,7 @@
     <!-- Ogni riga è un documento -->
     <tr v-for="(idDocumento, documento) in Object.fromEntries(elencoDocumentiDaMostrare)"
         :key="idDocumento">
-      <td v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna !== nomePropLinkDownload )"
+      <td v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload && nomeColonna!==nomePropLinkElimina )"
           :key="numeroColonnaQuestaTabella"
           id="{{idDocumento}}">
         {{ documento[propertyQuestaColonna] }}
@@ -36,15 +36,19 @@ export default {
   name: "TabellaDocumenti",
   props: [
 
-      /** Nomi delle colonne nell'intestazione della tabella.*/
-      "nomiColonneIntestazione",
+    /** Nomi delle colonne nell'intestazione della tabella.*/
+    "nomiColonneIntestazione",
 
-      /** Elenco dei documenti da mostrare.*/
-      "elencoDocumentiDaMostrare",
+    /** Elenco dei documenti da mostrare.*/
+    "elencoDocumentiDaMostrare",
 
     /** In un documento, il nome della property (se presente)
      * il cui valore è un link di download di quel documento.*/
-    "nomePropLinkDownload"
+    "nomePropLinkDownload",
+
+    /** In un documento, il nome della property (se presente)
+     * il cui valore è un link di eliminazione di quel documento.*/
+    "nomePropLinkElimina"
   ]
 }
 </script>
