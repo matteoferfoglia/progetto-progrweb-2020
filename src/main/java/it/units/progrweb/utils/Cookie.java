@@ -106,14 +106,21 @@ public class Cookie extends NewCookie {
     public static Cookie[] trovaCookiesDaHeader(String cookieHeader) {
 
         Cookie[] cookies;
-        try{
-            // cookieHeader è una stringa del tipo: nomeCookie1=valoreCookie1; nomeCookie2=valoreCookie2; ...
-            cookies = Arrays.stream(cookieHeader.split("; "))  // Stream<String>, ogni elemento è un cookie (nome=valore)
-                    .map(Cookie::valueOf)                      // mappa la stringa "nome=valore" ad un Cookie
-                    .toArray(Cookie[]::new);
-        } catch (IllegalArgumentException exception) {
-            //  impossibile eseguire il parsing della stringa data come parametro
-            cookies = new Cookie[0];    //array vuoto
+
+        if( cookieHeader != null ) {
+
+            try {
+                // cookieHeader è una stringa del tipo: nomeCookie1=valoreCookie1; nomeCookie2=valoreCookie2; ...
+                cookies = Arrays.stream(cookieHeader.split("; "))  // Stream<String>, ogni elemento è un cookie (nome=valore)
+                        .map(Cookie::valueOf)                      // mappa la stringa "nome=valore" ad un Cookie
+                        .toArray(Cookie[]::new);
+            } catch (IllegalArgumentException exception) {
+                //  impossibile eseguire il parsing della stringa data come parametro
+                cookies = new Cookie[0];    //array vuoto
+            }
+
+        } else {
+            cookies = new Cookie[0];
         }
 
         return cookies;
