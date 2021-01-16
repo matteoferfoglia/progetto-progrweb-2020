@@ -31,6 +31,14 @@ public abstract class Attore implements UserPrincipal {
     /** Email dell'attore. */
     protected String email;
 
+    /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
+    protected String tipoAttore;
+
+    /** Restituisce il tipo di un attore.*/
+    public String getTipoAttore() {
+        return tipoAttore;
+    }
+
     /** Restituisce il nome del field contenente lo username
      * di un attore, per la ricerca nel database.*/
     public static String getNomeFieldUsernameAttore() {

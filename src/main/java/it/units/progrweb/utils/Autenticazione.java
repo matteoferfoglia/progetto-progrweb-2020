@@ -9,9 +9,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderProxy
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
+import it.units.progrweb.utils.jwt.componenti.claim.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,7 +62,6 @@ public class Autenticazione {
 
     /** Tipo di Autenticazione HTTP richiesta.*/
     private static final String TIPO_AUTENTICAZIONE_RICHIESTA = "Bearer";
-
 
 
     /** Restituisce l'attore corrispondente alle credenziali date
@@ -220,26 +217,18 @@ public class Autenticazione {
      * @return true se il client è autenticato, false altrimenti.*/
     public static boolean isClientAutenticato(HttpServletRequest httpServletRequest) {
 
-        String tokenAutenticazioneBearer = getTokenAutenticazioneBearer(httpServletRequest);
+        JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest( httpServletRequest );
 
-        if (tokenAutenticazioneBearer == null)
+        if( jwtTokenAutenticazione != null ) {
+            // Cookie ricevuti in questa richiesta HTTP
+            Cookie[] cookiesDaQuestaRichiestaHttp = Cookie.getCookieDaRichiestaHttp(httpServletRequest);
+
+            return jwtTokenAutenticazione!= null
+                    && jwtTokenAutenticazione.isTokenValido()
+                    && isStessoHashCookieIdNelToken(jwtTokenAutenticazione, cookiesDaQuestaRichiestaHttp);
+        } else {
             return false;
-
-        // Calcolo del JWT token ottenuto dall'authorization header
-        JwtToken jwtTokenAutenticazione = null;
-        {
-            boolean isStringaNonNullaNonVuota = ! (tokenAutenticazioneBearer==null
-                                                    || tokenAutenticazioneBearer.trim().isEmpty()) ;
-            if( isStringaNonNullaNonVuota )
-                jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazioneBearer);
         }
-
-        // Cookie ricevuti in questa richiesta HTTP
-        Cookie[] cookiesDaQuestaRichiestaHttp = Cookie.getCookieDaRichiestaHttp(httpServletRequest);
-
-        return jwtTokenAutenticazione!= null
-                && jwtTokenAutenticazione.isTokenValido()
-                && isStessoHashCookieIdNelToken(jwtTokenAutenticazione, cookiesDaQuestaRichiestaHttp);
 
     }
 
@@ -250,7 +239,7 @@ public class Autenticazione {
         if( tokenAutenticazioneBearer==null )
             return null;
 
-        tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (rimuove "Bearer ")
+        tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (prima dello spazio, cioè rimuove "Bearer ")
         return tokenAutenticazioneBearer;
     }
 
@@ -301,6 +290,10 @@ public class Autenticazione {
         jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
                                               GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
 
+        // Aggiunge gli attributi dell'attore non sensibili
+        jwtPayload.aggiungiClaim( new JwtNomeSubjectClaim(attore.getNomeCognome()) );
+        jwtPayload.aggiungiClaim( new JwtTipoAttoreClaim( attore.getTipoAttore() ) );
+
         return new JwtToken(jwtPayload).generaTokenJsonCodificatoBase64UrlEncoded();
         
     }
@@ -339,5 +332,39 @@ public class Autenticazione {
             throws IOException {
         response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
                             Response.Status.UNAUTHORIZED.getReasonPhrase() );
+    }
+
+    /** Restituisce il tipo di {@link Attore} in base alle informazioni contenute
+     * nel token JWT. */
+    public static String getTipoAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
+        JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
+        return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_TIPO_ATTORE_CLAIM_NAME );
+    }
+
+    /** Restituisce il nome dell'{@link Attore} in base alle informazioni contenute
+     * nel token JWT. */
+    public static String getNomeAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
+        JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
+        return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_NOME_SUBJECT_CLAIM_NAME );
+    }
+
+    /** Data la HttpServletRequest, restituisce il token di autenticazione
+     * oppure null se non è presente.*/
+    private static JwtToken getTokenDaHttpServletRequest(HttpServletRequest httpServletRequest) {
+        String tokenAutenticazioneBearer = getTokenAutenticazioneBearer(httpServletRequest);
+
+        if (tokenAutenticazioneBearer == null)
+            return null;
+
+        // Calcolo del JWT token ottenuto dall'authorization header
+        JwtToken jwtTokenAutenticazione = null;
+        {
+            boolean isStringaNonNullaNonVuota = ! (tokenAutenticazioneBearer==null
+                    || tokenAutenticazioneBearer.trim().isEmpty()) ;
+            if( isStringaNonNullaNonVuota )
+                jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazioneBearer);
+        }
+
+        return jwtTokenAutenticazione;
     }
 }

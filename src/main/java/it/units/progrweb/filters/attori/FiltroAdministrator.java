@@ -1,7 +1,7 @@
 package it.units.progrweb.filters.attori;
 
-import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
+import it.units.progrweb.filters.FiltroAutenticazione;
 import it.units.progrweb.utils.Autenticazione;
 
 import javax.servlet.*;
@@ -13,6 +13,12 @@ import java.io.IOException;
 /**
  * Intercetta le richieste per gli Administrator e verifica
  * che siano tali.
+ * La verifica viene fatta in base ai valori del token
+ * di autenticazione, senza interrogare il database (ci
+ * si fida che ciò che è scritto nel token sia autentico
+ * ed integro - verifica demandata a {@link FiltroAutenticazione},
+ * che dovrebbe intercettare la richiesta prima di questo
+ * filtro.
  * @author Matteo Ferfoglia
  */
 @WebFilter(filterName = "FiltroAdministrator", asyncSupported = true)
@@ -23,8 +29,8 @@ public class FiltroAdministrator implements Filter {
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
 
-        Attore attore = Autenticazione.getAttoreDaHttpServletRequest((HttpServletRequest) req);
-        if(attore instanceof Administrator)
+        String tipoAttore = Autenticazione.getTipoAttoreDaHttpServletRequest((HttpServletRequest) req);
+        if(tipoAttore.equals(Administrator.class.getSimpleName()))
             chain.doFilter(req, resp);
         else
             Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);

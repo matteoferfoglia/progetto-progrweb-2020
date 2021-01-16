@@ -24,6 +24,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
 
     public Uploader() {
         super();
+        super.tipoAttore = Uploader.class.getSimpleName();
     }
 
     public static Uploader creaUploader(String username, String nomeCognome, String email, byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
@@ -56,6 +57,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
         // TODO
         super(username, nomeCognome, email);
         this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
+        super.tipoAttore = Uploader.class.getSimpleName();
     }
 
     /** Restituisce la lista dei documenti caricati dall'{@link Uploader}

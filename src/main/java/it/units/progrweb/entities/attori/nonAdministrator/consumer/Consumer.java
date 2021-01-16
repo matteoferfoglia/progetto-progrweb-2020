@@ -25,6 +25,7 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     public Consumer(String username, String nomeCognome, String email) {
         super(username, nomeCognome, email);
+        super.tipoAttore = Consumer.class.getSimpleName();
     }
 
     /** Restituisce l'entità {@link Consumer} cercata nel database

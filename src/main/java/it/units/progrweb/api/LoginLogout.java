@@ -1,9 +1,5 @@
 package it.units.progrweb.api;
 
-import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.administrator.Administrator;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.filters.FiltroAutenticazione;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
@@ -21,16 +17,6 @@ import javax.ws.rs.core.Response;
  */
 @Path("")
 public class LoginLogout {
-
-    /** Restituisce il nome dell'attore attualmente autenticato.*/
-    @Path("/nomeDiQuestoAttore")    // TODO : path variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String nomeDiQuestoAttoreAutenticato(@Context HttpServletRequest httpServletRequest) {
-        // TODO : aggiungerlo al token di autenticazione per evitare accessi nel database
-        Attore attore = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-        return attore!=null ? EncoderPrevenzioneXSS.encodeForHTMLContent(attore.getNomeCognome()) : "";     // TODO : aggiungere EncoderPrevenzioneXSS in tutti i metodi che restituiscono qualcosa al client
-    }
 
     /** Risponde alle richieste di login, rilasciando
      * un'opportuna {@link Response} al client.*/
@@ -66,21 +52,23 @@ public class LoginLogout {
         return Autenticazione.isClientAutenticato(httpServletRequest);
     }
 
+    /** Restituisce il nome dell'attore attualmente autenticato.*/
+    @Path("/nomeDiQuestoAttore")    // TODO : path variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String nomeDiQuestoAttoreAutenticato(@Context HttpServletRequest httpServletRequest) {
+        // TODO : aggiungerlo al token di autenticazione per evitare accessi nel database
+        String nomeAttore = Autenticazione.getNomeAttoreDaHttpServletRequest(httpServletRequest);
+        return nomeAttore!=null ? EncoderPrevenzioneXSS.encodeForHTMLContent(nomeAttore) : "";     // TODO : aggiungere EncoderPrevenzioneXSS in tutti i metodi che restituiscono qualcosa al client
+    }
+
     /** Restituisce il tipo di utente autenticato. */
     @Path("/getTipoUtenteAutenticato")  // TODO : var d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getTipoUtenteAutenticato(@Context HttpServletRequest httpServletRequest) {
-
-        Attore attore = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);   // TODO : salvare tipo di utente nel token di autenticazione per evitare di interrogare il database
-
-        if( attore instanceof Administrator )
-            return Administrator.class.getSimpleName();
-        else if( attore instanceof Uploader )
-            return Uploader.class.getSimpleName();
-        else if( attore instanceof Consumer )
-            return Consumer.class.getSimpleName();
-        else return "";
+        String tipoAttore = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
+        return EncoderPrevenzioneXSS.encodeForHTMLContent( tipoAttore );
 
     }
 

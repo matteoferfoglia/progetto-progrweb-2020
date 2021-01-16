@@ -20,6 +20,7 @@ public abstract class Administrator extends Attore {
 
     public Administrator(String username, String nomeCognome, String email) {
         super(username, nomeCognome, email);  // TODO
+        super.tipoAttore = Administrator.class.getSimpleName();
     }
 
 

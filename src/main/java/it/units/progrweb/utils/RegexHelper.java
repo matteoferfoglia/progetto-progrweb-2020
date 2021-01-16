@@ -49,7 +49,7 @@ public class RegexHelper {
      *      </li>
      * </ul>
      */
-    public static final String REGEX_COPPIA_NOME_VALORE = "\"(?i:([a-z0-9\\-]+))\""   // primo gruppo: nome proprietà (case insensitive)
+    public static final String REGEX_COPPIA_NOME_VALORE = "\"(?i:([a-z0-9 \\-]+))\""   // primo gruppo: nome proprietà (case insensitive, anche con spazi)
 
                                                             + ":"// separatore nome-valore proprietà
                                                             + "(\\s*)"                  // secondo gruppo: zero o più spazi

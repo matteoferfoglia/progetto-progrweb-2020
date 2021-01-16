@@ -9,7 +9,7 @@ package it.units.progrweb.utils.jwt.componenti.claim;
  *    locally unique in the context of the issuer or be globally unique.
  *    The processing of this claim is generally application specific.  The
  *    "sub" value is a case-sensitive string containing a StringOrURI
- *    value.  Use of this claim is OPTIONAL.
+ *    value. Use of this claim is OPTIONAL.
  * </blockquote>
  */
 public class JwtSubjectClaim extends JwtClaim {
