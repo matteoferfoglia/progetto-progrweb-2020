@@ -21,33 +21,10 @@
     </form>
   </header>
 
-  <table v-if="elencoDocumenti.size > 0">
-    <!-- Tabella dei documenti -->
-    <thead>
-      <tr>
-        <td v-for="nomeColonna in nomiColonneIntestazione"
-            :key="nomeColonna">
-          {{ nomeColonna }}
-        </td>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Ogni riga è un documento -->
-      <tr v-for="(idDocumento, documento) in Object.fromEntries(elencoDocumentiDaMostrare)"
-          :key="idDocumento">
-        <td v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna !== NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI )"
-            :key="numeroColonnaQuestaTabella"
-            id="{{idDocumento}}">
-          {{ documento[propertyQuestaColonna] }}
-        </td>
-        <td>
-          <a href="{{ documento[NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] }}">Download</a> <!-- Link download documento -->
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <TabellaDocumenti :nomiColonneIntestazione  ="nomiColonneIntestazione"
+                    :elencoDocumentiDaMostrare="elencoDocumentiDaMostrare"
+                    :nomePropLinkDownload     ="NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI"/>
 
-  <p v-else>Nessun documento disponibile.</p>
 
 </template>
 
@@ -63,13 +40,14 @@
  * componente, cercato nei parametri di this.$route), per il Consumer
  * attualmente autenticato.*/
 
-import {richiestaGet} from "../utils/http";
-import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../utils/documenti";
+import {richiestaGet} from "../../utils/http";
+import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../../utils/documenti";
+import TabellaDocumenti from "./TabellaDocumenti";
 
 export default {
 
   name: "ListaDocumenti",
-
+  components: {TabellaDocumenti},
   data() {
     return {
       layoutCaricato: false,  // diventa true quando il layout è caricato

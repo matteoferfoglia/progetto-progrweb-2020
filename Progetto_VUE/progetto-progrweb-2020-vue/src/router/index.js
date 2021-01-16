@@ -36,7 +36,7 @@ const routes = [
     children: [ // Nested routes (fonte: https://router.vuejs.org/guide/essentials/nested-routes.html)
       {
         path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
-        alias: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,  // default
+        alias: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,  // route default
         name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN,
         component: () => import('../views/autenticazione/LoginUtenteGiaRegistrato')
       },
@@ -58,7 +58,7 @@ const routes = [
   {
     path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
     name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI,
-    component: () => import('../views/ListaDocumenti'),
+    component: () => import('../views/listaDocumenti/ListaDocumentiPerConsumer'),
     meta: {
       requiresAuth: true,
       requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
