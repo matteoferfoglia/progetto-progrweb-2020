@@ -106,7 +106,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
         Map<String, Object> mappaProprietaOggetto = claimsSet.stream()
                 .collect(Collectors.toMap(
                         jwtClaim -> jwtClaim.getName(),
-                        jwtClaim -> jwtClaim.getValue(),
+                        jwtClaim -> jwtClaim.getValue() == null ? "" : jwtClaim.getValue(),
                         (k,v) -> {
                             throw new IllegalStateException("Errore: due claim non possono avere lo stesso nome.");    // il nome del claim è la chiave di questa mappa
                         },

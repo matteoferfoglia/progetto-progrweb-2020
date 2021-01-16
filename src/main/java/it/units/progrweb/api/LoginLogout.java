@@ -87,7 +87,7 @@ class CampiFormLogin {
     }
 
     public void setUsername(String username) {
-        this.username = EncoderPrevenzioneXSS.encodeForJava(username);
+        this.username = EncoderPrevenzioneXSS.encodeForJava(username==null ? "" : username);
     }
 
     public String getPassword() {
@@ -95,7 +95,7 @@ class CampiFormLogin {
     }
 
     public void setPassword(String password) {
-        this.password = EncoderPrevenzioneXSS.encodeForJava(password);
+        this.password = EncoderPrevenzioneXSS.encodeForJava(password==null ? "" : password);
     }
 
     public String getCsrfToken() {
@@ -103,6 +103,6 @@ class CampiFormLogin {
     }
 
     public void setCsrfToken(String csrfToken) {
-        this.csrfToken = EncoderPrevenzioneXSS.encodeForJava(csrfToken);
+        this.csrfToken = EncoderPrevenzioneXSS.encodeForJava(csrfToken==null ? "" : csrfToken);
     }
 }

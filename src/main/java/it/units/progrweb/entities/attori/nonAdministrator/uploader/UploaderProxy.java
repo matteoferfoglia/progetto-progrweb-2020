@@ -1,5 +1,6 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,13 +25,15 @@ public class UploaderProxy extends Uploader {
         this.mappaAttributiUploader_nome_valore = uploaderStorage.getMappaAttributi_Nome_Valore();
     }
 
-    public UploaderProxy( String nomeUploader, String emailUploader, String logoBase64 ) {
+    public UploaderProxy( String username, String nomeUploader, String emailUploader, String logoBase64 ) {
         // TODO : cancellare questo metodo, utilizzato solo in sviluppo per fare delle prove
 
-        this.nomeUploader = nomeUploader;
-        super.email = emailUploader;
+        super(username,nomeUploader,emailUploader,logoBase64.getBytes(StandardCharsets.UTF_8), "png");
+        this.nomeUploader = getNomeUploader();
         this.logoUploaderBase64 = logoBase64;
         this.mappaAttributiUploader_nome_valore = new HashMap<>();
+
+        // TODO  : cancellare !!
     }
 
     @Override

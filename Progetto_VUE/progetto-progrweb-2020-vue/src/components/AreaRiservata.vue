@@ -1,12 +1,14 @@
 <template>
   <h1>Area riservata</h1>
 
-  <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfToken = $event">
+  <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfTokenLogout = $event">
     <input type="submit" value="Logout">
   </Form>
 
-  <Consumer v-if="isConsumer()"/>
-  <Uploader v-else-if="isUploader()"/>
+  <!-- CSRF token può essere sovrascritto dai componenti se per qualche motivo
+       ne chiedono un altro (perché cambia il cookie) -->
+  <Consumer      v-if="isConsumer()"/>
+  <Uploader      v-else-if="isUploader()" @csrf-token-modificato="csrfTokenLogout = $event"/>
   <Administrator v-else-if="isAdministrator()"/>
 
 </template>
@@ -29,7 +31,7 @@ export default {
   components: {Consumer, Uploader, Administrator, Form},
   data: function () {
     return {
-      csrfToken: undefined,
+      csrfTokenLogout: undefined,
 
       /** Il tipo di utente attualmente autenticato.*/
       tipoUtenteAutenticato: undefined, // Administrator/Uploader/Consumer
@@ -60,7 +62,7 @@ export default {
     logout() {
 
       // Richiesta di logout al server
-      const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
+      const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfTokenLogout};
       richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL, parametriRichiestaGet)
           .catch(risposta => console.log("Logout fallito !! " + risposta) )          // TODO : gestire il caso di logout fallito (può succedere??)
           .finally( () => { // logout sul client

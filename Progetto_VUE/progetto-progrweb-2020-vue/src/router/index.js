@@ -89,6 +89,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
     // Gestione instradamento per route che richiede autenticazione
 
     verificaAutenticazione(routeDestinazione)
+
         .then( isUtenteAutenticato => {
 
           // Permette di gestire il caso "utente richiede risorsa senza autenticazione,
@@ -173,7 +174,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
         .catch(error => {
           console.error(error);
           next({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
-        });
+        })
 
   } else  {
     // SE route non richiede autorizzazione, ALLORA instrada senza problemi

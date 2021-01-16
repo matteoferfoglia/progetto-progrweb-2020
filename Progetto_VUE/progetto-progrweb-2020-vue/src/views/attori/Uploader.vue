@@ -2,10 +2,11 @@
   <header>
     <h1>Benvenuto Uploader {{ nomeAttoreAttualmenteAutenticato }} <!-- TODO : spostarlo in un componente padre, perché questa proprietà ci sarà anche negli altri Attori --> </h1>
   </header>
-  <main class="listaConsumer">
+  <main>
 
-    <p>Lista dei <i>Consumer</i></p>
-    <Form @csrf-token-ricevuto.stop="csrfToken = $event">
+    <Form @csrf-token-ricevuto="setCsrfToken( $event )">
+
+      <p v-if="mappa_idConsumer_proprietaConsumer.size > 0">Lista dei <i>Consumer</i></p>
       <ol>
         <li id="{{ consumer[0] }}"
             v-for="consumer in Array.from(mappa_idConsumer_proprietaConsumer.entries())"
@@ -24,7 +25,7 @@
       </ol>
 
       <p>
-        Aggiungi un Consumer
+        Aggiungi un <i>Consumer</i>
         <input type="text" v-model="usernameNuovoConsumer"
                name="{{ NOME_PROP_USERNAME_CONSUMER }}"
                placeholder="Username"
@@ -43,6 +44,7 @@
         <input type="button" value="Aggiungi" @click="aggiungiConsumer" />
       </p>
     </Form>
+
   </main>
 </template>
 
@@ -55,8 +57,12 @@ import {unisciOggetti} from "../../utils/utilitaGenerale";
 export default {
   name: "Uploader",
   components: {Form},
+  emits: ['csrf-token-modificato'], // Fonte: https://stackoverflow.com/a/64220977
   data() {
     return {
+
+      /** CSRF token.*/
+      csrfToken: undefined,
 
       /** Flag, true quando il layout è caricato.*/
       layoutCaricato: false,
@@ -102,9 +108,6 @@ export default {
        * Vedere valori di {@link #mappa_idConsumer_proprietaConsumer}*/
       NOME_PROP_USERNAME_CONSUMER: undefined,
 
-      /** CSRF token per l'eliminazione di un Consumer.*/
-      csrfToken: undefined
-
     }
   },
   created() {
@@ -148,6 +151,13 @@ export default {
 
   },
   methods: {
+
+    /** Informa il componente padre del cambiamento del token CSRF,
+     * oltre ad aggiornarlo in questo componente.*/
+    setCsrfToken( nuovoCsrfToken ) {
+      this.csrfToken = nuovoCsrfToken;
+      this.$emit('csrf-token-modificato', nuovoCsrfToken);
+    },
 
     /** Funzione per l'eliminazione del Consumer con
      * identificativo specificato nel parametro.*/
@@ -322,7 +332,7 @@ const getMappa_idConsumer_arrayIdFiles = async () => {
 
   // TODO : verificare correttezza
 
-    return richiestaGet( process.env.VUE_APP_GET_ID_UPLOADER_FILE_PER_QUESTO_CONSUMER )
+    return richiestaGet( process.env.VUE_APP_GET_ID_CONSUMER_FILE_PER_QUESTO_UPLOADER )
         .then( rispostaConMappa_idConsumer_arrayIdFiles => new Map(Object.entries(rispostaConMappa_idConsumer_arrayIdFiles.data)) )
         .catch( rispostaErrore => {
           console.error("Errore durante il caricamento della mappa Consumer-Files: " + rispostaErrore );

@@ -1,7 +1,6 @@
 package it.units.progrweb.api.uploader;
 
 import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
-import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
@@ -39,20 +38,15 @@ public class GestioneConsumer {
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        Uploader uploader;
-        if( ( uploader = isUploader(httpServletRequest) ) != null ) {
+        String usernameUploader = Autenticazione.getUsernameAttoreDaHttpServletRequest(httpServletRequest);
 
-            List<RelazioneUploaderConsumerFile> risultatoQuery =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploader(uploader.getUsername());
+        List<RelazioneUploaderConsumerFile> risultatoQuery =
+                RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploader( usernameUploader );
 
-            Map<String, Long[]> mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader =
-                    RelazioneUploaderConsumerFile.mappa_usernameConsumer_arrayIdFile(risultatoQuery);
+        Map<String, Long[]> mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader =
+                RelazioneUploaderConsumerFile.mappa_usernameConsumer_arrayIdFile(risultatoQuery);
 
-            return UtilitaGenerale.rispostaJsonConMappa(mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader);
-
-        } else {
-            return Autenticazione.creaResponseForbidden("Servizio riservato agli Uploader autenticati.");
-        }
+        return UtilitaGenerale.rispostaJsonConMappa(mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader);
 
     }
 
@@ -122,48 +116,43 @@ public class GestioneConsumer {
     public Response aggiungiConsumer(Consumer consumerDaAggiungere,
                                      @Context HttpServletRequest httpServletRequest) {
 
-        Uploader uploader;
-        if( ( uploader = isUploader(httpServletRequest) ) != null ) {
+        String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
+        String usernameUploader = Autenticazione.getUsernameAttoreDaHttpServletRequest( httpServletRequest );
 
-            String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
-            try {
+        try {
 
-                // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
-                Consumer consumerDalDB = (Consumer) DatabaseHelper.getById(usernameConsumerDaAggiungere, Consumer.class);
+            // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
+            Consumer consumerDalDB = (Consumer) DatabaseHelper.getById(usernameConsumerDaAggiungere, Consumer.class);
 
-                if( consumerDalDB.equals(consumerDaAggiungere) ) {
+            if( consumerDalDB.equals(consumerDaAggiungere) ) {
 
-                    // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
-                    if (!RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(uploader.getUsername(), consumerDaAggiungere.getUsername())) {
+                // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
+                if (!RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(usernameUploader, consumerDaAggiungere.getUsername())) {
 
-                        // SE precedenti controlli ok, ALLORA aggiungi il consumer
-                        RelazioneUploaderConsumerFile.aggiungiConsumerAdUploader(consumerDaAggiungere.getUsername(), uploader.getUsername());
+                    // SE precedenti controlli ok, ALLORA aggiungi il consumer
+                    RelazioneUploaderConsumerFile.aggiungiConsumerAdUploader(consumerDaAggiungere.getUsername(), usernameUploader);
 
-                        return Response
-                                .status(Response.Status.NO_CONTENT)// Fonte ("204 No Content" nella risposta, "to indicate successful completion of the request"): https://tools.ietf.org/html/rfc7231#section-4.3.3
-                                .entity("Consumer " + usernameConsumerDaAggiungere + " aggiunto.")    // TODO : var ambiene con messaggi
-                                .build();
-
-                    } else {
-                        return Response
-                                .status(Response.Status.BAD_REQUEST)
-                                .entity("Il Consumer " + usernameConsumerDaAggiungere + " è già associato all'Uploader " + uploader.getUsername() + ".")
-                                .build();
-                    }
+                    return Response
+                            .status(Response.Status.NO_CONTENT)// Fonte ("204 No Content" nella risposta, "to indicate successful completion of the request"): https://tools.ietf.org/html/rfc7231#section-4.3.3
+                            .entity("Consumer " + usernameConsumerDaAggiungere + " aggiunto.")    // TODO : var ambiene con messaggi
+                            .build();
 
                 } else {
-                    throw new NotFoundException();
+                    return Response
+                            .status(Response.Status.BAD_REQUEST)
+                            .entity("Il Consumer " + usernameConsumerDaAggiungere + " è già associato all'Uploader " + usernameUploader + ".")
+                            .build();
                 }
 
-            } catch (NotFoundException e) {
-                return Response
-                        .status(Response.Status.BAD_REQUEST )
-                        .entity("Il Consumer " + consumerDaAggiungere.toString() + " non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
-                        .build();
+            } else {
+                throw new NotFoundException();
             }
 
-        } else {
-            return Autenticazione.creaResponseForbidden("Servizio riservato agli Uploader autenticati.");    // TODO : var ambiene con messaggi errore
+        } catch (NotFoundException e) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST )
+                    .entity("Il Consumer " + consumerDaAggiungere.toString() + " non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
+                    .build();
         }
 
     }
@@ -176,40 +165,22 @@ public class GestioneConsumer {
     public Response eliminaConsumer(@PathParam("usernameConsumerDaEliminare") String usernameConsumerDaEliminare,
                                     @Context HttpServletRequest httpServletRequest) {
 
-        Uploader uploader;
-        if( ( uploader = isUploader(httpServletRequest) ) != null ) {
 
-            RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(usernameConsumerDaEliminare, uploader.getUsername());
+        String usernameUploader = Autenticazione.getUsernameAttoreDaHttpServletRequest(httpServletRequest);
+        RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(usernameConsumerDaEliminare, usernameUploader);
 
-            return Response
-                       .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                       .entity("Consumer " + usernameConsumerDaEliminare + "eliminato")    // TODO : var ambiene con messaggi errore
-                       .build();
+        return Response
+                   .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
+                   .entity("Consumer " + usernameConsumerDaEliminare + "eliminato")    // TODO : var ambiene con messaggi errore
+                   .build();
 
-        } else {
-            return Autenticazione.creaResponseForbidden("Servizio riservato agli Uploader autenticati.");    // TODO : var ambiene con messaggi errore
-        }
-
-    }
-
-    /** Estrae l'attore dalla richiesta e se si tratta di un
-     * {@link Consumer} lo restituisce, altrimenti restituisce
-     * null.*/
-    private static Uploader isUploader(HttpServletRequest httpServletRequest){
-
-        Attore attore = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-
-        if( attore instanceof Uploader )
-            return (Uploader) attore;
-        else
-            return null;
 
     }
 
 
     /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
      * il nome della proprietà contenente il nome del {@link Consumer}.*/
-    @Path("/nomeProprietaNomeUploader")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaNomeConsumer")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldNomeConsumer() {
@@ -219,7 +190,7 @@ public class GestioneConsumer {
 
     /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
      * il nome della proprietà contenente l'email del {@link Consumer}.*/
-    @Path("/nomeProprietaEmailUploader")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldLogoConsumer() {
@@ -229,7 +200,7 @@ public class GestioneConsumer {
 
     /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
      * il nome della proprietà contenente lo username del {@link Consumer}.*/
-    @Path("/nomeProprietaUsernamelUploader")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaUsernameConsumer")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldUsernameConsumer() {
