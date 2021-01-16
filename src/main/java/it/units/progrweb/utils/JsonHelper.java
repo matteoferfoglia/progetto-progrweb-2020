@@ -38,6 +38,9 @@ public class JsonHelper {
      */
     public static Map<String,Object> convertiStringaJsonToMappaProprieta(String stringaJSON) {
 
+        if( stringaJSON == null )
+            return null;
+
         // Parsing della stringaJson per ottenere le properties nella forma:    "nome": "valore"
         Matcher matcherPropertiesJson = Pattern.compile(RegexHelper.REGEX_COPPIA_NOME_VALORE)
                                                .matcher(stringaJSON);   // nomeProperty in Group1, valore property in group3 (vedere definizione della regex)
@@ -79,6 +82,9 @@ public class JsonHelper {
      * @param <V> è la classe per il valore della mappa data come argomento.
      */
     public static<K,V> String convertiMappaProprietaToStringaJson(Map<K,V> mappaProprieta) {
+
+        if ( mappaProprieta == null )
+            return "{ }";
 
         return "{"
                 +   mappaProprieta.entrySet().stream()
