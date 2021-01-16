@@ -41,7 +41,10 @@
  * attualmente autenticato.*/
 
 import {richiestaGet} from "../../utils/http";
-import {creaIndiceDeiFileRispettoAgliHashtagCheContengono} from "../../utils/documenti";
+import {
+  creaIndiceDeiFileRispettoAgliHashtagCheContengono,
+  ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
+} from "../../utils/documenti";
 import TabellaDocumenti from "./TabellaDocumenti";
 
 export default {
@@ -142,7 +145,8 @@ export default {
       await getElencoDocumentiPerQuestoConsumer( this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] )
             // Promise restituisce mappa { idDocumento => documento }
 
-              .then( elencoDocumenti => {    // Crea l'indice degli hashtag
+              // Crea l'indice degli hashtag
+              .then( elencoDocumenti => {
                 getNomePropertyHashtagsDeiDocumenti()
                       .then( nomePropertyHashtags => {
                         this.mappa_hashtag_idDocumenti =
@@ -152,41 +156,15 @@ export default {
                 return elencoDocumenti;
               })
 
-              .then( elencoDocumenti => {    // Ordina la mappa in base alla data di caricamento (prima i documenti più recenti)
-                    // restituisce la mappa dei documenti ordinata dal più recente, come valore di una Promise risolta
-                return getNomePropertyDataCaricamentoDocumenti()
-                              .then( nomePropertyDataCaricamento =>
-                                  new Map([...elencoDocumenti.entries()].sort( (a,b) => b[1][nomePropertyDataCaricamento]-a[1][nomePropertyDataCaricamento] )) ); // TODO : verificare corretto ordinamento
-                                      // Fonte: https://stackoverflow.com/a/50427905
-              })
+              // Ordina la mappa in base alla data di caricamento (prima i documenti più recenti)
+              .then( elencoDocumenti => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti(elencoDocumenti) )  // TODO verificare ordinamento corretto
 
-              .then( elencoDocumenti => {    // Crea l'array con l'id dei documenti non ancora visualizzati
-                 getNomePropertyDataVisualizzazioneDocumenti()
-                    .then( nomePropertyDataVisualizzazione =>
-                        this.arrayIdDocumentiNonAncoraVisualizzati =
-                            Array.from(elencoDocumenti.entries())
-                                 .filter( entryDocumento => entryDocumento[1][nomePropertyDataVisualizzazione] == null )  // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
-                                 .map( entryDocumento => entryDocumento[0] ) // salva l'id dei documenti risultanti dal filtraggio
-                                // entryDocumento è nella forma:   [chiaveDoc, {prop1Doc: val1, prop2Doc: val2}]
-                    );
-                return elencoDocumenti;
-              })
-
-              .then( elencoDocumenti =>  {        // Riordina l'elenco dei documenti portando in testa quelli ancora non letti, mantenendo i più recenti in testa
-                const documentiNonLetti = new Map( this.arrayIdDocumentiNonAncoraVisualizzati
-                                                       .map( id => [id, elencoDocumenti.get(id)] ) );
-                // Elimina dall'elenco generale dei documenti quelli già letti per non ricontarli
-                this.arrayIdDocumentiNonAncoraVisualizzati
-                    .forEach( id => elencoDocumenti.delete(id) );
-
-                // Restituisci il merge delle mappe
-                return new Map([...documentiNonLetti, ...elencoDocumenti]); // Fonte: https://stackoverflow.com/a/32000937
-              })
-
-              .then( elencoDocumenti => {         // Aggiunge la property "link per download documento"
-                                                  // e salva l'elenco dei documenti risultante (correttamente ordinati)
+              // Aggiunge la property "link per download documento"
+              // e salva l'elenco dei documenti risultante (correttamente ordinati)
+              .then( elencoDocumenti => {
                 elencoDocumenti.forEach( (propsDocumento, idDocumento) =>
-                    propsDocumento[this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO + "/" + idDocumento );
+                    propsDocumento[this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] =
+                        process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_PER_CONSUMER + "/" + idDocumento );
 
                 this.elencoDocumenti = elencoDocumenti;
                 return elencoDocumenti;
@@ -215,7 +193,7 @@ export default {
  * e la restituisce come valore di una promise.*/
 const getIntestazioneTabella = async () => {
 
-  return richiestaGet(process.env.VUE_APP_GET_INTESTAZIONE_TABELLA_DOCUMENTI)
+  return richiestaGet(process.env.VUE_APP_GET_NOMI_PROP_DOCUMENTI_PER_CONSUMER)
     .then(  risposta       => risposta.data )
     .catch( rispostaErrore => {
       console.error("Errore durante il caricamento dell'intestazione della lista dei documenti: " + rispostaErrore );
@@ -239,7 +217,7 @@ const getIntestazioneTabella = async () => {
  *                    mostrare i documenti.*/
 const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // TODO : passare come parametro l'id dell'Uploader e richiedere documenti solo da quell'Uploader
 
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER + "/" + idUploader)
+  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER + "/" + idUploader)
         .then(  risposta       => {
           // Conversione da oggetto a mappa (Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries#converting_an_object_to_a_map)
           return new Map(Object.entries(risposta.data));
@@ -264,7 +242,7 @@ const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // T
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyHashtagsDeiDocumenti = async () => {
 
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER_NOME_PROP_HAHSTAGS)
+  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
         .then(  risposta       => risposta.data )
         .catch( rispostaErrore => {
           console.error("Errore durante la ricezione del nome dell'attributo " +
@@ -275,47 +253,6 @@ const getNomePropertyHashtagsDeiDocumenti = async () => {
         });
 
 }
-
-/** Con riferimento a {@link #getElencoDocumentiPerQuestoConsumer},
- * questa funzione richiede al server il nome dell'attributo di un
- * oggetto "documento" il cui valore è la data di caricamento di
- * quel documento.
- * Se la richiesta va a buon fine, viene restituita una Promise
- * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyDataCaricamentoDocumenti = async () => {
-
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER_NOME_PROP_DATA_CARICAMENTO)
-        .then(  risposta       => risposta.data )
-        .catch( rispostaErrore => {
-          console.error("Errore durante la ricezione del nome dell'attributo " +
-              "contenente la data di caricamento dei documenti: " + rispostaErrore );
-          return Promise.reject(rispostaErrore);
-          // TODO : gestire l'errore (invio mail ai gestori?)
-          // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-        });
-
-}
-
-/** Con riferimento a {@link #getElencoDocumentiPerQuestoConsumer},
- * questa funzione richiede al server il nome dell'attributo di un
- * oggetto "documento" il cui valore è la data di visualizzazione di
- * quel documento da parte del Consumer.
- * Se la richiesta va a buon fine, viene restituita una Promise
- * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyDataVisualizzazioneDocumenti = async () => {
-
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_CONSUMER_NOME_PROP_DATA_VISUALIZZAZIONE)
-        .then(  risposta       => risposta.data )
-        .catch( rispostaErrore => {
-          console.error("Errore durante la ricezione del nome dell'attributo " +
-              "contenente la data di caricamento dei documenti: " + rispostaErrore );
-          return Promise.reject(rispostaErrore);
-          // TODO : gestire l'errore (invio mail ai gestori?)
-          // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-        });
-
-}
-
 </script>
 
 <style scoped>

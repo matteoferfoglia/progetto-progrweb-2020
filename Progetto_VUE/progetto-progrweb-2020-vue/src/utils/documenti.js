@@ -6,6 +6,7 @@
 
 
 import {isArray} from "./utilitaGenerale";
+import {richiestaGet} from "./http";
 
 /** Dato l'elenco dei documenti (formato di questo parametro
  * descritto di seguito nel campo param), ne fa il parsing per
@@ -53,4 +54,86 @@ export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocument
     }
 
     return indice_Hashtag_Documenti;
+}
+
+/** Ordina la mappa dei documenti in base alla data di caricamento
+ * e portando in testa quelli ancora non visualizzati..
+ * La mappa dei documenti deve avere come chiave l'identificativo del
+ * documento nell'entry di quella chiave e come valore l'oggetto che
+ * rappresenta il documento stesso.
+ * Restituisce la mappa risultante come valore di una Promise risolta,
+ * ammesso che la procedura vada a buon fine.*/
+export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti = mappaDocumenti => {
+
+    return getNomePropertyDataCaricamentoDocumenti()
+
+        // Ordina mappa in base alla data di caricamento ( Fonte: https://stackoverflow.com/a/50427905 )
+        .then( nomePropertyDataCaricamento =>
+            mappaDocumenti = new Map([...mappaDocumenti.entries()]
+                .sort( (a,b) => b[1][nomePropertyDataCaricamento] - a[1][nomePropertyDataCaricamento] ))
+        )   // TODO : verificare corretto ordinamento
+
+        // Crea l'array con l'id dei documenti non ancora visualizzati
+        .then( getNomePropertyDataVisualizzazioneDocumenti )
+        .then( nomePropDataVisualizzazione =>
+            Array.from(   mappaDocumenti.entries() )
+                 .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] == null ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
+                 .map(    entryDocumento => entryDocumento[0] )                                      // salva l'id dei documenti risultanti dal filtraggio
+                                                                                                     // entryDocumento è nella forma:   [chiaveDoc, {prop1Doc: val1, prop2Doc: val2}]
+        )   // restituisce array con id dei documenti non ancora visualizzati in una Promise
+
+        // Riordina l'elenco dei documenti portando in testa quelli ancora non letti
+        // mantenendo i più recenti in ordine, subito dopo quelli non letti
+        .then( arrayIdDocumentiNonAncoraVisualizzati =>  {
+            const mappaSoloDocumentiNonLetti =
+                new Map( arrayIdDocumentiNonAncoraVisualizzati
+                             .map( id => [id, mappaDocumenti.get(id)] ) );
+
+            // Elimina dalla mappa generale dei documenti quelli già letti per non ricontarli
+            arrayIdDocumentiNonAncoraVisualizzati
+                .forEach( id => mappaDocumenti.delete(id) );
+
+            // Restituisci il merge delle mappe
+            return new Map([...mappaSoloDocumentiNonLetti, ...mappaDocumenti]); // Fonte: https://stackoverflow.com/a/32000937
+        })
+
+        .catch( errore => Promise.reject("Errore durante l'ordinamento dei documenti: " + errore) );
+}
+
+/** Questa funzione richiede al server il nome dell'attributo di un
+ * oggetto "documento" il cui valore è la data di caricamento di
+ * quel documento.
+ * Se la richiesta va a buon fine, viene restituita una Promise
+ * risolta con valore il nome dell'attributo restituito dal server.*/
+const getNomePropertyDataCaricamentoDocumenti = async () => {
+
+    return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_DATA_CARICAMENTO)
+        .then(  risposta       => risposta.data )
+        .catch( rispostaErrore => {
+            console.error("Errore durante la ricezione del nome dell'attributo " +
+                "contenente la data di caricamento dei documenti: " + rispostaErrore );
+            return Promise.reject(rispostaErrore);
+            // TODO : gestire l'errore (invio mail ai gestori?)
+            // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+        });
+
+}
+
+/** Questa funzione richiede al server il nome dell'attributo di un
+ * oggetto "documento" il cui valore è la data di visualizzazione di
+ * quel documento da parte del Consumer.
+ * Se la richiesta va a buon fine, viene restituita una Promise
+ * risolta con valore il nome dell'attributo restituito dal server.*/
+const getNomePropertyDataVisualizzazioneDocumenti = async () => {
+
+    return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_DATA_VISUALIZZAZIONE)
+        .then(  risposta       => risposta.data )
+        .catch( rispostaErrore => {
+            console.error("Errore durante la ricezione del nome dell'attributo " +
+                "contenente la data di caricamento dei documenti: " + rispostaErrore );
+            return Promise.reject(rispostaErrore);
+            // TODO : gestire l'errore (invio mail ai gestori?)
+            // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+        });
+
 }
