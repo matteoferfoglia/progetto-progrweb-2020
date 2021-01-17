@@ -56,18 +56,26 @@ const routes = [
     }
   },
   {
-    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
-    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI,
-    component: () => import('../views/listaDocumenti/ListaDocumentiPerConsumer'),
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
+    component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaUploader'),
     meta: {
-      requiresAuth: true,
+      requiresAuth: true  // TODO: require essere uploader
+    }
+  },
+  {
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
+    component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaConsumer'),
+    meta: {
+      requiresAuth: true,  // TODO: require essere uploader
       requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
       requiresLogoUploader: true// logo Uploader
     }
   },
   {
-    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER + "/:" + NOME_PARAM_ID_CONSUMER,
-    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER,
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER_SCARICATI_DI_UN_CONSUMER + "/:" + NOME_PARAM_ID_CONSUMER,
+    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER_SCARICATI_DI_UN_CONSUMER,
     component: () => import('../views/ListaDocumentiVisualizzatiDaConsumer'),
     meta: {
       requiresAuth: true,

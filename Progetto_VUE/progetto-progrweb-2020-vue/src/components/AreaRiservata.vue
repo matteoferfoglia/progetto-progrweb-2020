@@ -1,5 +1,5 @@
-<template>
-  <h1>Area riservata</h1>
+<template v-if="isLayoutCaricato">
+  <h1>Area riservata di {{ nomeAttoreAttualmenteAutenticato }}</h1>
 
   <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfTokenLogout = $event">
     <input type="submit" value="Logout">
@@ -7,23 +7,20 @@
 
   <!-- CSRF token può essere sovrascritto dai componenti se per qualche motivo
        ne chiedono un altro (perché cambia il cookie) -->
-  <Consumer      v-if="isConsumer()"/>
-  <Uploader      v-else-if="isUploader()" @csrf-token-modificato="csrfTokenLogout = $event"/>
-  <Administrator v-else-if="isAdministrator()"/>
+  <Consumer      v-if="isConsumer()" />
+  <Uploader      v-else-if="isUploader()"
+                 @csrf-token-modificato="csrfTokenLogout = $event" />
+  <Administrator v-else-if="isAdministrator()" />
 
 </template>
 
 <script>
 
-/** Form viene mostrato solo dopo aver ricevuto dal server il CSRF token.*/
-
-// TODO : QUESTO COMPONENTE è INTERAMENTE DA IMPLEMENTARE
-
 import {richiestaGet} from "../utils/http";
 import Form from "./FormConCsrfToken";
 import {eliminaTokenAutenticazione} from "../utils/autenticazione";
 import Consumer from "../views/attori/Consumer";
-import Uploader from "../views/attori/Uploader";
+import Uploader from "../views/attori/uploader/Uploader";
 import Administrator from "../views/attori/Administrator";
 
 export default {
@@ -31,22 +28,36 @@ export default {
   components: {Consumer, Uploader, Administrator, Form},
   data: function () {
     return {
+
+      /** Flag: true quando il componente è stato caricato.*/
+      isLayoutCaricato: false,
+
+      /** CSRF token.*/
       csrfTokenLogout: undefined,
 
       /** Il tipo di utente attualmente autenticato.*/
       tipoUtenteAutenticato: undefined, // Administrator/Uploader/Consumer
 
+      /** Nome dell'attore attualmente autenticato.*/
+      nomeAttoreAttualmenteAutenticato: undefined,
+
     }
   },
   created() {
-    richiestaGet(process.env.VUE_APP_GET_TIPO_UTENTE_AUTENTICATO)
-        .then(  risposta       => this.tipoUtenteAutenticato = risposta.data )
-        .catch( rispostaErrore => {
-          console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-          return Promise.reject(rispostaErrore);
-          // TODO : gestire l'errore (invio mail ai gestori?)
-          // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-        });
+
+    const caricaQuestoComponente = async () => {
+      return getNomeAttoreAttualmenteAutenticato()
+              .then(nome => this.nomeAttoreAttualmenteAutenticato = nome)
+              .then(getTipoAttoreAttualmenteAutenticato)
+              .then(tipo => this.tipoUtenteAutenticato = tipo)
+              .catch(console.error);
+    }
+
+    caricaQuestoComponente()
+      .then( () => this.isLayoutCaricato = true )
+      .catch( console.error );
+
+
   },
   methods: {
     isConsumer() {
@@ -77,6 +88,35 @@ export default {
 
     }
   }
+}
+
+
+/** Restituisce il nome dell'attore attualmente autenticato.*/
+const getNomeAttoreAttualmenteAutenticato = async () => {
+
+  return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
+      .then(  risposta       =>  risposta.data )
+      .catch( rispostaErrore => {
+        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+        // TODO : gestire l'errore (invio mail ai gestori?)
+        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+      });
+
+}
+
+/** Restituisce il tipo dell'attore attualmente autenticato.*/
+const getTipoAttoreAttualmenteAutenticato = async () => {
+
+  return richiestaGet(process.env.VUE_APP_GET_TIPO_UTENTE_AUTENTICATO)
+      .then(  risposta       => risposta.data )
+      .catch( rispostaErrore => {
+        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+        // TODO : gestire l'errore (invio mail ai gestori?)
+        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+      });
+
 }
 
 </script>

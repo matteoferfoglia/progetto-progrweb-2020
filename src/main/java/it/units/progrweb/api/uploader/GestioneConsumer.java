@@ -29,13 +29,13 @@ public class GestioneConsumer {
 
     /** Riconosce l'{@link Uploader} da cui proviene la richiesta
      * e cerca nel database i {@link Consumer} per i quali questo
-     * {@link Uploader} ha carivato dei file, quindi restituisce
-     * una mappa { idConsumer => [idfilesCaricatiPerQuestoConsumer] }.
+     * {@link Uploader} ha caricato dei file, quindi restituisce
+     * l'array dei Consumer associati.
      */
-    @Path("/mappaId-consumer-files")
+    @Path("/elencoConsumer")
     @GET
-    // Risposta costruita in modo personalizzato
-    public Response getMappa_idConsumer_fileInviatiAlConsumer(@Context HttpServletRequest httpServletRequest) {
+    @Produces( MediaType.APPLICATION_JSON )
+    public List<String> getElencoConsumerDiUploader(@Context HttpServletRequest httpServletRequest) {
 
         // TODO : verificare correttezza
 
@@ -43,13 +43,7 @@ public class GestioneConsumer {
 
         String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
 
-        List<RelazioneUploaderConsumerFile> risultatoQuery =
-                RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploader( usernameUploader );
-
-        Map<String, Long[]> mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader =
-                RelazioneUploaderConsumerFile.mappa_usernameConsumer_arrayIdFile(risultatoQuery);
-
-        return UtilitaGenerale.rispostaJsonConMappa(mappa_idConsumer_arrayIdFileCaricatiPerConsumerDaQuestoUploader);
+        return RelazioneUploaderConsumerFile.getListaConsumerDiUploader( usernameUploader );
 
     }
 

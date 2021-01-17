@@ -180,22 +180,55 @@ public class RelazioneUploaderConsumerFile {
 
     }
 
+    /** Interroga il database e restituisce la lista degli username dei
+     * {@link Consumer} associati con l'{@link Uploader} il cui username
+     * è specificato come parametro.*/
+    public static List<String> getListaConsumerDiUploader( String usernameUploader ) {
+
+        String nomeAttributoUploader = "usernameUploader";
+        String nomeAttributoConsumer = "usernameConsumer";
+        if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoUploader, RelazioneUploaderConsumerFile.class ) &&
+                UtilitaGenerale.esisteAttributoInClasse( nomeAttributoConsumer, RelazioneUploaderConsumerFile.class ) ) {
+
+            List<String> risultato = DatabaseHelper.proiezione(
+                    DatabaseHelper.creaERestituisciQuery( RelazioneUploaderConsumerFile.class,
+                            nomeAttributoUploader, DatabaseHelper.OperatoreQuery.UGUALE, usernameUploader ),
+                    nomeAttributoConsumer
+            )
+                    .stream()
+                    .map( usernameConsumer -> (String)usernameConsumer )
+                    .collect(Collectors.toList());
+
+            return risultato;
+
+        } else {
+            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
+                                        "Contrallare esistenza dei Field \"" + nomeAttributoConsumer + "\" e \"" + nomeAttributoUploader + "\".",
+                                         new NoSuchFieldException() );
+            return new ArrayList<>();   // lista vuota come risultato
+        }
+
+    }
+
+
     /** Dati il nome di un attributo di {@link RelazioneUploaderConsumerFile}
      * ed il corrispettivo valore, questo metodo interroga il database e
      * restituisce la lista di tutte le occorrenza in cui l'attributo il
      * cui nome è specificato nel parametro ha il valore specificato nel
      * parametro corrispondente.*/
-    private static List<RelazioneUploaderConsumerFile> queryRelazioneUploaderConsumerFiles(String nomeAttributo, String valoreAttributo) {
+    private static List<RelazioneUploaderConsumerFile> queryRelazioneUploaderConsumerFiles(String nomeAttributo,
+                                                                                           String valoreAttributo) {
+
         if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo, RelazioneUploaderConsumerFile.class)) {
 
             return (List<RelazioneUploaderConsumerFile>)
                     DatabaseHelper.query(RelazioneUploaderConsumerFile.class,
-                            nomeAttributo, DatabaseHelper.OperatoreQuery.UGUALE, valoreAttributo );
+                                         nomeAttributo, DatabaseHelper.OperatoreQuery.UGUALE, valoreAttributo );
 
         } else {
             Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
-                    "Field \"" + nomeAttributo + "\" non trovato.",
-                    new NoSuchFieldException());
+                                        "Field \"" + nomeAttributo + "\" non trovato.",
+                                         new NoSuchFieldException());
         }
 
         return new ArrayList<>();   // nessun risultato dalla query

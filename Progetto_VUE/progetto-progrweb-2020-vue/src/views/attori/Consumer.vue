@@ -12,12 +12,12 @@
       <ol>
         <li v-for="uploader in Array.from(mappa_uploaders.entries())"
             :key="uploader[0]/*Id dell'uploader*/">
-          <router-link :to="{ name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI,
+          <router-link :to="{ name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
                               params: {
                                 [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[0],                           // id uploader
                                 [process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[1][NOME_PROP_LOGO_UPLOADER] // logo uploader
                               }
-                            }">
+                            }" >
             <!-- Link alla lista documenti-->
             <img src="{{ uploader[1][NOME_PROP_LOGO_UPLOADER] }}" alt="">
             <!-- TODO : verificare che le immagini vengano codificate correttamente -->
@@ -32,7 +32,7 @@
           mostra direttamente la lista dei documenti caricati da questi. -->
     <!-- TODO : verificare che questo div si carichi solo quando c'è esattamente un consumer (cioè controlla che il v-else-if faccia il suo lavoro) -->
     <div v-else-if="mappa_uploaders>0" @load="$router.push({
-                                                                path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI,
+                                                                path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
                                                                 params: { [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: mappa_uploaders.keys().next().value }
                                                             })" />
 

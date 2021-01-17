@@ -27,6 +27,7 @@ public abstract class DatabaseHelper {
     /** Astrazione del database. */
     private static final Objectify database = ObjectifyService.ofy();
 
+
     /** Enum delle operazioni possibili nelle query
      * (<a href="https://github.com/objectify/objectify/wiki/Queries#executing-queries">Fonte</a>).
      */
@@ -55,6 +56,16 @@ public abstract class DatabaseHelper {
     /** Salva subito un'entità nel database. */
     public static<Entita> void salvaEntitaAdesso(Entita entita) {
         database.save().entity(entita).now();
+    }
+
+    /** Data una query ed i nomi degli attributi su cui eseguire la proiezione,
+     * questo metodo esegue la query e restituisce la proiezione richiesta
+     * del risultato.*/
+    public static List<?> proiezione(Query<Object> query, String ...nomiAttributiProiettare ) {
+        if( query!= null && nomiAttributiProiettare.length>0 )
+            return query.project( nomiAttributiProiettare ).distinct(true).list();
+        else
+            return new ArrayList<>();
     }
 
     /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
@@ -191,13 +202,11 @@ public abstract class DatabaseHelper {
 
     }
 
-    /** Classe di supporto per {@link #query(Class, String, OperatoreQuery, Object)}
-     * e {@link #query(Class, String, OperatoreQuery, Object)}
-     * effettua l'interrogazione al database e restituisce un oggetto {@link Query}.
+    /**
      * @return null se non esite l'attributo su cui si esegue la query,
      *          altrimenti restituisce la {@link Query} risultante
      *          dall'interrogazione al database.*/
-    private static <Attributo, T> Query<T> creaERestituisciQuery(Class classeEntita,
+    public static <Attributo, T> Query<T> creaERestituisciQuery(Class classeEntita,
                                                                  String nomeAttributoCondizione,
                                                                  OperatoreQuery operatoreCondizione,
                                                                  Attributo valoreCondizione) {

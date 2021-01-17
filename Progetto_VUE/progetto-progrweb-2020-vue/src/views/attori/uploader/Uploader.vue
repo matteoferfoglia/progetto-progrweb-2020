@@ -1,7 +1,5 @@
 <template v-if="layoutCaricato">
-  <header>
-    <h1>Benvenuto Uploader {{ nomeAttoreAttualmenteAutenticato }} <!-- TODO : spostarlo in un componente padre, perché questa proprietà ci sarà anche negli altri Attori --> </h1>
-  </header>
+
   <main>
 
     <Form @csrf-token-ricevuto="setCsrfToken( $event )"
@@ -12,24 +10,11 @@
         <li id="{{ consumer[0] }}"
             v-for="consumer in Array.from(mappa_idConsumer_proprietaConsumer.entries())"
             :key="consumer[0]/*Id del consumer*/">
-
-          <router-link :to="{ path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER + '/' + consumer[0] }"
-                       :nomiColonneIntestazione     ="nomiPropDocumenti"
-                       :elencoDocumentiDaMostrare   ="mappaDocumentiPerUnConsumer"
-                       :nomePropLinkDownload        ="NOME_PROP_DOWNLOAD_DOCUMENTO"
-                       :nomePropLinkElimina         ="NOME_PROP_DELETE_DOCUMENTO"
-                       :possibileAggiungereDocumento=true
-                       :nomeConsumer                ="consumer[1][NOME_PROP_NOME_CONSUMER]"
-                        @click="caricaDocumentiPerQuestoConsumer(consumer[0])" > <!-- TODO : verificare che carichi la mappa, poi la passi al componente, altmenti vedi https://stackoverflow.com/a/47096768 -->
-
-            <ol>
-              <li>{{ this.camelCaseToHumanReadable(NOME_PROP_NOME_CONSUMER)     }}: <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}     </span></li>
-              <li>{{ this.camelCaseToHumanReadable(NOME_PROP_EMAIL_CONSUMER)    }}: <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}    </span></li>
-              <li>{{ this.camelCaseToHumanReadable(NOME_PROP_USERNAME_CONSUMER) }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }} </span></li>
-            </ol>
-
-          </router-link>
-
+          <SchedaUnConsumer :consumer="consumer"
+                            :nomeUploader="nomeUploader"
+                            :NOME_PROP_NOME_CONSUMER    ="NOME_PROP_NOME_CONSUMER"
+                            :NOME_PROP_USERNAME_CONSUMER="NOME_PROP_USERNAME_CONSUMER"
+                            :NOME_PROP_EMAIL_CONSUMER   ="NOME_PROP_EMAIL_CONSUMER"    />
           <input type="button" value="Elimina" @click.stop="eliminaConsumer(consumer[0])">
         </li>
       </ol>
@@ -39,7 +24,8 @@
         <input type="text" v-model="usernameNuovoConsumer"
                name="{{ NOME_PROP_USERNAME_CONSUMER }}"
                placeholder="Username"
-               @click.stop=" mostraOpzioniAutocompletamento = true " />
+               @click.stop=" mostraOpzioniAutocompletamento = true "
+               required />
         <datalist @keyup.stop="autocompletamentoUsername(usernameNuovoConsumer)"> <!-- TODO : menu a tendina DA VERIFICARE IL FUNZIONAMENTO -->
           <option @input="usernameDaAggiungereScelto(usernameNuovoConsumer)"
                   v-for="usernameDaAggiungere in suggerimentiAutocompletamentoUsernameConsumerDaAggiungere"
@@ -48,8 +34,8 @@
           </option>
         </datalist>
 
-        <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" />
-        <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="Email" />
+        <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" required/>
+        <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="Email" required/>
 
         <input type="submit" value="Aggiungi"/>
       </p>
@@ -60,14 +46,14 @@
 
 <script>
 // TODO : componente Consumer interamente da implementare
-import {richiestaDelete, richiestaGet, richiestaPost} from "../../utils/http";
-import Form from "../../components/FormConCsrfToken";
-import {unisciOggetti} from "../../utils/utilitaGenerale";
-import {ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
+import {richiestaDelete, richiestaGet, richiestaPost} from "../../../utils/http";
+import Form from "../../../components/FormConCsrfToken";
+import SchedaUnConsumer from "./SchedaUnConsumer";
+import {unisciOggetti} from "../../../utils/utilitaGenerale";
 
 export default {
   name: "Uploader",
-  components: {Form},
+  components: {Form, SchedaUnConsumer},
   emits: ['csrf-token-modificato'], // Fonte: https://stackoverflow.com/a/64220977
   data() {
     return {
@@ -77,9 +63,6 @@ export default {
 
       /** Flag, true quando il layout è caricato.*/
       layoutCaricato: false,
-
-      /** Nome dell'attore attualmente autenticato.*/
-      nomeAttoreAttualmenteAutenticato: undefined,
 
       /** Array con i suggerimenti degli username nel form di
        * aggiunta nuovo Consumer.*/
@@ -93,9 +76,6 @@ export default {
       usernameNuovoConsumer: "",
       nominativoNuovoConsumer: "",
       emailNuovoConsumer: "",
-
-      /** Mappa { idConsumer => arrayConIdFilesPerConsumerDaQuestoUploader }.*/
-      mappa_idConsumer_arrayIdFiles: new Map(),
 
       /** Mappa { idConsumer => oggettoConProprietaConsumer },
        * ordinata alfabeticamente rispetto al nome del Consumer.*/  // TODO : verificare ordinamento corretto
@@ -117,33 +97,13 @@ export default {
        * Consumer, lo username del Consumer è salvato nella proprietà con il nome
        * indicato in questa variabile.
        * Vedere valori di {@link #mappa_idConsumer_proprietaConsumer}*/
-      NOME_PROP_USERNAME_CONSUMER: undefined,
-
-
-      // Di seguito, proprietà per la rappresentazione della lista dei documenti per i consumer
-
-      /** Nome delle colonne di intestazione della tabella coi documenti.*/
-      nomiPropDocumenti: [],
-
-      /** Nome della colonna con l'url di download del documento.*/
-      NOME_PROP_DOWNLOAD_DOCUMENTO: "Link download",
-
-      /** Nome della colonna con l'url di eliminazione del documento.*/
-      NOME_PROP_DELETE_DOCUMENTO: "Link eliminazione",
-
-      /** Mappa documenti ( id => proprietà ) per uno specifico Consumer.
-       * Questa mappa è caricata dinamicamente in base alle azioni
-       * dell'utente.*/
-      mappaDocumentiPerUnConsumer: new Map()
+      NOME_PROP_USERNAME_CONSUMER: undefined
 
     }
   },
   created() {
 
     const caricaQuestoComponente = async () => {
-
-      await getNomeUploaderAttualmenteAutenticato()
-            .then( nomeUploader => this.nomeAttoreAttualmenteAutenticato = nomeUploader )
 
             // richiede il nome della prop contenente il nome di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
       await getNomePropNomeConsumer()
@@ -157,33 +117,18 @@ export default {
             .then( getNomePropUsernameConsumer )
             .then( nomePropUsernameConsumer => this.NOME_PROP_USERNAME_CONSUMER = nomePropUsernameConsumer )
 
-            // Richiede l'elenco dei nomi delle properties dei documenti per
-            .then( getNomiPropDocumenti )
-            // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
-            // documento (da creare dinamicamente), poi salva l'array
-            .then( nomiPropDocumenti => {
-              nomiPropDocumenti.push( this.NOME_PROP_DOWNLOAD_DOCUMENTO );
-              nomiPropDocumenti.push( this.NOME_PROP_DELETE_DOCUMENTO )
-              this.nomiPropDocumenti = nomiPropDocumenti;
-            })
-
-            // Richiede la mappa { consumer => [filesPerQuestoConsumer] }
-            .then( getMappa_idConsumer_arrayIdFiles )   // TODO : serve ?? Meglio che chieda direttamente l'elenco dei file quando utente clicca sul consumer senza consumare risorse inutili prima
-
-            // Salva mappa { consumer => [filesPerQuestoConsumer] } e restituisce array con identificativi dei consumer
-            .then( mappa_idConsumer_arrayIdFiles => {
-              this.mappa_idConsumer_arrayIdFiles = mappa_idConsumer_arrayIdFiles
-              return Array.from(mappa_idConsumer_arrayIdFiles.keys());
-            })
+            // Richiede l'elenco dei consumer associati con questo uploader
+            .then( getElencoConsumer )
 
             // Richiede le info di ogni Consumer e restituisce mappa { idConsumer => {proprietaQuestoConsumer} }
             .then( arrayIdConsumer => getMappa_idConsumer_proprietaConsumer( arrayIdConsumer ) )
 
             // Ordina la mappa dei Consumer (con relative proprietà) alfabeticamente e la salva nelle proprietà di questo componente
             .then( mappa_idConsumer_proprietaConsumer =>
-                this.mappa_idConsumer_proprietaConsumer = new Map( [...mappa_idConsumer_proprietaConsumer.entries()]
-                                                                      .sort((a,b) =>
-                                                                          a[1][this.NOME_PROP_NOME_UPLOADER] - b[1][this.NOME_PROP_NOME_UPLOADER] ) ) )// TODO : verificare
+                this.mappa_idConsumer_proprietaConsumer =
+                    new Map( [...mappa_idConsumer_proprietaConsumer.entries()]
+                            .sort((a,b) =>
+                                a[1][this.NOME_PROP_NOME_UPLOADER] - b[1][this.NOME_PROP_NOME_UPLOADER] ) ) ) // TODO : verificare
 
             .catch( console.error ) ;
 
@@ -202,15 +147,6 @@ export default {
       this.$emit('csrf-token-modificato', nuovoCsrfToken);
     },
 
-    /** Carica i documenti per il consumer indicato nel parametro.*/
-    caricaDocumentiPerQuestoConsumer( idConsumer ) {
-
-      this.mappaDocumentiPerUnConsumer = new Map();           // prima pulisce la variabile
-      getMappa_idFile_arrayIdFiles_perConsumer( idConsumer )  // poi richiede mappa idFile-propFile per questo consumer
-          .then( mappa => this.mappaDocumentiPerUnConsumer = mappa );
-
-    },
-
     /** Funzione per l'eliminazione del Consumer con
      * identificativo specificato nel parametro.*/
     eliminaConsumer( idConsumer ) {
@@ -221,7 +157,6 @@ export default {
         .then( () => {
             alert("Consumer \"" + this.mappa_idConsumer_proprietaConsumer.values()[this.NOME_PROP_USERNAME_CONSUMER] + "\" eliminato." ); // TODO : fare qualcosa di più carino di un alert
             this.mappa_idConsumer_proprietaConsumer.delete(idConsumer);
-            this.mappa_idConsumer_arrayIdFiles.delete(idConsumer);
           })
         .catch( rispostaErrore => {
           console.error("Errore durante l'eliminazione del consumer: " + rispostaErrore );
@@ -247,9 +182,6 @@ export default {
 
             // Aggiungi le info del consumer alla mappa in questo componente
             this.mappa_idConsumer_proprietaConsumer.set(this.usernameNuovoConsumer, proprietaConsumerDaAggiungere);
-
-            // Aggiungi il consumer alla mappa dei file (per ora vuota, visto che il Consumer è appena stato creato)
-            this.mappa_idConsumer_arrayIdFiles.set( this.usernameNuovoConsumer, [] );  // valore aggiunto è un array vuoto (non ci sono ancora file per questo Consumer)
 
             // Procedura completata
             alert("Aggiunto " + this.mappa_idConsumer_proprietaConsumer.get(this.usernameNuovoConsumer)[this.NOME_PROP_NOME_CONSUMER] + "!" );
@@ -303,36 +235,6 @@ export default {
     }
 
   }
-}
-
-/** Richiede al server la lista dei nomi delle proprietà
- * dei documenti inviati da questo Uploader ai Consumer e,
- * se la richiesta va a buon fine, li restituisce in un array
- * come valore di una Promise risolta.*/
-const getNomiPropDocumenti = async () => {
-
-  return richiestaGet( process.env.VUE_APP_GET_NOMI_PROP_DOCUMENTI_DI_QUESTO_UPLOADER )
-      .then( risposta => risposta.data )
-      .catch( rispostaErrore => {
-        console.error("Errore: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
-/** Restituisce il nome dell'uploader attualmente autenticato.*/
-const getNomeUploaderAttualmenteAutenticato = async () => {
-  // TODO aggiungerlo al token o a qualcosa che sia visibile dal client senza sprecare una richiesta al server (tra l'altro, se non c'è il nome nel token, il server dovrà cercarlo nel db e gli accessi costano).
-  return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
-      .then(  risposta       =>  risposta.data )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
 }
 
 
@@ -393,49 +295,20 @@ const getNomePropUsernameConsumer = async () => {
 
 }
 
-/** Richiede al server una mappa avente per chiavi gli identificativi dei
- * File serviti da questo Uploader ad un certo Consumer (indicato come
- * parametro) e per valori l'oggetto corrispondente al file indicato dalla
- * chiave dell'entry nella mappa.
- * Se tutto va a buon fine, restituisce tale mappa in una Promise risolta.
- * @param usernameConsumerDestinazione  Lo username del consumer a cui i
- *                                      documenti sono destinati.
+
+/** Richiede al server l'elenco di tutti i Consumer associati
+ * con questo Uploader. Se la richiesta va a buon fine, questa
+ * funzione restituisce una promise risolta il cui valore è
+ * l'array con i valori richiesti.
  */
-const getMappa_idFile_arrayIdFiles_perConsumer = async idConsumer => {
+const getElencoConsumer = async () => {
 
   // TODO : verificare correttezza
 
-  return richiestaGet( process.env.VUE_APP_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + idConsumer )
-
-    // Crea mappa
-    .then( rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop.data)) )
-
-    // TODO : molto simile al metodo in Lista Documenti Per Consumer
-
-    // Ordina e restituisci la mappa in base alla data di caricamento (prima i documenti più recenti)
-    .then( elencoDocumenti => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti(elencoDocumenti) )
-
-    .catch( rispostaErrore => {
-      console.error("Errore durante il caricamento della mappa coi documenti: " + rispostaErrore );
-      return Promise.reject(rispostaErrore);
-    });
-
-}
-
-
-/** Richiede al server una mappa avente per chiavi gli identificativi dei
- * Consumer serviti da questo Uploader e per valori l'array contenente
- * gli identificativi dei file caricati da questo Uploader e destinati al
- * Consumer avente per identificativo il valore della chiave corrispondente.
- */
-const getMappa_idConsumer_arrayIdFiles = async () => {
-
-  // TODO : verificare correttezza
-
-    return richiestaGet( process.env.VUE_APP_GET_ID_CONSUMER_FILE_PER_QUESTO_UPLOADER )
-        .then( rispostaConMappa_idConsumer_arrayIdFiles => new Map(Object.entries(rispostaConMappa_idConsumer_arrayIdFiles.data)) )
+    return richiestaGet( process.env.VUE_APP_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER )
+        .then( rispostaConListaConsumer => rispostaConListaConsumer.data )  // TODO : verificare che arrivi correttamente un array
         .catch( rispostaErrore => {
-          console.error("Errore durante il caricamento della mappa Consumer-Files: " + rispostaErrore );
+          console.error("Errore durante il caricamento deiConsumer: " + rispostaErrore );
           return Promise.reject(rispostaErrore);
         });
 
