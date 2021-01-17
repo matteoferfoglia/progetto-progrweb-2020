@@ -3,7 +3,7 @@
 
   <form @submit.prevent="validaEdInviaForm">
     <label>Codice fiscale<input type="text" v-model="codiceFiscale" name="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="REGEX_CODICE_FISCALE" required autofocus></label>
-    <label>Nome e cognome<input type="text" v-model="nomeCognome" name="nomeCognome" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required></label>
+    <label>Nome e cognome<input type="text" v-model="nominativo" name="nominativo" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required></label>
     <label>Email<input type="email" v-model="email" name="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" required></label>
     <label>Password<input type="password" v-model="password" name="password" autocomplete="off" maxlength="100" required></label>
     <label>Conferma password<input type="password" v-model="confermaPassword" name="confermaPassword" autocomplete="off" maxlength="100" required></label>
@@ -23,7 +23,7 @@ export default {
   data() {
     return {
       codiceFiscale: "",
-      nomeCognome: "",
+      nominativo: "",
       email: "",
       password: "",
       confermaPassword: "",
@@ -37,7 +37,7 @@ export default {
       // TODO : questo metodo è presente anche nel form di autenticazione: refactoring per evitare duplicazione!
 
       const isFormValido = () => {
-        return this.nomeCognome.length>0 &&
+        return this.nominativo.length>0 &&
             RegExp(this.REGEX_EMAIL).test(this.email) &&
             RegExp(this.REGEX_CODICE_FISCALE).test(this.codiceFiscale) &&
             this.password===this.confermaPassword &&
@@ -62,7 +62,7 @@ export default {
 
         let campiFormDaInviareAlServer = {
           [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME] : this.codiceFiscale,
-          [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] : this.nomeCognome,
+          [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMINATIVO_INPUT_FIELD_NAME] : this.nominativo,
           [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME] : this.email,
           [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME] : this.password
         }

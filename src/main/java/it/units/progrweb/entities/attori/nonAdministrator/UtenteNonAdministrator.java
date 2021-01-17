@@ -15,8 +15,8 @@ public abstract class UtenteNonAdministrator extends Attore {
         super();
     }
 
-    protected UtenteNonAdministrator(String username, String nomeCognome, String email) {
-        super(username, nomeCognome, email);
+    protected UtenteNonAdministrator(String username, String nominativo, String email) {
+        super(username, nominativo, email);
     }
 
 

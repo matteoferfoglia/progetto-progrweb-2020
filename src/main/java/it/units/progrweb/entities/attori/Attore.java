@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
+import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -26,7 +27,7 @@ public abstract class Attore implements UserPrincipal {
     protected String username;
 
     /** Nome e cognome dell'attore.*/
-    protected String nomeCognome;
+    protected String nominativo;
 
     /** Email dell'attore. */
     protected String email;
@@ -49,37 +50,51 @@ public abstract class Attore implements UserPrincipal {
     /** Restituisce il nome del field contenente il nome
      * di un attore.*/
     public static String getNomeFieldNomeAttore() {
-        final String nomeField = "nomeCognome";
+        final String nomeField = "nominativo";
         return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
     }
 
 
-    protected Attore(String username, String nomeCognome, String email) {
+    protected Attore(String username, String nominativo, String email) {
         this.username = username;
-        this.nomeCognome = nomeCognome;
+        this.nominativo = nominativo;
         setEmail(email);
         // TODO
     }
 
     protected Attore() {}
 
-    public String getNomeCognome() {
-        return nomeCognome;
+    public String getNominativo() {
+        return nominativo;
     }
 
-    protected void setEmail(String email) {
-        if( ! RegexHelper.isEmailValida(email) )
-            throw new IllegalArgumentException("Formato email non valido.");
-
-        this.email = email;
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public String getUsername() {
-        return username;
+    protected void setNominativo(String nominativo) {
+        this.nominativo = EncoderPrevenzioneXSS.encodeForJava(nominativo);
+    }
+
+    protected void setUsername(String username) {
+        this.username = EncoderPrevenzioneXSS.encodeForJava( username );
+    }
+
+    /** Modifica l'email solo se il nuovo valore è in un formato valido,
+     * altrimenti la mantiene inalterata.*/
+    protected void setEmail(String email) {
+
+        if( RegexHelper.isEmailValida(email) )
+            this.email = email;
+
+    }
+
+    protected void setTipoAttore(String tipoAttore) {
+        this.tipoAttore = tipoAttore;
     }
 
     /** Restituisce true se la password viene correttamente modificata, false altrimenti.*/
@@ -88,8 +103,8 @@ public abstract class Attore implements UserPrincipal {
         return true;
     }
 
-    /** Restituisce true se il campo nomeCognome viene correttamente modificato, false altrimenti.*/
-    protected boolean modificaNomeCognome(String nuovoNomeCognome){
+    /** Restituisce true se il campo nominativo viene correttamente modificato, false altrimenti.*/
+    protected boolean modificaNominativo(String nominativo){
         // TODO : accedere al database per modificare la password
         return true;
     }
@@ -115,7 +130,7 @@ public abstract class Attore implements UserPrincipal {
         Attore attore = (Attore) o;
 
         if (username != null ? !username.equals(attore.username) : attore.username != null) return false;
-        if (nomeCognome != null ? !nomeCognome.equals(attore.nomeCognome) : attore.nomeCognome != null) return false;
+        if (nominativo != null ? !nominativo.equals(attore.nominativo) : attore.nominativo != null) return false;
 
         return email != null ? email.equals(attore.email) : attore.email == null;
     }
@@ -123,7 +138,7 @@ public abstract class Attore implements UserPrincipal {
     @Override
     public int hashCode() {
         int result = username.hashCode();
-        result = 31 * result + nomeCognome.hashCode();
+        result = 31 * result + nominativo.hashCode();
         result = 31 * result + email.hashCode();
         return result;
     }
@@ -145,7 +160,7 @@ public abstract class Attore implements UserPrincipal {
     public String toString() {
         return "Attore{" +
                 "username='" + username + '\'' +
-                ", nomeCognome='" + nomeCognome + '\'' +
+                ", nominativo='" + nominativo + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }

@@ -83,7 +83,7 @@ public class Autenticazione {
                     String valoreId = "10";   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     usernameField.set(consumer, valoreId);
                     Field nomeField = consumer.getClass().getSuperclass().getSuperclass().getSuperclass() // field di Attore
-                            .getDeclaredField("nomeCognome");
+                            .getDeclaredField("nominativo");
                     nomeField.setAccessible(true);
                     String nome = "Pippo";   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     usernameField.set(consumer, nome);
@@ -288,7 +288,7 @@ public class Autenticazione {
                                               GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
 
         // Aggiunge gli attributi dell'attore non sensibili
-        jwtPayload.aggiungiClaim( new JwtNomeSubjectClaim(attore.getNomeCognome()) );
+        jwtPayload.aggiungiClaim( new JwtNomeSubjectClaim(attore.getNominativo()) );
         jwtPayload.aggiungiClaim( new JwtTipoAttoreClaim( attore.getTipoAttore() ) );
 
         return new JwtToken(jwtPayload).generaTokenJsonCodificatoBase64UrlEncoded();

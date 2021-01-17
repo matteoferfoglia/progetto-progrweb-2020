@@ -10,7 +10,7 @@ import com.googlecode.objectify.annotation.Subclass;
 // TODO : serve proxy pattern?
 @Subclass(index = false)
 public class AdministratorStorage extends Administrator {
-    public AdministratorStorage(String username, String nomeCognome, String email) {
-        super(username, nomeCognome, email);
+    public AdministratorStorage(String username, String nominativo, String email) {
+        super(username, nominativo, email);
     }
 }

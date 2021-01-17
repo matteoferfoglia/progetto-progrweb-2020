@@ -27,8 +27,8 @@ public abstract class Uploader extends UtenteNonAdministrator {
         super.tipoAttore = Uploader.class.getSimpleName();
     }
 
-    public static Uploader creaUploader(String username, String nomeCognome, String email, byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-        return new UploaderStorage(username, nomeCognome, email, immagineLogo, estensioneFileContenenteImmagineLogo);
+    public static Uploader creaUploader(String username, String nominativo, String email, byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
+        return new UploaderStorage(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);
     }
 
     /** Restituisce l'immagine logo dell'Uploader
@@ -47,15 +47,15 @@ public abstract class Uploader extends UtenteNonAdministrator {
 
     /** Costruttore.
      * @param username
-     * @param nomeCognome
+     * @param nominativo
      * @param email
      * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
      * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)
      */
-    public Uploader(String username, String nomeCognome, String email,
+    public Uploader(String username, String nominativo, String email,
                            byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
         // TODO
-        super(username, nomeCognome, email);
+        super(username, nominativo, email);
         this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
         super.tipoAttore = Uploader.class.getSimpleName();
     }

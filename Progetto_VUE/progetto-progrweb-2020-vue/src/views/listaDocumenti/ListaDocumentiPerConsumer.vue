@@ -46,6 +46,7 @@ import {
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
 } from "../../utils/documenti";
 import TabellaDocumenti from "./TabellaDocumenti";
+import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
 
 export default {
 
@@ -138,9 +139,11 @@ export default {
 
     const caricaContenuto = async () => {   // Grazie ad async, restituisce una Promise (usata dopo)
 
-      await getIntestazioneTabella()
+      await getNomiProprietaDocumenti()
               .then( intestazione =>
-                  this.nomiColonneIntestazione = intestazione.push(this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI) );
+                  this.nomiColonneIntestazione =
+                      intestazione.forEach( nomeProp => camelCaseToHumanReadable( nomeProp ) )
+                                  .push( this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI) );
 
       await getElencoDocumentiPerQuestoConsumer( this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] )
             // Promise restituisce mappa { idDocumento => documento }
@@ -191,7 +194,7 @@ export default {
 
 /** Richiede al server l'intestazione della tabella dei documenti
  * e la restituisce come valore di una promise.*/
-const getIntestazioneTabella = async () => {
+const getNomiProprietaDocumenti = async () => {
 
   return richiestaGet(process.env.VUE_APP_GET_NOMI_PROP_DOCUMENTI_PER_CONSUMER)
     .then(  risposta       => risposta.data )

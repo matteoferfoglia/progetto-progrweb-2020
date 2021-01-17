@@ -11,7 +11,6 @@ import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,28 +57,28 @@ public abstract class File {
     }
 
     /** Restituisce il nome dell'attributo che contiene la lista
-     * degli hashtag di un file in formato Human-Readable.*/
+     * degli hashtag di un file.*/
     public static String getNomeAttributoContenenteHashtagNeiFile() {
 
         final String NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE = "listaHashtag";
-        return UtilitaGenerale.getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE));
+        return getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE).getName();
     }
 
-    /** Restituisce il nome dell'attributo che contiene data di
-     * caricamento di un file in formato Human-Readable.*/
+    /** Restituisce il nome dell'attributo che contiene la data di
+     * caricamento di un file.*/
     public static String getNomeAttributoContenenteDataCaricamentoFile() {
 
         final String NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE = "dataEdOraDiCaricamento";
-        return UtilitaGenerale.getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE));
+        return getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE).getName();
 
     }
 
     /** Restituisce il nome dell'attributo che contiene data di
-     * visualizzazione di un file in formato Human-Readable.*/
+     * visualizzazione di un file.*/
     public static String getNomeAttributoContenenteDataVisualizzazioneFile() {
 
         final String NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE = "dataEdOraDiVisualizzazione";
-        return UtilitaGenerale.getNomeAttributoInFormatoHumanReadable(getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE));
+        return getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE).getName();
 
     }
 
@@ -136,7 +135,7 @@ public abstract class File {
     public static String[] anteprimaNomiProprietaFile() {
         // TODO : testare questa classe
         return Arrays.stream(getAnteprimaProprietaFile())
-                     .map(UtilitaGenerale::getNomeAttributoInFormatoHumanReadable)
+                     .map( field -> field.getName() )
                      .toArray(String[]::new);
     }
 

@@ -24,9 +24,9 @@ class UploaderStorage extends Uploader {
     }
 
     /** Vedere {@link Uploader}.*/
-     public UploaderStorage(String username, String nomeCognome, String email,
+     public UploaderStorage(String username, String nominativo, String email,
                      byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-         super(username, nomeCognome, email, immagineLogo, estensioneFileContenenteImmagineLogo);
+         super(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);
      }
 
     public String getImmagineLogoBase64() {
@@ -35,7 +35,7 @@ class UploaderStorage extends Uploader {
 
     @Override
     public String getNomeUploader() {
-        return nomeCognome;
+        return nominativo;
     }
 
     @Override
@@ -60,8 +60,8 @@ class UploaderStorage extends Uploader {
     }
 
     /** Crea un {@link Consumer} con le proprietà specificate nei parametri.*/
-    public Consumer creaConsumer(String username, String nomeCognome, String email) {
-        return new ConsumerStorage(username, nomeCognome, email);    // TODO
+    public Consumer creaConsumer(String username, String nominativo, String email) {
+        return new ConsumerStorage(username, nominativo, email);    // TODO
     }
 
     /** Restituisce true se la modifica del {@link Consumer va a buon fine, false altrimenti.*/

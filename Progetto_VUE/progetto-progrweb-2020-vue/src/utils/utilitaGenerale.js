@@ -61,3 +61,16 @@ export const unisciOggetti = ( oggetto1, oggeto2 ) => {
         oggettoUnito[propName] = oggeto2[propName];
     return oggettoUnito;
 }
+
+/** Data una stringa in formato CamelCase, la converte in formato
+ * Human Readable e restituisce il risultato. Ad esempio, data la
+ * string "nomeUtente", in uscita da questa funzione si avrà
+ * "Nome utente"
+ * (<a href="https://stackoverflow.com/a/7225450">Fonte</a>). */
+export const camelCaseToHumanReadable = testoDaConvertire => {
+    const risultato = testoDaConvertire.trim()
+                                       .replace(/([A-Z])/g, " $1" )
+                                       .toLowerCase();
+    return risultato.charAt(0).toUpperCase() +
+           risultato.slice(1);
+}

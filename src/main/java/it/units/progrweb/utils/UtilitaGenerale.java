@@ -1,7 +1,6 @@
 package it.units.progrweb.utils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
@@ -65,39 +64,6 @@ public class UtilitaGenerale {
         return httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
     }
 
-    /** Metodo di conversione da una stringa CamelCase ad una
-     * in cui le parole sono separate da spazi
-     * (<a href="https://stackoverflow.com/a/2560017">Fonte</a>).*/
-    public static String splitCamelCase(String s) {
-
-        // TODO : rivedere e testare questo metodo
-
-        return s.replaceAll(
-                String.format("%s|%s|%s",
-                        "(?<=[A-Z])(?=[A-Z][a-z])",
-                        "(?<=[^A-Z])(?=[A-Z])",
-                        "(?<=[A-Za-z])(?=[^A-Za-z])"
-                ),
-                " "
-        );
-
-    }
-
-    /** Metodo per rendere maiuscola la prima lettera della
-     * stringa passata come parametro.*/
-    public static String trasformaPrimaLetteraMaiuscola(@NotNull String stringaDaModificare) {
-        return stringaDaModificare.substring(0, 1).toUpperCase()
-                + stringaDaModificare.substring(1);
-    }
-
-    /** Dato un field il cui nome è espresso in notazione CamelCase,
-     * restituisce la versione Human Readable del suo nome.*/
-     public static String getNomeAttributoInFormatoHumanReadable(Field field) {
-        String nomeAttributo = field.getName();
-        nomeAttributo = splitCamelCase(nomeAttributo.trim());
-        return trasformaPrimaLetteraMaiuscola(nomeAttributo.toLowerCase());
-    }
-
     /** Crea una mappa (nome->valore) con i Field dati nel parametro.
      * Se un attributo (tra i field dati) dell'oggetto dato è null,
      * allora il corrispettivo valore della mappa sarà una stringa vuota.
@@ -111,7 +77,7 @@ public class UtilitaGenerale {
         return Arrays.stream(campiDaMostrareNellaMappa)
                 .collect(
                         Collectors.toMap(
-                                UtilitaGenerale::getNomeAttributoInFormatoHumanReadable,
+                                nomeField -> nomeField.getName(),
                                 field -> {
                                     try {
                                         field.setAccessible(true);
@@ -144,10 +110,11 @@ public class UtilitaGenerale {
     }
 
     /** Verifica l'esistenza di un field nella classe data, dato il suo nome
-     * come parametro.
+     * come parametro. Se il field non si trova, lo scrive nel {@link Logger}.
      * @return Il nome stesso se il field esiste, stringa vuota altrimenti.
      */
-    public static String ricercaFieldPerNomeInQuestaClasse( String nomeField, Class classeInCuiCercareField ) {
+    public static String ricercaFieldPerNomeInQuestaClasse( String nomeField,
+                                                            Class classeInCuiCercareField ) {
 
         if ( esisteAttributoInClasse(nomeField, classeInCuiCercareField) ) {
             return nomeField;

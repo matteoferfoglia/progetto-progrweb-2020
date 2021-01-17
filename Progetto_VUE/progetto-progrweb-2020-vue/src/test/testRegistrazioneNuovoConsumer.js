@@ -45,7 +45,7 @@ const tabellaParametriDeiTest = [
 
 // noinspection SpellCheckingInspection
 describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
-    (codFisc, nomeCognome, email, password, confermaPassword, formRiempitoCorrettamente) => {
+    (codFisc, nominativo, email, password, confermaPassword, formRiempitoCorrettamente) => {
 
     const wrapper = mount(RegistrazioneNuovoConsumer, {
         global: {
@@ -90,7 +90,7 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
 
             const datiAttesi = {
                 [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME]     : codFisc,
-                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMECOGNOME_INPUT_FIELD_NAME] : nomeCognome,
+                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMINATIVO_INPUT_FIELD_NAME] : nominativo,
                 [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME]       : email,
                 [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME]    : password
             }
@@ -114,7 +114,7 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
         mockUrl_varGlobale = undefined;
         mockDatiInviati_varGlobale = undefined;
 
-        await riempiCampiForm(formInputFields, [codFisc, nomeCognome, email, password, confermaPassword]);
+        await riempiCampiForm(formInputFields, [codFisc, nominativo, email, password, confermaPassword]);
         await wrapper.find("form").trigger("submit");
     }
 

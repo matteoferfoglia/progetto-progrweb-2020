@@ -29,11 +29,18 @@
 
   <p v-else>Nessun documento disponibile.</p>
 
+  <FormConCsrfToken v-if="possibileAggiungereDocumento">
+    <p>Carica un documento per {{ nomeConsumer }}</p>
+    <input type="text">
+  </FormConCsrfToken>
+
 </template>
 
 <script>
+import FormConCsrfToken from "../../components/FormConCsrfToken";
 export default {
   name: "TabellaDocumenti",
+  components: {FormConCsrfToken},
   props: [
 
     /** Nomi delle colonne nell'intestazione della tabella.*/
@@ -48,7 +55,13 @@ export default {
 
     /** In un documento, il nome della property (se presente)
      * il cui valore è un link di eliminazione di quel documento.*/
-    "nomePropLinkElimina"
+    "nomePropLinkElimina",
+
+    /** Flag: true se è possibile aggiungere un documento.*/
+    "possibileAggiungereDocumento",
+
+    /** Nome del Consumer a cui questi documenti si riferiscono.*/
+    "nomeConsumer"
   ]
 }
 </script>

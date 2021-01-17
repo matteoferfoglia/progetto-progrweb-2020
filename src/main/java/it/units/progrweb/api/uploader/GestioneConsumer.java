@@ -1,7 +1,9 @@
 package it.units.progrweb.api.uploader;
 
 import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
@@ -13,6 +15,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -113,8 +116,22 @@ public class GestioneConsumer {
     @Path("/aggiungiConsumerPerQuestoUploader")
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
-    public Response aggiungiConsumer(Consumer consumerDaAggiungere,
+    public Response aggiungiConsumer(ConsumerProxy consumerDaAggiungere,
                                      @Context HttpServletRequest httpServletRequest) {
+
+        // Verifica corretta deserializzazione degli attributi
+        Field[] attributi = Attore.class.getDeclaredFields();
+        for ( Field attributo : attributi ) {
+            attributo.setAccessible(true);
+            try {
+                if( attributo.get(consumerDaAggiungere) == null ) {
+                    // Errore di deserializzazione
+                    return Response.status( Response.Status.BAD_REQUEST )
+                                   .entity( "Valori di input inseriti non validi." )
+                                   .build();
+                }
+            } catch (IllegalAccessException exception) {}
+        }
 
         String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
         String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
@@ -124,7 +141,8 @@ public class GestioneConsumer {
             // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
             Consumer consumerDalDB = (Consumer) DatabaseHelper.getById(usernameConsumerDaAggiungere, Consumer.class);
 
-            if( consumerDalDB.equals(consumerDaAggiungere) ) {
+            if( consumerDalDB != null &&
+                    consumerDalDB.equals(consumerDaAggiungere) ) {
 
                 // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
                 if (!RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(usernameUploader, consumerDaAggiungere.getUsername())) {
@@ -151,7 +169,7 @@ public class GestioneConsumer {
         } catch (NotFoundException e) {
             return Response
                     .status(Response.Status.BAD_REQUEST )
-                    .entity("Il Consumer " + consumerDaAggiungere.toString() + " non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
+                    .entity("Il Consumer " + usernameConsumerDaAggiungere + " non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
                     .build();
         }
 
@@ -184,17 +202,7 @@ public class GestioneConsumer {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldNomeConsumer() {
-        return Consumer.getNomeFieldNomeConsumer();
-    }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
-
-    /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
-     * il nome della proprietà contenente l'email del {@link Consumer}.*/
-    @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldLogoConsumer() {
-        return Consumer.getNomeFieldEmailConsumer();
+        return Consumer.getNomeFieldNominativoConsumer();
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
@@ -205,6 +213,16 @@ public class GestioneConsumer {
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldUsernameConsumer() {
         return Consumer.getNomeFieldUsernameConsumer();
+    }
+    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
+
+    /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
+     * il nome della proprietà contenente lo username del {@link Consumer}.*/
+    @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeFieldEmailConsumer() {
+        return Consumer.getNomeFieldEmailConsumer();
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 

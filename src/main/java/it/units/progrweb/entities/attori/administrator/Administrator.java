@@ -18,8 +18,8 @@ public abstract class Administrator extends Attore {
         super();    // TODO
     }
 
-    public Administrator(String username, String nomeCognome, String email) {
-        super(username, nomeCognome, email);  // TODO
+    public Administrator(String username, String nominativo, String email) {
+        super(username, nominativo, email);  // TODO
         super.tipoAttore = Administrator.class.getSimpleName();
     }
 
@@ -27,15 +27,15 @@ public abstract class Administrator extends Attore {
     /** Crea un uploader con le proprietà specificate nei parametri.
      * @param administrator L'{@link Administrator} che esegue l'operazione.
      * @param username
-     * @param nomeCognome
+     * @param nominativo
      * @param email
      * @param immagineLogo  Immagine logo dell'uploader.
      * @param estensioneFileContenenteImmagineLogo Estensione dell'immagine logo (es.: "jpeg").
      * @return L'uploader appena creato.
      */
-    public static Uploader creaUploader(Administrator administrator, String username, String nomeCognome, String email,
+    public static Uploader creaUploader(Administrator administrator, String username, String nominativo, String email,
                                  byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-        return Uploader.creaUploader(username, nomeCognome, email, immagineLogo, estensioneFileContenenteImmagineLogo);    // TODO
+        return Uploader.creaUploader(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);    // TODO
     }
 
     /** Restituisce true se la modifica dell'uploader va a buon fine, false altrimenti.
@@ -56,8 +56,8 @@ public abstract class Administrator extends Attore {
 
     /** Crea un Administrator con le proprietà specificate nei parametri.
      * @param administrator L'{@link Administrator} che esegue l'operazione.*/
-    public static Administrator creaAdministrator(Administrator administrator, String username, String nomeCognome, String email) {
-        return new AdministratorProxy(username, nomeCognome, email);    // TODO
+    public static Administrator creaAdministrator(Administrator administrator, String username, String nominativo, String email) {
+        return new AdministratorProxy(username, nominativo, email);    // TODO
     }
 
     /** Restituisce true se la modifica dell'administrator va a buon fine, false altrimenti.

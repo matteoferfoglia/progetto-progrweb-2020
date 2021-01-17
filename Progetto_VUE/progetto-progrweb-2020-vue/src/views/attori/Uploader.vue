@@ -4,7 +4,8 @@
   </header>
   <main>
 
-    <Form @csrf-token-ricevuto="setCsrfToken( $event )">
+    <Form @csrf-token-ricevuto="setCsrfToken( $event )"
+          @submit.prevent="aggiungiConsumer">
 
       <p v-if="mappa_idConsumer_proprietaConsumer.size > 0">Lista dei <i>Consumer</i></p>
       <ol>
@@ -13,16 +14,18 @@
             :key="consumer[0]/*Id del consumer*/">
 
           <router-link :to="{ path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_SCARICATI_DA_CONSUMER + '/' + consumer[0] }"
-                       :nomiColonneIntestazione  ="nomiPropDocumenti"
-                       :elencoDocumentiDaMostrare="mappaDocumentiPerUnConsumer"
-                       :nomePropLinkDownload     ="NOME_PROP_DOWNLOAD_DOCUMENTO"
-                       :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"
+                       :nomiColonneIntestazione     ="nomiPropDocumenti"
+                       :elencoDocumentiDaMostrare   ="mappaDocumentiPerUnConsumer"
+                       :nomePropLinkDownload        ="NOME_PROP_DOWNLOAD_DOCUMENTO"
+                       :nomePropLinkElimina         ="NOME_PROP_DELETE_DOCUMENTO"
+                       :possibileAggiungereDocumento=true
+                       :nomeConsumer                ="consumer[1][NOME_PROP_NOME_CONSUMER]"
                         @click="caricaDocumentiPerQuestoConsumer(consumer[0])" > <!-- TODO : verificare che carichi la mappa, poi la passi al componente, altmenti vedi https://stackoverflow.com/a/47096768 -->
 
             <ol>
-              <li>{{ NOME_PROP_NOME_CONSUMER }}:     <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}     </span></li>
-              <li>{{ NOME_PROP_EMAIL_CONSUMER }}:    <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}    </span></li>
-              <li>{{ NOME_PROP_USERNAME_CONSUMER }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }} </span></li>
+              <li>{{ this.camelCaseToHumanReadable(NOME_PROP_NOME_CONSUMER)     }}: <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}     </span></li>
+              <li>{{ this.camelCaseToHumanReadable(NOME_PROP_EMAIL_CONSUMER)    }}: <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}    </span></li>
+              <li>{{ this.camelCaseToHumanReadable(NOME_PROP_USERNAME_CONSUMER) }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }} </span></li>
             </ol>
 
           </router-link>
@@ -48,7 +51,7 @@
         <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" />
         <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="Email" />
 
-        <input type="button" value="Aggiungi" @click="aggiungiConsumer" />
+        <input type="submit" value="Aggiungi"/>
       </p>
     </Form>
 
@@ -253,14 +256,16 @@ export default {
 
         })
         .catch( errore => {
-          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer );
-          console.error( "Errore durante la procedura di aggiunta nuovo Consumer: " + errore );
+          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer + ", " + errore.data.toLowerCase() );
+          console.error( "Errore durante la procedura di aggiunta nuovo Consumer.");
+          console.error( errore );
+        })
+        .finally( () => {
+          // Pulisci campi del form input
+          this.usernameNuovoConsumer = "";
+          this.nominativoNuovoConsumer = "";
+          this.emailNuovoConsumer = "";
         });
-
-      // Pulisci campi del form input
-      this.usernameNuovoConsumer = "";
-      this.nominativoNuovoConsumer = "";
-      this.emailNuovoConsumer = "";
 
     },
 

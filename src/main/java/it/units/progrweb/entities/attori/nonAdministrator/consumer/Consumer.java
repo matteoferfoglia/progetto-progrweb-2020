@@ -1,11 +1,13 @@
 package it.units.progrweb.entities.attori.nonAdministrator.consumer;
 
 import com.googlecode.objectify.annotation.Entity;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import java.util.List;
 import java.util.Map;
@@ -19,13 +21,14 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     // TODO : implementare questa classe
 
-    private Consumer() {
+    public Consumer() {
         super();
+        setTipoAttore(Consumer.class.getSimpleName());
     }
 
-    public Consumer(String username, String nomeCognome, String email) {
-        super(username, nomeCognome, email);
-        super.tipoAttore = Consumer.class.getSimpleName();
+    public Consumer(String username, String nominativo, String email) {
+        super(username, nominativo, email);
+        setTipoAttore(Consumer.class.getSimpleName());
     }
 
     /** Restituisce l'entità {@link Consumer} cercata nel database
@@ -42,26 +45,26 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
      * di un'istanza di questa classe. Devono essere presenti le proprietà
-     * i cui nomi sono restituiti dai metodi {@link #getNomeFieldNomeConsumer()},
+     * i cui nomi sono restituiti dai metodi {@link #getNomeFieldNominativoConsumer()},
      * {@link #getNomeFieldEmailConsumer()} e {@link #getNomeFieldUsernameConsumer()}.*/
     abstract public Map<String, ?> getMappaAttributi_Nome_Valore(); // TODO : metodo analogo anche in Consumer : si può mettere nella classe padre?
 
     /** Nome della proprietà contenente il nome del {@link Consumer},
      * come richiesto dal metodo {@link #getMappaAttributi_Nome_Valore()}.*/
-    public static String getNomeFieldNomeConsumer() {
-        return "Nominativo";
+    public static String getNomeFieldNominativoConsumer() {
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("nominativo", Attore.class);
     }
 
     /** Nome della proprietà contenente l'email del {@link Consumer},
      * come richiesto dal metodo {@link #getMappaAttributi_Nome_Valore()}.*/
     public static String getNomeFieldEmailConsumer() {
-        return "Email";
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("email", Attore.class);
     }
 
     /** Nome della proprietà contenente lo username del {@link Consumer},
      * come richiesto dal metodo {@link #getMappaAttributi_Nome_Valore()}.*/
     public static String getNomeFieldUsernameConsumer() {
-        return "Username";
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("username", Attore.class);
     }
 
     /** Dato l'identificativo di un {@link Uploader}, carica dal database

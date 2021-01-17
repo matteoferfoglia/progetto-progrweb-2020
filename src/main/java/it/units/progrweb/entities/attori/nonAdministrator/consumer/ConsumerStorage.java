@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 // TODO : serve Proxy pattern?
 @Subclass(index = false)
 public class ConsumerStorage extends Consumer {
-    public ConsumerStorage(String username, String nomeCognome, String email) {
-        super(username, nomeCognome, email);
+    public ConsumerStorage(String username, String nominativo, String email) {
+        super(username, nominativo, email);
     }
 
     /** Scarica dal database tutti i {@link File} caricati dall'{@link Uploader}
@@ -50,7 +50,7 @@ public class ConsumerStorage extends Consumer {
     public Map<String, ?> getMappaAttributi_Nome_Valore() {
 
         Map<String, String> mappa = new HashMap<>();
-        mappa.put(getNomeFieldNomeConsumer(), getNomeCognome());
+        mappa.put(getNomeFieldNominativoConsumer(), getNominativo());
         mappa.put(getNomeFieldEmailConsumer(), getEmail());
         mappa.put(getNomeFieldUsernameConsumer(), getUsername());
 

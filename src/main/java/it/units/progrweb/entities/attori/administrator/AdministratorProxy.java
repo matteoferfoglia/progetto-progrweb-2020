@@ -5,7 +5,7 @@ package it.units.progrweb.entities.attori.administrator;
  * @author Matteo Ferfoglia
  */
 public class AdministratorProxy extends Administrator {
-    public AdministratorProxy(String username, String nomeCognome, String email) {
-        super(username, nomeCognome, email);
+    public AdministratorProxy(String username, String nominativo, String email) {
+        super(username, nominativo, email);
     }
 }

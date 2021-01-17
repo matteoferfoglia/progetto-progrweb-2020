@@ -28,7 +28,7 @@ public class RegistrazioneNuovoConsumer {
 class CampiFormRegistrazione {
 
     private String codiceFiscale;
-    private String nomeCognome;
+    private String nominativo;
     private String email;
     private String password;
 
@@ -38,8 +38,8 @@ class CampiFormRegistrazione {
         return codiceFiscale;
     }
 
-    public String getNomeCognome() {
-        return nomeCognome;
+    public String getNominativo() {
+        return nominativo;
     }
 
     public String getEmail() {
@@ -54,8 +54,8 @@ class CampiFormRegistrazione {
         this.codiceFiscale =  EncoderPrevenzioneXSS.encodeForJava(codiceFiscale.toLowerCase()); // salvato in minuscolo
     }
 
-    public void setNomeCognome(String nomeCognome) {
-        this.nomeCognome = EncoderPrevenzioneXSS.encodeForJava(nomeCognome);
+    public void setNominativo(String nominativo) {
+        this.nominativo = EncoderPrevenzioneXSS.encodeForJava(nominativo);
     }
 
     public void setEmail(String email) {

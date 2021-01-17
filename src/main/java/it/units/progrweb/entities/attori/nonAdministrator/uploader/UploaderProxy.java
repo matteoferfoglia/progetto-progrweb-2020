@@ -20,7 +20,7 @@ public class UploaderProxy extends Uploader {
     private final Map<String, ?> mappaAttributiUploader_nome_valore;
 
     public UploaderProxy(UploaderStorage uploaderStorage) {
-        this.nomeUploader = uploaderStorage.getNomeCognome();
+        this.nomeUploader = uploaderStorage.getNominativo();
         this.logoUploaderBase64 = uploaderStorage.getImmagineLogoBase64();
         this.mappaAttributiUploader_nome_valore = uploaderStorage.getMappaAttributi_Nome_Valore();
     }
