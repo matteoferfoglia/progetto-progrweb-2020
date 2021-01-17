@@ -2,14 +2,18 @@ package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
 import java.nio.file.attribute.UserPrincipal;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 
 /**
@@ -52,6 +56,29 @@ public abstract class Attore implements UserPrincipal {
     public static String getNomeFieldNomeAttore() {
         final String nomeField = "nominativo";
         return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
+    }
+
+    /** Salva un nuovo attore nel database.
+     * @return true se la procedura va a buon fine, false altrimenti.*/
+    public static boolean salvaNuovoAttoreInDatabase( Attore attore, String password ) {
+
+        try {
+            AuthenticationDatabaseEntry authenticationDatabaseEntry =
+                    new AuthenticationDatabaseEntry(
+                            EncoderPrevenzioneXSS.encodeForJava( attore.getUsername() ),
+                            EncoderPrevenzioneXSS.encodeForJava( password ) );
+
+            DatabaseHelper.salvaEntita(attore);
+            DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
+
+            return true;
+
+        } catch (InvalidKeyException|NoSuchAlgorithmException e) {
+            Logger.scriviEccezioneNelLog( Attore.class, e );
+            return false;
+        }
+
+
     }
 
 

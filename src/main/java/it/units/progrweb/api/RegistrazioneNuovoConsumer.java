@@ -1,12 +1,15 @@
 package it.units.progrweb.api;
 
+import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.RegexHelper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Matteo Ferfoglia
@@ -16,10 +19,35 @@ public class RegistrazioneNuovoConsumer {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
-        // TODO metodo e signature (metodo da implementare !!!)
-        return "Registrazione completata per " + campiFormRegistrazione.getCodiceFiscale();
+    public Response registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
+
+        String codiceFiscale = campiFormRegistrazione.getCodiceFiscale();
+        String email         = campiFormRegistrazione.getEmail();
+        String nominativo    = campiFormRegistrazione.getNominativo();
+        String password      = campiFormRegistrazione.getPassword();
+
+        if( RegexHelper.isEmailValida( email )                     &&
+                RegexHelper.isCodiceFiscaleValido( codiceFiscale ) &&
+                nominativo.length() > 0                            &&
+                password.length()   > 0 ) {
+
+            Consumer nuovoConsumer = Consumer.creaConsumer( codiceFiscale, nominativo, email );
+
+            boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password );
+            if( registrazioneConclusaConSuccesso )
+                return Response.ok()
+                               .entity("Registrazione completata per " + nominativo)
+                               .build();
+
+            else return Response.serverError().build();
+
+        } else {
+
+            return Response.status( Response.Status.BAD_REQUEST )       // todo : REFACTORING per evitare duplicazione
+                           .entity( "Valori di input inseriti non validi." )
+                           .build();
+
+        }
     }
 }
 
@@ -27,10 +55,10 @@ public class RegistrazioneNuovoConsumer {
 @SuppressWarnings("unused")
 class CampiFormRegistrazione {
 
-    private String codiceFiscale;
-    private String nominativo;
-    private String email;
-    private String password;
+    private String codiceFiscale = "";
+    private String nominativo = "";
+    private String email = "";
+    private String password = "";
 
     public CampiFormRegistrazione() {}
 
@@ -51,7 +79,7 @@ class CampiFormRegistrazione {
     }
 
     public void setCodiceFiscale(String codiceFiscale) {
-        this.codiceFiscale =  EncoderPrevenzioneXSS.encodeForJava(codiceFiscale.toLowerCase()); // salvato in minuscolo
+        this.codiceFiscale =  EncoderPrevenzioneXSS.encodeForJava(codiceFiscale);
     }
 
     public void setNominativo(String nominativo) {

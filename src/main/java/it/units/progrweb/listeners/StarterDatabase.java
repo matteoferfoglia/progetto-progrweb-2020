@@ -22,8 +22,11 @@ public class StarterDatabase implements ServletContextListener {
      * name</i> delle classi.*/
     private final static String[] nomiEntitaGestiteDalDatabase = {  // TODO : RENDERLA VARIABILE D'AMBIENTE
             "it.units.progrweb.entities.attori.administrator.Administrator",
+            "it.units.progrweb.entities.attori.administrator.AdministratorStorage",
             "it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader",
+            "it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage",
             "it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer",
+            "it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage",
             "it.units.progrweb.entities.RelazioneUploaderConsumerFile",
             "it.units.progrweb.entities.AuthenticationDatabaseEntry",
             "it.units.progrweb.entities.file.File"

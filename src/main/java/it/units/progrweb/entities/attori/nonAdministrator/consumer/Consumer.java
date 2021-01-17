@@ -43,6 +43,11 @@ public abstract class Consumer extends UtenteNonAdministrator {
         }
     }
 
+    /** Crea e restituisce un {@link Consumer}.*/
+    public static Consumer creaConsumer( String username, String nominativo, String email ) {
+        return new ConsumerStorage( username, nominativo, email );
+    }
+
     /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
      * di un'istanza di questa classe. Devono essere presenti le proprietà
      * i cui nomi sono restituiti dai metodi {@link #getNomeFieldNominativoConsumer()},

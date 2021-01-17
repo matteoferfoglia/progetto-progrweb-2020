@@ -45,7 +45,7 @@ public class AuthenticationDatabaseEntry {
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
-    public AuthenticationDatabaseEntry(String username , String passwordAttore)
+    public AuthenticationDatabaseEntry(String username, String passwordAttore)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
         this.username  = username ;

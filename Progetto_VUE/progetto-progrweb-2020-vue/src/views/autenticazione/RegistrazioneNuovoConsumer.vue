@@ -50,7 +50,7 @@ export default {
         this.confermaPassword = "";
       }
 
-      const registrazioneCompletata = () => this.$router.push({name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_SCHERMATA_INIZIALE});   // redirect a schermata iniziale // TODO : cosa bisogna fare qui ?
+      const registrazioneCompletata = () => this.$router.push({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});   // TODO : cosa bisogna fare qui ?
 
       const registrazioneFallita = ris => {
         console.error("Errore durante la registrazione: " + ris);
