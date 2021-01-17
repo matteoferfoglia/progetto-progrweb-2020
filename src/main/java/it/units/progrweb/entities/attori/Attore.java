@@ -152,7 +152,8 @@ public abstract class Attore implements UserPrincipal {
     public boolean equals(Object o) {
 
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null ) return false;
+        if ( ! ( o instanceof Attore )  ) return false;
 
         Attore attore = (Attore) o;
 

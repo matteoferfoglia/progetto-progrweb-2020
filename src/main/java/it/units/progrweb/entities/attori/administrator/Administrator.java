@@ -14,7 +14,7 @@ public abstract class Administrator extends Attore {
 
     // TODO : implementare questa classe
 
-    private Administrator() {
+    protected Administrator() {
         super();    // TODO
     }
 

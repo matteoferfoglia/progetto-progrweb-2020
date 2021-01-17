@@ -188,7 +188,7 @@ export default {
 
         })
         .catch( errore => {
-          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer + ", " + errore.data.toLowerCase() );
+          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer + "." );
           console.error( "Errore durante la procedura di aggiunta nuovo Consumer.");
           console.error( errore );
         })

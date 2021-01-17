@@ -74,6 +74,7 @@ public abstract class DatabaseHelper {
             throws NotFoundException {
 
         try {
+            // return database.load().key( Key.create( classeEntita, identificativoEntita ) ).now();   // TODO : accertarsi che funzioni sia con id numerici sia stringhe
             return database.load().type(classeEntita).id(identificativoEntita).now();
         } catch (Exception e) {
             throw new NotFoundException();

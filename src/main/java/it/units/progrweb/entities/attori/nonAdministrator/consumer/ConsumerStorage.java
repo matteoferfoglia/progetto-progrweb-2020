@@ -24,6 +24,8 @@ public class ConsumerStorage extends Consumer {
         super(username, nominativo, email);
     }
 
+    private ConsumerStorage(){}
+
     /** Scarica dal database tutti i {@link File} caricati dall'{@link Uploader}
      * il cui identificativo è dato come parametro e destinati al {@link
      * Consumer} il cui identificativo è dato come parametro.
