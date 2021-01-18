@@ -26,18 +26,6 @@ import java.util.List;
 @Path("/uploader/documenti")    // TODO : variabile d'ambiente
 public class GestioneDocumenti {
 
-    /** Restituisce un array con i nomi di tutte le proprietà
-     * presenti nei documenti quando vengono restituiti come
-     * oggetti.*/
-    @Path("nomiProprietaOgniDocumento")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON )
-    public String[] getNomiPropDocumenti() {
-
-        return File.anteprimaNomiProprietaFile();   // TODO : c'è lo stesso metodo nei servizi per i Consumer
-
-    }
-
     /** Restituisce il documento il cui identificativo è
      * nel @PathParam.*/
     @Path("/downloadDocumento/{identificativoFile}")

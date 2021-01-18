@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Classe per la gestione dei {@link Consumer} da parte
@@ -69,11 +70,14 @@ public class GestioneConsumer {
             final String primoUsernameNONValido = String.copyValueOf( caratteri ).toLowerCase();
 
             // Ricerca nel database
-            List<String> suggerimenti = (List<String>) DatabaseHelper.queryAnd(
-                    Consumer.class, MAX_NUMERO_RISULTATI_DA_RESTITUIRE,
-                    Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.MAGGIOREOUGUALE, primoUsernameValido,
-                    Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.MINORE, primoUsernameNONValido
-            );
+            List<String> suggerimenti = DatabaseHelper.queryAnd(
+                            Consumer.class, MAX_NUMERO_RISULTATI_DA_RESTITUIRE,
+                            Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.MAGGIOREOUGUALE, primoUsernameValido,
+                            Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.MINORE, primoUsernameNONValido
+                    )
+                    .stream()
+                    .map( consumer -> ((Consumer)consumer).getUsername() )
+                    .collect(Collectors.toList());
 
             String[] daRestituire = new String[suggerimenti.size()];
             return suggerimenti.toArray(daRestituire);
@@ -188,36 +192,5 @@ public class GestioneConsumer {
 
 
     }
-
-
-    /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
-     * il nome della proprietà contenente il nome del {@link Consumer}.*/
-    @Path("/nomeProprietaNomeConsumer")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldNomeConsumer() {
-        return Consumer.getNomeFieldNominativoConsumer();
-    }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
-
-    /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
-     * il nome della proprietà contenente lo username del {@link Consumer}.*/
-    @Path("/nomeProprietaUsernameConsumer")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldUsernameConsumer() {
-        return Consumer.getNomeFieldUsernameConsumer();
-    }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
-
-    /** Con riferimento a {@link #getConsumer(String)}, questo metodo restituisce
-     * il nome della proprietà contenente lo username del {@link Consumer}.*/
-    @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldEmailConsumer() {
-        return Consumer.getNomeFieldEmailConsumer();
-    }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
 }

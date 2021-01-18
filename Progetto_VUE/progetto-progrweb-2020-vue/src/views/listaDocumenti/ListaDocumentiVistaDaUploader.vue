@@ -157,7 +157,7 @@ export default {
  * come valore di una Promise risolta.*/
 const getNomiPropDocumenti = async () => {
 
-  return richiestaGet( process.env.VUE_APP_GET_NOMI_PROP_DOCUMENTI_DI_QUESTO_UPLOADER )
+  return richiestaGet( process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
       .then( risposta => risposta.data )
       .catch( rispostaErrore => {
         console.error("Errore: " + rispostaErrore );

@@ -25,7 +25,7 @@ public class FiltroAutenticazione implements Filter {
     private static final String[] WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA = {
             "/api/login",
             "/api/logout",
-            "/api/consumer", "/api/uploader", "/api/administrator",// gestiti da filtri specifici
+            // "/api/consumer", "/api/uploader", "/api/administrator",// gestiti da filtri specifici    // TODO : io lascerei scommentato (è un controllo in più)
             "/api/verificaTokenAutenticazione",
             "/api/registrazioneNuovoConsumer",
             "/api/CSRFToken/generaCSRFToken",

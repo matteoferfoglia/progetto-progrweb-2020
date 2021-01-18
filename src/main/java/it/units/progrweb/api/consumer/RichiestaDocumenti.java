@@ -9,9 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +25,6 @@ import java.util.Map;
 @Path("/consumer/documenti")      // TODO : variabile d'ambiente
 public class RichiestaDocumenti {
 
-    /** Restituisce un array contenente i nomi delle proprietà
-     * comuni a tutti i documenti. Tale array può essere utilizzato
-     * dai client per preparare l'interfaccia grafica (es.: intestazione
-     * di una tabella che conterrà un documento per riga.*/
-    @Path("/arrayNomiProprietaOgniDocumento")  // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)       // TODO : cercare tutti i Produces e Consumes ed usare MediaType
-    public String[] getNomiProprietaFileInAnteprima() {
-        return File.anteprimaNomiProprietaFile();
-    }
 
     /** Restituisce un oggetto (JSON) in cui ogni property è un'astrazione
      * di un documento destinato al Consumer da cui proviene la richiesta:
@@ -76,38 +64,4 @@ public class RichiestaDocumenti {
 
     }
 
-
-    /** Restituisce il nome dell'attributo di un {@link File} che
-     * contiene l'array di hashtag riferiti a quel {@link File}.
-     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,String)
-     * metodo di invio dei file ai client}.*/
-    @Path("/nomePropHashtags")     // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeAttributoContenenteHashtagNeiFile() {
-        return File.getNomeAttributoContenenteHashtagNeiFile();
-    }
-
-    /** Restituisce il nome dell'attributo di un {@link File} che
-     * contiene la data di caricamento di quel {@link File}.
-     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,String)
-     * metodo di invio dei file ai client}.*/
-    @Path("/nomePropDataCaricamento")     // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeAttributoContenenteDataCaricamentoFile() {
-        return File.getNomeAttributoContenenteDataCaricamentoFile();
-    }
-
-    /** Restituisce il nome dell'attributo di un {@link File} che
-     * contiene la data di visualizzazione di quel {@link File}
-     * da parte del Consumer.
-     * Vedere anche il {@link #getElencoDocumenti(HttpServletRequest,String)
-     * metodo di invio dei file ai client}.*/
-    @Path("/nomePropDataVisualizzazione")     // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeAttributoContenenteDataVisualizzazioneFile() {
-        return File.getNomeAttributoContenenteDataVisualizzazioneFile();
-    }
 }

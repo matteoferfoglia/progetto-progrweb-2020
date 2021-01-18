@@ -198,7 +198,7 @@ export default {
  * e la restituisce come valore di una promise.*/
 const getNomiProprietaDocumenti = async () => {
 
-  return richiestaGet(process.env.VUE_APP_GET_NOMI_PROP_DOCUMENTI_PER_CONSUMER)
+  return richiestaGet(process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
     .then(  risposta       => risposta.data )
     .catch( rispostaErrore => {
       console.error("Errore durante il caricamento dell'intestazione della lista dei documenti: " + rispostaErrore );

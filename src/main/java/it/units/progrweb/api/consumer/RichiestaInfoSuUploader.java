@@ -12,9 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
@@ -92,24 +90,5 @@ public class RichiestaInfoSuUploader {
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
     }
-
-    /** Con riferimento a {@link #getUploader(String)}, questo metodo restituisce
-     * il nome della proprietà contenente il nome dell'Uploader.*/
-    @Path("/nomeProprietaNomeUploader")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldNomeUploader() {
-        return Uploader.getNomeFieldNomeUploader();
-    }
-
-    /** Con riferimento a {@link #getUploader(String)}, questo metodo restituisce
-     * il nome della proprietà contenente il logo dell'Uploader.*/
-    @Path("/nomeProprietaLogoUploader")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldLogoUploader() {
-        return Uploader.getNomeFieldLogoUploader();
-    }
-
 
 }
