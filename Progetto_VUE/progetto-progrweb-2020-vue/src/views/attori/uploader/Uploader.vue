@@ -183,7 +183,7 @@ export default {
       }
 
       // Richiesta di aggiunta consumer
-      richiestaPost( process.env.VUE_APP_ADD_CONSUMER_PER_QUESTO_UPLOADER,
+      richiestaPost( process.env.VUE_APP_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
                      unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken}) )
         .then( () => {
 
@@ -218,7 +218,7 @@ export default {
       // Chiedere al server la lista degli identificativi dei consumer il cui username inizia con i caratteri digitati
       richiestaGet(process.env.VUE_APP_GET_ID_CONSUMER_INIZIANTE_CON + "/" + caratteriDigitati)
         .then( risposta => {
-          this.suggerimentiAutocompletamentoUsernameConsumerDaAggiungere = risposta.data;
+          this.suggerimentiAutocompletamentoUsernameConsumerDaAggiungere = risposta;
         })
         .catch( console.error );
 
@@ -255,7 +255,7 @@ const getNomePropNomeConsumer = async () => {
   // TODO : verificare correttezza
 
   return richiestaGet( process.env.VUE_APP_GET_NOME_PROP_NOME_CONSUMER )
-      .then( risposta => risposta.data )
+      .then( risposta => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -274,7 +274,7 @@ const getNomePropEmailConsumer = async () => {
   // TODO : verificare correttezza
   // TODO : refactor ? Per richiedere il nome della prop con il nome del consumer è uguale...
   return richiestaGet( process.env.VUE_APP_GET_NOME_PROP_EMAIL_CONSUMER )
-      .then( risposta => risposta.data )
+      .then( risposta => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -293,7 +293,7 @@ const getNomePropUsernameConsumer = async () => {
   // TODO : verificare correttezza
   // TODO : refactor ? Per richiedere il nome della prop con il nome del consumer è uguale...
   return richiestaGet( process.env.VUE_APP_GET_NOME_PROP_USERNAME_CONSUMER )
-      .then( risposta => risposta.data )
+      .then( risposta => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -314,7 +314,7 @@ const getElencoConsumer = async () => {
   // TODO : verificare correttezza
 
     return richiestaGet( process.env.VUE_APP_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER )
-        .then( rispostaConListaConsumer => rispostaConListaConsumer.data )  // TODO : verificare che arrivi correttamente un array
+        .then( rispostaConListaConsumer => rispostaConListaConsumer )  // TODO : verificare che arrivi correttamente un array
         .catch( rispostaErrore => {
           console.error("Errore durante il caricamento deiConsumer: " + rispostaErrore );
           return Promise.reject(rispostaErrore);
@@ -329,7 +329,7 @@ const getElencoConsumer = async () => {
  * contiene un oggetto in cui ogni property è una proprietà del Consumer.*/
 const getInfoConsumer = idConsumer =>
     richiestaGet( process.env.VUE_APP_GET_INFO_CONSUMER + "/" + idConsumer )
-        .then( rispostaConProprietaConsumer => [ idConsumer, rispostaConProprietaConsumer.data ] ) ;
+        .then( rispostaConProprietaConsumer => [ idConsumer, rispostaConProprietaConsumer ] ) ;
 
 
 /** Dato l'array avente per elementi gli identificativi dei Consumer,

@@ -95,7 +95,7 @@ export default {
 const getNomeAttoreAttualmenteAutenticato = async () => {
 
   return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
-      .then(  risposta       =>  risposta.data )
+      .then(  risposta       =>  risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -109,7 +109,7 @@ const getNomeAttoreAttualmenteAutenticato = async () => {
 const getTipoAttoreAttualmenteAutenticato = async () => {
 
   return richiestaGet(process.env.VUE_APP_GET_TIPO_UTENTE_AUTENTICATO)
-      .then(  risposta       => risposta.data )
+      .then(  risposta       => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);

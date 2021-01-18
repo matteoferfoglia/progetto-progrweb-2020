@@ -199,7 +199,7 @@ export default {
 const getNomiProprietaDocumenti = async () => {
 
   return richiestaGet(process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
-    .then(  risposta       => risposta.data )
+    .then(  risposta       => risposta )
     .catch( rispostaErrore => {
       console.error("Errore durante il caricamento dell'intestazione della lista dei documenti: " + rispostaErrore );
       return Promise.reject(rispostaErrore);
@@ -225,7 +225,7 @@ const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // T
   return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER + "/" + idUploader)
         .then(  risposta       => {
           // Conversione da oggetto a mappa (Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries#converting_an_object_to_a_map)
-          return new Map(Object.entries(risposta.data));
+          return new Map(Object.entries(risposta));
         })
         .catch( rispostaErrore => {
           console.error("Errore durante il caricamento dell'intestazione della lista dei documenti: " + rispostaErrore );
@@ -248,7 +248,7 @@ const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // T
 const getNomePropertyHashtagsDeiDocumenti = async () => {
 
   return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
-        .then(  risposta       => risposta.data )
+        .then(  risposta       => risposta )
         .catch( rispostaErrore => {
           console.error("Errore durante la ricezione del nome dell'attributo " +
               "contenente gli hashtag nei documenti: " + rispostaErrore );

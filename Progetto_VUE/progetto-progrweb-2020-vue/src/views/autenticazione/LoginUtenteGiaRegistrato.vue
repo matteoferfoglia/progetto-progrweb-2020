@@ -92,7 +92,7 @@ export default {
         };
 
         richiestaPost(process.env.VUE_APP_LOGIN_SERVER_URL, campiFormDaInviareAlServer)
-            .then( risposta => loginRiuscito(risposta.data) )     // risposta.data contiene il token di autenticazione
+            .then( risposta => loginRiuscito(risposta) )     // risposta contiene il token di autenticazione
             .catch(risposta => loginFallito(risposta) );          // risposta contiene response, status e statusText (Fonte: https://stackoverflow.com/a/39153411)
       };
 

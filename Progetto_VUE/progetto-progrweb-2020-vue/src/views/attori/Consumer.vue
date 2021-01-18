@@ -129,7 +129,7 @@ export default {
 const getNomeAttoreAttualmenteAutenticato = async () => {
   // TODO aggiungerlo al token o a qualcosa che sia visibile dal client senza sprecare una richiesta al server (tra l'altro, se non c'è il nome nel token, il server dovrà cercarlo nel db e gli accessi costano).
   return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
-      .then(  risposta       =>  risposta.data )
+      .then(  risposta       =>  risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -146,7 +146,7 @@ const getNomeAttoreAttualmenteAutenticato = async () => {
  * valore di una promise risolta.*/
 const getIdentificativi_uploader_file = async () => {
   return richiestaGet(process.env.VUE_APP_GET_MAPPA_FILE_PER_QUESTO_CONSUMER)
-      .then(  risposta       =>  new Map(Object.entries(risposta.data)) )
+      .then(  risposta       =>  new Map(Object.entries(risposta)) )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -173,7 +173,7 @@ const getInfoUploaders = async arrayIdUploader => {
   return Promise.all( arrayIdUploader.map( idUploader => {   // Fonte: https://stackoverflow.com/a/31414472
 
     return richiestaGet( process.env.VUE_APP_GET_INFO_UPLOADER + "/" + idUploader ) // richiesta info uploader
-        .then( rispostaConNomeUploader => [ idUploader, rispostaConNomeUploader.data ] );
+        .then( rispostaConNomeUploader => [ idUploader, rispostaConNomeUploader ] );
 
   }))
       .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
@@ -195,7 +195,7 @@ const getNomePropNomeUploader = async () => {
   // TODO : verificare correttezza
 
   return richiestaGet(process.env.VUE_APP_GET_NOME_PROP_NOME_UPLOADER)
-      .then(  risposta       => risposta.data )
+      .then(  risposta       => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -214,7 +214,7 @@ const getNomePropLogoUploader = async () => {
   // TODO : verificare correttezza
 
   return richiestaGet(process.env.VUE_APP_GET_NOME_PROP_LOGO_UPLOADER)
-      .then(  risposta       => risposta.data )
+      .then(  risposta       => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);

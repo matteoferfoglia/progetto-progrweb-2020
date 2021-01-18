@@ -17,7 +17,7 @@ import {richiestaGet} from "./http";
  */
 export const richiediCSRFTokenAlServer = async () => {
     return await richiestaGet(process.env.VUE_APP_GET_CSRF_TOKEN_URL)
-        .then(risposta => risposta.data)
+        .then(risposta => risposta)
         .catch(risposta => {
             console.error("Errore durante il recupero del token CSRF: " + risposta );
             return Promise.reject(risposta);

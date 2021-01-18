@@ -117,7 +117,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                 richiestaGet(process.env.VUE_APP_GET_LOGO_UPLOADER + "/" +
                     routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) // Richiede il logo dell'Uploader al server
                     .then( logoBase64 => {
-                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] = logoBase64.data ;
+                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] = logoBase64 ;
                       next();
                     })
                     .catch( errore => {

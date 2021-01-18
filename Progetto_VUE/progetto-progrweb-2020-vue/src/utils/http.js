@@ -101,7 +101,7 @@ export const richiestaGet = (url,oggettoConParametri) => {
     const cloneConfigRichiesteHttp = aggiungiParametriAllaRequest(oggettoConParametri);
 
     return axios.get(url, cloneConfigRichiesteHttp)
-                .then(risposta => Promise.resolve(risposta) )
+                .then(risposta => Promise.resolve(risposta.data) )
                 .catch( onErrorHandler ) ;
 }
 
@@ -114,7 +114,7 @@ export const richiestaGet = (url,oggettoConParametri) => {
  */
 export const richiestaPost = (url, dati) => {
     return axios.post(url, dati, configRichiesteHttp.getConfig())
-        .then(risposta => Promise.resolve(risposta) )
+        .then(risposta => Promise.resolve(risposta.data) )
         .catch( onErrorHandler );
 }
 
@@ -147,7 +147,7 @@ export const richiestaDelete = (url, oggettoConParametri) => {
     const cloneConfigRichiesteHttp = aggiungiParametriAllaRequest(oggettoConParametri);
 
     return axios.delete(url, cloneConfigRichiesteHttp)
-        .then(risposta => Promise.resolve(risposta) )
+        .then(risposta => Promise.resolve(risposta.data) )
         .catch( onErrorHandler ) ;
 }
 

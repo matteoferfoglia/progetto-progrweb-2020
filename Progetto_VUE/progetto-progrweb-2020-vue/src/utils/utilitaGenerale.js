@@ -3,6 +3,8 @@
 // TODO : rivedere ed eventualmente ristrutturare questo script - serve??
 
 
+import {richiestaGet} from "./http";
+
 /** Restituisce true se l'oggetto passato come parametro
  è un array, false altrimenti.*/
 export const isArray = oggetto =>

@@ -158,7 +158,7 @@ export default {
 const getNomiPropDocumenti = async () => {
 
   return richiestaGet( process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
-      .then( risposta => risposta.data )
+      .then( risposta => risposta )
       .catch( rispostaErrore => {
         console.error("Errore: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -182,7 +182,7 @@ const getMappa_idFile_arrayIdFiles_perConsumer = async idConsumer => {
   return richiestaGet( process.env.VUE_APP_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + idConsumer )
 
       // Crea mappa
-      .then( rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop.data)) )
+      .then( rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)) )
 
       // TODO : molto simile al metodo in Lista Documenti Per Consumer
 
