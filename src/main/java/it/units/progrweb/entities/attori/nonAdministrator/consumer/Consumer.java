@@ -48,6 +48,17 @@ public abstract class Consumer extends UtenteNonAdministrator {
         return new ConsumerStorage( username, nominativo, email );
     }
 
+    /** Ricerca nel database il {@link Consumer} corrispondente
+     * allo username fornito e lo restituisce se presente,
+     * altrimenti restituisce null.*/
+    public static String getNominativoDaUsername(String usernameConsumer) {
+        try {
+            return ((Consumer)DatabaseHelper.getById( usernameConsumer, Consumer.class )).getNominativo();
+        } catch (NotFoundException notFoundException) {
+            return null;
+        }
+    }
+
     /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
      * di un'istanza di questa classe. Devono essere presenti le proprietà
      * i cui nomi sono restituiti dai metodi {@link #getNomeFieldNominativoConsumer()},

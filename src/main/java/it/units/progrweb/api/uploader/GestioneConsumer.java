@@ -193,4 +193,15 @@ public class GestioneConsumer {
 
     }
 
+
+    /** Dato lo username del consumer come @PathParam, restituisce il nome.*/
+    @Path("/nomeConsumer/{usernameConsumer}")
+    @GET
+    @Produces( MediaType.TEXT_PLAIN )
+    public String getNomeUploader( @PathParam("usernameConsumer") String usernameConsumer ) {
+
+        return Consumer.getNominativoDaUsername( usernameConsumer );
+
+    }
+
 }

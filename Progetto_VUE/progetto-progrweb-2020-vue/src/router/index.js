@@ -131,7 +131,9 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
             } else if ( routeDestinazione.matched.some(route => route.meta.requiresIdConsumer) ) {    // TODO : da verificare
 
-              if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
+              const idConsumer = routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ];
+
+              if( ! idConsumer ) {
 
                 // Se qui, nella route manca il parametro del consumer
                 console.error("Parametro " +
@@ -144,10 +146,18 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                 if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
 
                   // Se qui, nella route manca il parametro del consumer
-                  console.error("Parametro " +
-                      process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER +
-                      " mancante nella route.");
-                  next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
+                  richiestaGet( process.env.VUE_APP_GET_NOME_CONSUMER + "/" + idConsumer )
+                      .then( nomeConsumer => {
+                        // Salva il nome del consumer ed instrada
+                        routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] = nomeConsumer;
+                        next(routeDestinazione);
+                      })
+                      .catch( errore => {
+                        console.error("Parametro " +
+                          process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER +
+                          " mancante nella route.\n" + errore );
+                        next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
+                      });
 
                 } else {
 
