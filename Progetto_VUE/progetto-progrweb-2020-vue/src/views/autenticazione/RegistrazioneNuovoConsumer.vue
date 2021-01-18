@@ -4,7 +4,7 @@
   <form @submit.prevent="validaEdInviaForm">
     <label>Codice fiscale<input type="text" v-model="codiceFiscale" name="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="REGEX_CODICE_FISCALE" required autofocus></label>
     <label>Nome e cognome<input type="text" v-model="nominativo" name="nominativo" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required></label>
-    <label>Email<input type="email" v-model="email" name="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" required></label>
+    <label>Email<input type="email" v-model="email" name="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" :pattern="REGEX_EMAIL" required></label>
     <label>Password<input type="password" v-model="password" name="password" autocomplete="off" maxlength="100" required></label>
     <label>Conferma password<input type="password" v-model="confermaPassword" name="confermaPassword" autocomplete="off" maxlength="100" required></label>
     <input type="submit" value="Registrati">

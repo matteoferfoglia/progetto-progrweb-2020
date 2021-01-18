@@ -19,10 +19,6 @@ import {verificaAutenticazione} from "../utils/autenticazione";
 import {richiestaGet} from "../utils/http";
 
 
-/** Nelle route, nome del parametro con l'identificativo del consumer.*/
-const NOME_PARAM_ID_CONSUMER = "idConsumer";
-
-
 const routes = [
   {
     // Route non trovata (url invalido) (Fonte: https://router.vuejs.org/guide/essentials/redirect-and-alias.html#redirect)
@@ -56,30 +52,25 @@ const routes = [
     }
   },
   {
-    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
+          process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
     name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
     component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaUploader'),
     meta: {
-      requiresAuth: true  // TODO: require essere uploader
+      requiresAuth: true,  // TODO: require essere uploader
+      requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
+      requiresNomeConsumer: true, // per sapere il nome del consumer
     }
   },
   {
-    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" +
+          process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
     name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
     component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaConsumer'),
     meta: {
-      requiresAuth: true,  // TODO: require essere uploader
+      requiresAuth: true,  // TODO: require essere consumer
       requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
       requiresLogoUploader: true// logo Uploader
-    }
-  },
-  {
-    path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER_SCARICATI_DI_UN_CONSUMER + "/:" + NOME_PARAM_ID_CONSUMER,
-    name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER_SCARICATI_DI_UN_CONSUMER,
-    component: () => import('../views/ListaDocumentiVisualizzatiDaConsumer'),
-    meta: {
-      requiresAuth: true,
-      requiresIdConsumer: true // per sapere la lista di documenti destinata a quale Consumer
     }
   }
 ]
@@ -90,8 +81,17 @@ const router = createRouter({
 });
 
 
-// Gestione del routing
+// --------- Gestione del routing ---------
+
+// Permette di gestire il caso "utente richiede risorsa senza autenticazione,
+// lo mando alla pagina di login, poi lo rimando alla pagina che stava visitando"
+const MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE = "NON AUTENTICATO";
+const NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN = "motivoRedirectionVersoLogin";
+
+
 router.beforeEach((routeDestinazione, routeProvenienza, next) => {
+
+  // TODO : rivedere bene i percorsi di instradamento
 
   if( routeDestinazione.matched.some(route => route.meta.requiresAuth) ) {
     // Gestione instradamento per route che richiede autenticazione
@@ -100,22 +100,18 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
         .then( isUtenteAutenticato => {
 
-          // Permette di gestire il caso "utente richiede risorsa senza autenticazione,
-          // lo mando alla pagina di login, poi lo rimando alla pagina che stava visitando"
-          const MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE = "NON AUTENTICATO";
-          const NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN = "motivoRedirectionVersoLogin";
-
           if(isUtenteAutenticato) {
             // Autenticato
 
             if( routeDestinazione.matched.some(route => route.meta.requiresIdUploader) ) {
 
-              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]) {
+              if (! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]) {
                 // Se qui, nella route manca il parametro dell'uploader
-                console.error("Parametro " + process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER +
+                console.error("Parametro " +
+                    process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER +
                     " mancante nella route.");
                 next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
-              } else if ( !routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) {
+              } else if ( ! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) {
                 // Se qui, nella route manca il logo dell'uploader
 
                 richiestaGet(process.env.VUE_APP_GET_LOGO_UPLOADER + "/" +
@@ -135,10 +131,29 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
             } else if ( routeDestinazione.matched.some(route => route.meta.requiresIdConsumer) ) {    // TODO : da verificare
 
-              if( routeDestinazione.params[ NOME_PARAM_ID_CONSUMER ] ) {
-                next();
+              if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
+
+                // Se qui, nella route manca il parametro del consumer
+                console.error("Parametro " +
+                    process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER +
+                    " mancante nella route.");
+                next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
+
               } else {
-                next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});
+
+                if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
+
+                  // Se qui, nella route manca il parametro del consumer
+                  console.error("Parametro " +
+                      process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER +
+                      " mancante nella route.");
+                  next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
+
+                } else {
+
+                  next(); // instrada senza problemi se ci sono tutti i parametri
+                }
+
               }
 
 
@@ -158,23 +173,14 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
               next(routeRichiestaPrima);
 
             } else {
+
               next();
 
             }
           } else {
             // Non autenticato
 
-            next({
-              name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN, // redirect a login
-              params: {
-                // memorizzo la route richiesta e la passo al componente di login così può fare redirect dopo il login a ciò che aveva richiesto
-                [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: routeDestinazione.fullPath,
-                [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(routeDestinazione.params),
-                      // JSON perché devono essere stringhe (altrimenti gli oggetti annidati vengono passati come "[Object object]")
-
-                [NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN]: MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE
-              }
-            });
+            next( router.creaRouteAutenticazioneConInfoRichiesta( routeDestinazione ) );
 
           }
 
@@ -191,5 +197,29 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
   }
 
 });
+
+/** Crea una route per la pagina di autenticazione dell'utente,
+ * salvandosi le informazioni per poter reindirizzare (dopo
+ * l'autenticazione) l'utente alla route che aveva chiesto in
+ * precedenza.
+ * @param routeRichiesta
+ */
+router.creaRouteAutenticazioneConInfoRichiesta = routeRichiesta => {
+
+  // TODO : verificare che funzioni come da aspettative
+
+  return {
+    name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN, // redirect a login
+    params: {
+      // memorizzo la route richiesta e la passo al componente di login così può fare redirect dopo il login a ciò che aveva richiesto
+      [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: routeRichiesta.fullPath,
+      [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(routeRichiesta.params),
+      // JSON perché devono essere stringhe (altrimenti gli oggetti annidati vengono passati come "[Object object]")
+
+      [NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN]: MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE
+    }
+  }
+}
+
 
 export default router;

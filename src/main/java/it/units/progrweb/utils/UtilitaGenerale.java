@@ -3,6 +3,9 @@ package it.units.progrweb.utils;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -139,5 +142,26 @@ public class UtilitaGenerale {
                        .type(MediaType.APPLICATION_JSON)
                        .entity(JsonHelper.convertiMappaProprietaToStringaJson(mappa))
                        .build();
+    }
+
+    /** Effettua la conversione da Input Stream a byte[]
+     * (<a href="https://stackoverflow.com/a/1264737">Fonte</a>).*/
+    public static byte[] convertiInputStreamInByteArray( InputStream is ) {
+
+        final int CAPACITA_BUFFER_ARRAY = 16384;  // 16 KB
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[CAPACITA_BUFFER_ARRAY];
+
+        int nRead;
+        try {
+            while ((nRead = is.read(data, 0, data.length)) != -1)
+                buffer.write(data, 0, nRead);
+        } catch (IOException e) {
+            Logger.scriviEccezioneNelLog(UtilitaGenerale.class, e);
+        }
+
+        return buffer.toByteArray();
+
     }
 }

@@ -5,21 +5,19 @@
 
   <section>
     <p>Consumer: {{ nomeConsumer }}</p>
-
     <TabellaDocumenti :nomiColonneIntestazione  ="nomiPropDocumenti"
                       :elencoDocumentiDaMostrare="mappaDocumentiPerUnConsumer"
                       :nomePropLinkDownload     ="NOME_PROP_DOWNLOAD_DOCUMENTO"
                       :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"  />
   </section>
 
-  <form method="POST"
-        action="{{ process.env.VUE_APP_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER }}"
-        enctype="multipart/form-data" >  <!-- TODO : aggiungere csrf token -->
-    <!-- Fonte (Upload documento): https://stackoverflow.com/a/25889454 -->
+  <form @submit.prevent="caricaNuovoDocumento()" >  <!-- TODO : aggiungere csrf token -->
+    <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
     <p>Carica un nuovo documento:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
-    <label>Lista di hashtag <input type="text" v-model="listaHastag" placeholder="hashtag1, hashtag2" required></label>
-    <label>Documento        <input type="file" value="Scegli file"></label> <!-- TODO : caricare documento-->
+    <label>Lista di hashtag <input type="text" v-model="listaHashtag" placeholder="hashtag1, hashtag2" required></label>
+    <label>Documento        <input type="file"></label><!-- TODO : caricare documento-->
+    <input type="submit" value="Carica">
   </form>
 
 
@@ -28,25 +26,23 @@
 
 <script>
 import TabellaDocumenti from "./TabellaDocumenti";
-import {richiestaGet} from "../../utils/http";
+import {richiestaGet, richiestaPostConFile} from "../../utils/http";
 import {ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
 
 export default {
   name: "ListaDocumentiVistaDaUploader",
   components: {TabellaDocumenti},
-  props: [
-
-    /** Identificativo del consumer a cui i documenti si riferiscono.*/
-    "idConsumer",
-
-    /** Nome del consumer a cui i documenti si riferiscono.*/
-    "nomeConsumer"
-  ],
   data() {
     return {
 
       /** Flag, true quando questo componente è caricato.*/
       isLayoutCaricato: false,
+
+      /** Nome del consumer a cui i documenti si riferiscono.*/
+      nomeConsumer: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER],
+
+      /** Identificativo del consumer a cui i documenti si riferiscono.*/
+      idConsumer: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER],
 
       /** Nome delle colonne di intestazione della tabella coi documenti.*/
       nomiPropDocumenti: [],
@@ -64,9 +60,16 @@ export default {
 
 
 
+      // NOMI DEI PARAMETRI ATTESI DAL SERVER
+      nomeParametro_nomeDocumento:             "nomeFile",
+      nomeParametro_contenutoDocumento:        "contenutoFile",
+      nomeParametro_idConsumerDestinatario:    "usernameConsumerDestinatario",
+      nomeParametro_listaHashtag:              "listaHashtag",
+
+
       // PROPRIETA CARICAMENTO NUOVO DOCUMENTO:
       nomeDocumento: "",
-      listaHastag: ""
+      listaHashtag: ""
 
     }
   },
@@ -115,9 +118,38 @@ export default {
         .then( () => this.isLayoutCaricato = true )
         .catch( console.error );
 
+  },
+  methods: {
+
+    /** Funzione per inviare al server il nuovo documento
+     * oltre che i valori dei campi di input presi dal form.*/
+    caricaNuovoDocumento() {
+
+      // Costruzione dei parametri da inviare
+      const formData = new FormData();
+
+      formData.append( this.nomeParametro_contenutoDocumento,
+                       document.querySelector('input[type=file]').files[0] );
+      formData.append( this.nomeParametro_nomeDocumento, this.nomeDocumento );
+      formData.append( this.nomeParametro_idConsumerDestinatario, this.idConsumer );
+      formData.append( this.nomeParametro_listaHashtag, this.listaHashtag.trim().toLowerCase() );
+
+      // Controllo validità campi del form (false se qualche valore è falsy)
+      const formValido = Array.from(formData.values())
+                              .map(val => val ? 1 : 0)
+                              .reduce((a, b) => a * b) === 1;
+
+      if( formValido )
+        richiestaPostConFile( process.env.VUE_APP_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER, formData)
+          .then( () => alert( "Documento caricato" ) )
+          .catch( console.error );
+      else
+        console.error( "Campi del form non validi." );
+
+    }
+
   }
 }
-
 
 /** Richiede al server la lista dei nomi delle proprietà
  * dei documenti inviati da questo Uploader ai Consumer e,

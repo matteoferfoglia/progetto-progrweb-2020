@@ -29,7 +29,8 @@ public class StarterDatabase implements ServletContextListener {
             "it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage",
             "it.units.progrweb.entities.RelazioneUploaderConsumerFile",
             "it.units.progrweb.entities.AuthenticationDatabaseEntry",
-            "it.units.progrweb.entities.file.File"
+            "it.units.progrweb.entities.file.File",
+            "it.units.progrweb.entities.file.FileStorage"
     };
 
     // Salvare direttamente la classe (es.: FileStorage.class) non

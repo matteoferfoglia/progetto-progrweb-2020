@@ -12,6 +12,7 @@ import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -138,10 +139,12 @@ public class RelazioneUploaderConsumerFile {
         if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo1, RelazioneUploaderConsumerFile.class) ) {
             if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo2, RelazioneUploaderConsumerFile.class)) {
 
-                return (List<RelazioneUploaderConsumerFile>)
-                        DatabaseHelper.queryAnd(RelazioneUploaderConsumerFile.class,
+                return DatabaseHelper.queryAnd(RelazioneUploaderConsumerFile.class,
                                 nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, usernameUploader,
-                                nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, usernameConsumer);
+                                nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, usernameConsumer)
+                        .stream()
+                        .map( ris -> (RelazioneUploaderConsumerFile)ris )
+                        .collect( Collectors.toList() );
 
             } else {
                 Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
@@ -155,6 +158,28 @@ public class RelazioneUploaderConsumerFile {
         }
 
         return new ArrayList<>();   // nessun risultato dalla query
+
+    }
+
+
+    public static List<File> getListaFileDaUploaderAConsumer(String usernameUploader, String usernameConsumer) {
+
+        // TODO : refactoring del database (è un po' sprecato andare a cercare per id un'entità che magari nemmeno c'è) visto che fintanto che non viene caricato il primo file da consumer ad uploader il valore è fittizio
+
+        List<RelazioneUploaderConsumerFile> occorrenzeRelazione =
+                getOccorrenzeFiltratePerUploaderEConsumer( usernameUploader, usernameConsumer );
+        List<File> listaFile = occorrenzeRelazione.stream()
+                                                  .map( relazione -> {
+                                                      try {
+                                                          return File.getEntitaFromDbById( relazione.getIdFile() );
+                                                      } catch (NotFoundException notFoundException) {
+                                                          return null;
+                                                      }
+                                                  })
+                                                  .filter( Objects::nonNull )
+                                                  .collect(Collectors.toList());
+
+        return listaFile;
 
     }
 
@@ -196,7 +221,7 @@ public class RelazioneUploaderConsumerFile {
                     nomeAttributoConsumer
             )
                     .stream()
-                    .map( usernameConsumer -> (String)usernameConsumer )
+                    .map( occorrenzaDellaRelazione -> ((RelazioneUploaderConsumerFile)occorrenzaDellaRelazione).getUsernameConsumer() )
                     .collect(Collectors.toList());
 
             return risultato;
@@ -342,6 +367,23 @@ public class RelazioneUploaderConsumerFile {
     public static void aggiungiConsumerAdUploader(String usernameConsumer, String usernameUploader) {
 
         DatabaseHelper.salvaEntita( new RelazioneUploaderConsumerFile(usernameConsumer, usernameUploader, null) );
+
+    }
+
+    /** Crea un nuovo {@link File}, caricato dall'{@link Uploader} il
+     * cui username è fornito come parametro e destinato al {@link Consumer}
+     * il cui username è fornito come parametro.*/
+    public static void aggiungiFile(InputStream contenutoFile, String nomeFile, List<String> listaHashtag,
+                                    String usernameUploader, String usernameConsumer ) {
+
+        // Salva file in DB
+        byte[] contenuto = UtilitaGenerale.convertiInputStreamInByteArray( contenutoFile );
+        File fileSalvato = File.salvaFileInDb( nomeFile, contenuto, listaHashtag );
+
+        // Aggiungi relazione
+        RelazioneUploaderConsumerFile relazioneUploaderConsumerFile =
+                new RelazioneUploaderConsumerFile(usernameConsumer, usernameUploader, fileSalvato.getIdentificativoFile());
+        DatabaseHelper.salvaEntita(relazioneUploaderConsumerFile);
 
     }
 

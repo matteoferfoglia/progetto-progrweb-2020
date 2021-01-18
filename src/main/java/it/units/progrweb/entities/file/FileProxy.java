@@ -11,13 +11,8 @@ import java.util.Map;
  */
 public class FileProxy extends File {
 
-    // NOTA : questa classe estende File, quindi ne eredita gli attributi "protected"
-
-    /** Vedere {@link File#getConsumer()}.*/
-    private final Consumer consumerDestinatarioFile;
-
     /** Vedere {@link FileStorage#getIdentificativoFile()}.*/
-    private final String identificativoFile;
+    private final Long identificativoFile;
 
     /** Vedere {@link FileStorage#toMap_nomeProprieta_valoreProprieta()}.*/
     private final Map<String,?> rappresentazioneJson;
@@ -31,19 +26,13 @@ public class FileProxy extends File {
      * @param fileStorage Entità di cui creare il proxy.
      */
     public FileProxy(FileStorage fileStorage) {
-        this.consumerDestinatarioFile = fileStorage.getConsumer();
         this.identificativoFile = fileStorage.getIdentificativoFile();
         this.rappresentazioneJson = fileStorage.toMap_nomeProprieta_valoreProprieta();
         this.listaHashtag = fileStorage.getListaHashtag();
     }
 
     @Override
-    public Consumer getConsumer() {
-        return consumerDestinatarioFile;
-    }
-
-    @Override
-    public String getIdentificativoFile() {
+    public Long getIdentificativoFile() {
         return identificativoFile;
     }
 

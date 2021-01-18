@@ -60,7 +60,7 @@ public abstract class DatabaseHelper {
 
     /** Data una query ed i nomi degli attributi su cui eseguire la proiezione,
      * questo metodo esegue la query e restituisce la proiezione richiesta
-     * del risultato.*/
+     * del risultato. Comunque viene restituita l'intera entità.*/ // TODO : indagare meglio sul funzionamento di questo metodo
     public static List<?> proiezione(Query<Object> query, String ...nomiAttributiProiettare ) {
         if( query!= null && nomiAttributiProiettare.length>0 )
             return query.project( nomiAttributiProiettare ).distinct(true).list();

@@ -1,7 +1,9 @@
 <template v-if="layoutCaricato">
 
   <header>
-    <img class="logoUploader" src="{{ this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] }}" alt="Logo dell'Uploader">
+    <img class="logoUploader"
+         src="{{ this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] }}"
+         alt="Logo dell'Uploader">
 
     <!-- Mostra hashtag associati ai documenti mostrati e permette di filtrare -->
     <form v-if=" mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">

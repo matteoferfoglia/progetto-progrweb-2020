@@ -6,12 +6,17 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.UtilitaGenerale;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Classe per permettere ad un {@link Uploader} di gestire
@@ -69,25 +74,53 @@ public class GestioneDocumenti {
 
     }
 
-    /** Caricamento di un {@link File}. */
+    /** Caricamento di un {@link File}. Questo metodo attende dal
+     * client un file, il cui nome è specificato come @FormParam,
+     * e destinato al {@link Consumer} il cui username è
+     * specificato come @FormParam. L'uploader da cui proviene la
+     * richiesta viene determinato dagli header della richiesta
+     * stessa
+     * (<a href="https://docs.oracle.com/javaee/7/api/javax/ws/rs/FormParam.html">Fonte</a>,
+     * <a href="https://stackoverflow.com/a/25889454">Fonte</a>).*/
     @Path("/uploadDocumento")
-    @DELETE
-    public Response caricaFile(@Context HttpServletRequest httpServletRequest) {
+    @POST
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
+    public Response caricaFile(@Context HttpServletRequest httpServletRequest,
+                               @FormDataParam("contenutoFile")                InputStream contenuto,
+                               @FormDataParam("usernameConsumerDestinatario") String usernameConsumerDestinatario,
+                               @FormDataParam("nomeFile")                     String nomeFile,
+                               @FormDataParam("listaHashtag")                 String listaHashtag) {
 
-        // TODO
-        return null;
+
+        List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
+        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
+
+        RelazioneUploaderConsumerFile.aggiungiFile( contenuto, nomeFile, listaHashtag_list,
+                                                    usernameUploader, usernameConsumerDestinatario );
+
+        return Response.noContent().build();
 
     }
 
     /** Restituisce una mappa in cui ogni entry ha per chiave l'identificativo
      * di un {@link File} e come valore corrispondente l'oggetto che rappresenta
-     * il {@link File} in termini delle sue proprietà. */
-    @Path("/mappa-idFile-propFile")
-    @DELETE
-    public Response eliminaFile(@Context HttpServletRequest httpServletRequest) {
+     * il {@link File} in termini delle sue proprietà. Nella mappa sono presenti
+     * tutti i file caricati dall'{@link Uploader} attualmente autenticato e
+     * destinati al {@link Consumer} il cui username è specificato come
+     * PathParam.*/
+    @Path("/mappa-idFile-propFile/{usernameConsumer}")
+    @GET
+    public Response getElencoFile(@Context HttpServletRequest httpServletRequest,
+                                  @PathParam("usernameConsumer") String usernameConsumer) {
 
-        // TODO
-        return null;
+        // TODO rivere (Method not allowed ??)
+
+        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
+
+        List<File> fileDaRestituire =
+                RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer( usernameUploader, usernameConsumer );
+
+        return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire ) );
 
     }
 

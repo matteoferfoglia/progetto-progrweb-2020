@@ -12,10 +12,10 @@
       <ol>
         <li v-for="uploader in Array.from(mappa_uploaders.entries())"
             :key="uploader[0]/*Id dell'uploader*/">
-          <router-link :to="{ name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
+          <router-link :to="{ name: vueRouter_vistaDocumenti,
                               params: {
-                                [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[0],                           // id uploader
-                                [process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: uploader[1][NOME_PROP_LOGO_UPLOADER] // logo uploader
+                                [vueRouter_idUploader]:   uploader[0],                           // id uploader
+                                [vueRouter_logoUploader]: uploader[1][NOME_PROP_LOGO_UPLOADER] // logo uploader
                               }
                             }" >
             <!-- Link alla lista documenti-->
@@ -74,7 +74,15 @@ export default {
 
       /** Nome della proprietà contenente il logo dell'uploader
        * all'interno dell'oggetto nei valori della {@link #mappa_uploaders}.*/
-      NOME_PROP_LOGO_UPLOADER: undefined
+      NOME_PROP_LOGO_UPLOADER: undefined,
+
+      // Parametri Vue-Router
+      /** Nome della vista dei documenti caricati da questo Uploader per il Consumer specificato.*/
+      vueRouter_vistaDocumenti: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
+      /** Identificativo del consumer di cui si vogliono visualizzare i documenti.*/
+      vueRouter_idUploader: process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+      /** Nome del consumer di cui si vogliono visualizzare i documenti.*/
+      vueRouter_logoUploader: process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER
 
     }
   },

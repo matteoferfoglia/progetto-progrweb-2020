@@ -11,7 +11,6 @@
             v-for="consumer in Array.from(mappa_idConsumer_proprietaConsumer.entries())"
             :key="consumer[0]/*Id del consumer*/">
           <SchedaUnConsumer :consumer="consumer"
-                            :nomeUploader="nomeUploader"
                             :NOME_PROP_NOME_CONSUMER    ="NOME_PROP_NOME_CONSUMER"
                             :NOME_PROP_USERNAME_CONSUMER="NOME_PROP_USERNAME_CONSUMER"
                             :NOME_PROP_EMAIL_CONSUMER   ="NOME_PROP_EMAIL_CONSUMER"    />
@@ -23,7 +22,9 @@
         Aggiungi un <i>Consumer</i>
         <input type="text" v-model="usernameNuovoConsumer"
                name="{{ NOME_PROP_USERNAME_CONSUMER }}"
+               :pattern="REGEX_CODICE_FISCALE"
                placeholder="Username"
+               maxlength="100"
                @click.stop=" mostraOpzioniAutocompletamento = true "
                required />
         <datalist @keyup.stop="autocompletamentoUsername(usernameNuovoConsumer)"> <!-- TODO : menu a tendina DA VERIFICARE IL FUNZIONAMENTO -->
@@ -34,8 +35,8 @@
           </option>
         </datalist>
 
-        <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" required/>
-        <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="Email" required/>
+        <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" maxlength="100"  required/>
+        <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="xxxxxx@example.com" maxlength="100" :pattern="REGEX_EMAIL"  required/>
 
         <input type="submit" value="Aggiungi"/>
       </p>
@@ -60,6 +61,12 @@ export default {
 
       /** CSRF token.*/
       csrfToken: undefined,
+
+      /** RegEx codice fiscale.*/
+      REGEX_CODICE_FISCALE: process.env.VUE_APP_REGEX_CODICE_FISCALE,
+
+      /** RegEx email.*/
+      REGEX_EMAIL: process.env.VUE_APP_REGEX_EMAIL,
 
       /** Flag, true quando il layout è caricato.*/
       layoutCaricato: false,
@@ -188,7 +195,8 @@ export default {
 
         })
         .catch( errore => {
-          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer + "." );
+          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer +
+              " perché " + errore.data.charAt(0).toLowerCase() + errore.data.substring(1) );
           console.error( "Errore durante la procedura di aggiunta nuovo Consumer.");
           console.error( errore );
         })

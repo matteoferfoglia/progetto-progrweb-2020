@@ -2,21 +2,26 @@
 
   <!-- Componente per mostrare ad un Uploader la scheda di un Consumer -->
 
-  <router-link :to="{ path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER_SCARICATI_DI_UN_CONSUMER + '/' + consumer[0] }"
-               :idConsumer                  ="consumer[0]"
-               :nomeConsumer                ="consumer[1][NOME_PROP_NOME_CONSUMER]" >
+  <router-link :to="{ name: vueRouter_vistaDocumenti,
+                      params: {
+                        [vueRouter_idConsumer]:   consumer[0],
+                        [vueRouter_nomeConsumer]: consumer[1][NOME_PROP_NOME_CONSUMER]
+                      }
+                    }" >
 
-    <ol>
-      <li>{{ this.camelCaseToHumanReadable(NOME_PROP_NOME_CONSUMER)     }}: <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}     </span></li>
-      <li>{{ this.camelCaseToHumanReadable(NOME_PROP_EMAIL_CONSUMER)    }}: <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}    </span></li>
-      <li>{{ this.camelCaseToHumanReadable(NOME_PROP_USERNAME_CONSUMER) }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }} </span></li>
-    </ol>
+    <ul>
+      <li>{{ camelCaseToHumanReadable(NOME_PROP_NOME_CONSUMER)     }}: <span class="nome">{{ consumer[1][NOME_PROP_NOME_CONSUMER] }}     </span></li>
+      <li>{{ camelCaseToHumanReadable(NOME_PROP_EMAIL_CONSUMER)    }}: <span class="nome">{{ consumer[1][NOME_PROP_EMAIL_CONSUMER] }}    </span></li>
+      <li>{{ camelCaseToHumanReadable(NOME_PROP_USERNAME_CONSUMER) }}: <span class="nome">{{ consumer[1][NOME_PROP_USERNAME_CONSUMER] }} </span></li>
+    </ul>
 
   </router-link>
 
 </template>
 
 <script>
+
+import {camelCaseToHumanReadable} from "../../../utils/utilitaGenerale";
 
 export default {
   name: "SchedaUnConsumer",
@@ -40,7 +45,22 @@ export default {
      * della property con il suo username.*/
     "NOME_PROP_USERNAME_CONSUMER",
 
-  ]
+  ],
+  data() {
+    return {
+
+      // Parametri Vue-Router
+      /** Nome della vista dei documenti caricati da questo Uploader per il Consumer specificato.*/
+      vueRouter_vistaDocumenti: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
+      /** Identificativo del consumer di cui si vogliono visualizzare i documenti.*/
+      vueRouter_idConsumer: process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
+      /** Nome del consumer di cui si vogliono visualizzare i documenti.*/
+      vueRouter_nomeConsumer: process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
+
+      // Copia della funzione importata, per usarla nel template
+      camelCaseToHumanReadable: camelCaseToHumanReadable
+    }
+  }
 }
 
 </script>

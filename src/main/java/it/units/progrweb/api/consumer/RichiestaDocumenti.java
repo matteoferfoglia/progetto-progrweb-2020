@@ -3,7 +3,6 @@ package it.units.progrweb.api.consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Classe per rispondere alla richiesta di documenti destinati
@@ -58,13 +56,7 @@ public class RichiestaDocumenti {
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getAnteprimaFiles(usernameUploader);
 
-        Map<String,String> mappa_idFile_propFileInJson =
-               listaFile.stream()
-                        .collect(Collectors.toMap(
-                                File::getIdentificativoFile,
-                                file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta()) // Ogni elemento dello stream contiene la descrizione JSON di un file
-                            )
-                        );
+        Map<String, String> mappa_idFile_propFileInJson = File.getMappa_idFile_propFile(listaFile);
 
         return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFileInJson);
 

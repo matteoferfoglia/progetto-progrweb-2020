@@ -10,6 +10,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.datetime.DateTime;
 
@@ -19,7 +20,9 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Rappresentazione di un file, caricato da un
@@ -124,9 +127,21 @@ public abstract class File {
             return null;
     }
 
-    /** Restituisce il Consumer a cui è destinato questo file.*/
-    public abstract Consumer getConsumer();
+    /** Data una lista di {@link File}, costruisce una mappa avente per chiave
+     * l'identificativo per i file e come valore il file rappresentato come
+     * oggetto JSON.*/
+    public static Map<String, String> getMappa_idFile_propFile(List<File> listaFile) {
+        // TODO : refactoring potrebbe essere meglio avere una classe documenti che risponda alle richieste di documenti, sia di Consumer sia di Uploaders
 
+        Map<String,String> mappa_idFile_propFileInJson =
+               listaFile.stream()
+                        .collect(Collectors.toMap(
+                                file -> String.valueOf( file.getIdentificativoFile() ),
+                                file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta()) // Ogni elemento dello stream contiene la descrizione JSON di un file
+                            )
+                        );
+        return mappa_idFile_propFileInJson;
+    }
 
     /**
      * Restituisce un array contenente i nomi degli attributi
@@ -145,7 +160,7 @@ public abstract class File {
     }
 
     /** Restituisce l'identificativo del file.*/
-    public abstract String getIdentificativoFile();
+    public abstract Long getIdentificativoFile();
 
     /** Restituisce la mappa nome-valore degli attributi di un file
      * ritenuti rilevanti dalla classe concreta che implementa questo
@@ -192,6 +207,16 @@ public abstract class File {
         } catch (NotFoundException notFoundException) {
             return NotFoundException.creaResponseNotFound("File non trovato.");
         }
+
+    }
+
+
+    /** Crea, salva nel database e restituisce un'istanza di questa classe in base ai parametri.*/
+    public static File salvaFileInDb( String nomeFile, byte[] contenuto, List<String> listaHashtag ) {
+
+        FileStorage fileStorage = new FileStorage(nomeFile, contenuto, listaHashtag);
+        DatabaseHelper.salvaEntita( fileStorage );  // TODO : verificare che a questo punto sia disponibile l'@Id del file
+        return fileStorage;
 
     }
 }

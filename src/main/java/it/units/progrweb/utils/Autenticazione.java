@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.NoSuchElementException;
 
 import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanumerico;
 
@@ -252,8 +253,14 @@ public class Autenticazione {
 
         String identificativoAttoreDaToken = jwtTokenAutenticazione.getValoreSubjectClaim();
         String hashNelTokenAutenticazione = (String) jwtTokenAutenticazione.getValoreClaimByName(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE);
-        String valoreCookieId = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
-                                      .getValue();
+        String valoreCookieId;
+        try {
+            valoreCookieId = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
+                                    .getValue();
+        } catch ( NoSuchElementException e) {
+            // Cookie non trovato
+            return false;
+        }
         Attore attoreCheStaAutenticandosi = Attore.getAttoreById(String.valueOf(identificativoAttoreDaToken));
 
         String hashPasswordClient = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attoreCheStaAutenticandosi);
@@ -316,6 +323,8 @@ public class Autenticazione {
     public static Attore getAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
 
         // TODO : da testare
+
+        // TODO : vedere dov'è stato usato questo metodo (getTokenAutenticazioneBearer fa accessi costosi al database)
 
         String tokenAutenticazione = getTokenAutenticazioneBearer(httpServletRequest);
         Attore attore = getAttoreDaTokenAutenticazione(tokenAutenticazione);

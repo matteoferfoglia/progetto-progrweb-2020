@@ -12,6 +12,7 @@ import it.units.progrweb.utils.datetime.DateTime;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -37,18 +38,13 @@ class FileStorage extends File {
     private byte[] file;   // byte[] automaticamente convertito in Blob nel datastore
 
 
-    /** Ref del {@link Consumer} a cui è indirizzato il file.*/
-    @Index
-    @Load
-    private Ref<Consumer> consumer; // TODO : quando si crea un file, ricordarsi di impostare il consumer destinatario
-
-
     private FileStorage(){}
 
     /** Crea un nuovo file, con nome ed hashtags specificati. */
-    public FileStorage(String nomeDocumento, String... hashtags) {
+    public FileStorage(String nomeDocumento, byte[] contenuto, List<String> hashtags) {
         super(nomeDocumento, DateTime.adesso());
-        this.listaHashtag = Arrays.asList(hashtags);
+        this.file = contenuto;
+        this.listaHashtag = hashtags;
     }
 
 
@@ -93,11 +89,6 @@ class FileStorage extends File {
     }
 
     @Override
-    public Consumer getConsumer() {
-        return consumer.get();
-    }
-
-    @Override
     public Map<String, ?> toMap_nomeProprieta_valoreProprieta() {
         Map<String, Object> mappaNomeValoreProprieta;
 
@@ -117,12 +108,8 @@ class FileStorage extends File {
         return mappaNomeValoreProprieta;        // TODO : testare che funzioni (controllare il tipo del valore)
     }
 
-    public void setConsumer(Consumer consumer) {
-        this.consumer = Ref.create(consumer);
-    }
-
-    public String getIdentificativoFile() {
-        return String.valueOf(identificativoFile);
+    public Long getIdentificativoFile() {
+        return identificativoFile;
     }
 
     public List<String> getListaHashtag() {

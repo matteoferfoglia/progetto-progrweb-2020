@@ -46,13 +46,18 @@ class ResocontoDiUnUploader {
      * Crea il resoconto associato all'uploader specificato, nel periodo specificato.
      */
     public ResocontoDiUnUploader(Uploader uploader, PeriodoTemporale periodoTemporale) {
+        // TODO : rivedere (basta username preso dal token senza cercare uploader nel db)
+
+        // TODO : spostare relazione consumer - uploader in file: se non c'è data caricamento, non
+        //         è un file, indicizzare data caricamento e filtrare su data caricamento;
+        //         restituire la lista dei documenti filtrati e su essa puoi contare i consumer distinti
         this.uploader = uploader;
         this.periodoTemporaleDiRiferimento = periodoTemporale;
         this.listaDocumentiCaricati = Uploader.getDocumentiCaricatiNelPeriodoDallUploader(periodoTemporale, uploader);
         this.numeroDocumentiCaricati = this.listaDocumentiCaricati.size();
         this.numeroConsumersDistintiCuiDocumentiCaricatiRiferiscono =
                 this.listaDocumentiCaricati.stream()
-                        .map(File::getConsumer)
+                        .map(File::getNomeDocumento)    // TODO : è sbagliato !!! solo temporaneo !!!!
                         .distinct()
                         .count();   // TODO : rifare ! iterare sui consumer o aggiungere Key<Consumer> consumer in File per avere mapping bidirezionale
     }
@@ -64,10 +69,6 @@ class ResocontoDiUnUploader {
 
     public PeriodoTemporale getPeriodoTemporaleDiRiferimento() {
         return periodoTemporaleDiRiferimento;
-    }
-
-    public List<File> getListaDocumentiCaricati() {
-        return listaDocumentiCaricati;
     }
 
     public long getNumeroDocumentiCaricati() {
