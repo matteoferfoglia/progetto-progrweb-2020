@@ -11,11 +11,11 @@
                       :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"  />
   </section>
 
-  <form @submit.prevent="caricaNuovoDocumento()" >  <!-- TODO : aggiungere csrf token -->
+  <form @submit.prevent="caricaNuovoDocumento" id="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
     <p>Carica un nuovo documento:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
-    <label>Lista di hashtag <input type="text" v-model="listaHashtag" placeholder="hashtag1, hashtag2" required></label>
+    <label>Lista di hashtag <input type="text" v-model="listaHashtag" placeholder="hashtag1, hashtag2"></label>
     <label>Documento        <input type="file"></label><!-- TODO : caricare documento-->
     <input type="submit" value="Carica">
   </form>
@@ -125,23 +125,29 @@ export default {
      * oltre che i valori dei campi di input presi dal form.*/
     caricaNuovoDocumento() {
 
+      // Recupera il documento dal form
+      const inputFile = document.querySelector('input[type=file]');
+      const documento = inputFile.files[0];
+
       // Costruzione dei parametri da inviare
       const formData = new FormData();
-
-      formData.append( this.nomeParametro_contenutoDocumento,
-                       document.querySelector('input[type=file]').files[0] );
+      formData.append( this.nomeParametro_contenutoDocumento, documento );
       formData.append( this.nomeParametro_nomeDocumento, this.nomeDocumento );
       formData.append( this.nomeParametro_idConsumerDestinatario, this.idConsumer );
       formData.append( this.nomeParametro_listaHashtag, this.listaHashtag.trim().toLowerCase() );
 
-      // Controllo validità campi del form (false se qualche valore è falsy)
-      const formValido = Array.from(formData.values())
-                              .map(val => val ? 1 : 0)
-                              .reduce((a, b) => a * b) === 1;
+      // Controllo validità campi del form
+      const formValido = documento && this.nomeDocumento;  // che siano truthy
 
       if( formValido )
         richiestaPostConFile( process.env.VUE_APP_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER, formData)
-          .then( () => alert( "Documento caricato" ) )
+          .then( () => {
+            alert("Documento caricato");
+
+            // Pulisci i campi
+            document.getElementById("caricaNuovoDocumento").reset();
+
+          })
           .catch( console.error );
       else
         console.error( "Campi del form non validi." );
