@@ -180,7 +180,7 @@ const onErrorHandler = errore => {
 
     if( errore.response.status === HTTP_STATUS_UNAUTHORIZED ) {
         console.log( "Redirection a pagina di autenticazione." );   // TODO : scommentare la prossima riga (giusto che faccia redirect)
-        return Promise.reject( router.push( router.creaRouteAutenticazioneConInfoRichiesta( router.currentRoute ) ) );
+        router.push( router.creaRouteAutenticazioneConInfoRichiesta( router.currentRoute ) ) ;
     }
 
     else return Promise.reject( errore.response );

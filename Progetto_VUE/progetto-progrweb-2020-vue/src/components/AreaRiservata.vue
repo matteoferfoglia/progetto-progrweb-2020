@@ -12,6 +12,9 @@
                  @csrf-token-modificato="csrfTokenLogout = $event" />
   <Administrator v-else-if="isAdministrator()" />
 
+
+  <router-view/>
+
 </template>
 
 <script>

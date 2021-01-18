@@ -20,6 +20,8 @@
     <input type="submit" value="Carica">
   </form>
 
+  <button @click="chiudiListaDocumentiUnConsumer">Chiudi</button>
+
 
 
 </template>
@@ -152,6 +154,10 @@ export default {
       else
         console.error( "Campi del form non validi." );
 
+    },
+
+    chiudiListaDocumentiUnConsumer() {
+      this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
     }
 
   }
