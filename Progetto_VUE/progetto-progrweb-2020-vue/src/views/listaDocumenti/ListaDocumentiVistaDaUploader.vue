@@ -103,7 +103,7 @@ export default {
 
 
       // Richiede l'elenco dei nomi delle properties dei documenti per i Consumer
-      await getNomiPropDocumenti()
+      await richiestaGet( process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
           // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
           // documento (da creare dinamicamente), poi salva l'array
           .then( nomiPropDocumenti => {
@@ -155,21 +155,6 @@ export default {
     }
 
   }
-}
-
-/** Richiede al server la lista dei nomi delle proprietà
- * dei documenti inviati da questo Uploader ai Consumer e,
- * se la richiesta va a buon fine, li restituisce in un array
- * come valore di una Promise risolta.*/
-const getNomiPropDocumenti = async () => {
-
-  return richiestaGet( process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
-      .then( risposta => risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-      });
-
 }
 
 

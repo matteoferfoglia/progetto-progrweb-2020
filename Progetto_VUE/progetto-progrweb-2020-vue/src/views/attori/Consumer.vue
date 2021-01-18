@@ -90,13 +90,13 @@ export default {
 
     const caricaQuestoComponente = async () => {
 
-      await getNomeAttoreAttualmenteAutenticato()
+      await richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
             .then( nome => this.nomeAttoreAttualmenteAutenticato = nome );
 
             // Richiede nomi delle properties negli oggetti ricevuti dal server
-      await getNomePropNomeUploader()         // richiede nome prop con nome uploader
+      await richiestaGet(process.env.VUE_APP_GET_NOME_PROP_NOME_UPLOADER)                 // richiede nome prop con nome uploader
             .then( nomePropNomeUploader => this.NOME_PROP_NOME_UPLOADER = nomePropNomeUploader )
-            .then( getNomePropLogoUploader )  // richiede nome prop con logo uploader
+            .then( () => richiestaGet(process.env.VUE_APP_GET_NOME_PROP_LOGO_UPLOADER) )  // richiede nome prop con logo uploader
             .then( nomePropLogoUploader => this.NOME_PROP_LOGO_UPLOADER = nomePropLogoUploader )
 
             // Richiede identificativi uploader e corrispondenti identificativi dei file
@@ -122,20 +122,6 @@ export default {
     caricaQuestoComponente().then( () => this.layoutCaricato = true );
 
   }
-}
-
-
-/** Restituisce il nome dell'attore attualmente autenticato.*/
-const getNomeAttoreAttualmenteAutenticato = async () => {
-  // TODO aggiungerlo al token o a qualcosa che sia visibile dal client senza sprecare una richiesta al server (tra l'altro, se non c'è il nome nel token, il server dovrà cercarlo nel db e gli accessi costano).
-  return richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
-      .then(  risposta       =>  risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
 }
 
 /** Richiede al server una mappa avente per chiave l'identificativo
@@ -179,44 +165,6 @@ const getInfoUploaders = async arrayIdUploader => {
       .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni sugli Uploader: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
-/** Richiede al server il nome della proprietà contenente il nome di un
- * uploader nell'oggetto nel valore di un'entry della mappa restituita da
- * {@link getInfoUploaders}.
- */
-const getNomePropNomeUploader = async () => {
-
-  // TODO : verificare correttezza
-
-  return richiestaGet(process.env.VUE_APP_GET_NOME_PROP_NOME_UPLOADER)
-      .then(  risposta       => risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
-/** Richiede al server il nome della proprietà contenente l'immagine logo di un
- * uploader nell'oggetto nel valore di un'entry della mappa restituita da
- * {@link getInfoUploaders}.
- */
-const getNomePropLogoUploader = async () => {
-
-  // TODO : verificare correttezza
-
-  return richiestaGet(process.env.VUE_APP_GET_NOME_PROP_LOGO_UPLOADER)
-      .then(  risposta       => risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
         // TODO : gestire l'errore (invio mail ai gestori?)
         // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico

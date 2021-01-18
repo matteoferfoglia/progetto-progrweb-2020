@@ -141,7 +141,7 @@ export default {
 
     const caricaContenuto = async () => {   // Grazie ad async, restituisce una Promise (usata dopo)
 
-      await getNomiProprietaDocumenti()
+      await richiestaGet(process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
               .then( intestazione =>
                   this.nomiColonneIntestazione =
                       intestazione.forEach( nomeProp => camelCaseToHumanReadable( nomeProp ) )
@@ -152,12 +152,12 @@ export default {
 
               // Crea l'indice degli hashtag
               .then( elencoDocumenti => {
-                getNomePropertyHashtagsDeiDocumenti()
-                      .then( nomePropertyHashtags => {
-                        this.mappa_hashtag_idDocumenti =
-                            creaIndiceDeiFileRispettoAgliHashtagCheContengono(elencoDocumenti, nomePropertyHashtags);
-                        this.nomeProprietaHashtagInListaDocumenti = nomePropertyHashtags;
-                      });
+                richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
+                  .then( nomePropertyHashtags => {
+                    this.mappa_hashtag_idDocumenti =
+                        creaIndiceDeiFileRispettoAgliHashtagCheContengono(elencoDocumenti, nomePropertyHashtags);
+                    this.nomeProprietaHashtagInListaDocumenti = nomePropertyHashtags;
+                  });
                 return elencoDocumenti;
               })
 
@@ -194,20 +194,6 @@ export default {
 
 }
 
-/** Richiede al server l'intestazione della tabella dei documenti
- * e la restituisce come valore di una promise.*/
-const getNomiProprietaDocumenti = async () => {
-
-  return richiestaGet(process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
-    .then(  risposta       => risposta )
-    .catch( rispostaErrore => {
-      console.error("Errore durante il caricamento dell'intestazione della lista dei documenti: " + rispostaErrore );
-      return Promise.reject(rispostaErrore);
-      // TODO : gestire l'errore (invio mail ai gestori?)
-      // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-    });
-
-}
 
 /** Richiede al server tutti i documenti destinati al Consumer
  * attualmente autenticato. Con <i>documento</i>, in questo
@@ -236,28 +222,6 @@ const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // T
 
 }
 
-/** Con riferimento a {@link #getElencoDocumentiPerQuestoConsumer},
- * questa funzione richiede al server il nome dell'attributo di un
- * oggetto "documento" il cui valore è la lista degli hashtag di
- * quel documento.
- * L'oggetto "lista documenti" viene costruito dal server, quindi
- * deve essere il server a dire al client quale property contiene
- * la lista di documenti.
- * Se la richiesta va a buon fine, viene restituita una Promise
- * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyHashtagsDeiDocumenti = async () => {
-
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
-        .then(  risposta       => risposta )
-        .catch( rispostaErrore => {
-          console.error("Errore durante la ricezione del nome dell'attributo " +
-              "contenente gli hashtag nei documenti: " + rispostaErrore );
-          return Promise.reject(rispostaErrore);
-          // TODO : gestire l'errore (invio mail ai gestori?)
-          // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-        });
-
-}
 </script>
 
 <style scoped>

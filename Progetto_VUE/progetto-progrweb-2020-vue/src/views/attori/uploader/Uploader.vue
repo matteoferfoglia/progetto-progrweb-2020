@@ -113,15 +113,15 @@ export default {
     const caricaQuestoComponente = async () => {
 
             // richiede il nome della prop contenente il nome di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
-      await getNomePropNomeConsumer()
+      await richiestaGet( process.env.VUE_APP_GET_NOME_PROP_NOME_CONSUMER )
             .then( nomePropNomeConsumer => this.NOME_PROP_NOME_CONSUMER = nomePropNomeConsumer )
 
             // richiede il nome della prop contenente l'email di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
-            .then( getNomePropEmailConsumer )
+            .then( () => richiestaGet( process.env.VUE_APP_GET_NOME_PROP_EMAIL_CONSUMER ) )
             .then( nomePropEmailConsumer => this.NOME_PROP_EMAIL_CONSUMER = nomePropEmailConsumer )
 
             // richiede il nome della prop contenente lo username di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
-            .then( getNomePropUsernameConsumer )
+            .then( () => richiestaGet( process.env.VUE_APP_GET_NOME_PROP_USERNAME_CONSUMER ) )
             .then( nomePropUsernameConsumer => this.NOME_PROP_USERNAME_CONSUMER = nomePropUsernameConsumer )
 
             // Richiede l'elenco dei consumer associati con questo uploader
@@ -244,65 +244,6 @@ export default {
 
   }
 }
-
-
-/** Richiede al server il nome della property contenente il nome di un
- * consumer nell'oggetto con le proprietà di un consumer quando viene
- * restituito dal server. Vedere {@link getMappa_idConsumer_proprietaConsumer}.
- */
-const getNomePropNomeConsumer = async () => {
-
-  // TODO : verificare correttezza
-
-  return richiestaGet( process.env.VUE_APP_GET_NOME_PROP_NOME_CONSUMER )
-      .then( risposta => risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
-/** Richiede al server il nome della property contenente l'email di un
- * consumer nell'oggetto con le proprietà di un consumer quando viene
- * restituito dal server. Vedere {@link getMappa_idConsumer_proprietaConsumer}.
- */
-const getNomePropEmailConsumer = async () => {
-
-  // TODO : verificare correttezza
-  // TODO : refactor ? Per richiedere il nome della prop con il nome del consumer è uguale...
-  return richiestaGet( process.env.VUE_APP_GET_NOME_PROP_EMAIL_CONSUMER )
-      .then( risposta => risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
-/** Richiede al server il nome della property contenente lo username di un
- * consumer nell'oggetto con le proprietà di un consumer quando viene
- * restituito dal server. Vedere {@link getMappa_idConsumer_proprietaConsumer}.
- */
-const getNomePropUsernameConsumer = async () => {
-
-  // TODO : verificare correttezza
-  // TODO : refactor ? Per richiedere il nome della prop con il nome del consumer è uguale...
-  return richiestaGet( process.env.VUE_APP_GET_NOME_PROP_USERNAME_CONSUMER )
-      .then( risposta => risposta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
 
 /** Richiede al server l'elenco di tutti i Consumer associati
  * con questo Uploader. Se la richiesta va a buon fine, questa
