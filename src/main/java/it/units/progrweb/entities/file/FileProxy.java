@@ -12,7 +12,7 @@ public class FileProxy extends File {
     /** Vedere {@link FileStorage#getIdentificativoFile()}.*/
     private final Long identificativoFile;
 
-    /** Vedere {@link FileStorage#toMap_nomeProprieta_valoreProprieta()}.*/
+    /** Vedere {@link FileStorage#toMap_nomeProprieta_valoreProprieta(boolean)}.*/
     private final Map<String,?> rappresentazioneJson;
 
     /** Vedere {@link FileStorage#getListaHashtag()}.*/
@@ -22,15 +22,16 @@ public class FileProxy extends File {
     /** Data un'istanza di {@link it.units.progrweb.entities.file.FileStorage},
      * restituisce un'istanza di questa classe, che funge da proxy per quella data.
      * @param fileStorage Entità di cui creare il proxy.
+     * @param includiMetadati true se si vogliono includere i metadati del file.
      */
-    public FileProxy(FileStorage fileStorage) {
+    public FileProxy(FileStorage fileStorage, boolean includiMetadati) {
         this.identificativoFile = fileStorage.getIdentificativoFile();
-        this.rappresentazioneJson = fileStorage.toMap_nomeProprieta_valoreProprieta();
+        this.rappresentazioneJson = fileStorage.toMap_nomeProprieta_valoreProprieta(includiMetadati);
         this.listaHashtag = fileStorage.getListaHashtag();
     }
 
     @Override
-    public Map<String, ?> toMap_nomeProprieta_valoreProprieta(){     // TODO : testare
+    public Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati){     // TODO : testare
         return rappresentazioneJson;
     }
 

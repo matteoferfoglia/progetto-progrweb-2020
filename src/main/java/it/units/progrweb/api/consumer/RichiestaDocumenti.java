@@ -30,7 +30,7 @@ public class RichiestaDocumenti {
      * di un documento destinato al Consumer da cui proviene la richiesta:
      * ogni property ha per nome l'identificativo del documento e per valore
      * l'oggetto che rappresenta il documento (descritto in base ai suoi
-     * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile()}.
+     * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile(boolean)}.
      * @param httpServletRequest La richiesta HTTP.
      * @param  identificativoUploader Identificativo dell'Uploader. */
     @Path("/elencoDocumenti/{identificativoUploader}")     // TODO : variabile d'ambiente
@@ -44,7 +44,7 @@ public class RichiestaDocumenti {
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);
 
-        Map<String, String> mappa_idFile_propFileInJson = File.getMappa_idFile_propFile(listaFile);
+        Map<String, String> mappa_idFile_propFileInJson = File.getMappa_idFile_propFile(listaFile, false);
 
         return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFileInJson);
 
@@ -60,7 +60,7 @@ public class RichiestaDocumenti {
     public Response getFileById(@PathParam("identificativoFile") Long identificativoFile,
                                 @Context HttpServletRequest httpServletRequest) {
 
-        return File.creaResponseConFile(identificativoFile, httpServletRequest);
+        return File.creaResponseConFile(identificativoFile, httpServletRequest, true);
 
     }
 

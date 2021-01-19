@@ -14,15 +14,19 @@
     <tbody>
     <tr v-for="documento in Object.fromEntries(elencoDocumentiDaMostrare_wrapper)"
         :key="documento[nomePropLinkDownload]"><!-- Ogni riga è un documento -->
-      <td v-for="propertyQuestaColonna in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload && nomeColonna!==nomePropLinkElimina )"
+      <td v-for="propertyQuestaColonna in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload &&
+                                                                                         nomeColonna!==nomePropLinkElimina     )"
           :key="propertyQuestaColonna" >
         {{ documento[propertyQuestaColonna] }}
       </td>
       <td v-if="nomePropLinkDownload">
-        <a :href=documento[nomePropLinkDownload]>Download</a> <!-- Link download documento -->
+        <a :href=documento[nomePropLinkDownload]
+           download
+           @click.prevent="scaricaDocumento(documento[nomePropLinkDownload], documento[nomePropNomeDocumento])">Download</a> <!-- Link download documento -->
       </td>
       <td v-if="nomePropLinkElimina">
-        <a :href="documento[nomePropLinkElimina]">Elimina</a> <!-- Link download documento -->
+        <a :href="documento[nomePropLinkElimina]"
+           @click.prevent="eliminaDocumento(documento[nomePropLinkElimina])">Elimina</a> <!-- Link eliminazione documento -->
       </td>
     </tr>
     </tbody>
@@ -30,19 +34,13 @@
 
   <p v-else>Nessun documento disponibile.</p>
 
-  <FormConCsrfToken v-if="possibileAggiungereDocumento">
-    <p>Carica un documento per {{ nomeConsumer }}</p>
-    <input type="text">
-  </FormConCsrfToken>
-
 </template>
 
 <script>
-import FormConCsrfToken from "../../components/FormConCsrfToken";
 import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
+import {richiestaGet} from "../../utils/http";
 export default {
   name: "TabellaDocumenti",
-  components: {FormConCsrfToken},
   props: [
 
     // Passaggio di oggetti tramite props, Fonte: https://stackoverflow.com/a/57200056
@@ -61,9 +59,6 @@ export default {
      * il cui valore è un link di eliminazione di quel documento.*/
     "nomePropLinkElimina",
 
-    /** Flag: true se è possibile aggiungere un documento.*/
-    "possibileAggiungereDocumento",
-
     /** Nome del Consumer a cui questi documenti si riferiscono.*/
     "nomeConsumer"
   ],
@@ -73,8 +68,20 @@ export default {
 
       /** Wrapper per {@link #elencoDocumentiDaMostrare} per modificarne
        * i valori quando il padre li aggiorna.*/
-      elencoDocumentiDaMostrare_wrapper: new Map()
+      elencoDocumentiDaMostrare_wrapper: new Map(),
+
+      /** In un documento, il nome della property (se presente)
+       * il cui valore è il nome di quel documento.*/
+      nomePropNomeDocumento: undefined,
     }
+  },
+  created() {
+
+      // Richiede il nome della property di un file contenente il nome del documento
+      richiestaGet(process.env.VUE_APP_GET_NOME_PROP_NOME_DOCUMENTO)
+          .then( nomeProp => this.nomePropNomeDocumento = nomeProp )
+          .catch( console.error );
+
   },
   watch: {
 
@@ -86,6 +93,38 @@ export default {
         this.elencoDocumentiDaMostrare_wrapper = valoreAggiornato;
       }
     }
+  },
+  methods: {
+
+    /** Metodo per il download di un documento (dipende dall'URL)
+     * (<a href="https://stackoverflow.com/q/33247716">Fonte</a>).*/
+    scaricaDocumento( urlDocumento, nomeDocumento ) {
+      richiestaGet( urlDocumento )
+        .then( risposta => {
+          const blob = new Blob( [risposta], {type: "octet/stream"} );
+
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.setAttribute("download", nomeDocumento);
+          a.setAttribute("style","display: none");
+          a.href = downloadUrl;
+          document.body.appendChild(a);
+          a.click();
+          URL.revokeObjectURL(downloadUrl);
+
+        })
+        .catch( console.error );
+    },
+
+    /** Metodo per la cancellazione di un documento (dipende dall'URL).*/
+    eliminaDocumento( urlEliminazioneDocumento ) {
+      richiestaGet( urlEliminazioneDocumento )
+          .then( () => {
+            alert("Documento eliminato");
+          })
+          .catch( console.error );
+    }
+
   }
 }
 </script>

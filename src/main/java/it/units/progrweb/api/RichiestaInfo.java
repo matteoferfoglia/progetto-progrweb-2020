@@ -6,11 +6,13 @@ import it.units.progrweb.api.uploader.GestioneConsumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.utils.Autenticazione;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -32,8 +34,14 @@ public class RichiestaInfo {
     @Path("/arrayNomiProprietaOgniDocumento")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String[] getNomiProprietaFileInAnteprima() {
-        return File.anteprimaNomiProprietaFile();
+    public String[] getNomiProprietaFileInAnteprima(@Context HttpServletRequest httpServletRequest) {
+
+        String tipoAttore = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
+
+        if( Consumer.class.getSimpleName().equals( tipoAttore ) )
+            return File.anteprimaNomiProprietaFile( false );
+
+        return File.anteprimaNomiProprietaFile( true );
     }
 
     /** Restituisce il nome dell'attributo di un {@link File} che
@@ -68,6 +76,15 @@ public class RichiestaInfo {
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeAttributoContenenteDataVisualizzazioneFile() {
         return File.getNomeAttributoContenenteDataVisualizzazioneFile();
+    }
+
+    /** Restituisce il nome dell'attributo di un {@link File} che
+     * ne contiene il nome.*/
+    @Path("/nomeProprietaNomeDocumento")     // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getNomeAttributoContenenteNomeFile() {
+        return File.getNomeAttributoContenenteNomeFile();
     }
 
 

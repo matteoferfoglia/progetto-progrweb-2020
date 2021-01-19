@@ -2,6 +2,7 @@ package it.units.progrweb.entities.file;
 
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Subclass;
+import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
@@ -21,11 +22,6 @@ class FileStorage extends File {
 
     // TODO : implementare questa classe!!
 
-
-
-    /** Indirizzo IP del consumer che ha visualizzato il file. */
-    private String indirizzoIpVisualizzatore; // TODO : cambiare tipo??
-
     /** Lista di hashtag associati a questo file. */
     @Index
     private List<String> listaHashtag;
@@ -44,18 +40,22 @@ class FileStorage extends File {
     }
 
 
-    /** Vedere {@link #getContenutoFile(File, String)}.*/
-    static InputStream getContenutoFile(FileStorage file, String indirizzoIpVisualizzazione) {
-        return file.getContenutoFile(indirizzoIpVisualizzazione);
+    /** Vedere {@link #getContenutoFile(File, String, boolean)}.*/
+    static InputStream getContenutoFile(FileStorage file,
+                                        String indirizzoIpVisualizzazione,
+                                        boolean salvaDatiVisualizzazione) {
+        return file.getContenutoFile(indirizzoIpVisualizzazione, salvaDatiVisualizzazione);
     }
 
-    /** Vedere {@link #getContenutoFile(File, String)}.*/
-    private InputStream getContenutoFile(String indirizzoIpVisualizzazione) {
+    /** Vedere {@link #getContenutoFile(FileStorage, String, boolean)}.*/
+    private InputStream getContenutoFile(String indirizzoIpVisualizzazione,
+                                         boolean salvaDatiVisualizzazione  ) {
         // TODO : da implementare
-        if( getDataEdOraDiVisualizzazione() == null ) {
+        if( salvaDatiVisualizzazione && getDataEdOraDiVisualizzazione() == null ) {
             // Si tiene traccia solo del primo accesso al file
             setDataEdOraDiVisualizzazione( DateTime.adesso() );
-            this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
+            setIndirizzoIpVisualizzazione( indirizzoIpVisualizzazione );
+            DatabaseHelper.salvaEntita( this );
         }
 
         // Conversione da byte[]
@@ -85,10 +85,10 @@ class FileStorage extends File {
     }
 
     @Override
-    public Map<String, ?> toMap_nomeProprieta_valoreProprieta() {
+    public Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati) {
         Map<String, Object> mappaNomeValoreProprieta;
 
-        mappaNomeValoreProprieta = UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(), this);
+        mappaNomeValoreProprieta = UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(includiMetadati), this);
 
         // Aggiunge attributi rilevanti da questa classe
         // Accesso con reflection, così se campo non presente (es. se cambia nome) è subito individuato da un'eccezione

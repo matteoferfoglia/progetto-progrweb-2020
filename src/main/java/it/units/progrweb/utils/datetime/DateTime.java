@@ -91,16 +91,19 @@ public class DateTime implements Comparable<DateTime> {
 
     /** Metodo per convertire un'istanza di questa classe
      * al tipo {@link String}, che può risultare più semplice
-     * da gestire*/
+     * da gestire. Restituisce null se il parametro è null.*/
     public static String convertiInString(DateTime dataEdOraDiCaricamento) {
-        return dataEdOraDiCaricamento.toString( DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
+        return dataEdOraDiCaricamento==null ? null :
+                dataEdOraDiCaricamento.toString( DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
     }
 
     /** Metodo per ottenere un'istanza di questa classe
      * a partire da un valore di tipo {@link String} ottenuto
-     * col metodo {@link #convertiInString(DateTime)}*/
+     * col metodo {@link #convertiInString(DateTime)}.
+     * Restituisce null se il parametro è null.*/
     public static DateTime convertiDaString(String dataEdOraDiCaricamento) {
-        return new DateTime( dataEdOraDiCaricamento,
+        return dataEdOraDiCaricamento==null ? null :
+                new DateTime( dataEdOraDiCaricamento,
                              DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
     }
 

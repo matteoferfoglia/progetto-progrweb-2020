@@ -7,6 +7,7 @@ import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.UtilitaGenerale;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +35,14 @@ public class GestioneDocumenti {
     public Response getFileById(@PathParam("identificativoFile") Long identificativoFile,
                                 @Context HttpServletRequest httpServletRequest) {
 
-        return File.creaResponseConFile(identificativoFile, httpServletRequest);
+        return File.creaResponseConFile(identificativoFile, httpServletRequest, false);
 
     }
 
 
     /** Eliminazione del {@link File} dalla lista di quelli serviti
      * dall'Uploader che ne ha fatto richiesta. */
-    @Path("/cancellaConsumerPerQuestoUploader/{idFileDaEliminare}")
+    @Path("/eliminaDocumento/{idFileDaEliminare}")
     @DELETE
     public Response eliminaFile(@PathParam("idFileDaEliminare") Long idFileDaEliminare,
                                 @Context HttpServletRequest httpServletRequest) {
@@ -73,8 +74,9 @@ public class GestioneDocumenti {
     @Path("/uploadDocumento")
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
-    public Response caricaFile(@Context HttpServletRequest httpServletRequest,
+    public Response uploadFile(@Context HttpServletRequest httpServletRequest,
                                @FormDataParam("contenutoFile")                      InputStream contenuto,
+                               @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile,
                                @FormDataParam("identificativoConsumerDestinatario") Long identificativoConsumerDestinatario,
                                @FormDataParam("nomeFile")                           String nomeFile,
                                @FormDataParam("listaHashtag")                       String listaHashtag) {
@@ -83,7 +85,18 @@ public class GestioneDocumenti {
         List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
-        RelazioneUploaderConsumerFile.aggiungiFile( contenuto, nomeFile, listaHashtag_list,
+        // Determinazione estensione del file
+        String estensioneFile;
+        {
+            String nomeFileDaDettagli = dettagliFile.getFileName();
+            int indiceSeparatoreEstensioneNelNome = nomeFileDaDettagli.lastIndexOf(".");
+            indiceSeparatoreEstensioneNelNome = indiceSeparatoreEstensioneNelNome == -1 ?  // true se manca l'estensione
+                                                    nomeFileDaDettagli.length() :
+                                                    indiceSeparatoreEstensioneNelNome;
+            estensioneFile = nomeFileDaDettagli.substring(indiceSeparatoreEstensioneNelNome);
+        }
+
+        RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
                                                     identificativoUploader, identificativoConsumerDestinatario );
 
         return Response.noContent().build();
@@ -107,7 +120,7 @@ public class GestioneDocumenti {
         List<File> fileDaRestituire =
                 RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer( identificativoUploader, identificativoConsumer );
 
-        return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire ) );
+        return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire, true ) );
 
     }
 

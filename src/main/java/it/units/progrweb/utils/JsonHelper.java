@@ -162,6 +162,8 @@ public class JsonHelper {
     /** Converte i valori di una {@link Collection} nella corrispondente stringa JSON.*/
     private static String convertiCollectionInJson( Collection<?> collection ) {
         return
+                collection.size() == 0 ? "[ ]" :
+
                 "["
                 + collection.stream()
                             .map(JsonHelper::creaValoreJson)

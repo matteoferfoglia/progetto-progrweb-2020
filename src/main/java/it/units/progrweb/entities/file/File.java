@@ -49,6 +49,9 @@ public abstract class File {
     @Index
     private String dataEdOraDiCaricamento;
 
+    /** Indirizzo IP del consumer che ha visualizzato il file. */
+    private String indirizzoIpVisualizzatore; // TODO : cambiare tipo??
+
     /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
     private String dataEdOraDiVisualizzazione;
 
@@ -59,24 +62,40 @@ public abstract class File {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
     }
 
-    public void setNomeDocumento(String nomeDocumento) {
-        this.nomeDocumento = nomeDocumento;
-    }
-
-    public DateTime getDataEdOraDiCaricamento() {
+    protected DateTime getDataEdOraDiCaricamento() {
         return DateTime.convertiDaString( dataEdOraDiCaricamento );
     }
 
-    public void setDataEdOraDiCaricamento(DateTime dataEdOraDiCaricamento) {
+    protected void setNomeDocumento(String nomeDocumento) {
+        this.nomeDocumento = nomeDocumento;
+    }
+
+    protected void setDataEdOraDiCaricamento(DateTime dataEdOraDiCaricamento) {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
     }
 
-    public DateTime getDataEdOraDiVisualizzazione() {
+    protected DateTime getDataEdOraDiVisualizzazione() {
         return DateTime.convertiDaString( dataEdOraDiVisualizzazione );
     }
 
-    public void setDataEdOraDiVisualizzazione(DateTime dataEdOraDiVisualizzazione) {
+    protected void setDataEdOraDiVisualizzazione(DateTime dataEdOraDiVisualizzazione) {
         this.dataEdOraDiVisualizzazione = DateTime.convertiInString( dataEdOraDiVisualizzazione );
+    }
+
+    protected void setIndirizzoIpVisualizzazione(String indirizzoIpVisualizzazione) {
+        this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
+    }
+
+    protected String getIndirizzoIpVisualizzatore() {
+        return indirizzoIpVisualizzatore;
+    }
+
+    /** Restituisce il nome dell'attributo che contiene il nome di un file.*/
+    public static String getNomeAttributoContenenteNomeFile() {
+
+        final String NOME_ATTRIBUTO_NOME_FILE = "nomeDocumento";
+        return getFieldDaNome(NOME_ATTRIBUTO_NOME_FILE).getName();
+
     }
 
     /** Restituisce il nome dell'attributo che contiene la lista
@@ -85,6 +104,7 @@ public abstract class File {
 
         final String NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE = "listaHashtag";
         return getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE).getName();
+
     }
 
     /** Restituisce il nome dell'attributo che contiene la data di
@@ -139,25 +159,33 @@ public abstract class File {
     /** Se il file dato nel parametro è un'istanza di {@link FileStorage},
      * allora restituisce il documento associato a quest'istanza ed imposta
      * data ed ora di visualizzazione e l'indirizzo IP di chi ha visualizzato
-     * il documento, altrimenti restituisce null.*/
-    public static InputStream getContenutoFile(File file, String indirizzoIpVisualizzazione) {
+     * il documento, altrimenti restituisce null.
+     * @param salvaDataOraVisualizzazione true se si vuole salvare la data/ora
+     *                                    in cui il documento è richiesto (ignorato
+     *                                    se tale data/ora è già salvata).*/
+    public static InputStream getContenutoFile(File file,
+                                               String indirizzoIpVisualizzazione,
+                                               boolean salvaDataOraVisualizzazione) {
         if( file instanceof FileStorage)
-            return FileStorage.getContenutoFile((FileStorage) file, indirizzoIpVisualizzazione);
+            return FileStorage.getContenutoFile((FileStorage) file,
+                                                indirizzoIpVisualizzazione,
+                                                salvaDataOraVisualizzazione );
         else
             return null;
     }
 
     /** Data una lista di {@link File}, costruisce una mappa avente per chiave
      * l'identificativo per i file e come valore il file rappresentato come
-     * oggetto JSON.*/
-    public static Map<String, String> getMappa_idFile_propFile(List<File> listaFile) {
+     * oggetto JSON.
+     * @param includiMetadati true se si vogliono includere i metadati del file.*/
+    public static Map<String, String> getMappa_idFile_propFile(List<File> listaFile, boolean includiMetadati) {
         // TODO : refactoring potrebbe essere meglio avere una classe documenti che risponda alle richieste di documenti, sia di Consumer sia di Uploaders
 
         Map<String,String> mappa_idFile_propFileInJson =
                listaFile.stream()
                         .collect(Collectors.toMap(
                                 file -> String.valueOf( file.getIdentificativoFile() ),
-                                file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta()) // Ogni elemento dello stream contiene la descrizione JSON di un file
+                                file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta(includiMetadati)) // Ogni elemento dello stream contiene la descrizione JSON di un file
                             )
                         );
         return mappa_idFile_propFileInJson;
@@ -165,28 +193,48 @@ public abstract class File {
 
     /**
      * Restituisce un array contenente i nomi degli attributi
-     * di {@link File questa} classe.
+     * di {@link File questa} classe
+     * @param includiMetadati true se si vogliono anche i metadati.
      */
-    public static String[] anteprimaNomiProprietaFile() {
+    public static String[] anteprimaNomiProprietaFile(boolean includiMetadati) {
         // TODO : testare questa classe
-        return Arrays.stream(getAnteprimaProprietaFile())
+        return Arrays.stream(getAnteprimaProprietaFile(includiMetadati))
                      .map( field -> field.getName() )
                      .toArray(String[]::new);
     }
 
-    /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.*/
-    public static Field[] getAnteprimaProprietaFile() {
+    /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.
+     * @param includiMetadati true se si vogliono anche i metadati.*/
+    public static Field[] getAnteprimaProprietaFile( boolean includiMetadati ) {
         return Arrays.stream(File.class.getDeclaredFields())
                      .filter( field -> {
-                         String nomeAttributoInQuestaClasseDaNonMostrare = "identificativoFile";
-                         if( ! UtilitaGenerale.esisteAttributoInClasse(nomeAttributoInQuestaClasseDaNonMostrare, File.class) ) {
-                             // Informa se il field non si trova
-                             Logger.scriviEccezioneNelLog(File.class,
-                                     "L'attributo \"" + nomeAttributoInQuestaClasseDaNonMostrare + "\"" +
-                                             " non si trova nella classe: forse è stato rinominato",
-                                     new NoSuchFieldException());
+
+                         // Escludi i campi i cui nomi sono presenti in questo array
+                         String[] nomeAttributiInQuestaClasseDaNonMostrare = new String[]{};
+
+                         if( ! includiMetadati ) {
+
+                             nomeAttributiInQuestaClasseDaNonMostrare = new String[]{
+                                     "identificativoFile",
+                                     "indirizzoIpVisualizzazione",
+                                     "dataEdOraDiVisualizzazione"
+                             };
+
+                             Arrays.stream(nomeAttributiInQuestaClasseDaNonMostrare)
+                                   .forEach( nomeUnAttributo -> {
+                                       if( ! UtilitaGenerale.esisteAttributoInClasse(nomeUnAttributo, File.class) ) {
+                                           // Informa se il field non si trova
+                                           Logger.scriviEccezioneNelLog(File.class,
+                                                   "L'attributo \"" + nomeUnAttributo + "\"" +
+                                                           " non si trova nella classe: forse è stato rinominato",
+                                                   new NoSuchFieldException());
+                                       }
+                                   });
+
                          }
-                         return !field.getName().equals("identificativoFile");
+
+                         return ! UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaNonMostrare );
+
                      }).toArray(Field[]::new);
     }
 
@@ -201,8 +249,9 @@ public abstract class File {
 
     /** Restituisce la mappa nome-valore degli attributi di un file
      * ritenuti rilevanti dalla classe concreta che implementa questo
-     * metodo.*/
-    public abstract Map<String, ?> toMap_nomeProprieta_valoreProprieta();
+     * metodo.
+     * @param includiMetadati true se si vogliono anche i metadati.*/
+    public abstract Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati);
 
     public String getNomeDocumento() {
         return nomeDocumento;
@@ -216,8 +265,13 @@ public abstract class File {
      * file verrà recapitato.
      * Prima di restituire il file, si verifica che l'{@link Attore} che lo ha
      * richiesto sia in relazione con quel file (o {@link Consumer} o
-     * {@link Uploader}) (non si possono recuperare i file di altri utenti).*/
-    public static Response creaResponseConFile(Long identificativoFile, HttpServletRequest httpServletRequest) {
+     * {@link Uploader}) (non si possono recuperare i file di altri utenti).
+     * @param salvaDataOraVisualizzazione true se si vuole salvare la data/ora
+     *                                    in cui il documento è richiesto (ignorato
+     *                                    se tale data/ora è già salvata).*/
+    public static Response creaResponseConFile(Long identificativoFile,
+                                               HttpServletRequest httpServletRequest,
+                                               boolean salvaDataOraVisualizzazione   ) {
 
         // TODO : verifica che questo metodo funzioni
 
@@ -232,7 +286,7 @@ public abstract class File {
             if( relazioneFileAttore != null ) {
 
                 File file = File.getEntitaFromDbById(identificativoFile);
-                InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr());
+                InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
                 return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
                         .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
                         .build();
