@@ -38,7 +38,7 @@ public class RichiestaInfo {
 
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene l'array di hashtag riferiti a quel {@link File}.
-     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,String)
+     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,Long)
      * metodo di invio dei file ai client}.*/
     @Path("/nomePropHashtags")     // TODO : variabile d'ambiente
     @GET
@@ -49,7 +49,7 @@ public class RichiestaInfo {
 
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene la data di caricamento di quel {@link File}.
-     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,String)
+     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,Long)
      * metodo di invio dei file ai client}.*/
     @Path("/nomePropDataCaricamento")     // TODO : variabile d'ambiente
     @GET
@@ -61,7 +61,7 @@ public class RichiestaInfo {
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene la data di visualizzazione di quel {@link File}
      * da parte del Consumer.
-     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,String)
+     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,Long)
      * metodo di invio dei file ai client}.*/
     @Path("/nomePropDataVisualizzazione")     // TODO : variabile d'ambiente
     @GET
@@ -71,7 +71,7 @@ public class RichiestaInfo {
     }
 
 
-    /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(String)}, questo metodo restituisce
+    /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(Long)}, questo metodo restituisce
      * il nome della proprietà contenente il nome dell'Uploader.*/
     @Path("/nomeProprietaNomeUploader")        // TODO : variabile d'ambiente
     @GET
@@ -80,7 +80,7 @@ public class RichiestaInfo {
         return Uploader.getNomeFieldNomeUploader();
     }
 
-    /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(String)}, questo metodo restituisce
+    /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(Long)}, questo metodo restituisce
      * il nome della proprietà contenente il logo dell'Uploader.*/
     @Path("/nomeProprietaLogoUploader")        // TODO : variabile d'ambiente
     @GET
@@ -90,7 +90,7 @@ public class RichiestaInfo {
     }
 
 
-    /** Con riferimento a {@link GestioneConsumer#getConsumer(String)}, questo metodo restituisce
+    /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
      * il nome della proprietà contenente il nome del {@link Consumer}.*/
     @Path("/nomeProprietaNomeConsumer")        // TODO : variabile d'ambiente
     @GET
@@ -100,7 +100,7 @@ public class RichiestaInfo {
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
-    /** Con riferimento a {@link GestioneConsumer#getConsumer(String)}, questo metodo restituisce
+    /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
      * il nome della proprietà contenente lo username del {@link Consumer}.*/
     @Path("/nomeProprietaUsernameConsumer")        // TODO : variabile d'ambiente
     @GET
@@ -110,7 +110,7 @@ public class RichiestaInfo {
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
-    /** Con riferimento a {@link GestioneConsumer#getConsumer(String)}, questo metodo restituisce
+    /** Con riferimento a {@link GestioneConsumer#Long(String)}, questo metodo restituisce
      * il nome della proprietà contenente lo username del {@link Consumer}.*/
     @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
     @GET

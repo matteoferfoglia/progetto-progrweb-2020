@@ -133,8 +133,8 @@ public class CsrfCookies {
         String valoreCsrfTokenDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
 
-        String valoreIdentificativoClientDaJwt = jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
-                .getValoreSubjectClaim();
+        String valoreIdentificativoClientDaJwt = String.valueOf( jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+                .getValoreSubjectClaim() );
 
         String valoreIndirizzoIPClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimIPClientInJwtPayload);

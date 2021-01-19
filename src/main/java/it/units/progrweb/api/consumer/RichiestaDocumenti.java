@@ -32,17 +32,17 @@ public class RichiestaDocumenti {
      * l'oggetto che rappresenta il documento (descritto in base ai suoi
      * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile()}.
      * @param httpServletRequest La richiesta HTTP.
-     * @param  usernameUploader Username dell'Uploader. */
-    @Path("/elencoDocumenti/{usernameUploader}")     // TODO : variabile d'ambiente
+     * @param  identificativoUploader Identificativo dell'Uploader. */
+    @Path("/elencoDocumenti/{identificativoUploader}")     // TODO : variabile d'ambiente
     @GET
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
     public static Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
-                                              @PathParam("usernameUploader") String usernameUploader) {
+                                              @PathParam("identificativoUploader") Long identificativoUploader) {
 
         // TODO : verificare
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-        List<File> listaFile = consumer.getAnteprimaFiles(usernameUploader);
+        List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);
 
         Map<String, String> mappa_idFile_propFileInJson = File.getMappa_idFile_propFile(listaFile);
 

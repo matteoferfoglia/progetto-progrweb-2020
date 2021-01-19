@@ -25,8 +25,11 @@ public abstract class Attore implements UserPrincipal {
 
     // TODO : implementare questa classe
 
-    /** Username dell'attore.*/
+    /** Identificativo di un utente.*/
     @Id
+    protected Long identificativoAttore;
+
+    /** Username dell'attore.*/
     @Index
     protected String username;
 
@@ -38,6 +41,11 @@ public abstract class Attore implements UserPrincipal {
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
     protected String tipoAttore;
+
+    /** Restituisce l'identificativo dell'attore.*/
+    public Long getIdentificativoAttore() {
+        return identificativoAttore;
+    }
 
     /** Restituisce il tipo di un attore.*/
     public String getTipoAttore() {
@@ -116,7 +124,7 @@ public abstract class Attore implements UserPrincipal {
     protected void setEmail(String email) {
 
         if( RegexHelper.isEmailValida(email) )
-            this.email = email;
+            this.email = EncoderPrevenzioneXSS.encodeForJava( email );
 
     }
 
@@ -136,11 +144,11 @@ public abstract class Attore implements UserPrincipal {
         return true;
     }
 
-    /** Restituisce l'attore corrispondente allo username dato nel parametro,
+    /** Restituisce l'attore corrispondente all'identificativo dato nel parametro,
      * oppure null se non trovato.*/
-    public static Attore getAttoreById(String usernameAttore) {
+    public static Attore getAttoreById(Long identificativoAttore) {
         try {
-            return  (Attore) DatabaseHelper.getById(usernameAttore, Attore.class);
+            return  (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
         } catch (NotFoundException e) {
             return null;
         }
@@ -187,6 +195,7 @@ public abstract class Attore implements UserPrincipal {
     @Override
     public String toString() {
         return "Attore{" +
+                "identificativo='" + identificativoAttore + '\'' +
                 "username='" + username + '\'' +
                 ", nominativo='" + nominativo + '\'' +
                 ", email='" + email + '\'' +

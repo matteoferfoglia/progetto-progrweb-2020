@@ -66,7 +66,7 @@ public class AuthenticationDatabaseEntry {
 
     /** Dato un attore, restituisce la sua password (hashed e salted).*/
     public static String getHashedSaltedPasswordDellAttore(Attore attore) {
-        // TODO : metodo da implementare
+        // TODO : metodo da implementare    // Valutare una soluzione che non richieda di prendere Attore (il parametro) dal db perché costa
         return "PippoHashedSalted";
     }
 

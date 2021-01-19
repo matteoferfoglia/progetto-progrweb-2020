@@ -26,7 +26,7 @@ export const verificaAutenticazione = async $route => {
     impostaTokenDiAutenticazioneSeEsiste($route);
 
     // Richiesta al server se l'utente è attualmente autenticato
-    let promiseConEsitoAutenticazione;   // inizializzazione
+    let promiseConEsitoAutenticazione;
     await richiestaGet(process.env.VUE_APP_VERIFICA_TOKEN_AUTENTICAZIONE)
             .then(  esito  => promiseConEsitoAutenticazione = Promise.resolve(esito) )
             .catch( errore => promiseConEsitoAutenticazione = Promise.reject(errore) );

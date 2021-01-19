@@ -160,7 +160,13 @@ public abstract class File {
     }
 
     /** Restituisce l'identificativo del file.*/
-    public abstract Long getIdentificativoFile();
+    public Long getIdentificativoFile() {
+        return identificativoFile;
+    }
+
+    public void setIdentificativoFile(Long identificativoFile) {
+        this.identificativoFile = identificativoFile;
+    }
 
     /** Restituisce la mappa nome-valore degli attributi di un file
      * ritenuti rilevanti dalla classe concreta che implementa questo
@@ -184,13 +190,13 @@ public abstract class File {
 
         // TODO : verifica che questo metodo funzioni
 
-        String usernameAttoreDaHttpServletRequest =
-                Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
+        Long identificativoAttoreDaHttpServletRequest =
+                Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
         try {
 
             RelazioneUploaderConsumerFile relazioneFileAttore = RelazioneUploaderConsumerFile
-                    .attorePuoAccedereAFile( usernameAttoreDaHttpServletRequest, identificativoFile );
+                    .attorePuoAccedereAFile( identificativoAttoreDaHttpServletRequest, identificativoFile );
 
             if( relazioneFileAttore != null ) {
 
@@ -215,7 +221,8 @@ public abstract class File {
     public static File salvaFileInDb( String nomeFile, byte[] contenuto, List<String> listaHashtag ) {
 
         FileStorage fileStorage = new FileStorage(nomeFile, contenuto, listaHashtag);
-        DatabaseHelper.salvaEntita( fileStorage );  // TODO : verificare che a questo punto sia disponibile l'@Id del file
+        Long idFile = (Long) DatabaseHelper.salvaEntita( fileStorage );
+        fileStorage.setIdentificativoFile( idFile );
         return fileStorage;
 
     }

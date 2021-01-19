@@ -46,10 +46,10 @@ public class GestioneDocumenti {
     public Response eliminaFile(@PathParam("idFileDaEliminare") Long idFileDaEliminare,
                                 @Context HttpServletRequest httpServletRequest) {
 
-        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
         try {
 
-            if( RelazioneUploaderConsumerFile.eliminaFileDiUploader(idFileDaEliminare, usernameUploader) )
+            if( RelazioneUploaderConsumerFile.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
                 return Response
                         .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
                         .entity("File " + idFileDaEliminare + "eliminato")    // TODO : var ambiene con messaggi errore
@@ -64,7 +64,7 @@ public class GestioneDocumenti {
 
     /** Caricamento di un {@link File}. Questo metodo attende dal
      * client un file, il cui nome è specificato come @FormParam,
-     * e destinato al {@link Consumer} il cui username è
+     * e destinato al {@link Consumer} il cui identificativo è
      * specificato come @FormParam. L'uploader da cui proviene la
      * richiesta viene determinato dagli header della richiesta
      * stessa
@@ -74,17 +74,17 @@ public class GestioneDocumenti {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response caricaFile(@Context HttpServletRequest httpServletRequest,
-                               @FormDataParam("contenutoFile")                InputStream contenuto,
-                               @FormDataParam("usernameConsumerDestinatario") String usernameConsumerDestinatario,
-                               @FormDataParam("nomeFile")                     String nomeFile,
-                               @FormDataParam("listaHashtag")                 String listaHashtag) {
+                               @FormDataParam("contenutoFile")                      InputStream contenuto,
+                               @FormDataParam("identificativoConsumerDestinatario") Long identificativoConsumerDestinatario,
+                               @FormDataParam("nomeFile")                           String nomeFile,
+                               @FormDataParam("listaHashtag")                       String listaHashtag) {
 
 
         List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
-        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         RelazioneUploaderConsumerFile.aggiungiFile( contenuto, nomeFile, listaHashtag_list,
-                                                    usernameUploader, usernameConsumerDestinatario );
+                                                    identificativoUploader, identificativoConsumerDestinatario );
 
         return Response.noContent().build();
 
@@ -94,19 +94,19 @@ public class GestioneDocumenti {
      * di un {@link File} e come valore corrispondente l'oggetto che rappresenta
      * il {@link File} in termini delle sue proprietà. Nella mappa sono presenti
      * tutti i file caricati dall'{@link Uploader} attualmente autenticato e
-     * destinati al {@link Consumer} il cui username è specificato come
+     * destinati al {@link Consumer} il cui identificativo è specificato come
      * PathParam.*/
-    @Path("/mappa-idFile-propFile/{usernameConsumer}")
+    @Path("/mappa-idFile-propFile/{identificativoConsumer}")
     @GET
     public Response getElencoFile(@Context HttpServletRequest httpServletRequest,
-                                  @PathParam("usernameConsumer") String usernameConsumer) {
+                                  @PathParam("identificativoConsumer") Long identificativoConsumer) {
 
         // TODO rivere (Method not allowed ??)
 
-        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         List<File> fileDaRestituire =
-                RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer( usernameUploader, usernameConsumer );
+                RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer( identificativoUploader, identificativoConsumer );
 
         return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire ) );
 

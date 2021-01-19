@@ -25,16 +25,7 @@
                :pattern="REGEX_CODICE_FISCALE"
                placeholder="Username"
                maxlength="100"
-               @click.stop=" mostraOpzioniAutocompletamento = true "
                required />
-        <datalist @keyup.stop="autocompletamentoUsername(usernameNuovoConsumer)"> <!-- TODO : menu a tendina DA VERIFICARE IL FUNZIONAMENTO -->
-          <option @input="usernameDaAggiungereScelto(usernameNuovoConsumer)"
-                  v-for="usernameDaAggiungere in suggerimentiAutocompletamentoUsernameConsumerDaAggiungere"
-                  :key="usernameDaAggiungere">
-            {{ usernameDaAggiungere }}
-          </option>
-        </datalist>
-
         <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" maxlength="100"  required/>
         <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="xxxxxx@example.com" maxlength="100" :pattern="REGEX_EMAIL"  required/>
 
@@ -176,71 +167,46 @@ export default {
      * aggiungere sono presi dalle variabili di questo componente.*/
     aggiungiConsumer() {
 
-      const proprietaConsumerDaAggiungere = {
-        [this.NOME_PROP_USERNAME_CONSUMER]:          this.usernameNuovoConsumer,
-        [this.NOME_PROP_NOME_CONSUMER]:              this.nominativoNuovoConsumer,
-        [this.NOME_PROP_EMAIL_CONSUMER]:             this.emailNuovoConsumer
+      if( this.usernameNuovoConsumer   &&
+          this.nominativoNuovoConsumer &&
+          this.emailNuovoConsumer         ) {
+
+        const proprietaConsumerDaAggiungere = {
+          [this.NOME_PROP_USERNAME_CONSUMER]: this.usernameNuovoConsumer,
+          [this.NOME_PROP_NOME_CONSUMER]: this.nominativoNuovoConsumer,
+          [this.NOME_PROP_EMAIL_CONSUMER]: this.emailNuovoConsumer
+        }
+
+        // Richiesta di aggiunta consumer
+        richiestaPost(process.env.VUE_APP_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
+            unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken}))
+            .then( idConsumerAppenaCreato => {
+
+              // Aggiungi le info del consumer alla mappa in questo componente
+              this.mappa_idConsumer_proprietaConsumer.set(idConsumerAppenaCreato, proprietaConsumerDaAggiungere);
+
+              // Procedura completata
+              alert("Aggiunto " + this.mappa_idConsumer_proprietaConsumer.get(idConsumerAppenaCreato)[this.NOME_PROP_NOME_CONSUMER] + "!");
+
+            })
+            .catch(errore => {
+              alert("Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer +
+                  " perché " + errore.data.charAt(0).toLowerCase() + errore.data.substring(1));
+              console.error("Errore durante la procedura di aggiunta nuovo Consumer.");
+              console.error(errore);
+            })
+            .finally(() => {
+              // Pulisci campi del form input
+              this.usernameNuovoConsumer = "";
+              this.nominativoNuovoConsumer = "";
+              this.emailNuovoConsumer = "";
+            });
+
+      } else {
+        alert("Riempire correttamente i campi di input.");
       }
 
-      // Richiesta di aggiunta consumer
-      richiestaPost( process.env.VUE_APP_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
-                     unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken}) )
-        .then( () => {
-
-            // Aggiungi le info del consumer alla mappa in questo componente
-            this.mappa_idConsumer_proprietaConsumer.set(this.usernameNuovoConsumer, proprietaConsumerDaAggiungere);
-
-            // Procedura completata
-            alert("Aggiunto " + this.mappa_idConsumer_proprietaConsumer.get(this.usernameNuovoConsumer)[this.NOME_PROP_NOME_CONSUMER] + "!" );
-
-        })
-        .catch( errore => {
-          alert( "Errore: impossibile aggiungere il Consumer " + this.usernameNuovoConsumer +
-              " perché " + errore.data.charAt(0).toLowerCase() + errore.data.substring(1) );
-          console.error( "Errore durante la procedura di aggiunta nuovo Consumer.");
-          console.error( errore );
-        })
-        .finally( () => {
-          // Pulisci campi del form input
-          this.usernameNuovoConsumer = "";
-          this.nominativoNuovoConsumer = "";
-          this.emailNuovoConsumer = "";
-        });
-
     },
-
-    /** Funzione di autocompletamento dell'identificativo di
-     * un Consumer da aggiungere.
-     * @param caratteriDigitati Caratteri digitati dall'utente.
-     */
-    autocompletamentoUsername( caratteriDigitati ) {
-
-      // Chiedere al server la lista degli identificativi dei consumer il cui username inizia con i caratteri digitati
-      richiestaGet(process.env.VUE_APP_GET_ID_CONSUMER_INIZIANTE_CON + "/" + caratteriDigitati)
-        .then( risposta => {
-          this.suggerimentiAutocompletamentoUsernameConsumerDaAggiungere = risposta;
-        })
-        .catch( console.error );
-
-    },
-
-    /** Funzione da eseguire quando l'utente clicca su una delle option
-     * di autocompletamento proposte, nel form di aggiunta nuovo consumer.*/
-    usernameDaAggiungereScelto( usernameSelezionato ) {
-
-      // Autocompleta gli altri input del form
-      getInfoConsumer( usernameSelezionato )
-        .then( risposta => {
-          const infoConsumer = risposta[1];
-          this.usernameNuovoConsumer   = infoConsumer[this.NOME_PROP_USERNAME_CONSUMER];
-          this.emailNuovoConsumer      = infoConsumer[this.NOME_PROP_EMAIL_CONSUMER];
-          this.nominativoNuovoConsumer = infoConsumer[this.NOME_PROP_NOME_CONSUMER];
-
-          this.mostraOpzioniAutocompletamento = false;  // TODO : verificare correttezza (che sparisca il datalist)
-        })
-        .catch(console.error);
-
-    }
 
   }
 }
@@ -257,7 +223,7 @@ const getElencoConsumer = async () => {
     return richiestaGet( process.env.VUE_APP_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER )
         .then( rispostaConListaConsumer => rispostaConListaConsumer )  // TODO : verificare che arrivi correttamente un array
         .catch( rispostaErrore => {
-          console.error("Errore durante il caricamento deiConsumer: " + rispostaErrore );
+          console.error("Errore durante il caricamento dei Consumer: " + rispostaErrore );
           return Promise.reject(rispostaErrore);
         });
 

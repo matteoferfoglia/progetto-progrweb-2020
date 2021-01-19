@@ -23,7 +23,8 @@ public class FiltroCORS implements Filter {
     /** Array di stringhe contente i metodi permessi dalla CORS policy. */
     private final static String[] CORS_ALLOWED_METHOD = {
             "GET",
-            "POST"
+            "POST",
+            "DELETE"
     };
 
     /**

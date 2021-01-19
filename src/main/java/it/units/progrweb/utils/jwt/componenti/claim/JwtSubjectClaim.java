@@ -18,7 +18,7 @@ public class JwtSubjectClaim extends JwtClaim {
      * Crea un Subject claim.
      * @param subject Il subject.
      */
-    public JwtSubjectClaim(String subject) {
+    public JwtSubjectClaim(Object subject) {
         super(JwtClaim.JWT_SUBJECT_CLAIM_NAME, subject);
     }
 

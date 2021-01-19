@@ -81,7 +81,7 @@ public class JwtTokenTest {
                                                      final String NOME_CLAIM_GENERATO = GeneratoreTokenCasuali.generaTokenAlfanumerico(LUNGHEZZA_NOME_CLAIM + 1);
                                                      final String VALORE_CLAIM_GENERATO = GeneratoreTokenCasuali.generaTokenAlfanumerico(LUNGHEZZA_VALORE_CLAIM + 1);
 
-                                                     String claimJson = "\"" + NOME_CLAIM_GENERATO + "\": \"" + VALORE_CLAIM_GENERATO + "\"";
+                                                     String claimJson = " \"" + NOME_CLAIM_GENERATO + "\":\"" + VALORE_CLAIM_GENERATO + "\" ";
 
                                                      Object[] claims_e_json = {new JwtClaim(NOME_CLAIM_GENERATO, VALORE_CLAIM_GENERATO), claimJson};
                                                      return claims_e_json;
@@ -98,7 +98,7 @@ public class JwtTokenTest {
                                              Object[] object_token_json = (Object[])claim_json;
                                              String jwtClaimInFormatoJson = (String) object_token_json[1];
                                              return jwtClaimInFormatoJson;
-                                         }).collect(Collectors.joining(", "));
+                                         }).collect(Collectors.joining(","));
 
                              }
                              JwtPayload jwtPayload = new JwtPayload(jwtClaimsSet);
@@ -116,8 +116,8 @@ public class JwtTokenTest {
                                      payloadJson = "{}";
                                  }
 
-                                 String headerJson = "{\"alg\": \"" + JwtSignature.getAlgoritmoHash() + "\""
-                                         + ", \"typ\": \"JWT\"}";
+                                 String headerJson = "{ \"alg\":\"" + JwtSignature.getAlgoritmoHash() + "\""
+                                         + " , \"typ\":\"JWT\" }";
                                  String signature = new JwtSignature(new JwtHeader(JwtSignature.getAlgoritmoHash()),
                                          jwtPayload).getSignature();
 
@@ -135,7 +135,7 @@ public class JwtTokenTest {
     /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#JwtToken(it.units.progrweb.utils.jwt.componenti.JwtPayload)}.
      * Dati in claims del payload in formato JSON, si costruisce il token JWT,
      * si prende la sua rappresentazione come stringa codificata in base64
-     * url-encoded e si verirfica che sia uguale alla stringa attesa.*/
+     * url-encoded e si verifica che sia uguale alla stringa attesa.*/
     @ParameterizedTest
     @CsvSource({
             "'{\"sub\": \"1234567890\", \"name\": \"John Doe\",\"admin\": true}', ''"   // todo

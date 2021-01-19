@@ -132,7 +132,7 @@ public class JsonHelperTest {
 
                              } catch (IllegalStateException e) {
                                  // se vengono generate due proprietà con lo stesso nome
-                                 return Arguments.arguments("{}", new LinkedHashMap<>());   // oggetto vuoto
+                                 return Arguments.arguments("{ }", new LinkedHashMap<>());   // oggetto vuoto
                              }
 
                          });

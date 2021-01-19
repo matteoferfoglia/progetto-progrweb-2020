@@ -65,7 +65,7 @@ export default {
       // NOMI DEI PARAMETRI ATTESI DAL SERVER
       nomeParametro_nomeDocumento:             "nomeFile",
       nomeParametro_contenutoDocumento:        "contenutoFile",
-      nomeParametro_idConsumerDestinatario:    "usernameConsumerDestinatario",
+      nomeParametro_idConsumerDestinatario:    "identificativoConsumerDestinatario",
       nomeParametro_listaHashtag:              "listaHashtag",
 
 
@@ -80,13 +80,16 @@ export default {
     const caricaQuestoComponente = async () => {
 
       // Richiede mappa idFile-propFile per questo consumer
-      await getMappa_idFile_arrayIdFiles_perConsumer( this.idConsumer )
+      await richiestaGet( process.env.VUE_APP_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + this.idConsumer )
+            // Crea mappa
+            .then( rispostaConMappaFile_id_prop => new Map(Object.entries( rispostaConMappaFile_id_prop ) ) )
+            // Ordina mappa
             .then( ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti )
 
             // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
             .then( mappa =>
                 new Map(
-                    Array.from( mappa.entries() )
+                   Array.from( mappa.entries() )
                         .map( unDocumento => {
 
                           // Decomposizione di ogni entry
@@ -95,6 +98,8 @@ export default {
 
                           propDocumento[this.NOME_PROP_DELETE_DOCUMENTO]   = process.env.VUE_APP_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
                           propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+
+                          return [ idDocumento, propDocumento ];
 
                         })
                 )
@@ -161,36 +166,6 @@ export default {
     }
 
   }
-}
-
-
-/** Richiede al server una mappa avente per chiavi gli identificativi dei
- * File serviti da questo Uploader ad un certo Consumer (indicato come
- * parametro) e per valori l'oggetto corrispondente al file indicato dalla
- * chiave dell'entry nella mappa.
- * Se tutto va a buon fine, restituisce tale mappa in una Promise risolta.
- * @param usernameConsumerDestinazione  Lo username del consumer a cui i
- *                                      documenti sono destinati.
- */
-const getMappa_idFile_arrayIdFiles_perConsumer = async idConsumer => {
-
-  // TODO : verificare correttezza
-
-  return richiestaGet( process.env.VUE_APP_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + idConsumer )
-
-      // Crea mappa
-      .then( rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)) )
-
-      // TODO : molto simile al metodo in Lista Documenti Per Consumer
-
-      // Ordina e restituisci la mappa in base alla data di caricamento (prima i documenti più recenti)
-      .then( elencoDocumenti => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti(elencoDocumenti) )
-
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento della mappa coi documenti: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-      });
-
 }
 
 

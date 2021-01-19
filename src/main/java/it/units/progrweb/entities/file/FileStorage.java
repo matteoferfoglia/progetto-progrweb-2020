@@ -1,10 +1,7 @@
 package it.units.progrweb.entities.file;
 
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Subclass;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
@@ -12,7 +9,6 @@ import it.units.progrweb.utils.datetime.DateTime;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +93,7 @@ class FileStorage extends File {
         // Aggiunge attributi rilevanti da questa classe
         // Accesso con reflection, così se campo non presente (es. se cambia nome) è subito individuato da un'eccezione
         try {
-            Field listaHashtag = this.getClass().getField("listaHashtag");
+            Field listaHashtag = this.getClass().getDeclaredField("listaHashtag");
             listaHashtag.setAccessible(true);
             mappaNomeValoreProprieta.put(listaHashtag.getName(), listaHashtag.get(this));
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -106,10 +102,6 @@ class FileStorage extends File {
 
 
         return mappaNomeValoreProprieta;        // TODO : testare che funzioni (controllare il tipo del valore)
-    }
-
-    public Long getIdentificativoFile() {
-        return identificativoFile;
     }
 
     public List<String> getListaHashtag() {

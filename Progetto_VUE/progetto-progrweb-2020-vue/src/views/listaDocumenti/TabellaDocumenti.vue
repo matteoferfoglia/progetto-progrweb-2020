@@ -12,16 +12,18 @@
     </tr>
     </thead>
     <tbody>
-    <!-- Ogni riga è un documento -->
-    <tr v-for="(idDocumento, documento) in Object.fromEntries(elencoDocumentiDaMostrare)"
-        :key="idDocumento">
-      <td v-for="(numeroColonnaQuestaTabella, propertyQuestaColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload && nomeColonna!==nomePropLinkElimina )"
-          :key="numeroColonnaQuestaTabella"
+    <tr v-for="(documento, idDocumento) in Object.fromEntries(elencoDocumentiDaMostrare)"
+        :key="idDocumento"><!-- Ogni riga è un documento -->
+      <td v-for="(propertyQuestaColonna, indiceColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload && nomeColonna!==nomePropLinkElimina )"
+          :key="indiceColonna"
           id="{{idDocumento}}">
         {{ documento[propertyQuestaColonna] }}
       </td>
-      <td>
+      <td v-if="nomePropLinkDownload">
         <a href="{{ documento[nomePropLinkDownload] }}">Download</a> <!-- Link download documento -->
+      </td>
+      <td v-if="nomePropLinkElimina">
+        <a href="{{ documento[nomePropLinkDownload] }}">Elimina</a> <!-- Link download documento -->
       </td>
     </tr>
     </tbody>

@@ -38,6 +38,9 @@ public class JsonHelper {
      */
     public static Map<String,Object> convertiStringaJsonToMappaProprieta(String stringaJSON) {
 
+        // TODO : il JSON viene prodotto con tutte le spaziature poi arriva qua tutto attaccato,
+        //  perché?? Poi nel token csrf in fondo c'è un eccesso che non centra col token
+
         if( stringaJSON == null )
             return null;
 
@@ -83,18 +86,59 @@ public class JsonHelper {
      */
     public static<K,V> String convertiMappaProprietaToStringaJson(Map<K,V> mappaProprieta) {
 
-        if ( mappaProprieta == null )
-            return "{ }";
+        // TODO : migrare a soluzione già pronta
 
-        return "{"
+        if ( mappaProprieta == null )
+            return "{}";
+
+        String stringaJson =
+                "{"
                 +   mappaProprieta.entrySet().stream()
-                                             .map(entry -> "\"" + entry.getKey() + "\": "
-                                                                + ( entry.getValue()==null ? "null" :
-                                                                  entry.getValue() instanceof String ?
-                                                                    "\"" + entry.getValue() + "\"" :
-                                                                    String.valueOf(entry.getValue()) ) )
-                                             .collect(Collectors.joining(", "))
+                                             .map(entry -> {
+                                                 String chiave = String.valueOf( entry.getKey() );
+                                                 Object valore = entry.getValue() ;
+
+                                                 String valoreJson;
+
+                                                 if ( valore != null ) {
+
+                                                     switch (valore.getClass().getSimpleName()) {
+
+                                                         case "Integer":
+                                                         case "Float":
+                                                         case "Long":
+                                                         case "Double":
+                                                         case "Boolean":
+                                                             valoreJson = String.valueOf(valore);
+                                                             break;
+
+                                                         case "String":
+                                                             valoreJson = (String) valore;
+                                                             if (!(valoreJson.trim().startsWith("{") && valoreJson.endsWith("}"))) {
+                                                                 if (!valoreJson.equals("null")) {
+                                                                     // Se qui, si tratta di una stringa
+                                                                     valoreJson = "\"" + valoreJson + "\"";
+                                                                 } // null senza virgolette
+                                                             } // altrimenti è la rappresentazione di un oggetto JSON e non bisogna circondarlo con le virgolette
+                                                             break;
+
+                                                         default:
+                                                             valoreJson = "null";  // non so cos'è
+
+                                                             // TODO : non gestito caso array
+                                                     }
+
+                                                 } else {
+                                                     valoreJson = "null";
+                                                 }
+
+                                                 return " \"" + chiave + "\":" + valoreJson + " ";  //  TODO : i due punti andrebbero spaziati
+
+                                             })
+                                             .collect(Collectors.joining(","))
                 + "}";
+
+        return stringaJson;
 
     }
 }

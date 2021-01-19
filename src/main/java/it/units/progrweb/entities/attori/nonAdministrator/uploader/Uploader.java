@@ -68,17 +68,17 @@ public abstract class Uploader extends UtenteNonAdministrator {
     }
 
     /** Restituisce l'entità {@link Uploader Uploader} cercata nel
-     * database in base allo username fornito.
+     * database in base all'identificativo fornito.
      * @return L'uploader cercato, oppure null in caso di errore.*/
-    public static Uploader cercaUploaderDaUsername(String usernameUploader ) {
+    public static Uploader cercaUploaderDaIdentificativo(Long identificativoUploader ) {
         try{
-            return (Uploader) DatabaseHelper.getById(usernameUploader, Uploader.class);
+            return (Uploader) DatabaseHelper.getById(identificativoUploader, Uploader.class);
         } catch ( NotFoundException notFoundException) {
             return null;
         }
     }
 
-    /** Restituisce il nome del field contenente lo username
+    /** Restituisce il nome del field contenente l'username
      * di un Uploader.*/
     public static String getNomeFieldUsernameUploader() {
         return Attore.getNomeFieldUsernameAttore();

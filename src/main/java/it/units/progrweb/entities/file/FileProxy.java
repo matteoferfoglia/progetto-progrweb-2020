@@ -1,7 +1,5 @@
 package it.units.progrweb.entities.file;
 
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +27,6 @@ public class FileProxy extends File {
         this.identificativoFile = fileStorage.getIdentificativoFile();
         this.rappresentazioneJson = fileStorage.toMap_nomeProprieta_valoreProprieta();
         this.listaHashtag = fileStorage.getListaHashtag();
-    }
-
-    @Override
-    public Long getIdentificativoFile() {
-        return identificativoFile;
     }
 
     @Override

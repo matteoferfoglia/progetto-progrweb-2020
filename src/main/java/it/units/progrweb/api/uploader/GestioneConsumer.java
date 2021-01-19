@@ -8,6 +8,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,15 +38,15 @@ public class GestioneConsumer {
     @Path("/elencoConsumer")
     @GET
     @Produces( MediaType.APPLICATION_JSON )
-    public List<String> getElencoConsumerDiUploader(@Context HttpServletRequest httpServletRequest) {
+    public List<Long> getElencoConsumerDiUploader(@Context HttpServletRequest httpServletRequest) {
 
         // TODO : verificare correttezza
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
-        return RelazioneUploaderConsumerFile.getListaConsumerDiUploader( usernameUploader );
+        return RelazioneUploaderConsumerFile.getListaConsumerDiUploader( identificativoUploader );
 
     }
 
@@ -89,36 +91,48 @@ public class GestioneConsumer {
 
     }
 
-    /** Dato lo username di un {@link Consumer} come @PathParam
+    /** Dato l'identificativo di un {@link Consumer} come @PathParam
      * restituisce l'oggetto JSON in cui ogni proprietà dell'oggetto
      * rappresenta un {@link Consumer} ed il corrispettivo valore è
      * un oggetto con le proprietà di quel {@link Consumer}.
      */
-    @Path("/proprietaConsumer/{usernameConsumer}")
+    @Path("/proprietaConsumer/{identificativoConsumer}")
     @GET
     // Risposta costruita in modo personalizzato
-    public Response getConsumer(@PathParam("usernameConsumer") String usernameConsumer) {
+    public Response getConsumer(@PathParam("identificativoConsumer") Long identificativoConsumer) {
 
         // TODO : verificare correttezza
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        Consumer consumer = Consumer.cercaConsumerDaUsername(usernameConsumer);
+        Consumer consumer = Consumer.cercaConsumerDaIdentificativo(identificativoConsumer);
         Map<String,?> mappaProprietaUploader_nome_valore = consumer.getMappaAttributi_Nome_Valore();
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
     }
 
     /** Creazione di un {@link Consumer} che deve essere già registrato
-     * in questa piattaforma.*/
+     * in questa piattaforma. Se la richiesta va a buon fine, restituisce
+     * l'identificativo del Consumer creato.*/
     @Path("/aggiungiConsumerPerQuestoUploader")
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     public Response aggiungiConsumer(ConsumerProxy consumerDaAggiungere,
                                      @Context HttpServletRequest httpServletRequest) {
 
+        String nomeAttributoIdentificativoAttore = "identificativoAttore";  // campo non presente nei dati della richiesta
+                                                                            // Sarà null nell'istanza deserializzata, prima però verifico che esista nella classe
+
+        if( ! UtilitaGenerale.esisteAttributoInClasse( nomeAttributoIdentificativoAttore, Attore.class ) ) {
+            Logger.scriviEccezioneNelLog(this.getClass(), new NoSuchFieldException());
+            return Response.serverError().build();
+        }
+
         // Verifica corretta deserializzazione degli attributi
-        Field[] attributi = Attore.class.getDeclaredFields();
+        Field[] attributi = Arrays.stream(Attore.class.getDeclaredFields())
+                                  .filter( field -> ! field.getName().equals(nomeAttributoIdentificativoAttore) )
+                                  .toArray(Field[]::new);
+
         for ( Field attributo : attributi ) {
             attributo.setAccessible(true);
             try {
@@ -132,31 +146,33 @@ public class GestioneConsumer {
         }
 
         String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
-        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         try {
 
             // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
-            Consumer consumerDalDB = (Consumer) DatabaseHelper.getById(usernameConsumerDaAggiungere, Consumer.class);
+            Consumer consumerDalDB = (Consumer) DatabaseHelper.query(
+                    Consumer.class, Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.UGUALE, usernameConsumerDaAggiungere
+            ).get(0);
 
             if( consumerDalDB != null &&
                     consumerDalDB.equals(consumerDaAggiungere) ) {
 
                 // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
-                if (!RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(usernameUploader, consumerDaAggiungere.getUsername())) {
+                if (!RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(identificativoUploader, consumerDalDB.getIdentificativoAttore())) {
 
                     // SE precedenti controlli ok, ALLORA aggiungi il consumer
-                    RelazioneUploaderConsumerFile.aggiungiConsumerAdUploader(consumerDaAggiungere.getUsername(), usernameUploader);
+                    RelazioneUploaderConsumerFile.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
 
                     return Response
-                            .status(Response.Status.NO_CONTENT)// Fonte ("204 No Content" nella risposta, "to indicate successful completion of the request"): https://tools.ietf.org/html/rfc7231#section-4.3.3
-                            .entity("Consumer " + usernameConsumerDaAggiungere + " aggiunto.")    // TODO : var ambiene con messaggi
+                            .ok()
+                            .entity(consumerDalDB.getIdentificativoAttore())
                             .build();
 
                 } else {
                     return Response
                             .status(Response.Status.BAD_REQUEST)
-                            .entity("Il Consumer " + usernameConsumerDaAggiungere + " è già associato all'Uploader " + usernameUploader + ".")
+                            .entity("Il Consumer " + consumerDalDB.getUsername() + " è già associato all'Uploader che ne ha fatto richiesta.")
                             .build();
                 }
 
@@ -164,10 +180,10 @@ public class GestioneConsumer {
                 throw new NotFoundException();
             }
 
-        } catch (NotFoundException e) {
+        } catch (Exception e) {
             return Response
                     .status(Response.Status.BAD_REQUEST )
-                    .entity("Il Consumer " + usernameConsumerDaAggiungere + " non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
+                    .entity("Il Consumer richiesto non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
                     .build();
         }
 
@@ -176,31 +192,31 @@ public class GestioneConsumer {
 
     /** Eliminazione di un {@link Consumer} dalla lista di quelli serviti
      * dall'Uploader che ne ha fatto richiesta. */
-    @Path("/cancellaConsumerPerQuestoUploader/{usernameConsumerDaEliminare}")
+    @Path("/cancellaConsumerPerQuestoUploader/{identificativoConsumerDaEliminare}")
     @DELETE
-    public Response eliminaConsumer(@PathParam("usernameConsumerDaEliminare") String usernameConsumerDaEliminare,
+    public Response eliminaConsumer(@PathParam("identificativoConsumerDaEliminare") Long identificativoConsumerDaEliminare,
                                     @Context HttpServletRequest httpServletRequest) {
 
 
-        String usernameUploader = Autenticazione.getUsernameAttoreDaTokenAutenticazione(httpServletRequest);
-        RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(usernameConsumerDaEliminare, usernameUploader);
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+        RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(identificativoConsumerDaEliminare, identificativoUploader);
 
         return Response
                    .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                   .entity("Consumer " + usernameConsumerDaEliminare + "eliminato")    // TODO : var ambiene con messaggi errore
+                   .entity("Consumer eliminato")    // TODO : var ambiene con messaggi errore
                    .build();
 
 
     }
 
 
-    /** Dato lo username del consumer come @PathParam, restituisce il nome.*/
-    @Path("/nomeConsumer/{usernameConsumer}")
+    /** Dato l'identificativo del consumer come @PathParam, restituisce il nome.*/
+    @Path("/nomeConsumer/{identificativoConsumer}")
     @GET
     @Produces( MediaType.TEXT_PLAIN )
-    public String getNomeUploader( @PathParam("usernameConsumer") String usernameConsumer ) {
+    public String getNomeUploader( @PathParam("identificativoConsumer") Long identificativoConsumer ) {
 
-        return Consumer.getNominativoDaUsername( usernameConsumer );
+        return Consumer.getNominativoDaIdentificativo( identificativoConsumer );
 
     }
 

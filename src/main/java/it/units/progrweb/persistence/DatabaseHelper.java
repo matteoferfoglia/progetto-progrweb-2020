@@ -8,7 +8,6 @@ import com.googlecode.objectify.cache.AsyncCacheFilter;
 import com.googlecode.objectify.cmd.Query;
 import it.units.progrweb.utils.Logger;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -48,9 +47,9 @@ public abstract class DatabaseHelper {
 
     }
 
-    /** Salva un'entità nel database. */
-    public static<Entita> void salvaEntita(Entita entita) {
-        database.save().entity(entita);
+    /** Salva un'entità nel database e ne restituisce l'identificativo. */
+    public static<Entita> Object salvaEntita(Entita entita) {
+        return database.save().entity(entita).now().getId();
     }
 
     /** Salva subito un'entità nel database. */
@@ -88,6 +87,8 @@ public abstract class DatabaseHelper {
             throws NotFoundException {
 
         // TODO : attenzione: molto simile al metodo con lo stesso nome che prende String come parametro ... refactoring?
+
+        // TODO : attenzione a quante volte viene invocato questo metodo (accedere al db costa)
 
         try {
             return database.load().type(classeEntita).id(identificativoEntita).now();
@@ -212,29 +213,9 @@ public abstract class DatabaseHelper {
                                                                  OperatoreQuery operatoreCondizione,
                                                                  Attributo valoreCondizione) {
         // TODO : testare
+        String condizioneQuery = nomeAttributoCondizione + operatoreCondizione.operatore ;
+        return database.load().type(classeEntita).filter(condizioneQuery, valoreCondizione);
 
-        try {
-
-            // Verifica che l'attributo esista nella classe indicata (altrimenti genera eccezione)
-            Field attributoCondizione = classeEntita.getDeclaredField(nomeAttributoCondizione);
-
-            // Verifica che l'attributo sia dello stesso tipo di quello con  cui deve essere confrontato
-            if(attributoCondizione.getType().equals(valoreCondizione.getClass())) {
-                // TODO : testare che .getClass() sull'attributo il cui tipo è indovinato non restituisca cose strane
-
-                String condizioneQuery = nomeAttributoCondizione + operatoreCondizione.operatore ;
-                return database.load().type(classeEntita).filter(condizioneQuery, valoreCondizione);
-            } else {
-                throw new NoSuchFieldException("Il field " + nomeAttributoCondizione + " è di tipo "
-                                                + attributoCondizione.getType() + " ma il valore" +
-                                                " della condizione è di tipo " + valoreCondizione.getClass() );
-            }
-        } catch (NoSuchFieldException e) {
-            Logger.scriviEccezioneNelLog(DatabaseHelper.class,
-                    "Il field " + nomeAttributoCondizione + " non risulta nella classe " + classeEntita.getName(),
-                    e);
-            return null;    // TODO : testare (forse è necessario restituire un'istanza di Query)
-        }
 
     }
 

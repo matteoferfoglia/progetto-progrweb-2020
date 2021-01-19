@@ -24,16 +24,16 @@ import java.util.Map;
 @Path("/consumer")                          // TODO : variabile d'ambiente
 public class RichiestaInfoSuUploader {
 
-    /** Dato come @PathParam lo username di un Uploader, restituisce
+    /** Dato come @PathParam l'identificativo di un Uploader, restituisce
      * la rappresentazione codificata in base64 del suo logo.*/
-    @Path("/logoUploader/{usernameUploader}")
+    @Path("/logoUploader/{identificativoUploader}")
     @GET
-    public Response getLogoUploaderBase64(@PathParam("usernameUploader") String usernameUploader) {
+    public Response getLogoUploaderBase64(@PathParam("identificativoUploader") Long identificativoUploader) {
 
         // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
 
         try {
-            Uploader uploader = (Uploader) DatabaseHelper.getById( usernameUploader, Uploader.class );
+            Uploader uploader = (Uploader) DatabaseHelper.getById( identificativoUploader, Uploader.class );
             return Response.ok()
                            .entity( uploader.getImmagineLogoBase64() )
                            .build();
@@ -49,7 +49,7 @@ public class RichiestaInfoSuUploader {
      * Consumer essa provenga, quindi cerca tutti gli Uploader
      * che hanno caricato almeno un documento per quel Consumer
      * e li restituisce in un oggetto JSON in cui ogni property
-     * ha come nome lo username dell'Uploader e come
+     * ha come nome l'identificativo dell'Uploader e come
      * valore l'array contenente gli identificativi di tutti i
      * file caricati dall'Uploader identificato dal nome della
      * property e destinati al Consumer da cui proviene la
@@ -63,14 +63,14 @@ public class RichiestaInfoSuUploader {
         // TODO : verificare correttezza
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
-        Map<String, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer = null;
+        Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer = null;
 
         if ( consumer != null) {
             List<RelazioneUploaderConsumerFile> risultatoQuery =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getUsername());
+                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getIdentificativoAttore());
 
            mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
-                    RelazioneUploaderConsumerFile.mappa_usernameUploader_arrayIdFile(risultatoQuery);
+                    RelazioneUploaderConsumerFile.mappa_identificativoUploader_arrayIdFile(risultatoQuery);
 
         }
 
@@ -78,14 +78,14 @@ public class RichiestaInfoSuUploader {
 
     }
 
-    /** Dato lo username di un Uploader, restituisce l'oggetto JSON
+    /** Dato l'identificativo di un Uploader, restituisce l'oggetto JSON
      * con le properties di quell'Uploader.*/
-    @Path("/proprietaUploader/{usernameUploader}")        // TODO : variabile d'ambiente
+    @Path("/proprietaUploader/{identificativoUploader}")        // TODO : variabile d'ambiente
     @GET
     // Produces omesso perché la serializzazione in JSON è personalizzata
-    public Response getUploader(@PathParam("usernameUploader") String usernameUploader) {
+    public Response getUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
 
-        Uploader uploader = Uploader.cercaUploaderDaUsername(usernameUploader);
+        Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
         Map<String,?> mappaProprietaUploader_nome_valore = uploader.getMappaAttributi_Nome_Valore();
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 

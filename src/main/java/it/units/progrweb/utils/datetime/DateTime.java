@@ -16,7 +16,7 @@ import java.util.Date;
 public class DateTime implements Comparable<DateTime> {
 
     /** Istante temporale rappresentato da quest'istanza. */
-    private final Instant istanteTemporale;
+    private Instant istanteTemporale;
 
     /** Differenza di fuso orario per UTC. Vedere {@link ZoneOffset#UTC}. */
     public static final ZoneOffset UTC_ZONE_OFFSET = ZoneOffset.UTC;
@@ -61,6 +61,16 @@ public class DateTime implements Comparable<DateTime> {
         );
     }
 
+    /** No-arg constructor e getter/setter.*/
+    private DateTime() {
+        istanteTemporale = Instant.ofEpochMilli(0);
+    }
+    private Instant getIstanteTemporale() {
+        return istanteTemporale;
+    }
+    private void setIstanteTemporale(Instant i) {
+        istanteTemporale = i;
+    }
 
     /** Restituisce l'istante attuale, rappresentato come istanza di questa classe.*/
     public static DateTime adesso() {
