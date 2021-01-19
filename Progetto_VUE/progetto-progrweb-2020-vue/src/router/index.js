@@ -233,5 +233,21 @@ router.creaRouteAutenticazioneConInfoRichiesta = routeRichiesta => {
   }
 }
 
+/** Si occupa del redirect verso la pagina di autenticazione.
+ * @param routeRichiesta per poter proseguire la navigazione
+ * dopo l'autenticazione.*/
+router.redirectVersoPaginaAutenticazione = routeRichiesta => {
+
+  if( router.currentRoute.value.path === process.env.VUE_APP_ROUTER_PATH_LOGIN ||
+      router.currentRoute.value.path ===  process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH ) {
+    // aggiorna la pagina se sei già in login
+    console.log("Aggiornamento della pagina.");
+    router.go(0);
+  }
+
+  router.push( router.creaRouteAutenticazioneConInfoRichiesta( routeRichiesta ) ) ;
+
+}
+
 
 export default router;
