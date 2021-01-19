@@ -32,7 +32,7 @@ import {richiestaGet, richiestaPostConFile} from "../../utils/http";
 import {ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
 
 export default {
-  name: "ListaDocumentiVistaDaUploader",
+  name: "ListaDocumentiDiUnConsumerVistaDaUploader",
   components: {TabellaDocumenti},
   data() {
     return {

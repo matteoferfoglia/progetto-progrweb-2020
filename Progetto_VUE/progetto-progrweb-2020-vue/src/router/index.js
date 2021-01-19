@@ -55,7 +55,7 @@ const routes = [
         path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
             process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
         name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
-        component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaUploader'),
+        component: () => import('../views/listaDocumenti/ListaDocumentiDiUnConsumerVistaDaUploader'),
         meta: {
           requiresAuth: true,  // TODO: require essere uploader
           requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
