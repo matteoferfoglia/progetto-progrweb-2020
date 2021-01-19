@@ -7,7 +7,7 @@
     <tr>
       <td v-for="nomeColonna in nomiColonneIntestazione"
           :key="nomeColonna">
-        {{ nomeColonna }}
+        {{ camelCaseToHumanReadable(nomeColonna) }}
       </td>
     </tr>
     </thead>
@@ -40,6 +40,7 @@
 
 <script>
 import FormConCsrfToken from "../../components/FormConCsrfToken";
+import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
 export default {
   name: "TabellaDocumenti",
   components: {FormConCsrfToken},
@@ -64,7 +65,12 @@ export default {
 
     /** Nome del Consumer a cui questi documenti si riferiscono.*/
     "nomeConsumer"
-  ]
+  ],
+  data() {
+    return {
+      camelCaseToHumanReadable: camelCaseToHumanReadable
+    }
+  }
 }
 </script>
 

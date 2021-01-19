@@ -12,6 +12,7 @@ import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
@@ -175,7 +176,18 @@ public abstract class File {
 
     /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.*/
     public static Field[] getAnteprimaProprietaFile() {
-        return File.class.getDeclaredFields();
+        return Arrays.stream(File.class.getDeclaredFields())
+                     .filter( field -> {
+                         String nomeAttributoInQuestaClasseDaNonMostrare = "identificativoFile";
+                         if( ! UtilitaGenerale.esisteAttributoInClasse(nomeAttributoInQuestaClasseDaNonMostrare, File.class) ) {
+                             // Informa se il field non si trova
+                             Logger.scriviEccezioneNelLog(File.class,
+                                     "L'attributo \"" + nomeAttributoInQuestaClasseDaNonMostrare + "\"" +
+                                             " non si trova nella classe: forse è stato rinominato",
+                                     new NoSuchFieldException());
+                         }
+                         return !field.getName().equals("identificativoFile");
+                     }).toArray(Field[]::new);
     }
 
     /** Restituisce l'identificativo del file.*/

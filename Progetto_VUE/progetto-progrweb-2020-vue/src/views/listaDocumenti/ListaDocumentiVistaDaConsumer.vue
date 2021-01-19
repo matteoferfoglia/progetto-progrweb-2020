@@ -48,7 +48,6 @@ import {
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
 } from "../../utils/documenti";
 import TabellaDocumenti from "./TabellaDocumenti";
-import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
 
 export default {
 
@@ -144,8 +143,7 @@ export default {
       await richiestaGet(process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
               .then( intestazione =>
                   this.nomiColonneIntestazione =
-                      intestazione.forEach( nomeProp => camelCaseToHumanReadable( nomeProp ) )
-                                  .push( this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI) );
+                      intestazione.push( this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI) );
 
       await getElencoDocumentiPerQuestoConsumer( this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] )
             // Promise restituisce mappa { idDocumento => documento }

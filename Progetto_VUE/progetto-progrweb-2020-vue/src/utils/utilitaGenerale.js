@@ -2,9 +2,6 @@
 
 // TODO : rivedere ed eventualmente ristrutturare questo script - serve??
 
-
-import {richiestaGet} from "./http";
-
 /** Restituisce true se l'oggetto passato come parametro
  è un array, false altrimenti.*/
 export const isArray = oggetto =>
@@ -72,7 +69,8 @@ export const unisciOggetti = ( oggetto1, oggeto2 ) => {
 export const camelCaseToHumanReadable = testoDaConvertire => {
     const risultato = testoDaConvertire.trim()
                                        .replace(/([A-Z])/g, " $1" )
-                                       .toLowerCase();
+                                       .toLowerCase()
+                                       .trim();
     return risultato.charAt(0).toUpperCase() +
            risultato.slice(1);
 }
