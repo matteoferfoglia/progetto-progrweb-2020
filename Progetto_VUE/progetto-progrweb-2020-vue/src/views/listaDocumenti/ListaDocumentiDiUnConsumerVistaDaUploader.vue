@@ -41,10 +41,10 @@ export default {
       isLayoutCaricato: false,
 
       /** Nome del consumer a cui i documenti si riferiscono.*/
-      nomeConsumer: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER],
+      nomeConsumer: undefined,
 
       /** Identificativo del consumer a cui i documenti si riferiscono.*/
-      idConsumer: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER],
+      idConsumer: undefined,
 
       /** Nome delle colonne di intestazione della tabella coi documenti.*/
       nomiPropDocumenti: [],
@@ -77,36 +77,58 @@ export default {
   },
   created() {
 
-    const caricaQuestoComponente = async () => {
+    this.caricaQuestoComponente()
+        .then( () => this.isLayoutCaricato = true )
+        .catch( console.error );
+
+  },
+  watch: {
+
+    /** Aggiorna il contenuto della pagina se cambia la route
+     * (<a href="https://stackoverflow.com/a/50140702">Fonte</a>)*/
+    '$route' () {
+      this.caricaQuestoComponente();
+    }
+
+  },
+  methods: {
+
+    /** Funzione di setup.*/
+    async caricaQuestoComponente() {
+
+      // Carica proprietà da Vue Router
+      this.nomeConsumer = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER];
+      this.idConsumer   = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER];
+
 
       // Richiede mappa idFile-propFile per questo consumer
       await richiestaGet( process.env.VUE_APP_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + this.idConsumer )
-            // Crea mappa
-            .then( rispostaConMappaFile_id_prop => new Map(Object.entries( rispostaConMappaFile_id_prop ) ) )
-            // Ordina mappa
-            .then( ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti )
+          // Crea mappa
+          .then( rispostaConMappaFile_id_prop => new Map(Object.entries( rispostaConMappaFile_id_prop ) ) )
+          // Ordina mappa
+          .then( ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti )
 
-            // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
-            .then( mappa =>
-                new Map(
-                   Array.from( mappa.entries() )
-                        .map( unDocumento => {
+          // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
+          .then( mappa =>
+              new Map(
+                  Array.from( mappa.entries() )
+                      .map( unDocumento => {
 
-                          // Decomposizione di ogni entry
-                          const idDocumento   = unDocumento[0];
-                          const propDocumento = unDocumento[1];
+                        // Decomposizione di ogni entry
+                        const idDocumento   = unDocumento[0];
+                        const propDocumento = unDocumento[1];
 
-                          propDocumento[this.NOME_PROP_DELETE_DOCUMENTO]   = process.env.VUE_APP_URL_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
-                          propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+                        propDocumento[this.NOME_PROP_DELETE_DOCUMENTO]   = process.env.VUE_APP_URL_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+                        propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
 
-                          return [ idDocumento, propDocumento ];
+                        return [ idDocumento, propDocumento ];
 
-                        })
-                )
-            )
+                      })
+              )
+          )
 
-            // Salva la mappa
-            .then( mappa => this.mappaDocumentiPerUnConsumer = mappa );
+          // Salva la mappa
+          .then( mappa => this.mappaDocumentiPerUnConsumer = mappa );
 
 
       // Richiede l'elenco dei nomi delle properties dei documenti per i Consumer
@@ -119,14 +141,7 @@ export default {
             this.nomiPropDocumenti = nomiPropDocumenti;
           })
 
-    };
-
-    caricaQuestoComponente()
-        .then( () => this.isLayoutCaricato = true )
-        .catch( console.error );
-
-  },
-  methods: {
+    },
 
     /** Funzione per inviare al server il nuovo documento
      * oltre che i valori dei campi di input presi dal form.*/
