@@ -17,7 +17,7 @@
     <p>Carica un nuovo documento per {{ nomeConsumer }}:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
     <label>Lista di hashtag <input type="text" v-model="listaHashtag" placeholder="hashtag1, hashtag2"></label>
-    <label>Documento        <input type="file"></label><!-- TODO : caricare documento-->
+    <label>Documento        <input type="file" required></label><!-- TODO : caricare documento-->
     <input type="submit" value="Carica">
   </form>
 
@@ -30,7 +30,7 @@
 <script>
 import TabellaDocumenti from "./TabellaDocumenti";
 import {richiestaGet, richiestaPostConFile} from "../../utils/http";
-import {ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
+import {MappaDocumenti, ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
 
 export default {
   name: "ListaDocumentiDiUnConsumerVistaDaUploader",
@@ -59,7 +59,7 @@ export default {
       /** Mappa documenti ( id => proprietà ) per uno specifico Consumer.
        * Questa mappa è caricata dinamicamente in base alle azioni
        * dell'utente.*/
-      mappaDocumentiPerUnConsumer: new Map(),
+      mappaDocumentiPerUnConsumer: new MappaDocumenti(),
 
 
 
@@ -129,7 +129,7 @@ export default {
           )
 
           // Salva la mappa
-          .then( mappa => this.mappaDocumentiPerUnConsumer = mappa );
+          .then( mappa => this.mappaDocumentiPerUnConsumer.set( mappa ) );
 
 
       // Richiede l'elenco dei nomi delle properties dei documenti per i Consumer
@@ -151,7 +151,7 @@ export default {
       // Id del documento appeso in fondo all'url
       const idDocumentoEliminato = urlEliminazioneDocumento.substring(urlEliminazioneDocumento.lastIndexOf("/")+1);
 
-      this.mappaDocumentiPerUnConsumer.delete(idDocumentoEliminato);
+      this.mappaDocumentiPerUnConsumer.get().delete(idDocumentoEliminato);
 
     },
 
@@ -183,8 +183,10 @@ export default {
             alert("Documento caricato");
 
             // Aggiungi il documento all'elenco di quelli mostrati da questo componente
-            this.mappaDocumentiPerUnConsumer = new Map([ ...mappa_idDocumento_proprietaDocumento, // merge delle mappe
-                                                                ...this.mappaDocumentiPerUnConsumer]);
+            this.mappaDocumentiPerUnConsumer.set(
+                new Map([ ...Object.entries(mappa_idDocumento_proprietaDocumento),  // merge della nuova entry in cima alla mappa
+                                ... this.mappaDocumentiPerUnConsumer.get()] )
+            );
 
             // Pulisci i campi
             document.getElementById("caricaNuovoDocumento").reset();
@@ -192,7 +194,7 @@ export default {
           })
           .catch( console.error );
       else
-        console.error( "Campi del form non validi." );
+        alert( "Campi del form non validi." );
 
     },
 

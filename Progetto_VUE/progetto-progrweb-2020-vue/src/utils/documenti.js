@@ -137,3 +137,43 @@ const getNomePropertyDataVisualizzazioneDocumenti = async () => {
         });
 
 }
+
+
+/** Classe per rappresentare una mappa avente per chiave
+ * gli identificativi dei documenti e le properties di
+ * quei documeni come valori corrispondenti. Esempio:
+ * {
+ *     "12345" => { nomeDocumento: "Fattura", Hashtag: "pagare" },
+ *     "67890" => { nomeDocumento: "Bonifico", Hashtag: "soldi" },
+ * }.
+ * Si accede alla mappa tramite getter/setter.
+ *
+ * Si tratta di un oggetto wrapper: definisco un
+ * oggetto avente una proprietà corrispondente alla mappa
+ * sopra descritta.
+ *
+ * MOTIVAZIONE DI UN OGGETTO WRAPPER:
+ *  Se passo ad un altro componente un oggetto immutabile
+ *  e poi lo modifico nel primo componente, allora nel primo
+ *  componente ottengo un nuovo oggetto (con un riferimento
+ *  diverso da quello che ho passato all'altro componente):
+ *  i due oggetti ormai sarebbero slegati.
+ *  Soluzione: utilizzo un wrapper: se ne modifico una property
+ *  da un componente e poi l'altro componente accede a quella
+ *  property dello stesso oggetto, allora vedrà il valore aggiornato.
+ */
+export class MappaDocumenti{
+
+    constructor() {
+        this.mappaDocumenti = { mappa: new Map()};
+    }
+
+    get() {
+        return this.mappaDocumenti.mappa;
+    }
+
+    set(nuovaMappaDocumenti) {
+        this.mappaDocumenti.mappa = nuovaMappaDocumenti;
+    }
+
+}

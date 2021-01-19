@@ -44,7 +44,7 @@
 
 import {richiestaGet} from "../../utils/http";
 import {
-  creaIndiceDeiFileRispettoAgliHashtagCheContengono,
+  creaIndiceDeiFileRispettoAgliHashtagCheContengono, MappaDocumenti,
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
 } from "../../utils/documenti";
 import TabellaDocumenti from "./TabellaDocumenti";
@@ -58,16 +58,17 @@ export default {
       layoutCaricato: false,  // diventa true quando il layout è caricato
       nomiColonneIntestazione: [],
 
-      /** Oggetto di tipo Map in cui ogni entry ha come chiave
-       * l'identificativo del documento e come valore la sua
-       * rappresentazione come oggetto (in base alle sue property).
+      /** Oggetto di tipo {@link MappaDocumenti} avente come property
+       * una mappa in cui ogni entry ha come chiave l'identificativo
+       * del documento e come valore la sua rappresentazione come
+       * oggetto (in base alle sue property).
        * Le entry sono ordinate in base alla data del documento:
        * dal più recente al meno recente.*/
-      elencoDocumenti: new Map(),
+      elencoDocumenti: new MappaDocumenti(),
 
       /** Come {@link #elencoDocumenti}, ma contiene solo i
        * documenti da mostrare, a seguito del filtraggio dell'utente.*/
-      elencoDocumentiDaMostrare: new Map(),
+      elencoDocumentiDaMostrare: new MappaDocumenti(),
 
       /** Nella rappresentazione di un documento, questo attributo
        * è il nome della property contenente la lista di hashtag.*/
@@ -124,9 +125,9 @@ export default {
                // Fonte (flatMap): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
       );
 
-      this.elencoDocumentiDaMostrare = this.elencoDocumenti
-                                           .filter( entryDocumento => setIdDocumentiDaMostrare.includes(entryDocumento[0]) ); // entryDocumento[0] è l'id di un documento
-                                            // Risultato filter: nella mappa restano solo i documenti che hanno id tra quelli filtrati prima
+      this.elencoDocumentiDaMostrare.set( this.elencoDocumenti.get()
+                                              .filter( entryDocumento => setIdDocumentiDaMostrare.includes(entryDocumento[0]) ) ); // entryDocumento[0] è l'id di un documento
+                                              // Risultato filter: nella mappa restano solo i documenti che hanno id tra quelli filtrati prima
 
       // Osservazione: elencoDocumenti non viene sovrascritto, quindi l'ordine di visualizzazione è mantenuto
       // TODO : verificare che si mantenga l'ordine di visualizzazione dei documenti
@@ -169,8 +170,8 @@ export default {
                     propsDocumento[this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] =
                         process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_PER_CONSUMER + "/" + idDocumento );
 
-                this.elencoDocumenti = elencoDocumenti;
-                return elencoDocumenti;
+                this.elencoDocumenti.set( elencoDocumenti );
+
               });
 
     }

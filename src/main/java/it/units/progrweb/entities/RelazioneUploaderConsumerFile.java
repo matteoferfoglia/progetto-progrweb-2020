@@ -375,8 +375,9 @@ public class RelazioneUploaderConsumerFile {
 
     /** Crea un nuovo {@link File}, caricato dall'{@link Uploader} il
      * cui identificativo è fornito come parametro e destinato al {@link Consumer}
-     * il cui identificativo è fornito come parametro.*/
-    public static void aggiungiFile(InputStream contenutoFile, String nomeFile, List<String> listaHashtag,
+     * il cui identificativo è fornito come parametro.
+     * @return L'entità appena salvata.*/
+    public static File aggiungiFile(InputStream contenutoFile, String nomeFile, List<String> listaHashtag,
                                     Long identificativoUploader, Long identificativoConsumer ) {
 
         if( listaHashtag==null ) listaHashtag = new ArrayList<>();
@@ -395,6 +396,8 @@ public class RelazioneUploaderConsumerFile {
         RelazioneUploaderConsumerFile relazioneUploaderConsumerFile =
                 new RelazioneUploaderConsumerFile(identificativoConsumer, identificativoUploader, fileSalvato.getIdentificativoFile());
         DatabaseHelper.salvaEntita(relazioneUploaderConsumerFile);
+
+        return fileSalvato;
 
     }
 

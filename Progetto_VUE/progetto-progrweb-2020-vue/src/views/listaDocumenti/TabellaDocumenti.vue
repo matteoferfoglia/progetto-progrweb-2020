@@ -1,7 +1,7 @@
 <template>
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
-  <table v-if="elencoDocumentiDaMostrare.size > 0">
+  <table v-if="elencoDocumentiDaMostrare.get().size > 0">
     <!-- Tabella dei documenti -->
     <thead>
     <tr>
@@ -12,8 +12,8 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="documento in Object.fromEntries(elencoDocumentiDaMostrare_wrapper)"
-        :key="documento[nomePropLinkDownload]"><!-- Ogni riga è un documento -->
+    <tr v-for="(documento, indice) in Object.fromEntries(elencoDocumentiDaMostrare.get())"
+        :key="indice"><!-- Ogni riga è un documento -->
       <td v-for="propertyQuestaColonna in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload &&
                                                                                          nomeColonna!==nomePropLinkElimina     )"
           :key="propertyQuestaColonna" >
@@ -48,7 +48,7 @@ export default {
     /** Nomi delle colonne nell'intestazione della tabella.*/
     "nomiColonneIntestazione",
 
-    /** Elenco dei documenti da mostrare.*/
+    /** Elenco dei documenti da mostrare, di tipo {@link MappaDocumenti}.*/
     "elencoDocumentiDaMostrare",
 
     /** In un documento, il nome della property (se presente)
@@ -64,15 +64,14 @@ export default {
   ],
   data() {
     return {
-      camelCaseToHumanReadable: camelCaseToHumanReadable,
 
-      /** Wrapper per {@link #elencoDocumentiDaMostrare} per modificarne
-       * i valori quando il padre li aggiorna.*/
-      elencoDocumentiDaMostrare_wrapper: new Map(),
+      /** "Import" della funzione per usarla nel template.*/
+      camelCaseToHumanReadable: camelCaseToHumanReadable,
 
       /** In un documento, il nome della property (se presente)
        * il cui valore è il nome di quel documento.*/
-      nomePropNomeDocumento: undefined,
+      nomePropNomeDocumento: undefined
+
     }
   },
   created() {
@@ -82,17 +81,6 @@ export default {
           .then( nomeProp => this.nomePropNomeDocumento = nomeProp )
           .catch( console.error );
 
-  },
-  watch: {
-
-    /** Watcher per aggiornare l'elenco dei documenti se modificato dal paadre
-     * (<a href="https://stackoverflow.com/a/42134176">Fonte</a>).
-     * @param valoreAggiornato */
-    elencoDocumentiDaMostrare: {
-      handler(valoreAggiornato) {
-        this.elencoDocumentiDaMostrare_wrapper = valoreAggiornato;
-      }
-    }
   },
   methods: {
 

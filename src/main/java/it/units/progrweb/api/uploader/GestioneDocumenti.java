@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Classe per permettere ad un {@link Uploader} di gestire
@@ -70,7 +71,10 @@ public class GestioneDocumenti {
      * richiesta viene determinato dagli header della richiesta
      * stessa
      * (<a href="https://docs.oracle.com/javaee/7/api/javax/ws/rs/FormParam.html">Fonte</a>,
-     * <a href="https://stackoverflow.com/a/25889454">Fonte</a>).*/
+     * <a href="https://stackoverflow.com/a/25889454">Fonte</a>).
+     * Se il caricamento va a buon fine, questo servizio risponde
+     * con l'entry ( {chiave: {proprietà documento}} ) relativa
+     * al documento appena creato.*/
     @Path("/uploadDocumento")
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
@@ -96,10 +100,12 @@ public class GestioneDocumenti {
             estensioneFile = nomeFileDaDettagli.substring(indiceSeparatoreEstensioneNelNome);
         }
 
-        RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
+        File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
                                                     identificativoUploader, identificativoConsumerDestinatario );
 
-        return Response.noContent().build();
+        // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
+        Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
+        return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
 
     }
 
