@@ -52,9 +52,9 @@ class FileStorage extends File {
     /** Vedere {@link #getContenutoFile(File, String)}.*/
     private InputStream getContenutoFile(String indirizzoIpVisualizzazione) {
         // TODO : da implementare
-        if( this.dataEdOraDiVisualizzazione == null ) {
+        if( getDataEdOraDiVisualizzazione() == null ) {
             // Si tiene traccia solo del primo accesso al file
-            this.dataEdOraDiVisualizzazione = DateTime.adesso();
+            setDataEdOraDiVisualizzazione( DateTime.adesso() );
             this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
         }
 

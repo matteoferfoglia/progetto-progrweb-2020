@@ -2,6 +2,8 @@ package it.units.progrweb.utils;
 
 import com.google.appengine.repackaged.com.google.gson.Gson;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -98,39 +100,7 @@ public class JsonHelper {
                                                  String chiave = String.valueOf( entry.getKey() );
                                                  Object valore = entry.getValue() ;
 
-                                                 String valoreJson;
-
-                                                 if ( valore != null ) {
-
-                                                     switch (valore.getClass().getSimpleName()) {
-
-                                                         case "Integer":
-                                                         case "Float":
-                                                         case "Long":
-                                                         case "Double":
-                                                         case "Boolean":
-                                                             valoreJson = String.valueOf(valore);
-                                                             break;
-
-                                                         case "String":
-                                                             valoreJson = (String) valore;
-                                                             if (!(valoreJson.trim().startsWith("{") && valoreJson.endsWith("}"))) {
-                                                                 if (!valoreJson.equals("null")) {
-                                                                     // Se qui, si tratta di una stringa
-                                                                     valoreJson = "\"" + valoreJson + "\"";
-                                                                 } // null senza virgolette
-                                                             } // altrimenti è la rappresentazione di un oggetto JSON e non bisogna circondarlo con le virgolette
-                                                             break;
-
-                                                         default:
-                                                             valoreJson = "null";  // non so cos'è
-
-                                                             // TODO : non gestito caso array
-                                                     }
-
-                                                 } else {
-                                                     valoreJson = "null";
-                                                 }
+                                                 String valoreJson = creaValoreJson( valore );
 
                                                  return " \"" + chiave + "\":" + valoreJson + " ";  //  TODO : i due punti andrebbero spaziati
 
@@ -140,5 +110,62 @@ public class JsonHelper {
 
         return stringaJson;
 
+    }
+
+    /** Dato un oggetto, crea la sua rappresentazione JSON.*/
+    private static String creaValoreJson( Object valoreDaConvertire ) {
+        String valoreJson;
+
+        if ( valoreDaConvertire != null ) {
+
+            if (valoreDaConvertire instanceof Collection) {
+                return convertiCollectionInJson((Collection<?>) valoreDaConvertire);
+            } else if (valoreDaConvertire.getClass().isArray()) {
+                return convertiCollectionInJson(Arrays.asList(valoreDaConvertire));
+            } else {
+
+                switch (valoreDaConvertire.getClass().getSimpleName()) {
+
+                    case "Integer":
+                    case "Float":
+                    case "Long":
+                    case "Double":
+                    case "Boolean":
+                        return String.valueOf(valoreDaConvertire);
+
+                    case "String":
+                        valoreJson = (String) valoreDaConvertire;
+                        if (!(valoreJson.trim().startsWith("{") && valoreJson.endsWith("}"))) {
+                            if (!valoreJson.equals("null")) {
+                                // Se qui, si tratta di una stringa
+                                return "\"" + valoreJson + "\"";
+                            } // null senza virgolette
+                        } // altrimenti è la rappresentazione di un oggetto JSON e non bisogna circondarlo con le virgolette
+                        return valoreJson;
+
+                    default: // non so cos'è: provo a convertirlo in String
+                        try {
+                            return String.valueOf( valoreDaConvertire );
+                        } catch (Exception e) {
+                            return "null";
+                        }
+                }
+
+            }
+
+        } else{
+            return  "null";
+        }
+
+    }
+
+    /** Converte i valori di una {@link Collection} nella corrispondente stringa JSON.*/
+    private static String convertiCollectionInJson( Collection<?> collection ) {
+        return
+                "["
+                + collection.stream()
+                            .map(JsonHelper::creaValoreJson)
+                            .collect( Collectors.joining(",") )
+                + "]";
     }
 }

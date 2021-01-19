@@ -88,7 +88,21 @@ public abstract class DatabaseHelper {
 
         // TODO : attenzione: molto simile al metodo con lo stesso nome che prende String come parametro ... refactoring?
 
-        // TODO : attenzione a quante volte viene invocato questo metodo (accedere al db costa)
+        // TODO : attenzione a quante volte viene invocato questo metodo (accedere al db costa), di seguito stacktrafce invocazioni
+        //        ma riprovare mettendo qua il breakpoint e vedere quante volte viene chiamato in una request
+        /* Invocato 4 volte da Filtro Autenticazione sulla stessa richiesta, serve?
+            getById:94, DatabaseHelper (it.units.progrweb.persistence)
+            getAttoreById:151, Attore (it.units.progrweb.entities.attori)
+            isStessoHashCookieIdNelToken:278, Autenticazione (it.units.progrweb.utils)
+            isClientAutenticato:236, Autenticazione (it.units.progrweb.utils)
+            isClientAttualmenteAutenticato:52, LoginLogout (it.units.progrweb.api)
+            FiltroAutenticazione
+
+            getById:94, DatabaseHelper (it.units.progrweb.persistence)
+            getNominativoDaIdentificativo:56, Consumer (it.units.progrweb.entities.attori.nonAdministrator.consumer)
+            getNomeUploader:219, GestioneConsumer (it.units.progrweb.api.uploader)
+            doFilter:34, FiltroUploader (it.units.progrweb.filters.attori)
+       */
 
         try {
             return database.load().type(classeEntita).id(identificativoEntita).now();

@@ -15,6 +15,10 @@ import java.util.Date;
  */
 public class DateTime implements Comparable<DateTime> {
 
+    /** Pattern da utilizzare per la conversione da un'istanza di
+     * questa classe in una {@link String} e viceversa.*/
+    private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd HH:mm:ss X";
+
     /** Istante temporale rappresentato da quest'istanza. */
     private Instant istanteTemporale;
 
@@ -61,17 +65,6 @@ public class DateTime implements Comparable<DateTime> {
         );
     }
 
-    /** No-arg constructor e getter/setter.*/
-    private DateTime() {
-        istanteTemporale = Instant.ofEpochMilli(0);
-    }
-    private Instant getIstanteTemporale() {
-        return istanteTemporale;
-    }
-    private void setIstanteTemporale(Instant i) {
-        istanteTemporale = i;
-    }
-
     /** Restituisce l'istante attuale, rappresentato come istanza di questa classe.*/
     public static DateTime adesso() {
         return new DateTime(Instant.now());
@@ -95,6 +88,22 @@ public class DateTime implements Comparable<DateTime> {
     public static DateTime convertiDaDate(Date date) {
         return new DateTime(Instant.ofEpochMilli(date.getTime()));
     }
+
+    /** Metodo per convertire un'istanza di questa classe
+     * al tipo {@link String}, che può risultare più semplice
+     * da gestire*/
+    public static String convertiInString(DateTime dataEdOraDiCaricamento) {
+        return dataEdOraDiCaricamento.toString( DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
+    }
+
+    /** Metodo per ottenere un'istanza di questa classe
+     * a partire da un valore di tipo {@link String} ottenuto
+     * col metodo {@link #convertiInString(DateTime)}*/
+    public static DateTime convertiDaString(String dataEdOraDiCaricamento) {
+        return new DateTime( dataEdOraDiCaricamento,
+                             DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
+    }
+
 
     /** Restituisce un'istanza della classe Date a partire
      * da un oggetto di questa classe. */
@@ -193,6 +202,11 @@ public class DateTime implements Comparable<DateTime> {
     @Override
     public String toString() {
         return istanteTemporale.toString();
+    }
+
+    /** Crea una rappresentazione come stringa nel {@link DateTimeFormatter} fornito.*/
+    private String toString(DateTimeFormatter dateTimeFormatter) {
+        return dateTimeFormatter.withZone(UTC_ZONE_OFFSET).format( istanteTemporale );
     }
 
     /** Restituisce la data rappresentata da quest'istanza,

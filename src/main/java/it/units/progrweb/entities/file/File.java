@@ -44,19 +44,38 @@ public abstract class File {
     @Index
     protected String nomeDocumento;        // TODO : verificare in objectify che questi campi siano presenti nella subclass "@Entity" che estende questa class
 
-    /** Data e ora di caricamento del file.*/
+    /** Data e ora di caricamento del file salvati come Long.*/
     @Index
-    protected DateTime dataEdOraDiCaricamento;
+    private String dataEdOraDiCaricamento;
 
-    /** Data e ora di (eventuale) visualizzazione del file.*/
-    @Index  // TODO : è importante sapere la dataora di visualizzazione o non serve l'index?
-    protected DateTime dataEdOraDiVisualizzazione;
+    /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
+    private String dataEdOraDiVisualizzazione;
 
     protected File(){}
 
     protected File(String nomeDocumento, DateTime dataEdOraDiCaricamento) {
         this.nomeDocumento = nomeDocumento;
-        this.dataEdOraDiCaricamento = dataEdOraDiCaricamento;
+        this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
+    }
+
+    public void setNomeDocumento(String nomeDocumento) {
+        this.nomeDocumento = nomeDocumento;
+    }
+
+    public DateTime getDataEdOraDiCaricamento() {
+        return DateTime.convertiDaString( dataEdOraDiCaricamento );
+    }
+
+    public void setDataEdOraDiCaricamento(DateTime dataEdOraDiCaricamento) {
+        this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
+    }
+
+    public DateTime getDataEdOraDiVisualizzazione() {
+        return DateTime.convertiDaString( dataEdOraDiVisualizzazione );
+    }
+
+    public void setDataEdOraDiVisualizzazione(DateTime dataEdOraDiVisualizzazione) {
+        this.dataEdOraDiVisualizzazione = DateTime.convertiInString( dataEdOraDiVisualizzazione );
     }
 
     /** Restituisce il nome dell'attributo che contiene la lista
@@ -221,6 +240,7 @@ public abstract class File {
     public static File salvaFileInDb( String nomeFile, byte[] contenuto, List<String> listaHashtag ) {
 
         FileStorage fileStorage = new FileStorage(nomeFile, contenuto, listaHashtag);
+        fileStorage.setDataEdOraDiCaricamento( DateTime.adesso() );
         Long idFile = (Long) DatabaseHelper.salvaEntita( fileStorage );
         fileStorage.setIdentificativoFile( idFile );
         return fileStorage;

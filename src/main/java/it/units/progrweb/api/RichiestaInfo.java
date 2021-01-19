@@ -110,7 +110,7 @@ public class RichiestaInfo {
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
-    /** Con riferimento a {@link GestioneConsumer#Long(String)}, questo metodo restituisce
+    /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
      * il nome della proprietà contenente lo username del {@link Consumer}.*/
     @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
     @GET

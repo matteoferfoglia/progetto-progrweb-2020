@@ -101,7 +101,6 @@ public class GestioneDocumenti {
     public Response getElencoFile(@Context HttpServletRequest httpServletRequest,
                                   @PathParam("identificativoConsumer") Long identificativoConsumer) {
 
-        // TODO rivere (Method not allowed ??)
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
