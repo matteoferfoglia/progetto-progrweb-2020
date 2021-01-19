@@ -69,9 +69,9 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti = mappaDocume
 
         // Ordina mappa in base alla data di caricamento ( Fonte: https://stackoverflow.com/a/50427905 )
         .then( nomePropertyDataCaricamento =>
-            mappaDocumenti = new Map([...mappaDocumenti.entries()]
-                .sort( (a,b) => b[1][nomePropertyDataCaricamento] - a[1][nomePropertyDataCaricamento] ))
-        )   // TODO : verificare corretto ordinamento
+            mappaDocumenti = new Map([...mappaDocumenti]
+                .sort( (a,b) => a[1][nomePropertyDataCaricamento] < b[1][nomePropertyDataCaricamento] ? 1 : -1 ))
+        )
 
         // Crea l'array con l'id dei documenti non ancora visualizzati
         .then( getNomePropertyDataVisualizzazioneDocumenti )
