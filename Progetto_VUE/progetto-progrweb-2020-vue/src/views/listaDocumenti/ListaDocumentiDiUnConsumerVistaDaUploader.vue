@@ -8,7 +8,8 @@
     <TabellaDocumenti :nomiColonneIntestazione  ="nomiPropDocumenti"
                       :elencoDocumentiDaMostrare="mappaDocumentiPerUnConsumer"
                       :nomePropLinkDownload     ="NOME_PROP_DOWNLOAD_DOCUMENTO"
-                      :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"   />
+                      :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"
+                      @documento-eliminato="rimuoviDocumentoDaLista"/>
   </section>
 
   <form @submit.prevent="caricaNuovoDocumento" id="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
@@ -143,6 +144,17 @@ export default {
 
     },
 
+    /** Funzione per eliminare un documento dall'elenco, a seguito
+     * della richiesta di eliminazione da parte dell'utente.*/
+    rimuoviDocumentoDaLista(urlEliminazioneDocumento) {
+
+      // Id del documento appeso in fondo all'url
+      const idDocumentoEliminato = urlEliminazioneDocumento.substring(urlEliminazioneDocumento.lastIndexOf("/")+1);
+
+      this.mappaDocumentiPerUnConsumer.delete(idDocumentoEliminato);
+
+    },
+
     /** Funzione per inviare al server il nuovo documento
      * oltre che i valori dei campi di input presi dal form.*/
     caricaNuovoDocumento() {
@@ -163,8 +175,16 @@ export default {
 
       if( formValido )
         richiestaPostConFile( process.env.VUE_APP_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER, formData)
-          .then( () => {
+          .then( mappa_idDocumento_proprietaDocumento => {
+            // Server restituisce una mappa avente per chiave l'id del file aggiunto
+            //  e per valore l'oggetto con le properties del file: l'unica entry è
+            //  il file appena aggiunto
+
             alert("Documento caricato");
+
+            // Aggiungi il documento all'elenco di quelli mostrati da questo componente
+            this.mappaDocumentiPerUnConsumer = new Map([ ...mappa_idDocumento_proprietaDocumento, // merge delle mappe
+                                                                ...this.mappaDocumentiPerUnConsumer]);
 
             // Pulisci i campi
             document.getElementById("caricaNuovoDocumento").reset();

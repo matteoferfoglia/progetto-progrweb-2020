@@ -120,6 +120,7 @@ export default {
     eliminaDocumento( urlEliminazioneDocumento ) {
       richiestaDelete( urlEliminazioneDocumento )
           .then( () => {
+            this.$emit( "documento-eliminato", urlEliminazioneDocumento );
             alert("Documento eliminato");
           })
           .catch( console.error );
