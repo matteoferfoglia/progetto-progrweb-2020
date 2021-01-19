@@ -53,12 +53,12 @@ public class GestioneDocumenti {
             if( RelazioneUploaderConsumerFile.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
                 return Response
                         .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                        .entity("File " + idFileDaEliminare + "eliminato")    // TODO : var ambiene con messaggi errore
+                        .entity("File " + idFileDaEliminare + " eliminato")    // TODO : var ambiene con messaggi errore
                         .build();
             else return Autenticazione.creaResponseForbidden("Non autorizzato a cancellare il file.");
 
         } catch (NotFoundException notFoundException) {
-            return NotFoundException.creaResponseNotFound("File non trovato.");
+            return NotFoundException.creaResponseNotFound("File " + idFileDaEliminare + " non trovato.");
         }
 
     }

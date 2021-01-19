@@ -38,7 +38,7 @@
 
 <script>
 import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
-import {richiestaGet} from "../../utils/http";
+import {richiestaDelete, richiestaGet} from "../../utils/http";
 export default {
   name: "TabellaDocumenti",
   props: [
@@ -118,7 +118,7 @@ export default {
 
     /** Metodo per la cancellazione di un documento (dipende dall'URL).*/
     eliminaDocumento( urlEliminazioneDocumento ) {
-      richiestaGet( urlEliminazioneDocumento )
+      richiestaDelete( urlEliminazioneDocumento )
           .then( () => {
             alert("Documento eliminato");
           })
