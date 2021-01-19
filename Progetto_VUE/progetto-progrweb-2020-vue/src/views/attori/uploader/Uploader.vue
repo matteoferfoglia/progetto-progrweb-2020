@@ -37,7 +37,6 @@
 </template>
 
 <script>
-// TODO : componente Consumer interamente da implementare
 import {richiestaDelete, richiestaGet, richiestaPost} from "../../../utils/http";
 import Form from "../../../components/FormConCsrfToken";
 import SchedaUnConsumer from "./SchedaUnConsumer";
@@ -76,7 +75,7 @@ export default {
       emailNuovoConsumer: "",
 
       /** Mappa { idConsumer => oggettoConProprietaConsumer },
-       * ordinata alfabeticamente rispetto al nome del Consumer.*/  // TODO : verificare ordinamento corretto
+       * ordinata alfabeticamente rispetto al nome del Consumer.*/
       mappa_idConsumer_proprietaConsumer: new Map(),
 
       /** Nell'oggetto restituito dal server contenente le informazioni di un
@@ -126,7 +125,7 @@ export default {
                 this.mappa_idConsumer_proprietaConsumer =
                     new Map( [...mappa_idConsumer_proprietaConsumer.entries()]
                             .sort((a,b) =>
-                                a[1][this.NOME_PROP_NOME_UPLOADER] - b[1][this.NOME_PROP_NOME_UPLOADER] ) ) ) // TODO : verificare
+                                a[1][this.NOME_PROP_NOME_UPLOADER] - b[1][this.NOME_PROP_NOME_UPLOADER] ) ) )
 
             .catch( console.error ) ;
 
@@ -153,13 +152,11 @@ export default {
 
       richiestaDelete( process.env.VUE_APP_DELETE_CONSUMER_PER_QUESTO_UPLOADER + "/" + idConsumer, parametriRichiestaDelete )
         .then( () => {
-            alert("Consumer \"" + this.mappa_idConsumer_proprietaConsumer.values()[this.NOME_PROP_USERNAME_CONSUMER] + "\" eliminato." ); // TODO : fare qualcosa di più carino di un alert
+            alert("Consumer \"" + this.mappa_idConsumer_proprietaConsumer.get(idConsumer)[this.NOME_PROP_NOME_CONSUMER] + "\" eliminato." );
             this.mappa_idConsumer_proprietaConsumer.delete(idConsumer);
           })
         .catch( rispostaErrore => {
           console.error("Errore durante l'eliminazione del consumer: " + rispostaErrore );
-          // TODO : gestire l'errore (invio mail ai gestori?)
-          // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
         });
     },
 
@@ -221,7 +218,7 @@ const getElencoConsumer = async () => {
   // TODO : verificare correttezza
 
     return richiestaGet( process.env.VUE_APP_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER )
-        .then( rispostaConListaConsumer => rispostaConListaConsumer )  // TODO : verificare che arrivi correttamente un array
+        .then( rispostaConListaConsumer => rispostaConListaConsumer )
         .catch( rispostaErrore => {
           console.error("Errore durante il caricamento dei Consumer: " + rispostaErrore );
           return Promise.reject(rispostaErrore);
