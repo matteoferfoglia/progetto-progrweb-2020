@@ -12,18 +12,17 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="(documento, idDocumento) in Object.fromEntries(elencoDocumentiDaMostrare)"
-        :key="idDocumento"><!-- Ogni riga è un documento -->
-      <td v-for="(propertyQuestaColonna, indiceColonna) in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload && nomeColonna!==nomePropLinkElimina )"
-          :key="indiceColonna"
-          id="{{idDocumento}}">
+    <tr v-for="documento in Object.fromEntries(elencoDocumentiDaMostrare_wrapper)"
+        :key="documento[nomePropLinkDownload]"><!-- Ogni riga è un documento -->
+      <td v-for="propertyQuestaColonna in nomiColonneIntestazione.filter( nomeColonna => nomeColonna!==nomePropLinkDownload && nomeColonna!==nomePropLinkElimina )"
+          :key="propertyQuestaColonna" >
         {{ documento[propertyQuestaColonna] }}
       </td>
       <td v-if="nomePropLinkDownload">
-        <a href="{{ documento[nomePropLinkDownload] }}">Download</a> <!-- Link download documento -->
+        <a :href=documento[nomePropLinkDownload]>Download</a> <!-- Link download documento -->
       </td>
       <td v-if="nomePropLinkElimina">
-        <a href="{{ documento[nomePropLinkDownload] }}">Elimina</a> <!-- Link download documento -->
+        <a :href="documento[nomePropLinkElimina]">Elimina</a> <!-- Link download documento -->
       </td>
     </tr>
     </tbody>
@@ -45,6 +44,8 @@ export default {
   name: "TabellaDocumenti",
   components: {FormConCsrfToken},
   props: [
+
+    // Passaggio di oggetti tramite props, Fonte: https://stackoverflow.com/a/57200056
 
     /** Nomi delle colonne nell'intestazione della tabella.*/
     "nomiColonneIntestazione",
@@ -68,7 +69,22 @@ export default {
   ],
   data() {
     return {
-      camelCaseToHumanReadable: camelCaseToHumanReadable
+      camelCaseToHumanReadable: camelCaseToHumanReadable,
+
+      /** Wrapper per {@link #elencoDocumentiDaMostrare} per modificarne
+       * i valori quando il padre li aggiorna.*/
+      elencoDocumentiDaMostrare_wrapper: new Map()
+    }
+  },
+  watch: {
+
+    /** Watcher per aggiornare l'elenco dei documenti se modificato dal paadre
+     * (<a href="https://stackoverflow.com/a/42134176">Fonte</a>).
+     * @param valoreAggiornato */
+    elencoDocumentiDaMostrare: {
+      handler(valoreAggiornato) {
+        this.elencoDocumentiDaMostrare_wrapper = valoreAggiornato;
+      }
     }
   }
 }

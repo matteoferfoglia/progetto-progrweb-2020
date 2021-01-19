@@ -8,7 +8,7 @@
     <TabellaDocumenti :nomiColonneIntestazione  ="nomiPropDocumenti"
                       :elencoDocumentiDaMostrare="mappaDocumentiPerUnConsumer"
                       :nomePropLinkDownload     ="NOME_PROP_DOWNLOAD_DOCUMENTO"
-                      :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"  />
+                      :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"   />
   </section>
 
   <form @submit.prevent="caricaNuovoDocumento" id="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
@@ -96,8 +96,8 @@ export default {
                           const idDocumento   = unDocumento[0];
                           const propDocumento = unDocumento[1];
 
-                          propDocumento[this.NOME_PROP_DELETE_DOCUMENTO]   = process.env.VUE_APP_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
-                          propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+                          propDocumento[this.NOME_PROP_DELETE_DOCUMENTO]   = process.env.VUE_APP_URL_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+                          propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
 
                           return [ idDocumento, propDocumento ];
 
