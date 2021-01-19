@@ -2,7 +2,7 @@
 
   <!-- Componente per mostrare ad un Uploader la scheda di un Consumer -->
 
-  <router-link :to="{ name: vueRouter_vistaDocumenti,
+  <router-link :to="{ name: vueRouter_vistaDocumentiDelConsumer,
                       params: {
                         [vueRouter_idConsumer]:   consumer[0],
                         [vueRouter_nomeConsumer]: consumer[1][NOME_PROP_NOME_CONSUMER]
@@ -51,7 +51,7 @@ export default {
 
       // Parametri Vue-Router
       /** Nome della vista dei documenti caricati da questo Uploader per il Consumer specificato.*/
-      vueRouter_vistaDocumenti: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
+      vueRouter_vistaDocumentiDelConsumer: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
       /** Identificativo del consumer di cui si vogliono visualizzare i documenti.*/
       vueRouter_idConsumer: process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
       /** Nome del consumer di cui si vogliono visualizzare i documenti.*/
