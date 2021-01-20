@@ -19,6 +19,9 @@ export const HTTP_STATUS_OK = 200;
 /** Stato della risposta HTTP: CONFLICT.*/
 export const HTTP_STATUS_CONFLICT = 409;
 
+/** Stato della risposta HTTP indicante che il CSRF token risulta invalido.*/
+export const HTTP_STATUS_CSRF_INVALIDO = Number(process.env.VUE_APP_HttpStatusCode_CsrfTokenInvalido);
+
 /** Nome dell' Authorization header nelle richieste HTTP.*/
 const HTTP_HEADER_AUTHORIZATION_NOME = "Authorization";    // è standard, ma meglio evitare valori "literal" nel codice
 
@@ -175,15 +178,23 @@ const aggiungiParametriAllaRequest = oggettoConParametri => {
     return cloneConfigRichiesteHttp;
 }
 
+
+/** Gestore degli errori dovuti a richieste HTTP fallite
+ * effettuate dai metodi di questa classe.
+ * Comportamento predefinito: se il server risponde con
+ * {@link HTTP_STATUS_UNAUTHORIZED}, allora redirect a
+ * pagina di autenticazione.*/
 const onErrorHandler = errore => {
 
     // TODO : verificare che funzioni come da aspettative
 
     console.error( errore );
 
+    // Redirection automatica a login
     if( errore.response.status === HTTP_STATUS_UNAUTHORIZED ) {
-        console.log( "Redirection a pagina di autenticazione." );
         router.redirectVersoPaginaAutenticazione( router.currentRoute );
+    } else if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO ) {
+        router.go(0);   // refresh della pagina per aggiornare token (risultato invalido)
     }
 
     else return Promise.reject( errore.response );

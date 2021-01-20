@@ -1,6 +1,9 @@
 package it.units.progrweb.filters;
 
-import it.units.progrweb.utils.*;
+import it.units.progrweb.utils.Cookie;
+import it.units.progrweb.utils.JsonHelper;
+import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
 import javax.servlet.*;
@@ -116,8 +119,12 @@ public class FiltroCSRF implements Filter {
                 chain.doFilter(copiaHttpReq, resp);
 
             } else {
-                // Problemi con CSRF
-                Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+                // Problemi con CSRF, quindi redirection login
+                HttpServletResponse response = (HttpServletResponse)resp;
+                response.sendError( HttpStatusCode_CsrfTokenInvalido.getStatusCode(),
+                                    HttpStatusCode_CsrfTokenInvalido.getReasonPhrase() );
+                response.addHeader("Location", httpReq.getRequestURI());// chiede al client di ricaricare la pagina (così aggiorna i token)
+
             }
 
         } else {
@@ -198,4 +205,22 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
         };
         return inputStream;
     }
+}
+
+/** Status code personalizzato per indicare al client che il token
+ * CSRF non è più valido.*/
+class HttpStatusCode_CsrfTokenInvalido {
+
+    /** Codice errore (personalizzato).*/
+    private static int statusCode = 499;
+    private static String reasonPhrase = "CSRF token invalido";
+
+    public static int getStatusCode() {
+        return statusCode;
+    }
+
+    public static String getReasonPhrase() {
+        return reasonPhrase;
+    }
+
 }
