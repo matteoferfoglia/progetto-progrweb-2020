@@ -31,15 +31,23 @@ public class RegistrazioneNuovoConsumer {
                 nominativo.length() > 0                            &&
                 password.length()   > 0 ) {
 
-            Consumer nuovoConsumer = Consumer.creaConsumer( codiceFiscale, nominativo, email );
+            if( ! Attore.isAttoreGiaRegistrato( codiceFiscale ) ) {
 
-            boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password );
-            if( registrazioneConclusaConSuccesso )
-                return Response.ok()
-                               .entity("Registrazione completata per " + nominativo)
+                Consumer nuovoConsumer = Consumer.creaConsumer( codiceFiscale, nominativo, email );
+
+                boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password );
+                if( registrazioneConclusaConSuccesso )
+                    return Response.ok()
+                            .entity("Registrazione completata per " + nominativo)
+                            .build();
+
+                else return Response.serverError().build();
+
+            } else {
+                return Response.status( Response.Status.CONFLICT )
+                               .entity( codiceFiscale + " risulta gia' registrato nella piattaforma." )
                                .build();
-
-            else return Response.serverError().build();
+            }
 
         } else {
 
@@ -52,7 +60,6 @@ public class RegistrazioneNuovoConsumer {
 }
 
 
-@SuppressWarnings("unused")
 class CampiFormRegistrazione {
 
     private String codiceFiscale = "";

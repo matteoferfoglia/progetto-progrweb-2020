@@ -1,5 +1,6 @@
 package it.units.progrweb.entities.attori;
 
+import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
@@ -14,6 +15,7 @@ import javax.security.auth.Subject;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 
 /**
@@ -21,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author Matteo Ferfoglia
  */
+@Entity
 public abstract class Attore implements UserPrincipal {
 
     // TODO : implementare questa classe
@@ -41,6 +44,27 @@ public abstract class Attore implements UserPrincipal {
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
     protected String tipoAttore;
+
+    /**
+     * @param username Username dell'attore di cui verificare
+     *                 la registrazione nella piattaforma.
+     * @return true se l'attore associato al parametro fornito è
+     *         già registrato nella piattaforma, false altrimenti.
+     */
+    public static boolean isAttoreGiaRegistrato(String username) {
+
+        String nomeAttributoPerQuery = "username";
+        if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoPerQuery, Attore.class ) ) {
+            List<?> risultatoQuery = DatabaseHelper.query( Attore.class,
+                    nomeAttributoPerQuery, DatabaseHelper.OperatoreQuery.UGUALE, username );    // TODO : che succede se non trova nulla ?
+
+            return risultatoQuery.size() == 1;
+        } else {
+            Logger.scriviEccezioneNelLog( Attore.class, new NoSuchFieldException() );
+            return false;
+        }
+
+    }
 
     /** Restituisce l'identificativo dell'attore.*/
     public Long getIdentificativoAttore() {

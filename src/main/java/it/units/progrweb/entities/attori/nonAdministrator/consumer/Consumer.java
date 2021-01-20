@@ -1,6 +1,6 @@
 package it.units.progrweb.entities.attori.nonAdministrator.consumer;
 
-import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -16,7 +16,7 @@ import java.util.Map;
  * Rappresentazione di un Consumer.
  * @author Matteo Ferfoglia
  */
-@Entity
+@Subclass
 public abstract class Consumer extends UtenteNonAdministrator {
 
     // TODO : implementare questa classe

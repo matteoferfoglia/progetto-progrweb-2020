@@ -16,7 +16,7 @@
 
 // TODO in caso di errore (input inserito dall'utente non valido) evidenziare la casella di input invalida (selector css ":invalid")
 
-import {richiestaPost} from "../../utils/http";
+import {getHttpResponseStatus, HTTP_STATUS_CONFLICT, richiestaPost} from "../../utils/http";
 
 export default {
   name: 'RegistrazioneNuovoConsumer',
@@ -46,16 +46,19 @@ export default {
 
       const informaUtenteFormInvalido = () => {
         alert("Compilare correttamente i campi del form.");
-        // TODO: migliorare messaggio dell' alert, magari evidenziare con CSS i campi input invalidi e mostrare il popup con l'errore specifico.
         this.confermaPassword = "";
       }
 
-      const registrazioneCompletata = () => this.$router.push({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});   // TODO : cosa bisogna fare qui ?
+      const registrazioneCompletata = () => this.$router.push({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});
 
       const registrazioneFallita = ris => {
-        console.error("Errore durante la registrazione: " + ris);
-        alert("Si è verificato un errore durante la registrazione. Riprovare in seguito.");
-        // TODO notificare l'errore ai gestori (via mail ?)
+        console.error( "Errore durante la registrazione: " + JSON.stringify(ris) );
+
+        if( getHttpResponseStatus( ris ) === HTTP_STATUS_CONFLICT ) {
+          alert( ris.data )
+        } else {
+          alert("Si è verificato un errore durante la registrazione. Riprovare in seguito.");
+        }
       }
 
       const inviaForm = () => {
@@ -69,7 +72,7 @@ export default {
 
         richiestaPost(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL, campiFormDaInviareAlServer)
             .then(  ()       => registrazioneCompletata() )
-            .catch( risposta => registrazioneFallita(risposta.data) );
+            .catch( risposta => registrazioneFallita(risposta) );
       };
 
 

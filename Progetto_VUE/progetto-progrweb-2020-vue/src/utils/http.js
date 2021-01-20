@@ -16,6 +16,9 @@ export const HTTP_STATUS_UNAUTHORIZED = 401;
 /** Stato della risposta HTTP: ok.*/
 export const HTTP_STATUS_OK = 200;
 
+/** Stato della risposta HTTP: CONFLICT.*/
+export const HTTP_STATUS_CONFLICT = 409;
+
 /** Nome dell' Authorization header nelle richieste HTTP.*/
 const HTTP_HEADER_AUTHORIZATION_NOME = "Authorization";    // è standard, ma meglio evitare valori "literal" nel codice
 

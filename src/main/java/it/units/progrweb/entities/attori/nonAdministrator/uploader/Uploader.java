@@ -1,6 +1,6 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
-import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.file.File;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author Matteo Ferfoglia
  */
-@Entity
+@Subclass
 public abstract class Uploader extends UtenteNonAdministrator {
 
     protected LogoUploader immagineLogoUploader;

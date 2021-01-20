@@ -1,6 +1,6 @@
 package it.units.progrweb.entities.attori.administrator;
 
-import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.utils.datetime.DateTime;
@@ -9,7 +9,7 @@ import it.units.progrweb.utils.datetime.DateTime;
  * Rappresentazione di un attore con il ruolo di Administrator.
  * @author Matteo Ferfoglia
  */
-@Entity
+@Subclass
 public abstract class Administrator extends Attore {
 
     // TODO : implementare questa classe
