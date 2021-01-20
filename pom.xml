@@ -100,6 +100,14 @@
             <version>5.1.24</version>
         </dependency>
 
+        <!-- Gestione mail -->
+        <!-- Dependency compresa tra quelle di appengine
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.5.0-b01</version>
+        </dependency> -->
+
         <!-- OWASP Java Encoder, https://owasp.org/owasp-java-encoder/encoder/index.html per encoding -->
         <dependency>
             <groupId>org.owasp.encoder</groupId>
