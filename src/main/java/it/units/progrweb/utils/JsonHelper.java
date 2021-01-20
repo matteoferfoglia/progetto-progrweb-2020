@@ -121,7 +121,7 @@ public class JsonHelper {
             if (valoreDaConvertire instanceof Collection) {
                 return convertiCollectionInJson((Collection<?>) valoreDaConvertire);
             } else if (valoreDaConvertire.getClass().isArray()) {
-                return convertiCollectionInJson(Arrays.asList(valoreDaConvertire));
+                return convertiCollectionInJson( Arrays.asList( (Object[])valoreDaConvertire ) );
             } else {
 
                 switch (valoreDaConvertire.getClass().getSimpleName()) {

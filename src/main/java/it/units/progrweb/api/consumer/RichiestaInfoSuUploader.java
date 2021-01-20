@@ -13,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,7 +86,13 @@ public class RichiestaInfoSuUploader {
     public Response getUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
 
         Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
-        Map<String,?> mappaProprietaUploader_nome_valore = uploader.getMappaAttributi_Nome_Valore();
+
+        Map<String,?> mappaProprietaUploader_nome_valore;
+        if( uploader != null)
+            mappaProprietaUploader_nome_valore = uploader.getMappaAttributi_Nome_Valore();
+        else
+            mappaProprietaUploader_nome_valore = new HashMap<>(0);
+
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
     }
