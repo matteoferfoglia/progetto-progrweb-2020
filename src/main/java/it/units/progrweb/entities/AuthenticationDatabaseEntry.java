@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.GeneratoreTokenCasuali;
 import it.units.progrweb.utils.GestoreSicurezza;
@@ -73,25 +74,26 @@ public class AuthenticationDatabaseEntry {
 
     /** Dati username  e password, restituisce true se tali
      * credenziali sono valide, false altrimenti. */
-    public static boolean verificaCredenziali(String username , String passwordInChiaro) {
-        // TODO : implementare questa classe
+    public static boolean verificaCredenziali(String username , String password) {
 
-        boolean credenzialiValide;
+        boolean credenzialiValide = false;  // default: false, in caso modificato modificato dal metodo
         AuthenticationDatabaseEntry authenticationEntry;
                 
         try {
-            authenticationEntry = cercaAttore(username);
+            authenticationEntry = cercaAttoreInAuthDb(username);
 
-            // Se qui, allora attore trovato
-            credenzialiValide = calcolaHashedSaltedPassword(passwordInChiaro, authenticationEntry.salt)
+            if( authenticationEntry!= null )
+                credenzialiValide = calcolaHashedSaltedPassword(password, authenticationEntry.salt)
                                     .equals(authenticationEntry.hashedSaltedPassword);
 
         } catch (NotFoundException e) {
             // attore non trovato
             credenzialiValide = false;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            Logger.scriviEccezioneNelLog(AuthenticationDatabaseEntry.class, e);    // TODO : gestire quest'eccezione, notificare ai gestori? Stampare su log?
-            credenzialiValide = false;  // errore del server durante la verifica delle credenziali
+            Logger.scriviEccezioneNelLog(AuthenticationDatabaseEntry.class,
+                    "Errore del server durante la verifica delle credenziali",
+                    e);
+            credenzialiValide = false;
         }
 
         return credenzialiValide;
@@ -102,9 +104,11 @@ public class AuthenticationDatabaseEntry {
      * altrimenti lancia un'eccezione.
      * @throws NotFoundException se non trova nell'AuthDB lo username  cercato.
      */
-    private static AuthenticationDatabaseEntry cercaAttore(String username )
+    private static AuthenticationDatabaseEntry cercaAttoreInAuthDb(String username )
             throws NotFoundException {
-        throw new NotFoundException();  // TODO : metodo da implementare!
+
+        return (AuthenticationDatabaseEntry) DatabaseHelper.getById(username, AuthenticationDatabaseEntry.class);
+
     }
 
 }

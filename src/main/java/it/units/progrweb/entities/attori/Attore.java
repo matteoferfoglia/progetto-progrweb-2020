@@ -179,6 +179,29 @@ public abstract class Attore implements UserPrincipal {
     }
 
 
+    /** Restituisce l'attore corrispondente allo username fornito,
+     * oppure null se non trovato.*/
+    public static Attore getAttorebyUsername(String username) {
+
+        String nomeAttributoQuery = "username";
+        if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoQuery, Attore.class ) ) {
+            List<?> risultatoQuery = DatabaseHelper.query(Attore.class,
+                    nomeAttributoQuery, DatabaseHelper.OperatoreQuery.UGUALE, username);
+            if( risultatoQuery.size() == 1 ) {
+                return (Attore) risultatoQuery.get(0);
+            } else {
+                return null;
+            }
+        } else {
+            Logger.scriviEccezioneNelLog(Attore.class,
+                    "Attributo " + nomeAttributoQuery + " non presente in questa classe.",
+                    new NoSuchFieldException());
+            return null;
+        }
+
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

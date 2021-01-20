@@ -197,5 +197,5 @@ const onErrorHandler = errore => {
         router.go(0);   // refresh della pagina per aggiornare token (risultato invalido)
     }
 
-    else return Promise.reject( errore.response );
+    return Promise.reject( errore.response );
 }
