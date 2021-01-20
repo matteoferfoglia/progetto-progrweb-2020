@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
@@ -16,6 +17,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -79,15 +81,19 @@ public abstract class Attore implements UserPrincipal {
     /** Restituisce il nome del field contenente lo username
      * di un attore, per la ricerca nel database.*/
     public static String getNomeFieldUsernameAttore() {
-        final String nomeField = "username";
-        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("username", Attore.class);
+    }
+
+    /** Restituisce il nome del field contenente lo'email
+     * di un attore..*/
+    public static String getNomeFieldEmailAttore() {
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("email", Attore.class);
     }
 
     /** Restituisce il nome del field contenente il nome
      * di un attore.*/
-    public static String getNomeFieldNomeAttore() {
-        final String nomeField = "nominativo";
-        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse(nomeField, Attore.class);
+    public static String getNomeFieldNominativoAttore() {
+        return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("nominativo", Attore.class);
     }
 
     /** Salva un nuovo attore nel database.
@@ -168,6 +174,18 @@ public abstract class Attore implements UserPrincipal {
         return true;
     }
 
+
+    /** Ricerca nel database l {@link Attore} corrispondente
+     * all'identificativo fornito e restituisce il suo nominativo
+     * se presente, altrimenti restituisce null.*/
+    public static String getNominativoDaIdentificativo(Long identificativoAttore) {
+        try {
+            return ((Attore)DatabaseHelper.getById( identificativoAttore, Consumer.class )).getNominativo();
+        } catch (NotFoundException notFoundException) {
+            return null;
+        }
+    }
+
     /** Restituisce l'attore corrispondente all'identificativo dato nel parametro,
      * oppure null se non trovato.*/
     public static Attore getAttoreById(Long identificativoAttore) {
@@ -176,6 +194,20 @@ public abstract class Attore implements UserPrincipal {
         } catch (NotFoundException e) {
             return null;
         }
+    }
+
+    /** Restituisce l'attore corrispondente allo username dato nel parametro,
+     * oppure null se non trovato.*/
+    public static Attore getAttoreByUsername(String username) {
+
+        List<?> attoriTrovatiInDb = DatabaseHelper.query(
+                Attore.class, Consumer.getNomeFieldUsernameAttore(), DatabaseHelper.OperatoreQuery.UGUALE, username
+        );
+        if( attoriTrovatiInDb.size() == 1) {
+            return (Attore) attoriTrovatiInDb.get(0);
+        }
+
+        return null;    // non trovato
     }
 
 
@@ -248,4 +280,12 @@ public abstract class Attore implements UserPrincipal {
                 ", email='" + email + '\'' +
                 '}';
     }
+
+
+    /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
+     * di un'istanza di questa classe. Devono essere presenti le proprietà
+     * i cui nomi sono restituiti dai metodi {@link #getNomeFieldNominativoAttore()},
+     * {@link #getNomeFieldEmailAttore()} e {@link #getNomeFieldUsernameAttore()}.*/
+    abstract public Map<String, ?> getMappaAttributi_Nome_Valore(); // TODO : metodo analogo anche in Consumer : si può mettere nella classe padre?
+
 }

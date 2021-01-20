@@ -94,7 +94,7 @@ public class RichiestaInfo {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldNomeUploader() {
-        return Uploader.getNomeFieldNomeUploader();
+        return Uploader.getNomeFieldNominativoAttore();
     }
 
     /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(Long)}, questo metodo restituisce
@@ -113,7 +113,7 @@ public class RichiestaInfo {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldNomeConsumer() {
-        return Consumer.getNomeFieldNominativoConsumer();
+        return Consumer.getNomeFieldNominativoAttore();
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
@@ -123,7 +123,7 @@ public class RichiestaInfo {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldUsernameConsumer() {
-        return Consumer.getNomeFieldUsernameConsumer();
+        return Consumer.getNomeFieldUsernameAttore();
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
@@ -133,7 +133,7 @@ public class RichiestaInfo {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldEmailConsumer() {
-        return Consumer.getNomeFieldEmailConsumer();
+        return Consumer.getNomeFieldEmailAttore();
     }
     // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 

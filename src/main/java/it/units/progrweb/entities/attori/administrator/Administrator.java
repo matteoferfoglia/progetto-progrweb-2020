@@ -35,7 +35,7 @@ public abstract class Administrator extends Attore {
      */
     public static Uploader creaUploader(Administrator administrator, String username, String nominativo, String email,
                                  byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-        return Uploader.creaUploader(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);    // TODO
+        return null;  // todo
     }
 
     /** Restituisce true se la modifica dell'uploader va a buon fine, false altrimenti.

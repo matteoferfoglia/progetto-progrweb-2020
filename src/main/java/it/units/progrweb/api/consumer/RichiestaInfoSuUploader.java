@@ -3,7 +3,6 @@ package it.units.progrweb.api.consumer;
 import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
-import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.UtilitaGenerale;
@@ -32,15 +31,15 @@ public class RichiestaInfoSuUploader {
 
         // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
 
-        try {
-            Uploader uploader = (Uploader) DatabaseHelper.getById( identificativoUploader, Uploader.class );
+        Uploader uploader = Uploader.getAttoreById( identificativoUploader );
+        if( uploader != null) {
             return Response.ok()
                            .entity( uploader.getImmagineLogoBase64() )
                            .build();
-
-        } catch (NotFoundException notFoundException) {
+        } else {
             return NotFoundException.creaResponseNotFound("Uploader non trovato.");
         }
+
 
     }
 

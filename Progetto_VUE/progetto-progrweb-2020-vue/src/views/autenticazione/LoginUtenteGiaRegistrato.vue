@@ -71,8 +71,6 @@ export default {
         if(getHttpResponseStatus(risposta) === HTTP_STATUS_UNAUTHORIZED) {
           alert("Credenziali invalide");
           this.password = "";   // pulisci campo password
-        } else {
-          alert("Errore imprevisto durante l'autenticazione, riprovare in seguito.")
         }
 
         console.error("Errore durante l'autenticazione (" + risposta.status + " [" + risposta.statusText + "])");

@@ -4,8 +4,6 @@ import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.file.File;
-import it.units.progrweb.persistence.DatabaseHelper;
-import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.util.ArrayList;
@@ -27,8 +25,9 @@ public abstract class Uploader extends UtenteNonAdministrator {
         super.tipoAttore = Uploader.class.getSimpleName();
     }
 
-    public static Uploader creaUploader(String username, String nominativo, String email, byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-        return new UploaderStorage(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);
+    public static Uploader getAttoreById(Long identificativoAttore) {
+        Attore a = Attore.getAttoreById(identificativoAttore);
+        return a instanceof Uploader ? (Uploader) a : null;
     }
 
     /** Restituisce l'immagine logo dell'Uploader
@@ -42,8 +41,9 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * di un'istanza di questa classe. L'attributo con l'immagine logo
      * deve avere come nome quello restituito da {@link #getNomeFieldLogoUploader()}
      * e come valore la codifica Base64 dell'immagine. L'attributo con
-     * il nome deve avere come nome quello restituito da {@link #getNomeFieldNomeUploader()}.*/
-    abstract public Map<String, ?> getMappaAttributi_Nome_Valore(); // TODO : metodo analogo anche in Consumer : si può mettere nella classe padre?
+     * il nome deve avere come nome quello restituito da {@link #getNomeFieldNominativoAttore()}.*/
+    @Override
+    abstract public Map<String, ?> getMappaAttributi_Nome_Valore();
 
     /** Costruttore.
      * @param username
@@ -71,24 +71,8 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * database in base all'identificativo fornito.
      * @return L'uploader cercato, oppure null in caso di errore.*/
     public static Uploader cercaUploaderDaIdentificativo(Long identificativoUploader ) {
-        try{
-            return (Uploader) DatabaseHelper.getById(identificativoUploader, Uploader.class);
-        } catch ( NotFoundException notFoundException) {
-            return null;
-        }
-    }
-
-    /** Restituisce il nome del field contenente l'username
-     * di un Uploader.*/
-    public static String getNomeFieldUsernameUploader() {
-        return Attore.getNomeFieldUsernameAttore();
-    }
-
-    /** Restituisce il nome del field contenente il nome
-     * di un Uploader.
-     * @return il nome del field richiesto, oppure null se non trovato.*/
-    public static String getNomeFieldNomeUploader() {
-        return Attore.getNomeFieldNomeAttore();
+        Attore attoreTrovatoInDb = Attore.getAttoreById(identificativoUploader);
+        return attoreTrovatoInDb instanceof Uploader ? (Uploader) attoreTrovatoInDb : null;
     }
 
     /** Restituisce il nome del field contenente il logo

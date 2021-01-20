@@ -42,7 +42,7 @@ class UploaderStorage extends Uploader {
     public Map<String, ?> getMappaAttributi_Nome_Valore() {
 
          Map<String, String> mappa_nomeAttributo_valore = new HashMap<>(2);
-         mappa_nomeAttributo_valore.put(Uploader.getNomeFieldNomeUploader(), getNomeUploader());
+         mappa_nomeAttributo_valore.put(Uploader.getNomeFieldNominativoAttore(), getNomeUploader());
          mappa_nomeAttributo_valore.put(Uploader.getNomeFieldLogoUploader(), getImmagineLogoBase64());
 
          return mappa_nomeAttributo_valore;

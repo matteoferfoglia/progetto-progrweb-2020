@@ -52,9 +52,9 @@ public class ConsumerStorage extends Consumer {
     public Map<String, ?> getMappaAttributi_Nome_Valore() {
 
         Map<String, String> mappa = new HashMap<>();
-        mappa.put(getNomeFieldNominativoConsumer(), getNominativo());
-        mappa.put(getNomeFieldEmailConsumer(), getEmail());
-        mappa.put(getNomeFieldUsernameConsumer(), getUsername());
+        mappa.put(getNomeFieldNominativoAttore(), getNominativo());
+        mappa.put(getNomeFieldEmailAttore(), getEmail());
+        mappa.put(getNomeFieldUsernameAttore(), getUsername());
 
         return mappa;
 

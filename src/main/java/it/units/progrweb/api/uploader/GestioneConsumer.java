@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -74,8 +75,8 @@ public class GestioneConsumer {
             // Ricerca nel database
             List<String> suggerimenti = DatabaseHelper.queryAnd(
                             Consumer.class, MAX_NUMERO_RISULTATI_DA_RESTITUIRE,
-                            Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.MAGGIOREOUGUALE, primoUsernameValido,
-                            Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.MINORE, primoUsernameNONValido
+                            Consumer.getNomeFieldUsernameAttore(), DatabaseHelper.OperatoreQuery.MAGGIOREOUGUALE, primoUsernameValido,
+                            Consumer.getNomeFieldUsernameAttore(), DatabaseHelper.OperatoreQuery.MINORE, primoUsernameNONValido
                     )
                     .stream()
                     .map( consumer -> ((Consumer)consumer).getUsername() )
@@ -105,8 +106,12 @@ public class GestioneConsumer {
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        Consumer consumer = Consumer.cercaConsumerDaIdentificativo(identificativoConsumer);
-        Map<String,?> mappaProprietaUploader_nome_valore = consumer.getMappaAttributi_Nome_Valore();
+        Consumer consumer = Consumer.getAttoreById(identificativoConsumer);
+        Map<String,?> mappaProprietaUploader_nome_valore;
+        if( consumer != null )
+            mappaProprietaUploader_nome_valore = consumer.getMappaAttributi_Nome_Valore();
+        else mappaProprietaUploader_nome_valore = new HashMap<>(0);
+
         return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
 
     }
@@ -119,6 +124,8 @@ public class GestioneConsumer {
     @Consumes( MediaType.APPLICATION_JSON )
     public Response aggiungiConsumer(ConsumerProxy consumerDaAggiungere,
                                      @Context HttpServletRequest httpServletRequest) {
+
+        // TODO : rivedere ed eventualmente semplificare questo metodo
 
         String nomeAttributoIdentificativoAttore = "identificativoAttore";  // campo non presente nei dati della richiesta
                                                                             // Sarà null nell'istanza deserializzata, prima però verifico che esista nella classe
@@ -151,9 +158,7 @@ public class GestioneConsumer {
         try {
 
             // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
-            Consumer consumerDalDB = (Consumer) DatabaseHelper.query(
-                    Consumer.class, Consumer.getNomeFieldUsernameConsumer(), DatabaseHelper.OperatoreQuery.UGUALE, usernameConsumerDaAggiungere
-            ).get(0);
+            Consumer consumerDalDB = Consumer.getAttoreByUsername(usernameConsumerDaAggiungere);
 
             if( consumerDalDB != null &&
                     consumerDalDB.equals(consumerDaAggiungere) ) {
