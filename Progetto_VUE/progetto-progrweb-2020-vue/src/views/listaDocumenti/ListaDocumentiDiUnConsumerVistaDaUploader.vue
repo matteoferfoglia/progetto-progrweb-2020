@@ -94,6 +94,28 @@ export default {
   },
   methods: {
 
+    /** Data un'entry della mappa restituita dal server quando
+     * gli si richiede l'elenco dei documenti (in pratica: dato
+     * un documento, nella forma [ idDocumento, { proprietà documento} ] ),
+     * questo metodo aggiunge alle proprietà di quel documento gli url
+     * per il download e l'eliminazione del documento stesso.
+     * Infine restituisce la entry corrispondente al documento, con
+     * le properties (gli url) appena aggiunte.
+     * @param unDocumento nella forma di una entry, cioè un array con due
+     *                    elementi:   [ idDocumento, { proprietà documento} ] */
+    aggiungiUrlDownloadEliminazioneDocumento: function (unDocumento) {
+
+      // Decomposizione di ogni entry
+      const idDocumento = unDocumento[0];
+      const propDocumento = unDocumento[1];
+
+      propDocumento[this.NOME_PROP_DELETE_DOCUMENTO] = process.env.VUE_APP_URL_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+      propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+
+      return [idDocumento, propDocumento];
+
+    },
+
     /** Funzione di setup.*/
     async caricaQuestoComponente() {
 
@@ -113,18 +135,7 @@ export default {
           .then( mappa =>
               new Map(
                   Array.from( mappa.entries() )
-                      .map( unDocumento => {
-
-                        // Decomposizione di ogni entry
-                        const idDocumento   = unDocumento[0];
-                        const propDocumento = unDocumento[1];
-
-                        propDocumento[this.NOME_PROP_DELETE_DOCUMENTO]   = process.env.VUE_APP_URL_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
-                        propDocumento[this.NOME_PROP_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
-
-                        return [ idDocumento, propDocumento ];
-
-                      })
+                      .map( unDocumento => this.aggiungiUrlDownloadEliminazioneDocumento(unDocumento) )
               )
           )
 
@@ -182,9 +193,14 @@ export default {
 
             alert("Documento caricato");
 
+            // Aggiungi url nelle properties
+            mappa_idDocumento_proprietaDocumento = new Map(
+                [this.aggiungiUrlDownloadEliminazioneDocumento( Object.entries(mappa_idDocumento_proprietaDocumento)[0] ) ]
+            );
+
             // Aggiungi il documento all'elenco di quelli mostrati da questo componente
             this.mappaDocumentiPerUnConsumer.set(
-                new Map([ ...Object.entries(mappa_idDocumento_proprietaDocumento),  // merge della nuova entry in cima alla mappa
+                new Map([ ...mappa_idDocumento_proprietaDocumento,  // merge della nuova entry in cima alla mappa
                                 ... this.mappaDocumentiPerUnConsumer.get()] )
             );
 
