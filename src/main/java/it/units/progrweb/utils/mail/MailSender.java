@@ -1,4 +1,4 @@
-package it.units.progrweb.mail;
+package it.units.progrweb.utils.mail;
 
 import javax.mail.*;
 import javax.mail.internet.*;

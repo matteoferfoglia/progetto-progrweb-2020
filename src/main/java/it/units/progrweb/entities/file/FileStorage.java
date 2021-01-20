@@ -39,30 +39,25 @@ class FileStorage extends File {
         this.listaHashtag = hashtags;
     }
 
+    public byte[] getFile() {
+        return file;
+    }
 
     /** Vedere {@link #getContenutoFile(File, String, boolean)}.*/
     static InputStream getContenutoFile(FileStorage file,
                                         String indirizzoIpVisualizzazione,
                                         boolean salvaDatiVisualizzazione) {
-        return file.getContenutoFile(indirizzoIpVisualizzazione, salvaDatiVisualizzazione);
-    }
 
-    /** Vedere {@link #getContenutoFile(FileStorage, String, boolean)}.*/
-    private InputStream getContenutoFile(String indirizzoIpVisualizzazione,
-                                         boolean salvaDatiVisualizzazione  ) {
-        // TODO : da implementare
-        if( salvaDatiVisualizzazione && getDataEdOraDiVisualizzazione() == null ) {
+        if( salvaDatiVisualizzazione && file.getDataEdOraDiVisualizzazione() == null ) {
             // Si tiene traccia solo del primo accesso al file
-            setDataEdOraDiVisualizzazione( DateTime.adesso() );
-            setIndirizzoIpVisualizzazione( indirizzoIpVisualizzazione );
-            DatabaseHelper.salvaEntita( this );
+            file.setDataEdOraDiVisualizzazione( DateTime.adesso() );
+            file.setIndirizzoIpVisualizzazione( indirizzoIpVisualizzazione );
+            DatabaseHelper.salvaEntita( file );
         }
 
         // Conversione da byte[]
-        return new ByteArrayInputStream(file);
-
+        return new ByteArrayInputStream(file.getFile());
     }
-
 
     /** Elimina questo file dal database ed imposta tutti i suoi campi a null.
      * @return true se la procedura va a buon fine, false altrimenti.*/

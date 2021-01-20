@@ -6,16 +6,21 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.mail.MailSender;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +79,11 @@ public class GestioneDocumenti {
      * <a href="https://stackoverflow.com/a/25889454">Fonte</a>).
      * Se il caricamento va a buon fine, questo servizio risponde
      * con l'entry ( {chiave: {proprietà documento}} ) relativa
-     * al documento appena creato.*/
+     * al documento appena creato.
+     *
+     * Inoltre: dopo aver eseguito il caricamento del documento,
+     * questo servizio provvede ad inviare una notifica via
+     * emil al {@link Consumer} destinatario del documento.*/
     @Path("/uploadDocumento")
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
@@ -83,7 +92,7 @@ public class GestioneDocumenti {
                                @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile,
                                @FormDataParam("identificativoConsumerDestinatario") Long identificativoConsumerDestinatario,
                                @FormDataParam("nomeFile")                           String nomeFile,
-                               @FormDataParam("listaHashtag")                       String listaHashtag) {
+                               @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
 
         List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
@@ -100,12 +109,93 @@ public class GestioneDocumenti {
             estensioneFile = nomeFileDaDettagli.substring(indiceSeparatoreEstensioneNelNome);
         }
 
-        File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
-                                                    identificativoUploader, identificativoConsumerDestinatario );
+        // Prima di caricare il file, verifica che il destinatario esista.
+        Consumer destinatario = Consumer.getAttoreById( identificativoConsumerDestinatario );
+        if( destinatario != null ) {
 
-        // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
-        Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
-        return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
+            // Se qui, allora destinatario esiste
+
+            File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
+                    identificativoUploader, identificativoConsumerDestinatario );
+
+            Uploader mittente = Uploader.getAttoreById(identificativoUploader);
+            inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
+
+            // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
+            Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
+
+            return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
+
+        } else {
+
+            return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
+                           .entity( "Consumer " + identificativoConsumerDestinatario + " non trovato nel sistema." )
+                           .build();
+
+        }
+
+    }
+
+    /** Invia una notifica via emil al {@link Consumer} destinatario del documento.
+     * @param fileAggiunto Il file da notificare.
+     * @param mittenteFile Il mittente del file.
+     * @param destinatarioFile destinatario del documento.
+     * @param httpServletRequest Utilizzato per creare l'url di download del documento.*/
+    private void inviaNotificaDocumentoCaricatoAlConsumerDestinatario(@NotNull File fileAggiunto,
+                                                                      @NotNull Uploader mittenteFile,
+                                                                      @NotNull Consumer destinatarioFile,
+                                                                      @Context HttpServletRequest httpServletRequest) {
+
+        // TODO : metodo da verificare
+
+        String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
+        String linkDownloadFile =  indirizzoServer + "/api/consumer/downloadDocumento/" + fileAggiunto.getIdentificativoFile();      // TODO : variabile d'ambiente (sarebbe meglio che sia un metodo ad hoc ad occuparsi della creazione dell'url)
+
+        String oggettoNotifica   = "Filesharing - Nuovo documento disponibile";  // TODO : variabile d'ambiente il nome della piattaforma
+        String emailDestinatario = destinatarioFile.getEmail();
+        String nomeDestinatario  = destinatarioFile.getNominativo();
+
+        String messaggioHtmlNotifica;
+        {
+            // TODO : verificare sintassi HTML corretta
+
+            // Creazione del corpo del messaggio in formato HTML
+            messaggioHtmlNotifica =
+                    "<!DOCTYPE html>"                                                       +
+                    "<html>"                                                                +
+                        "<head>"                                                            +
+                            "<title>" + oggettoNotifica + "</title>"                        +
+                        "</head>"                                                           +
+                        "<body>"                                                            +
+                            "<h1>" + oggettoNotifica + "</h1>"                              +
+                            //"<p>" + mittenteFile.getNominativo() + " ha caricato il file "  + // TODO : scommentare questa riga quando si registrerà un uploader vero
+                                "&ldquo;" + fileAggiunto.getNomeDocumento() + "&rdquo;. "   +
+                                "<a href=\"" + indirizzoServer + "\">Accedi</a> al sistema" +
+                                " oppure <a href=\"" + linkDownloadFile + "\">scarica</a> " +
+                                "direttamente il file."                                     +
+                            "</p>"                                                          +
+                        "</body>"                                                           +
+                    "</html>";
+        }
+
+        MailSender mailSender = new MailSender();
+        try {
+            mailSender.inviaEmailMultiPart( emailDestinatario, nomeDestinatario,
+                                            oggettoNotifica, "", messaggioHtmlNotifica,
+                                            null, null, null );
+        } catch (UnsupportedEncodingException|MessagingException e) {
+            Logger.scriviEccezioneNelLog( GestioneDocumenti.class,
+                            "Problemi durante l'invio dell'e-mail", e );
+        }
+
+
+
+        // TODO : refactoring: creare una classe solo per la gestione dei documenti,
+        // todo   che sia comune a tutti gli attori: metter lì il metodo per il calcolo
+        // todo   dell'url di download (visto che sarà quella classe a gestirlo).
+        // todo   Ricorda che anche sul Client nella tabella mostrata all'Uploader si
+        // todo   crea un url di download/upload. Sarebbe meglio che chiedesse al server
+        // todo   quale sia l'url (del tipo:    GET .../api/documenti/urlDownload/{idDocumento}
 
     }
 

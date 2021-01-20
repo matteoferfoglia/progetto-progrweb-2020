@@ -29,7 +29,7 @@ public class UploaderProxy extends Uploader {
         // TODO : cancellare questo metodo, utilizzato solo in sviluppo per fare delle prove
 
         super(username,nomeUploader,emailUploader,logoBase64.getBytes(StandardCharsets.UTF_8), "png");
-        this.nomeUploader = getNomeUploader();
+        this.nomeUploader = getNominativo();
         this.logoUploaderBase64 = logoBase64;
         this.mappaAttributiUploader_nome_valore = new HashMap<>();
 
@@ -39,11 +39,6 @@ public class UploaderProxy extends Uploader {
     @Override
     public String getImmagineLogoBase64() {
         return logoUploaderBase64;
-    }
-
-    @Override
-    public String getNomeUploader() {
-        return nomeUploader;
     }
 
     @Override

@@ -34,9 +34,6 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * codificata in Base64.*/
     abstract public String getImmagineLogoBase64();
 
-    /** Restituisce il nome dell'Uploader.*/
-    abstract public String getNomeUploader();
-
     /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
      * di un'istanza di questa classe. L'attributo con l'immagine logo
      * deve avere come nome quello restituito da {@link #getNomeFieldLogoUploader()}

@@ -12,7 +12,7 @@
                       @documento-eliminato="rimuoviDocumentoDaLista"/>
   </section>
 
-  <form @submit.prevent="caricaNuovoDocumento" id="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
+  <form @submit.prevent="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
     <p>Carica un nuovo documento per {{ nomeConsumer }}:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
@@ -135,7 +135,7 @@ export default {
           .then( mappa =>
               new Map(
                   Array.from( mappa.entries() )
-                      .map( unDocumento => this.aggiungiUrlDownloadEliminazioneDocumento(unDocumento) )
+                       .map( unDocumento => this.aggiungiUrlDownloadEliminazioneDocumento(unDocumento) )
               )
           )
 

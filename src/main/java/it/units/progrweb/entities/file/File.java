@@ -288,8 +288,8 @@ public abstract class File {
                 File file = File.getEntitaFromDbById(identificativoFile);
                 InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
                 return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
-                        .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
-                        .build();
+                               .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
+                               .build();
 
             } else {
                 return Autenticazione.creaResponseForbidden("Accesso al file vietato.");

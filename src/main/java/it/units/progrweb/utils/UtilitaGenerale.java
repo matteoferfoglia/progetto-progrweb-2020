@@ -1,6 +1,7 @@
 package it.units.progrweb.utils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
@@ -62,9 +63,24 @@ public class UtilitaGenerale {
      *     </li>
      * </ul>
      */
-    public static String getUrlPattern(HttpServletRequest httpRequest) {
+    public static String getUrlPattern(@NotNull HttpServletRequest httpRequest) {
         // TODO : testare
         return httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
+    }
+
+    /** Restituiscel'indirizzo del server, inteso come ciò precede quanto
+     * restituito da {@link HttpServletRequest#getRequestURI()}.
+     * Esempio: se il request URL è  http://nome.server.com:8080/app/file
+     * allora questo metodo restituirà http://nome.server.com:8080 .*/
+    public static String getIndirizzoServer(@NotNull HttpServletRequest httpServletRequest) {
+
+        // TODO : testare
+
+        String requestUrl = httpServletRequest.getRequestURL().toString();
+        String requestUri = httpServletRequest.getRequestURI();
+
+        return requestUrl.substring(0, requestUrl.indexOf(requestUri));
+
     }
 
     /** Crea una mappa (nome->valore) con i Field dati nel parametro.
@@ -164,4 +180,5 @@ public class UtilitaGenerale {
         return buffer.toByteArray();
 
     }
+
 }
