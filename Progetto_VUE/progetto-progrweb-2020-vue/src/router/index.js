@@ -147,7 +147,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
                 if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
 
-                  // Se qui, nella route manca il parametro del consumer
+                  // Se qui, nella route manca il parametro col nome del consumer
                   richiestaGet( process.env.VUE_APP_GET_NOME_CONSUMER + "/" + idConsumer )
                       .then( nomeConsumer => {
                         // Salva il nome del consumer ed instrada

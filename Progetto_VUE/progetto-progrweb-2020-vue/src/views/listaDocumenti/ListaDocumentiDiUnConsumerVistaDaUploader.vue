@@ -12,7 +12,7 @@
                       @documento-eliminato="rimuoviDocumentoDaLista"/>
   </section>
 
-  <form @submit.prevent="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
+  <form @submit.prevent="caricaNuovoDocumento" id="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
     <p>Carica un nuovo documento per {{ nomeConsumer }}:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
@@ -87,8 +87,14 @@ export default {
 
     /** Aggiorna il contenuto della pagina se cambia la route
      * (<a href="https://stackoverflow.com/a/50140702">Fonte</a>)*/
-    '$route' () {
-      this.caricaQuestoComponente();
+    '$route' (nuovaRoute) {
+
+      // Se la nuova route fa riferimento a questo componente,
+      // Allora devo caricare i nuovi dati
+      // Altrimenti non devo fare nulla
+      if( nuovaRoute.name === process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER ) {
+        this.caricaQuestoComponente();
+      }
     }
 
   },
