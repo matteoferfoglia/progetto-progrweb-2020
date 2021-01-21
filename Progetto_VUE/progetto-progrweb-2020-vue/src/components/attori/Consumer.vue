@@ -34,7 +34,7 @@
     <div v-else-if="mappa_uploaders>0" @load="$router.push({
                                                                 path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
                                                                 params: { [process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]: mappa_uploaders.keys().next().value }
-                                                            })" />
+                                                            })" /> <!-- TODO : ricontrollare questo router push -->
 
   </main>
 </template>

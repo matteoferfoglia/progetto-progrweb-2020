@@ -38,7 +38,7 @@
 
 <script>
 import {richiestaDelete, richiestaGet, richiestaPost} from "../../../utils/http";
-import Form from "../../../components/FormConCsrfToken";
+import Form from "../../FormConCsrfToken";
 import SchedaUnConsumer from "./SchedaUnConsumer";
 import {unisciOggetti} from "../../../utils/utilitaGenerale";
 

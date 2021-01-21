@@ -28,7 +28,7 @@ const routes = [
   },
   {
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
-    component: () => import('../components/Autenticazione'),
+    component: () => import('../components/pagineApplicazione/Autenticazione'),
     children: [ // Nested routes (fonte: https://router.vuejs.org/guide/essentials/nested-routes.html)
       {
         path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
@@ -46,7 +46,7 @@ const routes = [
     path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
     name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
     // TODO : children : suddividere in Administrator / Uploader / Consumer
-    component: () => import('../components/AreaRiservata'),                // lazy-loading
+    component: () => import('../components/pagineApplicazione/AreaRiservata'),                // lazy-loading
     meta: {
       requiresAuth: true
     },

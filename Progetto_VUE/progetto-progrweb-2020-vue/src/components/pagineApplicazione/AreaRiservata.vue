@@ -19,12 +19,12 @@
 
 <script>
 
-import {richiestaGet} from "../utils/http";
-import {eliminaTokenAutenticazione} from "../utils/autenticazione";
-import Consumer from "../views/attori/Consumer";
-import Uploader from "../views/attori/uploader/Uploader";
-import Administrator from "../views/attori/Administrator";
-import HeaderAreaRiservata from "./HeaderAreaRiservata";
+import {richiestaGet} from "../../utils/http";
+import {eliminaTokenAutenticazione} from "../../utils/autenticazione";
+import Consumer from "../attori/Consumer";
+import Uploader from "../attori/uploader/Uploader";
+import Administrator from "../attori/Administrator";
+import HeaderAreaRiservata from "../HeaderAreaRiservata";
 
 export default {
   name: 'AreaRiservata',
