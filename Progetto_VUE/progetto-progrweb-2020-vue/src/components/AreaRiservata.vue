@@ -1,15 +1,15 @@
 <template v-if="isLayoutCaricato">
-  <h1>Area riservata di {{ nomeAttoreAttualmenteAutenticato }}</h1>
 
-  <Form @submit.prevent="logout" @csrf-token-ricevuto="csrfTokenLogout = $event">
-    <input type="submit" value="Logout">
-  </Form>
+  <HeaderAreaRiservata :nomeUtenteAutenticato="nomeAttoreAttualmenteAutenticato"
+                       :tipoUtenteAutenticato="tipoAttoreAutenticato"
+                       @logout="logout"
+                       @csrf-token-modificato="csrfToken = $event" />
 
-  <!-- CSRF token può essere sovrascritto dai componenti se per qualche motivo
-       ne chiedono un altro (perché cambia il cookie) -->
+  <h1>Area riservata</h1>
+
   <Consumer      v-if="isConsumer()" />
   <Uploader      v-else-if="isUploader()"
-                 @csrf-token-modificato="csrfTokenLogout = $event" />
+                 @csrf-token-modificato="csrfToken = $event" />
   <Administrator v-else-if="isAdministrator()" />
 
 
@@ -20,26 +20,28 @@
 <script>
 
 import {richiestaGet} from "../utils/http";
-import Form from "./FormConCsrfToken";
 import {eliminaTokenAutenticazione} from "../utils/autenticazione";
 import Consumer from "../views/attori/Consumer";
 import Uploader from "../views/attori/uploader/Uploader";
 import Administrator from "../views/attori/Administrator";
+import HeaderAreaRiservata from "./HeaderAreaRiservata";
 
 export default {
   name: 'AreaRiservata',
-  components: {Consumer, Uploader, Administrator, Form},
+  components: {HeaderAreaRiservata, Consumer, Uploader, Administrator},
   data: function () {
     return {
 
       /** Flag: true quando il componente è stato caricato.*/
       isLayoutCaricato: false,
 
-      /** CSRF token.*/
-      csrfTokenLogout: undefined,
+      /** CSRF token.
+       * Può essere sovrascritto dai componenti se per qualche motivo
+       * ne chiedono un altro (perché cambia il cookie associato al token).*/
+      csrfToken: undefined,
 
       /** Il tipo di utente attualmente autenticato.*/
-      tipoUtenteAutenticato: undefined, // Administrator/Uploader/Consumer
+      tipoAttoreAutenticato: undefined, // Administrator/Uploader/Consumer
 
       /** Nome dell'attore attualmente autenticato.*/
       nomeAttoreAttualmenteAutenticato: undefined,
@@ -52,7 +54,7 @@ export default {
       return getNomeAttoreAttualmenteAutenticato()
               .then(nome => this.nomeAttoreAttualmenteAutenticato = nome)
               .then(getTipoAttoreAttualmenteAutenticato)
-              .then(tipo => this.tipoUtenteAutenticato = tipo)
+              .then(tipo => this.tipoAttoreAutenticato = tipo)
               .catch(console.error);
     }
 
@@ -64,19 +66,19 @@ export default {
   },
   methods: {
     isConsumer() {
-      return this.tipoUtenteAutenticato===process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+      return this.tipoAttoreAutenticato===process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
     },
     isUploader() {
-      return this.tipoUtenteAutenticato===process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+      return this.tipoAttoreAutenticato===process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
     },
     isAdministrator() {
-      return this.tipoUtenteAutenticato===process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
+      return this.tipoAttoreAutenticato===process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
     },
 
     logout() {
 
       // Richiesta di logout al server
-      const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfTokenLogout};
+      const parametriRichiestaGet = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
       richiestaGet(process.env.VUE_APP_LOGOUT_SERVER_URL, parametriRichiestaGet)
           .catch(risposta => console.log("Logout fallito !! " + risposta) )          // TODO : gestire il caso di logout fallito (può succedere??)
           .finally( () => { // logout sul client
