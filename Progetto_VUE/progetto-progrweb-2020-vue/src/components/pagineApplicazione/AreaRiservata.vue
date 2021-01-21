@@ -1,7 +1,6 @@
 <template v-if="isLayoutCaricato">
 
   <HeaderAreaRiservata :nomeUtenteAutenticato="nomeAttoreAttualmenteAutenticato"
-                       :tipoUtenteAutenticato="tipoAttoreAutenticato"
                        @logout="logout"
                        @csrf-token-modificato="csrfToken = $event" />
 

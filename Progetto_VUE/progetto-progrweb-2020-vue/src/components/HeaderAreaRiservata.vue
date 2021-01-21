@@ -55,8 +55,7 @@ export default {
   name: "HeaderAreaRiservata",
   components: {FormConCsrfToken},
   props: [
-    "nomeUtenteAutenticato",
-    "tipoUtenteAutenticato"
+    "nomeUtenteAutenticato"
   ],
   data() {
     return {
