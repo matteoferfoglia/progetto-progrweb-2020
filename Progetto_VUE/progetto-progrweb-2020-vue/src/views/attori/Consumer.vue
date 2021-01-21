@@ -2,7 +2,7 @@
   <header>
     <h1>Benvenuto {{ nomeAttoreAttualmenteAutenticato }}</h1>
   </header>
-  <main> <!-- TODO : semanticamente corretto main? -->
+  <main> <!-- TODO : semanticamente corretto main? Meglio spostarlo nel componente padre?-->
 
     <!-- Nel caso in cui il Consumer abbia ricevuto documenti da più Uploaders,
           mostra la lista degli Uploaders che gli hanno inviato documenti (logo +
@@ -15,7 +15,7 @@
           <router-link :to="{ name: vueRouter_vistaDocumenti,
                               params: {
                                 [vueRouter_idUploader]:   uploader[0],                           // id uploader
-                                [vueRouter_logoUploader]: uploader[1][NOME_PROP_LOGO_UPLOADER] // logo uploader
+                                [vueRouter_logoUploader]: uploader[1][NOME_PROP_LOGO_UPLOADER]   // logo uploader
                               }
                             }" >
             <!-- Link alla lista documenti-->
