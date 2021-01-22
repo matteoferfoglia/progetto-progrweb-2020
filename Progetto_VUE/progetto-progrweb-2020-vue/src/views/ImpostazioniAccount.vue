@@ -119,7 +119,8 @@ export default {
 
 
 
-      // Chiave per forza aggiornamento dei componenti
+      // Chiave per forzare aggiornamento dei componenti (se cambia la chiave
+      // c'è un listener nel componente da aggiornare che lo fa aggiornare)
       valoreQualsiasiPerAggiornareIlComponenteSeModificato: 0,
 
       tokenCsrf: undefined
