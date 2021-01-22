@@ -92,7 +92,7 @@ public abstract class DatabaseHelper {
         //        ma riprovare mettendo qua il breakpoint e vedere quante volte viene chiamato in una request
         /* Invocato 4 volte da Filtro Autenticazione sulla stessa richiesta, serve?
             getById:94, DatabaseHelper (it.units.progrweb.persistence)
-            getAttoreById:151, Attore (it.units.progrweb.entities.attori)
+            getAttoreDaIdentificativo:151, Attore (it.units.progrweb.entities.attori)
             isStessoHashCookieIdNelToken:278, Autenticazione (it.units.progrweb.utils)
             isClientAutenticato:236, Autenticazione (it.units.progrweb.utils)
             isClientAttualmenteAutenticato:52, LoginLogout (it.units.progrweb.api)

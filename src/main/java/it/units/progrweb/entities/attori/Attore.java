@@ -16,6 +16,7 @@ import javax.security.auth.Subject;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -141,37 +142,25 @@ public abstract class Attore implements UserPrincipal {
         return email;
     }
 
-    protected void setNominativo(String nominativo) {
+    public void setNominativo(String nominativo) {
         this.nominativo = EncoderPrevenzioneXSS.encodeForJava(nominativo);
     }
 
-    protected void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = EncoderPrevenzioneXSS.encodeForJava( username );
     }
 
     /** Modifica l'email solo se il nuovo valore è in un formato valido,
      * altrimenti la mantiene inalterata.*/
-    protected void setEmail(String email) {
+    public void setEmail(String email) {
 
         if( RegexHelper.isEmailValida(email) )
             this.email = EncoderPrevenzioneXSS.encodeForJava( email );
 
     }
 
-    protected void setTipoAttore(String tipoAttore) {
+    public void setTipoAttore(String tipoAttore) {
         this.tipoAttore = tipoAttore;
-    }
-
-    /** Restituisce true se la password viene correttamente modificata, false altrimenti.*/
-    protected boolean modificaPropriaPassword(String nuovaPassword) {
-        // TODO : accedere al database per modificare la password
-        return true;
-    }
-
-    /** Restituisce true se il campo nominativo viene correttamente modificato, false altrimenti.*/
-    protected boolean modificaNominativo(String nominativo){
-        // TODO : accedere al database per modificare la password
-        return true;
     }
 
 
@@ -188,7 +177,7 @@ public abstract class Attore implements UserPrincipal {
 
     /** Restituisce l'attore corrispondente all'identificativo dato nel parametro,
      * oppure null se non trovato.*/
-    public static Attore getAttoreById(Long identificativoAttore) {
+    public static Attore getAttoreDaIdentificativo(Long identificativoAttore) {
         try {
             return  (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
         } catch (NotFoundException e) {
@@ -196,24 +185,9 @@ public abstract class Attore implements UserPrincipal {
         }
     }
 
-    /** Restituisce l'attore corrispondente allo username dato nel parametro,
-     * oppure null se non trovato.*/
-    public static Attore getAttoreByUsername(String username) {
-
-        List<?> attoriTrovatiInDb = DatabaseHelper.query(
-                Attore.class, Consumer.getNomeFieldUsernameAttore(), DatabaseHelper.OperatoreQuery.UGUALE, username
-        );
-        if( attoriTrovatiInDb.size() == 1) {
-            return (Attore) attoriTrovatiInDb.get(0);
-        }
-
-        return null;    // non trovato
-    }
-
-
     /** Restituisce l'attore corrispondente allo username fornito,
      * oppure null se non trovato.*/
-    public static Attore getAttorebyUsername(String username) {
+    public static Attore getAttoreDaUsername(String username) {
 
         String nomeAttributoQuery = "username";
         if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoQuery, Attore.class ) ) {
@@ -260,6 +234,7 @@ public abstract class Attore implements UserPrincipal {
 
 
 
+    /** Vedere {@link Principal#getName()}.*/
     @Override
     public String getName() {
         return username;

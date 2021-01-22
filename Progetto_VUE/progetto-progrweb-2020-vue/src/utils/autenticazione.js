@@ -27,7 +27,7 @@ export const verificaAutenticazione = async $route => {
 
     // Richiesta al server se l'utente è attualmente autenticato
     let promiseConEsitoAutenticazione;
-    await richiestaGet(process.env.VUE_APP_VERIFICA_TOKEN_AUTENTICAZIONE)
+    await richiestaGet(process.env.VUE_APP_URL_VERIFICA_TOKEN_AUTENTICAZIONE)
             .then(  esito  => promiseConEsitoAutenticazione = Promise.resolve(esito) )
             .catch( errore => promiseConEsitoAutenticazione = Promise.reject(errore) );
 
@@ -48,7 +48,7 @@ const impostaTokenDiAutenticazioneSeEsiste = $route => {
     if($route) {    // controllo che $route (parametro di questo metodo) sia definita
         const tokenDaRoute = $route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE];
         if(tokenDaRoute)
-            salvaTokenAutenticazione(tokenDaRoute);
+            salvaTokenAutenticazioneInLocalStorage(tokenDaRoute);
     }
 
     // Cerco token in local storage
@@ -66,7 +66,7 @@ const nomeVariabileInCuiSalvareIlTokenAutenticazione = process.env.VUE_APP_NOME_
 
 /** Salva il token di autenticazione nello storage locale.
  * @param valoreTokenAutenticazione Il valore del token di autenticazione.*/
-export const salvaTokenAutenticazione = valoreTokenAutenticazione =>
+export const salvaTokenAutenticazioneInLocalStorage = valoreTokenAutenticazione =>
     localStorage.setItem(nomeVariabileInCuiSalvareIlTokenAutenticazione, valoreTokenAutenticazione);
 
 /** Legge il valore del token di autenticazione dallo storage
@@ -77,4 +77,11 @@ export const getTokenAutenticazione = () =>
 /** Elimina il token di autenticazione dallo storage locale.*/
 export const eliminaTokenAutenticazione = () =>
     localStorage.removeItem(nomeVariabileInCuiSalvareIlTokenAutenticazione);
+
+/** Imposta token di autenticazione per le successive richieste
+ * effettuate da questo client*/
+export const setTokenAutenticazione = nuovoValoreTokenAutenticazione => {
+    salvaTokenAutenticazioneInLocalStorage(nuovoValoreTokenAutenticazione);
+    impostaAuthorizationHeaderInRichiesteHttp(nuovoValoreTokenAutenticazione);
+}
 

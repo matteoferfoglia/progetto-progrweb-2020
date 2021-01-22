@@ -2,6 +2,7 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.RegexHelper;
 
@@ -21,6 +22,8 @@ public class RegistrazioneNuovoConsumer {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
 
+        // TODO : usare @FormDataParam
+
         String codiceFiscale = campiFormRegistrazione.getCodiceFiscale();
         String email         = campiFormRegistrazione.getEmail();
         String nominativo    = campiFormRegistrazione.getNominativo();
@@ -37,9 +40,7 @@ public class RegistrazioneNuovoConsumer {
 
                 boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password );
                 if( registrazioneConclusaConSuccesso )
-                    return Response.ok()
-                            .entity("Registrazione completata per " + nominativo)
-                            .build();
+                    return Autenticazione.creaResponseAutenticazione(codiceFiscale, password);  // utente risulterà subito autenticato
 
                 else return Response.serverError().build();
 

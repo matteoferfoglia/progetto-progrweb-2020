@@ -21,13 +21,25 @@
       <p>
         Aggiungi un <i>Consumer</i>
         <input type="text" v-model="usernameNuovoConsumer"
-               name="{{ NOME_PROP_USERNAME_CONSUMER }}"
                :pattern="REGEX_CODICE_FISCALE"
                placeholder="Username"
                maxlength="100"
+               autocomplete="on"
                required />
-        <input type="text" v-model="nominativoNuovoConsumer" name="{{ NOME_PROP_NOME_CONSUMER }}" placeholder="Nominativo" maxlength="100"  required/>
-        <input type="email" v-model="emailNuovoConsumer" name="{{ NOME_PROP_EMAIL_CONSUMER }}" placeholder="xxxxxx@example.com" maxlength="100" :pattern="REGEX_EMAIL"  required/>
+        <input type="text"
+               v-model="nominativoNuovoConsumer"
+               placeholder="Nominativo"
+               maxlength="100"
+               autocomplete="on"
+               required/>
+        <input type="email"
+               v-model="emailNuovoConsumer"
+               name="{{ NOME_PROP_EMAIL_CONSUMER }}"
+               placeholder="xxxxxx@example.com"
+               maxlength="100"
+               :pattern="REGEX_EMAIL"
+               autocomplete="on"
+               required/>
 
         <input type="submit" value="Aggiungi"/>
       </p>
@@ -103,15 +115,15 @@ export default {
     const caricaQuestoComponente = async () => {
 
             // richiede il nome della prop contenente il nome di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
-      await richiestaGet( process.env.VUE_APP_GET_NOME_PROP_NOME_CONSUMER )
+      await richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_NOME_CONSUMER )
             .then( nomePropNomeConsumer => this.NOME_PROP_NOME_CONSUMER = nomePropNomeConsumer )
 
             // richiede il nome della prop contenente l'email di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
-            .then( () => richiestaGet( process.env.VUE_APP_GET_NOME_PROP_EMAIL_CONSUMER ) )
+            .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_EMAIL_CONSUMER ) )
             .then( nomePropEmailConsumer => this.NOME_PROP_EMAIL_CONSUMER = nomePropEmailConsumer )
 
             // richiede il nome della prop contenente lo username di un consumer nell'oggetto che sarà restituito dal server con le info di un Consumer
-            .then( () => richiestaGet( process.env.VUE_APP_GET_NOME_PROP_USERNAME_CONSUMER ) )
+            .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_USERNAME_CONSUMER ) )
             .then( nomePropUsernameConsumer => this.NOME_PROP_USERNAME_CONSUMER = nomePropUsernameConsumer )
 
             // Richiede l'elenco dei consumer associati con questo uploader
@@ -150,7 +162,7 @@ export default {
 
       const parametriRichiestaDelete = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
 
-      richiestaDelete( process.env.VUE_APP_DELETE_CONSUMER_PER_QUESTO_UPLOADER + "/" + idConsumer, parametriRichiestaDelete )
+      richiestaDelete( process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER + "/" + idConsumer, parametriRichiestaDelete )
         .then( () => {
             alert("Consumer \"" + this.mappa_idConsumer_proprietaConsumer.get(idConsumer)[this.NOME_PROP_NOME_CONSUMER] + "\" eliminato." );
             this.mappa_idConsumer_proprietaConsumer.delete(idConsumer);
@@ -175,7 +187,7 @@ export default {
         }
 
         // Richiesta di aggiunta consumer
-        richiestaPost(process.env.VUE_APP_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
+        richiestaPost(process.env.VUE_APP_URL_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
             unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken}))
             .then( idConsumerAppenaCreato => {
 
@@ -217,7 +229,7 @@ const getElencoConsumer = async () => {
 
   // TODO : verificare correttezza
 
-    return richiestaGet( process.env.VUE_APP_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER )
+    return richiestaGet( process.env.VUE_APP_URL_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER )
         .then( rispostaConListaConsumer => rispostaConListaConsumer )
         .catch( rispostaErrore => {
           console.error("Errore durante il caricamento dei Consumer: " + rispostaErrore );
@@ -232,7 +244,7 @@ const getElencoConsumer = async () => {
  * in cui il primo contiene l'identificativo del Consumer ed il secondo
  * contiene un oggetto in cui ogni property è una proprietà del Consumer.*/
 const getInfoConsumer = idConsumer =>
-    richiestaGet( process.env.VUE_APP_GET_INFO_CONSUMER + "/" + idConsumer )
+    richiestaGet( process.env.VUE_APP_URL_GET_INFO_CONSUMER + "/" + idConsumer )
         .then( rispostaConProprietaConsumer => [ idConsumer, rispostaConProprietaConsumer ] ) ;
 
 

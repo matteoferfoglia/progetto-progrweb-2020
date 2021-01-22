@@ -25,7 +25,7 @@ public class LoginLogout {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response login(CampiFormLogin campiFormLogin){
-
+        // TODO : usare @FormDataParam
         // TODO : verificare che CSRF token venga controllato e testare
         return Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword());
     }

@@ -89,7 +89,7 @@ export default {
           [process.env.VUE_APP_CSRF_INPUT_FIELD_NAME] : this.csrfToken
         };
 
-        richiestaPost(process.env.VUE_APP_LOGIN_SERVER_URL, campiFormDaInviareAlServer)
+        richiestaPost(process.env.VUE_APP_URL_LOGIN, campiFormDaInviareAlServer)
             .then( risposta => loginRiuscito(risposta) )     // risposta contiene il token di autenticazione
             .catch(risposta => loginFallito(risposta) );          // risposta contiene response, status e statusText (Fonte: https://stackoverflow.com/a/39153411)
       };

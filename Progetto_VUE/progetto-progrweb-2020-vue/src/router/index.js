@@ -26,6 +26,7 @@ const routes = [
     path: '/:pathMatch(.*)*',
     redirect: { name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}
   },
+
   {
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
     component: () => import('../components/pagineApplicazione/Autenticazione'),
@@ -38,43 +39,58 @@ const routes = [
       },
       {
         path: process.env.VUE_APP_ROUTER_PATH_REGISTRAZIONE_CONSUMER,
-        component: () => import('../views/autenticazione/RegistrazioneNuovoConsumer'),  // lazy-loading
+        component: () => import('../views/autenticazione/RegistrazioneNuovoConsumer'),
       }
     ]
   },
+
   {
     path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
-    name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
     // TODO : children : suddividere in Administrator / Uploader / Consumer
-    component: () => import('../components/pagineApplicazione/AreaRiservata'),                // lazy-loading
+    component: () => import('../components/pagineApplicazione/AreaRiservata'),
     meta: {
       requiresAuth: true
     },
     children: [
       {
-        path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
-            process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
-        name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
-        component: () => import('../views/listaDocumenti/ListaDocumentiDiUnConsumerVistaDaUploader'),
-        meta: {
-          requiresAuth: true,  // TODO: require essere uploader
-          requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
-          requiresNomeConsumer: true, // per sapere il nome del consumer
-        }
+        // Schermata principale dell'area riservata
+        path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA, // percorso default
+        name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
+        component: () => import('../views/SchermataPrincipaleAttoreAutenticato'),
+        children: [
+          {
+            path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
+                process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
+            name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
+            component: () => import('../views/listaDocumenti/ListaDocumentiDiUnConsumerVistaDaUploader'),
+            meta: {
+              // TODO: require essere uploader
+              requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
+              requiresNomeConsumer: true, // per sapere il nome del consumer
+            }
+          },
+          {
+            path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" +
+                process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
+            name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
+            component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaConsumer'),
+            meta: {
+              // TODO: require essere consumer
+              requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
+              requiresLogoUploader: true// logo Uploader
+            }
+          }
+        ]
       },
+
       {
-        path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" +
-            process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
-        name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
-        component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaConsumer'),
-        meta: {
-          requiresAuth: true,  // TODO: require essere consumer
-          requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
-          requiresLogoUploader: true// logo Uploader
-        }
+        path: process.env.VUE_APP_ROUTER_PATH_IMPOSTAZIONI_ACCOUNT,
+        component: () => import('../views/ImpostazioniAccount')
       }
+
     ]
-  },
+  }
+
 ]
 
 const router = createRouter({
@@ -116,7 +132,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
               } else if ( ! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) {
                 // Se qui, nella route manca il logo dell'uploader
 
-                richiestaGet(process.env.VUE_APP_GET_LOGO_UPLOADER + "/" +
+                richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" +
                     routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) // Richiede il logo dell'Uploader al server
                     .then( logoBase64 => {
                       routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] = logoBase64 ;
@@ -148,7 +164,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                 if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
 
                   // Se qui, nella route manca il parametro col nome del consumer
-                  richiestaGet( process.env.VUE_APP_GET_NOME_CONSUMER + "/" + idConsumer )
+                  richiestaGet( process.env.VUE_APP_URL_GET_NOME_CONSUMER + "/" + idConsumer )
                       .then( nomeConsumer => {
                         // Salva il nome del consumer ed instrada
                         routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] = nomeConsumer;

@@ -19,25 +19,48 @@ import {richiediCSRFTokenAlServer} from "../utils/CSRF";
 
 export default {
   name: 'FormConCsrfToken',
+  props: [
+    /** Chiave utilizzata per "forzare" l'aggiornamento del componente,
+     * che si aggiorna quando cambia la chiave.
+     * (<a href="https://stackoverflow.com/a/47466574">Fonte</a>).*/
+    'valoreQualsiasiPerAggiornareIComponenteSeModificato'
+  ],
   data: function () {
     return {
       csrfToken: undefined,
-      isCsrfTokenCaricato: false
+      isCsrfTokenCaricato: false,
     }
   },
   created() {
     // dati già disponibili e modificabili in questo hook
+    this.richiestaCSRFTokenAlServer();
 
-    richiediCSRFTokenAlServer().then( valoreToken => {
-      // Se qui, allora token csrf ricevuto dal server
-      this.csrfToken = valoreToken;
-      this.isCsrfTokenCaricato = true;
-      this.$emit('csrf-token-ricevuto',valoreToken);
-    }).catch( errore => {
-      // Errore durante la ricezione del token csrf
-      console.error("Errore in " +
-          this.$options.name /*Nome componente: */ + ": " + errore);  // TODO : gestire questo errore
-    });
+  },
+  methods: {
+
+    richiestaCSRFTokenAlServer() {
+      richiediCSRFTokenAlServer().then( valoreToken => {
+        // Se qui, allora token csrf ricevuto dal server
+        this.csrfToken = valoreToken;
+        this.isCsrfTokenCaricato = true;
+        this.$emit('csrf-token-ricevuto',valoreToken);
+      }).catch( errore => {
+        // Errore durante la ricezione del token csrf
+        console.error("Errore in " +
+            this.$options.name /*Nome componente: */ + ": " + errore);  // TODO : gestire questo errore
+      });
+    }
+
+  },
+  watch: {
+
+    valoreQualsiasiPerAggiornareIComponenteSeModificato: {
+      immediately: true,
+      handler() {
+        this.richiestaCSRFTokenAlServer();
+      },
+      deep: true
+    }
 
   }
 }

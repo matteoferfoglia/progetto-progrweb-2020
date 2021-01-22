@@ -77,7 +77,7 @@ export default {
   created() {
 
       // Richiede il nome della property di un file contenente il nome del documento
-      richiestaGet(process.env.VUE_APP_GET_NOME_PROP_NOME_DOCUMENTO)
+      richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
           .then( nomeProp => this.nomePropNomeDocumento = nomeProp )
           .catch( console.error );
 

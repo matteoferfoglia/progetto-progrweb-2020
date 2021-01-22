@@ -88,7 +88,7 @@ public class GestioneDocumenti {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response uploadFile(@Context HttpServletRequest httpServletRequest,
-                               @FormDataParam("contenutoFile")                      InputStream contenuto,
+                               @FormDataParam("contenutoFile")                      InputStream contenuto,                  // TODO : variabili d'ambiente tutti i campi del form
                                @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile,
                                @FormDataParam("identificativoConsumerDestinatario") Long identificativoConsumerDestinatario,
                                @FormDataParam("nomeFile")                           String nomeFile,
@@ -98,19 +98,10 @@ public class GestioneDocumenti {
         List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
-        // Determinazione estensione del file
-        String estensioneFile;
-        {
-            String nomeFileDaDettagli = dettagliFile.getFileName();
-            int indiceSeparatoreEstensioneNelNome = nomeFileDaDettagli.lastIndexOf(".");
-            indiceSeparatoreEstensioneNelNome = indiceSeparatoreEstensioneNelNome == -1 ?  // true se manca l'estensione
-                                                    nomeFileDaDettagli.length() :
-                                                    indiceSeparatoreEstensioneNelNome;
-            estensioneFile = nomeFileDaDettagli.substring(indiceSeparatoreEstensioneNelNome);
-        }
+        String estensioneFile = UtilitaGenerale.getEstensioneDaNomeFile(dettagliFile.getFileName());
 
         // Prima di caricare il file, verifica che il destinatario esista.
-        Consumer destinatario = Consumer.getAttoreById( identificativoConsumerDestinatario );
+        Consumer destinatario = Consumer.getAttoreDaIdentificativo( identificativoConsumerDestinatario );
         if( destinatario != null ) {
 
             // Se qui, allora destinatario esiste
@@ -118,7 +109,7 @@ public class GestioneDocumenti {
             File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
                     identificativoUploader, identificativoConsumerDestinatario );
 
-            Uploader mittente = Uploader.getAttoreById(identificativoUploader);
+            Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploader);
             inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
 
             // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }

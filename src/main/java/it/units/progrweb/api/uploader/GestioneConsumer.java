@@ -106,7 +106,7 @@ public class GestioneConsumer {
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        Consumer consumer = Consumer.getAttoreById(identificativoConsumer);
+        Consumer consumer = Consumer.getAttoreDaIdentificativo(identificativoConsumer);
         Map<String,?> mappaProprietaUploader_nome_valore;
         if( consumer != null )
             mappaProprietaUploader_nome_valore = consumer.getMappaAttributi_Nome_Valore();
@@ -158,7 +158,7 @@ public class GestioneConsumer {
         try {
 
             // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
-            Consumer consumerDalDB = Consumer.getAttoreByUsername(usernameConsumerDaAggiungere);
+            Consumer consumerDalDB = Consumer.getAttoreDaUsername(usernameConsumerDaAggiungere);
 
             if( consumerDalDB != null &&
                     consumerDalDB.equals(consumerDaAggiungere) ) {

@@ -30,9 +30,9 @@ public abstract class Consumer extends UtenteNonAdministrator {
     /** Restituisce l'entità {@link Consumer} cercata nel database
      * in base all'identificativo fornito.
      * @return Il consumer cercato, oppure null in caso di errore.*/
-    public static Consumer getAttoreById(Long identificativoConsumer ) {
+    public static Consumer getAttoreDaIdentificativo(Long identificativoConsumer ) {
 
-        Attore attoreTrovatoInDb = Attore.getAttoreById(identificativoConsumer);
+        Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoConsumer);
         return attoreTrovatoInDb instanceof Consumer ? (Consumer) attoreTrovatoInDb : null;
 
     }
@@ -40,9 +40,9 @@ public abstract class Consumer extends UtenteNonAdministrator {
     /** Restituisce l'entità {@link Consumer} cercata nel database
      * in base allo username fornito.
      * @return Il consumer cercato, oppure null in caso di errore.*/
-    public static Consumer getAttoreByUsername( String username ) {
+    public static Consumer getAttoreDaUsername( String username ) {
 
-        Attore attoreTrovatoInDb = Attore.getAttoreByUsername(username);
+        Attore attoreTrovatoInDb = Attore.getAttoreDaUsername(username);
         return attoreTrovatoInDb instanceof Consumer ? (Consumer) attoreTrovatoInDb : null;
 
     }

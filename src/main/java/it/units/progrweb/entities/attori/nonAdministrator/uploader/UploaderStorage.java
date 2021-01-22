@@ -24,13 +24,9 @@ class UploaderStorage extends Uploader {
     }
 
     /** Vedere {@link Uploader}.*/
-     public UploaderStorage(String username, String nominativo, String email,
-                     byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-         super(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);
-     }
-
-    public String getImmagineLogoBase64() {
-        return immagineLogoUploader.getLogo_base64();
+    public UploaderStorage(String username, String nominativo, String email,
+                 byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
+     super(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);
     }
 
     @Override

@@ -107,7 +107,7 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti = mappaDocume
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyDataCaricamentoDocumenti = async () => {
 
-    return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_DATA_CARICAMENTO)
+    return richiestaGet(process.env.VUE_APP_URL_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_DATA_CARICAMENTO)
         .then(  risposta       => risposta )
         .catch( rispostaErrore => {
             console.error("Errore durante la ricezione del nome dell'attributo " +
@@ -126,7 +126,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyDataVisualizzazioneDocumenti = async () => {
 
-    return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_DATA_VISUALIZZAZIONE)
+    return richiestaGet(process.env.VUE_APP_URL_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_DATA_VISUALIZZAZIONE)
         .then(  risposta       => risposta )
         .catch( rispostaErrore => {
             console.error("Errore durante la ricezione del nome dell'attributo " +

@@ -10,9 +10,6 @@ import java.util.Map;
  */
 public class UploaderProxy extends Uploader {
 
-    /** Nome dell'uploader.*/
-    private final String nomeUploader;
-
     /** Immagine logo dell'uploader codificato in base 64.*/
     private final String logoUploaderBase64;
 
@@ -20,7 +17,6 @@ public class UploaderProxy extends Uploader {
     private final Map<String, ?> mappaAttributiUploader_nome_valore;
 
     public UploaderProxy(UploaderStorage uploaderStorage) {
-        this.nomeUploader = uploaderStorage.getNominativo();
         this.logoUploaderBase64 = uploaderStorage.getImmagineLogoBase64();
         this.mappaAttributiUploader_nome_valore = uploaderStorage.getMappaAttributi_Nome_Valore();
     }
@@ -29,7 +25,6 @@ public class UploaderProxy extends Uploader {
         // TODO : cancellare questo metodo, utilizzato solo in sviluppo per fare delle prove
 
         super(username,nomeUploader,emailUploader,logoBase64.getBytes(StandardCharsets.UTF_8), "png");
-        this.nomeUploader = getNominativo();
         this.logoUploaderBase64 = logoBase64;
         this.mappaAttributiUploader_nome_valore = new HashMap<>();
 

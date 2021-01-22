@@ -6,6 +6,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderProxy;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
@@ -36,7 +37,7 @@ public class Autenticazione {
     /** Rappresentazione di un attore non presente nel database
      * di autenticazione (es. se credenziali non sono valide),
      * oppure di un attore non autenticato.*/
-    private static final Attore ATTORE_NON_AUTENTICATO = null;
+    private static final Attore ATTORE_NON_AUTENTICATO = null;      // TODO : cancellare
 
     /** Tempo in secondi durante il quale ad un attore che si è autenticato
      * non verranno chieste nuovamente le credenziali. */
@@ -45,14 +46,14 @@ public class Autenticazione {
     /** Lunghezza del token CSRF associato al token di autenticazione di un client.*/
     private static final int LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE = 128;
 
-    /** Nome del claim contenente l'hash del token associato al client nel JWT di autenticazione.
-     * Vedere anche {@link #creaJwtTokenAutenticazionePerAttore(Attore, String)}.*/
-    private static final String NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE = "hash-csrf-autenticazione";
-
     /** Nome del cookie contenente un token per il client. L'hash di questo valore
      * è presente nel token di autenticazione del client, nel claim con nome specificato
      * in {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE}.*/
     private static final String NOME_COOKIE_CLIENT_TOKEN = "TOKEN-ID-CLIENT-AUTENTICAZIONE";
+
+    /** Nome del claim contenente l'hash del token associato al client nel JWT di autenticazione.
+     * Vedere anche {@link #creaJwtTokenAutenticazionePerAttore(Attore, String)}.*/
+    private static final String NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE = "hash-" + NOME_COOKIE_CLIENT_TOKEN;
 
     /** Nelle richieste HTTP, è il nome dell' header contenente il token di autenticazione.*/
     private static final String NOME_HEADER_AUTHORIZATION = "Authorization";
@@ -74,7 +75,7 @@ public class Autenticazione {
                     AuthenticationDatabaseEntry.verificaCredenziali(username, password);
 
         if( credenzialiCorrette ) {
-            return Attore.getAttorebyUsername( username );
+            return Attore.getAttoreDaUsername( username );
         } else {
             //return ATTORE_NON_AUTENTICATO;
 
@@ -102,6 +103,11 @@ public class Autenticazione {
                     nomeField.setAccessible(true);
                     String nome = "ConsumerTest";   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     nomeField.set(consumer, nome);
+                    Field usernameField = consumer.getClass().getSuperclass().getSuperclass().getSuperclass() // field di Attore
+                            .getDeclaredField("username");
+                    usernameField.setAccessible(true);
+                    String usernamePROVA = "USRNMEPRVTST";   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
+                    usernameField.set(consumer, usernamePROVA);
                 } catch (NoSuchFieldException | IllegalAccessException e) {/* non dovrebbe mai capitare questa eccezione*/ }
                 return consumer;
             } else if( password.equals("pluto") ) {       // TODO : questo metodo è da implementare !!! (TUTTO!! )
@@ -118,6 +124,11 @@ public class Autenticazione {
                     nomeField.setAccessible(true);
                     String nome = "UploaderTest";   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
                     nomeField.set(uploader, nome);
+                    Field usernameField = uploader.getClass().getSuperclass().getSuperclass().getSuperclass() // field di Attore
+                            .getDeclaredField("username");
+                    usernameField.setAccessible(true);
+                    String usernamePROVA = "USRNMEPRVTST";   // todo : VALORE A CASO MESSO SOLO PER FAR FUNZIONARE, MA ANCORA DA IMPLEMENTARE QUESTO METODO
+                    usernameField.set(uploader, usernamePROVA);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     // non dovrebbe mai capitare questa eccezione
                 }
@@ -170,8 +181,11 @@ public class Autenticazione {
 
         Attore attore = Autenticazione.getAttoreDaCredenziali(username, password);
 
-        if(Autenticazione.isAttoreAutenticato(attore))
-            return creaResponseAutenticazionePerAttoreAutenticato(attore);
+        if(Autenticazione.isAttoreAutenticato(attore)) {
+            try {
+                return creaResponseAutenticazionePerAttoreAutenticato(attore);
+            } catch (NotFoundException notFoundException) {}
+        }
 
         // Autenticazione fallita
         return creaResponseUnauthorized();
@@ -207,11 +221,15 @@ public class Autenticazione {
     }
 
     /** Metodo da invocare se un attore ha fornito le credenziali corrette.
+     * Restituisce una response contenente i cookie ed il token di autenticazione
+     * che il client dovrà esibire a questo server per autenticarsi.
      *
      * @param attore che ha fornito le credenziali corrette.
      * @return Response con token e cookie di autenticazione per l'attore.
+     * @throws NotFoundException Se le credenziali non sono corrette.
      */
-    private static Response creaResponseAutenticazionePerAttoreAutenticato(Attore attore) {
+    public static Response creaResponseAutenticazionePerAttoreAutenticato(Attore attore)
+            throws NotFoundException {
 
         try {
             String valoreTokenCsrfAutenticazione = generaTokenAlfanumerico(LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE);
@@ -287,27 +305,31 @@ public class Autenticazione {
                                                         Cookie[] cookies) {
 
         Long identificativoAttoreDaToken = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
-        String hashNelTokenAutenticazione = (String) jwtTokenAutenticazione.getValoreClaimByName(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE);
-        String valoreCookieId;
+        String valoreHash_nelTokenAutenticazione_dalClient = (String) jwtTokenAutenticazione.getValoreClaimByName(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE);
+        String valoreCookieId_dalClient;
         try {
-            valoreCookieId = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
+            valoreCookieId_dalClient = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
                                     .getValue();
         } catch ( NoSuchElementException e) {
             // Cookie non trovato
             return false;
         }
-        Attore attoreCheStaAutenticandosi = Attore.getAttoreById(identificativoAttoreDaToken);
+        Attore attoreCheStaAutenticandosi = Attore.getAttoreDaIdentificativo(identificativoAttoreDaToken);
 
-        String hashPasswordClient = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attoreCheStaAutenticandosi);
-        String hashValoreCookieId;
         try {
-            hashValoreCookieId = GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordClient);
+            String hashPasswordAttore_daAuthDb =
+                    AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attoreCheStaAutenticandosi.getUsername()); // TODO : Scommentare (questa riga è corretta)
+
+            String hashValoreCookieId_ricalcolatoCoiValoriNelServer =
+                    GestoreSicurezza.hmacSha256(valoreCookieId_dalClient, hashPasswordAttore_daAuthDb);
+
+            return valoreHash_nelTokenAutenticazione_dalClient.equals(hashValoreCookieId_ricalcolatoCoiValoriNelServer);
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(Autenticazione.class, e);
             return false;
+        } catch (NotFoundException notFoundException) {
+            return false;
         }
-
-        return hashNelTokenAutenticazione.equals(hashValoreCookieId);
 
     }
 
@@ -316,12 +338,14 @@ public class Autenticazione {
      * @param attore
      * @param valoreCookieId è il valore del cookie associato all'attore che si sta autenticando.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}.
-     * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}.*/
+     * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}.
+     * @throws NotFoundException Se l'{@link Attore} passato nel parametro non viene trovato
+ *                                nell'AuthDB.*/
     private static String creaJwtTokenAutenticazionePerAttore(Attore attore,
                                                               String valoreCookieId)
-            throws InvalidKeyException, NoSuchAlgorithmException {
+            throws InvalidKeyException, NoSuchAlgorithmException, NotFoundException {
 
-        String hashPasswordAttore = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attore);
+        String hashPasswordAttore = AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attore.getUsername());
 
         JwtPayload jwtPayload = new JwtPayload();
         jwtPayload.aggiungiClaim(new JwtSubjectClaim(attore.getIdentificativoAttore()));
@@ -346,7 +370,7 @@ public class Autenticazione {
 
         JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
         Long idAttore = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
-        Attore attore = Attore.getAttoreById(idAttore);
+        Attore attore = Attore.getAttoreDaIdentificativo(idAttore);
 
         return attore;
     }
@@ -354,7 +378,8 @@ public class Autenticazione {
     /** Data una HttpServletRequest, restituisce l'attore autenticato
      * per quella HttpServletRequest. Se la richiesta proviene da un client
      * che non si è autenticato oppure se l'autenticazione non è valida,
-     * allora restituisce {@link #ATTORE_NON_AUTENTICATO}.*/
+     * allora restituisce {@link #ATTORE_NON_AUTENTICATO}.
+     * Questo metodo utilizza {@link #getAttoreDaTokenAutenticazione(String)}*/
     public static Attore getAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
 
         // TODO : da testare
@@ -389,7 +414,7 @@ public class Autenticazione {
         return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_NOME_SUBJECT_CLAIM_NAME );
     }
 
-    /** Restituisce lo username dell'{@link Attore} in base alle informazioni contenute
+    /** Restituisce l'identificativo dell'{@link Attore} in base alle informazioni contenute
      * nel token JWT. */
     public static Long getIdentificativoAttoreDaTokenAutenticazione(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);

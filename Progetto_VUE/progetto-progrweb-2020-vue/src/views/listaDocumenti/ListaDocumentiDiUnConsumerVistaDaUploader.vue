@@ -12,7 +12,7 @@
                       @documento-eliminato="rimuoviDocumentoDaLista"/>
   </section>
 
-  <form @submit.prevent="caricaNuovoDocumento" id="caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
+  <form @submit.prevent="caricaNuovoDocumento" :id="idForm_caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
     <p>Carica un nuovo documento per {{ nomeConsumer }}:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
@@ -63,7 +63,10 @@ export default {
 
 
 
-      // NOMI DEI PARAMETRI ATTESI DAL SERVER
+      /** Valore dell'attributo "id" del form per il caricamento dei documenti.*/
+      idForm_caricaNuovoDocumento: "caricaNuovoDocumento",
+
+      // NOMI DEI PARAMETRI ATTESI DAL SERVER // TODO : variabili d'ambiente sia per client sia per server
       nomeParametro_nomeDocumento:             "nomeFile",
       nomeParametro_contenutoDocumento:        "contenutoFile",
       nomeParametro_idConsumerDestinatario:    "identificativoConsumerDestinatario",
@@ -85,7 +88,8 @@ export default {
   },
   watch: {
 
-    /** Aggiorna il contenuto della pagina se cambia la route
+    /** Aggiorna il contenuto della pagina se cambia la route, ad
+     * es.: si chiedono i dati di un altro Consumer
      * (<a href="https://stackoverflow.com/a/50140702">Fonte</a>)*/
     '$route' (nuovaRoute) {
 
@@ -131,7 +135,7 @@ export default {
 
 
       // Richiede mappa idFile-propFile per questo consumer
-      await richiestaGet( process.env.VUE_APP_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + this.idConsumer )
+      await richiestaGet( process.env.VUE_APP_URL_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + this.idConsumer )
           // Crea mappa
           .then( rispostaConMappaFile_id_prop => new Map(Object.entries( rispostaConMappaFile_id_prop ) ) )
           // Ordina mappa
@@ -150,7 +154,7 @@ export default {
 
 
       // Richiede l'elenco dei nomi delle properties dei documenti per i Consumer
-      await richiestaGet( process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
+      await richiestaGet( process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
           // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
           // documento (da creare dinamicamente), poi salva l'array
           .then( nomiPropDocumenti => {
@@ -177,7 +181,7 @@ export default {
     caricaNuovoDocumento() {
 
       // Recupera il documento dal form
-      const inputFile = document.querySelector('input[type=file]');
+      const inputFile = document.querySelector('#' + this.idForm_caricaNuovoDocumento + ' input[type=file]');
       const documento = inputFile.files[0];
 
       // Costruzione dei parametri da inviare
@@ -191,7 +195,7 @@ export default {
       const formValido = documento && this.nomeDocumento;  // che siano truthy
 
       if( formValido )
-        richiestaPostConFile( process.env.VUE_APP_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER, formData)
+        richiestaPostConFile( process.env.VUE_APP_URL_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER, formData)
           .then( mappa_idDocumento_proprietaDocumento => {
             // Server restituisce una mappa avente per chiave l'id del file aggiunto
             //  e per valore l'oggetto con le properties del file: l'unica entry è
@@ -211,7 +215,7 @@ export default {
             );
 
             // Pulisci i campi
-            document.getElementById("caricaNuovoDocumento").reset();
+            document.getElementById(this.idForm_caricaNuovoDocumento).reset();
 
           })
           .catch( console.error );

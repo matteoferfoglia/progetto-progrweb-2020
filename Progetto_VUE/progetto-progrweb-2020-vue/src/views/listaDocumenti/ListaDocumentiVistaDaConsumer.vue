@@ -141,7 +141,7 @@ export default {
 
     const caricaContenuto = async () => {   // Grazie ad async, restituisce una Promise (usata dopo)
 
-      await richiestaGet(process.env.VUE_APP_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
+      await richiestaGet(process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
               .then( intestazione =>
                   this.nomiColonneIntestazione =
                       intestazione.push( this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI) );
@@ -151,7 +151,7 @@ export default {
 
               // Crea l'indice degli hashtag
               .then( elencoDocumenti => {
-                richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
+                richiestaGet(process.env.VUE_APP_URL_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
                   .then( nomePropertyHashtags => {
                     this.mappa_hashtag_idDocumenti =
                         creaIndiceDeiFileRispettoAgliHashtagCheContengono(elencoDocumenti, nomePropertyHashtags);
@@ -207,7 +207,7 @@ export default {
  *                    mostrare i documenti.*/
 const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // TODO : passare come parametro l'id dell'Uploader e richiedere documenti solo da quell'Uploader
 
-  return richiestaGet(process.env.VUE_APP_GET_DOCUMENTI_PER_CONSUMER + "/" + idUploader)
+  return richiestaGet(process.env.VUE_APP_URL_GET_DOCUMENTI_PER_CONSUMER + "/" + idUploader)
         .then(  risposta       => {
           // Conversione da oggetto a mappa (Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries#converting_an_object_to_a_map)
           return new Map(Object.entries(risposta));

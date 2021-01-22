@@ -25,14 +25,23 @@ public abstract class Uploader extends UtenteNonAdministrator {
         super.tipoAttore = Uploader.class.getSimpleName();
     }
 
-    public static Uploader getAttoreById(Long identificativoAttore) {
-        Attore a = Attore.getAttoreById(identificativoAttore);
+    public static Uploader getAttoreDaIdentificativo(Long identificativoAttore) {
+        Attore a = Attore.getAttoreDaIdentificativo(identificativoAttore);
         return a instanceof Uploader ? (Uploader) a : null;
     }
 
     /** Restituisce l'immagine logo dell'Uploader
      * codificata in Base64.*/
-    abstract public String getImmagineLogoBase64();
+    public String getImmagineLogoBase64(){
+        return immagineLogoUploader.getLogo_base64();
+    }
+
+    /** Modifica l'immagine logo dell'Uploader.*/
+    public void setImmagineLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo){
+        this.immagineLogoUploader.setLogo(immagineLogo_bytes, estensioneFileContenenteLogo);
+    }
+
+    /**
 
     /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
      * di un'istanza di questa classe. L'attributo con l'immagine logo
@@ -68,7 +77,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * database in base all'identificativo fornito.
      * @return L'uploader cercato, oppure null in caso di errore.*/
     public static Uploader cercaUploaderDaIdentificativo(Long identificativoUploader ) {
-        Attore attoreTrovatoInDb = Attore.getAttoreById(identificativoUploader);
+        Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoUploader);
         return attoreTrovatoInDb instanceof Uploader ? (Uploader) attoreTrovatoInDb : null;
     }
 

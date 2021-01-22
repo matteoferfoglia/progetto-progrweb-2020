@@ -14,7 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static it.units.progrweb.utils.UtilitaGenerale.getUrlPattern;
 
@@ -34,7 +40,12 @@ public class FiltroCSRF implements Filter {
     private static final String[] LISTA_URL_DA_CONTROLLARE_CSRF = {
             "/api/login",
             "/api/logout",
-            "/api/uploader/cancellaConsumerPerQuestoUploader"
+            "/api/uploader/cancellaConsumerPerQuestoUploader",
+            "/api/modificaInformazioniAttore",
+            "/api/uploader/aggiungiConsumerPerQuestoUploader",
+            "/api/uploader/cancellaConsumerPerQuestoUploader",
+            "/api/uploader/documenti/eliminaDocumento",
+            "/api/uploader/documenti/uploadDocumento"
     };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
 
     /** Nome del parametro che nella richiesta HTTP (proveniente dal client)
@@ -43,6 +54,7 @@ public class FiltroCSRF implements Filter {
 
     // Ricerca dei parametri in una request dipende dal content-type
     private static final String CONTENT_TYPE_JSON = "application/json";
+    private static final String COTENT_TYPE_MULTIPART_FORM = "multipart/form-data";
 
 
 
@@ -71,14 +83,17 @@ public class FiltroCSRF implements Filter {
             if(contentType != null) {   // null se non c'è content-type nella request
                 // Cerca CSRF nel body della request
 
-                if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
+                if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ||
+                        contentType.toLowerCase().contains(COTENT_TYPE_MULTIPART_FORM) ) {
 
                     // Parsing del body della request per trovare il csrfToken se presente (Fonte: https://stackoverflow.com/a/3831791 e adattato)
-                    StringBuffer requestBody = new StringBuffer();
+                    StringBuilder requestBody = new StringBuilder();
 
                     try {
 
-                        // TODO : rivedere questa parte e refactoring (estrarre un metodo che faccia solo il parsing della richiesta JSON)
+                        // TODO : rivedere questa parte e refactoring (estrarre un metodo che faccia solo il parsing della richiesta JSON) - Attenzione c'è anche il multipart/form-data
+
+                        // TODO : migliorare efficienza (non serve leggere tutto se poi mi serve solo un attributo)
 
                         ServletInputStream reader = copiaHttpReq.getInputStream();
 
@@ -95,8 +110,44 @@ public class FiltroCSRF implements Filter {
                             requestBody.append(line);
                         }
 
-                        Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonToMappaProprieta(requestBody.toString());
-                        csrfToken = (String) mappaProprietaValori.get(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
+                        if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
+                            Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonToMappaProprieta(requestBody.toString());
+                            csrfToken = (String) mappaProprietaValori.get(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
+                        } else if ( contentType.toLowerCase().contains(COTENT_TYPE_MULTIPART_FORM) ) {
+                            // Necessario parsing (semplificato, solo per individuare il token) Fonte: https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+
+                            // Estrazione del boundary dal content-type
+                            String boundary_nomeAttributo="boundary=";
+                            String boundary = contentType.substring( contentType.indexOf(boundary_nomeAttributo)+boundary_nomeAttributo.length());
+
+                            // TODO : che succede se manca il csrf ?? Come si comporta?? genera eccezioni??
+                            // TODO : rivedere regex
+
+                            List<String> listaCsrfTokenTorovatiNellaRichiesta =
+                                  Arrays.stream(requestBody.toString().split(boundary))
+                                        .filter( encapsulatedMultipart -> Pattern.compile("(name=\"" + NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST + "\")")
+                                                                                 .matcher(encapsulatedMultipart)
+                                                                                 .find() )
+                                        // dopo filter() restano solo i campi che contengono csrfToken
+                                        .flatMap( encapsulatedMultipart -> {
+                                            Matcher matcher = Pattern.compile("(?:\\r\\n)(.*)")   // prendi tutte le righe
+                                                    .matcher(encapsulatedMultipart);
+
+                                            List<String> valoriCsrfToken = new ArrayList<>();
+                                            while(matcher.find())
+                                                valoriCsrfToken.add(matcher.group(1).trim());  // prendo il gruppo col valore cercato
+
+                                            return valoriCsrfToken.stream();
+                                        })
+                                        .collect( Collectors.toList() );
+
+                            csrfToken = listaCsrfTokenTorovatiNellaRichiesta.stream()
+                                            .filter( csrfTokenTrovato -> CsrfToken.isCsrfTokenValido(csrfTokenTrovato, cookieHeader, indirizzoIPClient) )
+                                            .findAny()
+                                            .orElseGet(() -> "");   // restituisce il primo (non in ordine) token valido trovato, oppure stringa vuota
+
+                        }
+
 
                     } catch (Exception e) {
                         Logger.scriviEccezioneNelLog(this.getClass(), "Errore nella lettura del body della request", e);

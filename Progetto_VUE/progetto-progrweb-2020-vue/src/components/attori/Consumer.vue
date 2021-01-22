@@ -1,6 +1,6 @@
 <template v-if="layoutCaricato">
   <header>
-    <h1>Benvenuto {{ nomeAttoreAttualmenteAutenticato }}</h1>
+    <h2>Benvenuto!</h2>
   </header>
   <main> <!-- TODO : semanticamente corretto main? Meglio spostarlo nel componente padre?-->
 
@@ -90,13 +90,13 @@ export default {
 
     const caricaQuestoComponente = async () => {
 
-      await richiestaGet(process.env.VUE_APP_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
+      await richiestaGet(process.env.VUE_APP_URL_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
             .then( nome => this.nomeAttoreAttualmenteAutenticato = nome );
 
             // Richiede nomi delle properties negli oggetti ricevuti dal server
-      await richiestaGet(process.env.VUE_APP_GET_NOME_PROP_NOME_UPLOADER)                 // richiede nome prop con nome uploader
+      await richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_UPLOADER)                 // richiede nome prop con nome uploader
             .then( nomePropNomeUploader => this.NOME_PROP_NOME_UPLOADER = nomePropNomeUploader )
-            .then( () => richiestaGet(process.env.VUE_APP_GET_NOME_PROP_LOGO_UPLOADER) )  // richiede nome prop con logo uploader
+            .then( () => richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_LOGO_UPLOADER) )  // richiede nome prop con logo uploader
             .then( nomePropLogoUploader => this.NOME_PROP_LOGO_UPLOADER = nomePropLogoUploader )
 
             // Richiede identificativi uploader e corrispondenti identificativi dei file
@@ -131,7 +131,7 @@ export default {
  * Se la richiesta va a buon fine, tale mappa viene restituita come
  * valore di una promise risolta.*/
 const getIdentificativi_uploader_file = async () => {
-  return richiestaGet(process.env.VUE_APP_GET_MAPPA_FILE_PER_QUESTO_CONSUMER)
+  return richiestaGet(process.env.VUE_APP_URL_GET_MAPPA_FILE_PER_QUESTO_CONSUMER)
       .then(  risposta       =>  new Map(Object.entries(risposta)) )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
@@ -158,7 +158,7 @@ const getInfoUploaders = async arrayIdUploader => {
   //  (una Promise per ogni Uploader).
   return Promise.all( arrayIdUploader.map( idUploader => {   // Fonte: https://stackoverflow.com/a/31414472
 
-    return richiestaGet( process.env.VUE_APP_GET_INFO_UPLOADER + "/" + idUploader ) // richiesta info uploader
+    return richiestaGet( process.env.VUE_APP_URL_GET_INFO_UPLOADER + "/" + idUploader ) // richiesta info uploader
         .then( rispostaConNomeUploader => [ idUploader, rispostaConNomeUploader ] );
 
   }))

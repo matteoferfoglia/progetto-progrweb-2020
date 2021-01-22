@@ -181,4 +181,12 @@ public class UtilitaGenerale {
 
     }
 
+    /** Dato il nome di un file, ne restituisce l'estensione.*/
+    public static String getEstensioneDaNomeFile(String nomeFile) {
+        int indiceSeparatoreEstensioneNelNome = nomeFile.lastIndexOf(".");
+        indiceSeparatoreEstensioneNelNome = indiceSeparatoreEstensioneNelNome == -1 ?  // true se manca l'estensione
+                                                nomeFile.length() :
+                                                indiceSeparatoreEstensioneNelNome;
+        return nomeFile.substring(indiceSeparatoreEstensioneNelNome);
+    }
 }

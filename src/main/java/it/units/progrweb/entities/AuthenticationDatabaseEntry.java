@@ -3,7 +3,6 @@ package it.units.progrweb.entities;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.GeneratoreTokenCasuali;
@@ -12,6 +11,8 @@ import it.units.progrweb.utils.Logger;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Classe rappresentante un'entità dell'authentication database.
@@ -50,7 +51,7 @@ public class AuthenticationDatabaseEntry {
             throws InvalidKeyException, NoSuchAlgorithmException {
 
         this.username  = username ;
-        this.salt = GeneratoreTokenCasuali.generaTokenAlfanumerico(SALT_LENGTH);
+        this.salt = generaSalt();
         this.hashedSaltedPassword = calcolaHashedSaltedPassword(passwordAttore, this.salt);
     }
 
@@ -65,10 +66,13 @@ public class AuthenticationDatabaseEntry {
         return GestoreSicurezza.hmacSha256(passwordInChiaro.concat(salt));
     }
 
-    /** Dato un attore, restituisce la sua password (hashed e salted).*/
-    public static String getHashedSaltedPasswordDellAttore(Attore attore) {
-        // TODO : metodo da implementare    // Valutare una soluzione che non richieda di prendere Attore (il parametro) dal db perché costa
-        return "PippoHashedSalted";
+    /** Dato lo username di un attore, restituisce la sua password (hashed e salted).
+     * @throws NotFoundException Se lo username non viene trovato nell'AuthDB.*/
+    public static String getHashedSaltedPasswordDellAttore(String usernameAttore)
+            throws NotFoundException {
+        // TODO : scommentare la prossima riga    // Valutare una soluzione che non richieda di prendere Attore (il parametro) dal db perché costa
+        // return cercaAttoreInAuthDb(usernameAttore).hashedSaltedPassword;
+        return "PippoHashed";   // finché non si fanno test senza veri attori nel db
     }
 
 
@@ -83,8 +87,7 @@ public class AuthenticationDatabaseEntry {
             authenticationEntry = cercaAttoreInAuthDb(username);
 
             if( authenticationEntry!= null )
-                credenzialiValide = calcolaHashedSaltedPassword(password, authenticationEntry.salt)
-                                    .equals(authenticationEntry.hashedSaltedPassword);
+                credenzialiValide = verificaCredenziali(password, authenticationEntry);
 
         } catch (NotFoundException e) {
             // attore non trovato
@@ -99,6 +102,15 @@ public class AuthenticationDatabaseEntry {
         return credenzialiValide;
     }
 
+    /** Questo metodo <strong>NON</strong> accede al database.
+     * @return true se credenziali valide, false altrimenti.*/
+    private static boolean verificaCredenziali(String passwordDaVerificare, AuthenticationDatabaseEntry authenticationEntry)
+            throws InvalidKeyException, NoSuchAlgorithmException {
+
+        return calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
+                .equals(authenticationEntry.hashedSaltedPassword);
+    }
+
     /** Cerca l'attore in base allo username nell'AuthDB.
      * Se lo trova, restituisce l'entry corrispondente,
      * altrimenti lancia un'eccezione.
@@ -111,4 +123,76 @@ public class AuthenticationDatabaseEntry {
 
     }
 
+    /** Se la vecchia password coincide con quella nel database,
+     * allora si procede alla modifica con la nuova password e
+     * restituisce true, altrimenti restituisce false. In realtà
+     * questo metodo predispone il sistema per la modifica e
+     * restituisce un {@link Optional}: se {@link Optional#isPresent()}
+     * restituisce true, allora si può invocare {@link Optional#get()}
+     * per completare l'operazione di aggiornamento nel database,
+     * altrimenti significa che ci sono stati problemi (la coppia
+     * (username, password) non era presente nel database).
+     * L'aggiornamento del database <strong>non</strong> avviene
+     * automaticamente, ma bisogna invocare {@link Optional#get()}
+     * (può essere invocato solo una volta, le successiva non
+     * produce alcun effetto nel database).
+     * Motivazione dell'utilizzo di {@link Optional}: il metodo
+     * invocante potrebbe richiedere modifiche anche in altre
+     * parti del database e prima di confermarle potrebbe dover
+     * verificare che non vi siano stati problemi. Se le operazioni
+     * sul database invece avessero effetto immediato, doverle
+     * poi rimodificare (ad esempio perché qualche controllo su
+     * un altro database ha generato un'eccezione) potrebbe
+     * comportare un ulteriore costo relativo all'ulteriore accesso
+     * in scrittura nel database.
+     * @param username
+     * @param vecchiaPassword
+     * @param nuovaPassword
+     * @return {@link Optional} - Vedere descrizione del metodo.
+     */
+    public static Optional<AuthenticationDatabaseEntry> modificaPassword(String username,
+                                                                         String vecchiaPassword,
+                                                                         String nuovaPassword   ) {
+
+        // TODO : testare che funzioni come da aspettative
+
+        AuthenticationDatabaseEntry authenticationDatabaseEntry;
+        try {
+            authenticationDatabaseEntry = cercaAttoreInAuthDb( username );
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+
+        try {
+            if( verificaCredenziali( vecchiaPassword, authenticationDatabaseEntry ) ) {
+
+                authenticationDatabaseEntry.salt = generaSalt();
+                authenticationDatabaseEntry.hashedSaltedPassword =
+                        calcolaHashedSaltedPassword(nuovaPassword, authenticationDatabaseEntry.salt);
+
+                // Creazione del Supplier che modificherà il database
+                boolean giaModificatoIlDatabase = false;
+                Supplier<AuthenticationDatabaseEntry> modificaDatabase = () -> {
+                    if( ! giaModificatoIlDatabase ) // stile closure: questo flag non è modificabile dall'esterno del metodo in cui è definito
+                        DatabaseHelper.salvaEntitaAdesso(authenticationDatabaseEntry);  // importante che le modifiche vengano apportate subito per i cambi di password
+                    return authenticationDatabaseEntry;
+                };
+
+                return Optional.of(modificaDatabase.get());// TODO: verificare funzionamento e soprattutto che la modifica nel db avvenga solo DOPO aver invoca Optional#get()
+
+            } else {
+                return Optional.empty();
+            }
+        } catch (InvalidKeyException|NoSuchAlgorithmException e) {
+            Logger.scriviEccezioneNelLog(AuthenticationDatabaseEntry.class, e);
+            return Optional.empty();
+        }
+
+
+    }
+
+    /** Generatore casuale di Salt per questa classe.*/
+    private static String generaSalt() {
+        return GeneratoreTokenCasuali.generaTokenAlfanumerico(SALT_LENGTH);
+    }
 }

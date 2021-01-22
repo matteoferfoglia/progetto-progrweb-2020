@@ -32,7 +32,7 @@ public class RichiestaInfoSuUploader {
 
         // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
 
-        Uploader uploader = Uploader.getAttoreById( identificativoUploader );
+        Uploader uploader = Uploader.getAttoreDaIdentificativo( identificativoUploader );
         if( uploader != null) {
             return Response.ok()
                            .entity( uploader.getImmagineLogoBase64() )

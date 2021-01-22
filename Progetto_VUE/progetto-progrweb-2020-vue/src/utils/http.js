@@ -194,7 +194,7 @@ const onErrorHandler = errore => {
     if( errore.response.status === HTTP_STATUS_UNAUTHORIZED ) {
         router.redirectVersoPaginaAutenticazione( router.currentRoute );
     } else if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO ) {
-        router.go(0);   // refresh della pagina per aggiornare token (risultato invalido)
+        router.go(0);   // refresh della pagina per aggiornare token (che è risultato invalido)
     }
 
     return Promise.reject( errore.response );

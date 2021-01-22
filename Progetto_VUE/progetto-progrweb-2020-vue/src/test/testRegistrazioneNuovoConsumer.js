@@ -97,10 +97,10 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
             const datiJSONAttesi = JSON.stringify(datiAttesi);
 
             // console.log("Inviato: \t{url=" + urlAzioneForm + ", dati=" + datiJSONInviati + " }");
-            // console.log("Atteso: \t{url=" + process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL + ", dati=" + datiJSONAttesi + " }");
+            // console.log("Atteso: \t{url=" + process.env.VUE_APP_URL_REGISTRAZIONE_CONSUMER + ", dati=" + datiJSONAttesi + " }");
 
             expect(datiJSONInviati).toStrictEqual(datiJSONAttesi);
-            expect(urlAzioneForm).toStrictEqual(process.env.VUE_APP_REGISTRAZIONE_CONSUMER_SERVER_URL);
+            expect(urlAzioneForm).toStrictEqual(process.env.VUE_APP_URL_REGISTRAZIONE_CONSUMER);
 
         }
 
