@@ -1,12 +1,22 @@
 package it.units.progrweb.listeners;
 
+import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.VoidWork;
+import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
  * Starter del database per indicare quali classi
@@ -34,24 +44,6 @@ public class StarterDatabase implements ServletContextListener {
             "it.units.progrweb.entities.file.FileStorage"
     };
 
-    // Salvare direttamente la classe (es.: FileStorage.class) non
-    // era possibile perché se il suo accesso è di tipo private-package
-    // sarebbe inacessibile dall'esterno del package ed usare le
-    // reflection era poco comodo, in quanto avrebbe richiesto un blocco
-    // try-catch intorno all'inizializzazione di un parametro.
-    // In caso di modifica del nome delle classi, bisognerà modificare
-    // manualmente questo parametro: se ci si dimentica, l'errore sarà
-    // subito evidente all'avvio del server. Con questa soluzione si
-    // perde un po' in automazione, ma l'eventuale lavoro manuale è
-    // concentrato nell'inizializzazione del parametro e facilmente
-    // tracciabile.
-    // Motivazione di tutto ciò: meglio rendere inaccessibili le classi
-    // corrispondenti ad entità salvate nel database e rendere pubbliche
-    // solo le entità "proxy" (ma le entità storage non sono accessibile
-    // nemmeno da qua, se non che tramite Reflection).
-
-
-
     /**
      * Registra tutte le classi che dovranno essere gestite dal database.
      * Attenzione: questo metodo è specifico solamente per Objectify.
@@ -74,6 +66,77 @@ public class StarterDatabase implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent sce) {
         registraClassiDatabase();
+
+        // Inizializzazione del database SOLO in ambiente di sviluppo
+        // Fonte: https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server#detecting_the_application_runtime_environment
+        if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
+            // Local development server
+
+            // Caricamento di alcuni attori di prova
+
+
+
+            try {
+
+                // Creazione delle entità di test
+                Object consumerTest, uploaderTest, administratorTest;
+                AuthenticationDatabaseEntry authConsumerTest, authUploaderTest, authAdministratorTest;
+
+                {
+                    // Creazione delle entità (oggetti Java)
+
+                    {
+                        // Creazione consumer
+                        Class consumerStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage");
+                        Constructor<?> constructorConsumerStorage = consumerStorage.getDeclaredConstructor(String.class, String.class, String.class);
+                        constructorConsumerStorage.setAccessible(true);
+                        consumerTest = constructorConsumerStorage.newInstance("PPPPLT80A01A952G", "Pippo Pluto", "pippopluto@example.com");
+                        authConsumerTest = new AuthenticationDatabaseEntry("PPPPLT80A01A952G","1234");
+                    }
+
+                    {
+                        // Creazione Uploader
+                        Class uploaderStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage");
+                        Constructor<?> constructorUploaderStorage = uploaderStorage.getDeclaredConstructor(String.class, String.class, String.class, byte[].class, String.class);
+                        constructorUploaderStorage.setAccessible(true);
+                        uploaderTest = constructorUploaderStorage.newInstance("AB01", "Banca Prova", "bancaprova@example.com",
+                                UtilitaGenerale.convertiInputStreamInByteArray(sce.getServletContext().getResourceAsStream("/favicon.ico") ), "ico");
+                        authUploaderTest = new AuthenticationDatabaseEntry("AB01","5678");
+                    }
+
+                    {
+                        // Creazione Administrator
+                        Class administratorStorage = Class.forName("it.units.progrweb.entities.attori.administrator.AdministratorStorage");
+                        Constructor<?> constructorAdministratorStorage = administratorStorage.getDeclaredConstructor(String.class, String.class, String.class);
+                        constructorAdministratorStorage.setAccessible(true);
+                        administratorTest = constructorAdministratorStorage.newInstance("AdminTest", "Mario l'Amministratore", "marioadmin@example.com");
+                        authAdministratorTest = new AuthenticationDatabaseEntry("AdminTest","9012");
+                    }
+
+                }
+
+                // Salvataggio nel database locale
+                ObjectifyService.run(new VoidWork() {
+                    // Fonte(usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
+                    public void vrun() {
+                        ofy().save()
+                             .entities(consumerTest, uploaderTest, administratorTest,
+                                       authConsumerTest, authUploaderTest, authAdministratorTest)
+                             .now();
+                    }
+                });
+
+            } catch (InvalidKeyException | NoSuchAlgorithmException |
+                    ClassNotFoundException | NoSuchMethodException |
+                    InstantiationException | IllegalAccessException |
+                    InvocationTargetException e) {
+                Logger.scriviEccezioneNelLog(StarterDatabase.class, e);
+            }
+
+        } else {
+            // Production
+            // which is: SystemProperty.Environment.Value.Production
+        }
     }
 
     public void contextDestroyed(ServletContextEvent sce) {}

@@ -2,7 +2,7 @@ package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.file.File;
 
 import java.util.HashMap;
@@ -52,7 +52,7 @@ class UploaderStorage extends Uploader {
 
     /** Crea un {@link Consumer} con le proprietà specificate nei parametri.*/
     public Consumer creaConsumer(String username, String nominativo, String email) {
-        return new ConsumerStorage(username, nominativo, email);    // TODO
+        return new ConsumerProxy(username, nominativo, email);    // TODO
     }
 
     /** Restituisce true se la modifica del {@link Consumer va a buon fine, false altrimenti.*/

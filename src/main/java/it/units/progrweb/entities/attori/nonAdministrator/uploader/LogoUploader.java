@@ -2,6 +2,7 @@ package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
 import it.units.progrweb.utils.Base64Helper;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import java.util.Map;
  * @author Matteo Ferfoglia
  * Creato il 12 gennaio 2021 (19:43)
  */
-class LogoUploader {
+class LogoUploader implements Serializable {
 
     /**
      * File contenente il logo, rappresentato come array di byte.
@@ -45,6 +46,7 @@ class LogoUploader {
      * Modifica il logo.
      */
     public void setLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo) {
+        // TODO : controllare la dimensione complessiva dell'immagine (l'entità complessiva in Datastore può essere max 1 MB)
         this.logo = immagineLogo_bytes;
         this.estensioneFileContenenteLogo = estensioneFileContenenteLogo;
     }

@@ -70,9 +70,7 @@ public class AuthenticationDatabaseEntry {
      * @throws NotFoundException Se lo username non viene trovato nell'AuthDB.*/
     public static String getHashedSaltedPasswordDellAttore(String usernameAttore)
             throws NotFoundException {
-        // TODO : scommentare la prossima riga    // Valutare una soluzione che non richieda di prendere Attore (il parametro) dal db perché costa
-        // return cercaAttoreInAuthDb(usernameAttore).hashedSaltedPassword;
-        return "PippoHashed";   // finché non si fanno test senza veri attori nel db
+        return cercaAttoreInAuthDb(usernameAttore).hashedSaltedPassword;
     }
 
 

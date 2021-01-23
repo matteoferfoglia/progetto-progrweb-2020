@@ -1,5 +1,6 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
+import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
@@ -16,12 +17,28 @@ import java.util.Map;
 @Subclass
 public abstract class Uploader extends UtenteNonAdministrator {
 
+    @Serialize
     protected LogoUploader immagineLogoUploader;
 
     final static String NOME_PROPRIETA_LOGO = "Immagine logo";
 
     public Uploader() {
         super();
+        super.tipoAttore = Uploader.class.getSimpleName();
+    }
+
+    /** Costruttore.
+     * @param username
+     * @param nominativo
+     * @param email
+     * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
+     * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)
+     */
+    public Uploader(String username, String nominativo, String email,
+                    byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
+        // TODO
+        super(username, nominativo, email);
+        this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
         super.tipoAttore = Uploader.class.getSimpleName();
     }
 
@@ -50,21 +67,6 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * il nome deve avere come nome quello restituito da {@link #getNomeFieldNominativoAttore()}.*/
     @Override
     abstract public Map<String, ?> getMappaAttributi_Nome_Valore();
-
-    /** Costruttore.
-     * @param username
-     * @param nominativo
-     * @param email
-     * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
-     * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)
-     */
-    public Uploader(String username, String nominativo, String email,
-                           byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-        // TODO
-        super(username, nominativo, email);
-        this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
-        super.tipoAttore = Uploader.class.getSimpleName();
-    }
 
     /** Restituisce la lista dei documenti caricati dall'{@link Uploader}
      * specificato nel periodo temporale specificato.*/

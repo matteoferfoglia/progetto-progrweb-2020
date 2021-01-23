@@ -159,7 +159,7 @@ public class GestioneDocumenti {
                         "</head>"                                                           +
                         "<body>"                                                            +
                             "<h1>" + oggettoNotifica + "</h1>"                              +
-                            //"<p>" + mittenteFile.getNominativo() + " ha caricato il file "  + // TODO : scommentare questa riga quando si registrerà un uploader vero
+                            "<p>" + mittenteFile.getNominativo() + " ha caricato il file "  +
                                 "&ldquo;" + fileAggiunto.getNomeDocumento() + "&rdquo;. "   +
                                 "<a href=\"" + indirizzoServer + "\">Accedi</a> al sistema" +
                                 " oppure <a href=\"" + linkDownloadFile + "\">scarica</a> " +

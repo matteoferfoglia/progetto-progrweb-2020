@@ -11,7 +11,7 @@ import java.util.Map;
  */
 // TODO : serve proxy pattern?
 @Subclass(index = false)
-public class AdministratorStorage extends Administrator {
+class AdministratorStorage extends Administrator {
 
     private AdministratorStorage() {
         super();

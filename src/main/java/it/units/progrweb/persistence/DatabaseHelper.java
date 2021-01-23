@@ -52,6 +52,11 @@ public abstract class DatabaseHelper {
         return database.save().entity(entita).now().getId();
     }
 
+    /** Salva più di un'entità nel database. */
+    public static<Entita> void salvaEntita(Entita ...entita) {
+        database.save().entities(entita).now();
+    }
+
     /** Salva subito un'entità nel database. */
     public static<Entita> void salvaEntitaAdesso(Entita entita) {
         database.save().entity(entita).now();

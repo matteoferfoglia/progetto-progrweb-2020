@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
  */
 // TODO : serve Proxy pattern?
 @Subclass(index = false)
-public class ConsumerStorage extends Consumer {
-    public ConsumerStorage(String username, String nominativo, String email) {
+class ConsumerStorage extends Consumer {
+    private ConsumerStorage(String username, String nominativo, String email) {
         super(username, nominativo, email);
     }
 

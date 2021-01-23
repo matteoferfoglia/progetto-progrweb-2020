@@ -49,7 +49,7 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     /** Crea e restituisce un {@link Consumer}.*/
     public static Consumer creaConsumer( String username, String nominativo, String email ) {
-        return new ConsumerStorage( username, nominativo, email );
+        return new ConsumerProxy( username, nominativo, email );
     }
 
     /** Dato l'identificativo di un {@link Uploader}, carica dal database
