@@ -5,7 +5,7 @@
       :valoreQualsiasiPerAggiornareIComponenteSeModificato="valoreQualsiasiPerAggiornareIlComponenteSeModificato"
       :id="idForm_modificaInformazioniAttore"
       @change="isFormModificato = true"
-      @submit.prevent="modificaInformazioni"
+      @submit="modificaInformazioni"
       @csrf-token-ricevuto="aggiornaCsrfToken($event)"><!-- TODO : è necessario che questo evento venga raccolta dal padre? Dovrebbe andare direttamente in area riservata perché è li il <router-view> -->
 
     <small>Riempire solo i campi da aggiornare.</small>
@@ -37,7 +37,7 @@
           <input type="password"
                  v-model="vecchiaPassword"
                  maxlength="100"
-                 autocomplete="off">
+                 autocomplete="current-password">
         </label>
         <label>Nuova password
           <input type="password"
@@ -91,7 +91,7 @@ export default {
     'nominativo-attore-modificato'
 
   ],
-  props: ['tipoAttoreAutenticato','nomeUtenteAutenticato'],
+  props: ['tipoAttoreAutenticato','nomeUtenteAutenticato', 'csrfToken'],
   data() {
     return {
 
@@ -123,7 +123,7 @@ export default {
       // c'è un listener nel componente da aggiornare che lo fa aggiornare)
       valoreQualsiasiPerAggiornareIlComponenteSeModificato: 0,
 
-      tokenCsrf: undefined
+      csrfToken_wrapper: this.csrfToken
 
     }
   },
@@ -131,16 +131,18 @@ export default {
 
     /** Restituisce true se è un uploader, false altrimenti.*/
     isUploader() {
-      return this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+      return this.tipoAttoreAutenticato ===
+          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
     },
 
     /** Restituisce true se è un consumer, false altrimenti.*/
     isConsumer() {
-      return this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+      return this.tipoAttoreAutenticato ===
+          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
     },
 
     aggiornaCsrfToken( nuovoValore ) {
-      this.tokenCsrf = nuovoValore,
+      this.csrfToken_wrapper = nuovoValore,
       this.$emit('csrf-token-ricevuto', nuovoValore);
     },
 
@@ -152,6 +154,8 @@ export default {
 
         // Costruzione dei parametri da inviare con i soli campi del form che sono stati modificati
         const formData = new FormData();
+
+        formData.append(process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME, this.csrfToken_wrapper);
 
         if( this.isFileLogoCaricato ) {
           const inputLogo = document.querySelector('#' + this.idForm_modificaInformazioniAttore + ' input[type=file]').files[0];
@@ -183,7 +187,8 @@ export default {
 
         if( informazioniCheSarannoModificate.length>0 ) {
 
-          let stringaInformativaDelleModifiche = "Stanno per essere modificate le seguenti informazioni: " + informazioniCheSarannoModificate.join(", ") + ".";
+          let stringaInformativaDelleModifiche = "Stanno per essere modificate le seguenti informazioni: " +
+              informazioniCheSarannoModificate.join(", ").replace(/,([^,]+)$/,' e$1') + ".";
           const confermaModifiche = confirm(stringaInformativaDelleModifiche);
 
           if (confermaModifiche) {
@@ -193,8 +198,6 @@ export default {
               // Salvo la variabile nella funzione perché, trattandosi di richieste
               // asincrone, intanto il valore della variabile potrebbe cambiare.
               const nominativoModificato = this.nuovoNominativo;
-
-              formData.append(process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME, this.tokenCsrf);
 
               richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData)
                   .then(nuovoTokenAutenticazione => {  // Nella risposta c'è il nuovo token di autenticazione
@@ -234,6 +237,15 @@ export default {
       this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
     }
 
+  },
+  watch: {
+    csrfToken : {
+      immediate: true,
+      deep: true,
+      handler(nuovoValore) {
+        this.csrfToken_wrapper = nuovoValore;
+      }
+    }
   }
 }
 

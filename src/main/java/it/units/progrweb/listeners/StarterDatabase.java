@@ -4,6 +4,7 @@ import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -119,10 +120,25 @@ public class StarterDatabase implements ServletContextListener {
                 ObjectifyService.run(new VoidWork() {
                     // Fonte(usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
                     public void vrun() {
-                        ofy().save()
-                             .entities(consumerTest, uploaderTest, administratorTest,
-                                       authConsumerTest, authUploaderTest, authAdministratorTest)
-                             .now();
+                        Long idConsumer = ofy().save().entity(consumerTest).now().getId();
+                        Long idUploader = ofy().save().entity(uploaderTest).now().getId();
+
+                        try {
+                            // Creazione relazione consumer-uploader
+                            Constructor<RelazioneUploaderConsumerFile> costruttoreRelazione = null;
+                            costruttoreRelazione = RelazioneUploaderConsumerFile.class
+                                    .getDeclaredConstructor(Long.class, Long.class, Long.class);
+                            costruttoreRelazione.setAccessible(true);
+                            RelazioneUploaderConsumerFile relazione = costruttoreRelazione.newInstance(idConsumer, idUploader, null);
+
+                            ofy().save()
+                                    .entities(administratorTest, relazione, authConsumerTest, authUploaderTest, authAdministratorTest)
+                                    .now();
+
+                        } catch (InstantiationException|IllegalAccessException|
+                                InvocationTargetException|NoSuchMethodException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 

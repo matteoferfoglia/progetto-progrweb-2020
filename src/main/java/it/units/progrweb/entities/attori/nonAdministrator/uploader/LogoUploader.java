@@ -72,6 +72,7 @@ class LogoUploader implements Serializable {
             put("png",  "image/png");
             put("svg",  "image/svg+xml");
             put("webp", "image/webp");
+            put("ico", "image/x-icon");
         }};
 
         String estensione = estensioneFileContenenteLogo.toLowerCase();

@@ -151,7 +151,7 @@ export default {
               const formAggiuntaUploaderOAdministrator =
                   document.querySelector("#"+this.idSectionAggiuntaUploaderOAdministrator+" form");
               formAggiuntaUploaderOAdministrator.reset();
-              
+
             } else {
               // Uploader ha aggiunto un Consumer
               messaggioInformativo = "Consumer " + oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
