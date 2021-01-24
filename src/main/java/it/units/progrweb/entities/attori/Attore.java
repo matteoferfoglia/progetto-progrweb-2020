@@ -4,7 +4,9 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
@@ -13,6 +15,7 @@ import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
+import javax.ws.rs.core.Response;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -47,6 +50,22 @@ public abstract class Attore implements UserPrincipal {
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
     protected String tipoAttore;
+
+    /** Tipi di attori permessi nel sistema.*/
+    public enum TipoAttore {
+        Consumer(Consumer.class.getSimpleName()),
+        Uploader(Uploader.class.getSimpleName()),
+        Administrator(Administrator.class.getSimpleName());
+
+        private final String nomeTipoAttore;
+        TipoAttore( String nomeTipoAttore ) {
+            this.nomeTipoAttore = nomeTipoAttore;
+        }
+
+        public String getNomeTipoAttore() {
+            return nomeTipoAttore;
+        }
+    }
 
     /**
      * @param username Username dell'attore di cui verificare
@@ -264,3 +283,5 @@ public abstract class Attore implements UserPrincipal {
     abstract public Map<String, ?> getMappaAttributi_Nome_Valore(); // TODO : metodo analogo anche in Consumer : si può mettere nella classe padre?
 
 }
+
+

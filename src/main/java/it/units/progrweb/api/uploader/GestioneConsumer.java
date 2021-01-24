@@ -126,6 +126,7 @@ public class GestioneConsumer {
                                      @Context HttpServletRequest httpServletRequest) {
 
         // TODO : rivedere ed eventualmente semplificare questo metodo
+        // TODO : metodo simile in ModificaInformazioniAttore
 
         String nomeAttributoIdentificativoAttore = "identificativoAttore";  // campo non presente nei dati della richiesta
                                                                             // Sarà null nell'istanza deserializzata, prima però verifico che esista nella classe
@@ -188,7 +189,7 @@ public class GestioneConsumer {
         } catch (Exception e) {
             return Response
                     .status(Response.Status.BAD_REQUEST )
-                    .entity("Il Consumer richiesto non è registrato nella piattaforma.")    // TODO : var ambiene con messaggi errore
+                    .entity("Il Consumer richiesto non è registrato nella piattaforma.")    // TODO : var ambienTe con messaggi errore
                     .build();
         }
 

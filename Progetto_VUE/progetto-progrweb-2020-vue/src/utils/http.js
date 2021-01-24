@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import router from "../router";
+import {eliminaTokenAutenticazione} from "./autenticazione";
 
 // TODO : ristrutturare meglio questo script
 
@@ -192,6 +193,7 @@ const onErrorHandler = errore => {
 
     // Redirection automatica a login
     if( errore.response.status === HTTP_STATUS_UNAUTHORIZED ) {
+        eliminaTokenAutenticazione();
         router.redirectVersoPaginaAutenticazione( router.currentRoute );
     } else if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO ) {
         router.go(0);   // refresh della pagina per aggiornare token (che è risultato invalido)

@@ -89,10 +89,10 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
             const datiJSONInviati = JSON.stringify(mockDatiInviati_varGlobale);
 
             const datiAttesi = {
-                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_CODFISC_INPUT_FIELD_NAME]     : codFisc,
-                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_NOMINATIVO_INPUT_FIELD_NAME] : nominativo,
-                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_EMAIL_INPUT_FIELD_NAME]       : email,
-                [process.env.VUE_APP_REGISTRAZIONE_CONSUMER_PASSWORD_INPUT_FIELD_NAME]    : password
+                [process.env.VUE_APP_FORM_CODFISC_INPUT_FIELD_NAME]     : codFisc,
+                [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME] : nominativo,
+                [process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME]       : email,
+                [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME]    : password
             }
             const datiJSONAttesi = JSON.stringify(datiAttesi);
 

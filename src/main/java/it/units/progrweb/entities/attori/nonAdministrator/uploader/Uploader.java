@@ -3,6 +3,7 @@ package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.attori.FormatoUsernameInvalido;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
@@ -10,6 +11,7 @@ import it.units.progrweb.utils.datetime.PeriodoTemporale;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Matteo Ferfoglia
@@ -20,7 +22,12 @@ public abstract class Uploader extends UtenteNonAdministrator {
     @Serialize
     protected LogoUploader immagineLogoUploader;
 
+    /** Nome della proprietà che contiene il logo dell'{@link Uploader},
+     * nelle risposte fornite ai client. Vedere {@link #getNomeFieldLogoUploader()}*/
     final static String NOME_PROPRIETA_LOGO = "Immagine logo";
+
+    /** RegEx per validare lo username di un {@link Uploader}.*/
+    private final static String REGEX_VALIDITA_USERNAME_UPLOADER = "^\\w{4}$";
 
     public Uploader() {
         super();
@@ -33,13 +40,24 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * @param email
      * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
      * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)
+     * @throws IllegalArgumentException Se lo username non è valido.
      */
     public Uploader(String username, String nominativo, String email,
                     byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
         // TODO
         super(username, nominativo, email);
+
+        if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_UPLOADER, username) ) {   // TODO : metodo da verificare
+            throw new FormatoUsernameInvalido("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_UPLOADER + "\"");
+        }
+
         this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
         super.tipoAttore = Uploader.class.getSimpleName();
+    }
+
+    /** Crea un attore di questa classe.*/
+    public static Uploader creaAttore( String username, String nominativo, String email ) {
+        return new UploaderStorage(username, nominativo, email, null, "");
     }
 
     public static Uploader getAttoreDaIdentificativo(Long identificativoAttore) {

@@ -20,17 +20,30 @@ import {richiestaGet} from "../utils/http";
 
 
 const routes = [
+
+  // Route default (se non trovate altre)
   {
     // Route non trovata (url invalido) (Fonte: https://router.vuejs.org/guide/essentials/redirect-and-alias.html#redirect)
     // todo : si potrebbe mostrare un alert prima di effettuare redirect
     path: '/:pathMatch(.*)*',
-    redirect: { name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}
+    props: true,
+    redirect: { name: process.env.VUE_APP_ROUTER_ROOT_NOME }
   },
 
   {
+    // Componente root
+    path: process.env.VUE_APP_ROUTER_ROOT_PATH,
+    name: process.env.VUE_APP_ROUTER_ROOT_NOME,
+    redirect: {name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA},
+  },
+
+
+  {
+    // Autenticazione
+
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
-    component: () => import('../components/pagineApplicazione/Autenticazione'),
-    children: [ // Nested routes (fonte: https://router.vuejs.org/guide/essentials/nested-routes.html)
+    component: () => import('../views/pagineApplicazione/PaginaAutenticazione'),
+    children: [
       {
         path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
         alias: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,  // route default
@@ -40,29 +53,38 @@ const routes = [
       {
         path: process.env.VUE_APP_ROUTER_PATH_REGISTRAZIONE_CONSUMER,
         component: () => import('../views/autenticazione/RegistrazioneNuovoConsumer'),
-      }
+      },
     ]
   },
 
+
   {
+    // Area riservata
+
     path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
-    // TODO : children : suddividere in Administrator / Uploader / Consumer
-    component: () => import('../components/pagineApplicazione/AreaRiservata'),
+    component: () => import('../views/pagineApplicazione/AreaRiservata'),
+    props: true,
     meta: {
       requiresAuth: true
     },
     children: [
       {
+        path: process.env.VUE_APP_ROUTER_PATH_IMPOSTAZIONI_ACCOUNT,
+        component: () => import('../views/areaRiservata/ImpostazioniAccount'),
+      },
+
+      {
         // Schermata principale dell'area riservata
         path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA, // percorso default
         name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
-        component: () => import('../views/SchermataPrincipaleAttoreAutenticato'),
+        component: () => import('../views/areaRiservata/SchermataPrincipaleAttoreAutenticato'),
+        props: true,
         children: [
           {
             path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
                 process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
             name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
-            component: () => import('../views/listaDocumenti/ListaDocumentiDiUnConsumerVistaDaUploader'),
+            component: () => import('../views/areaRiservata/listaDocumenti/ListaDocumentiDiUnConsumerVistaDaUploader'),
             meta: {
               // TODO: require essere uploader
               requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
@@ -73,7 +95,7 @@ const routes = [
             path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" +
                 process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
             name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
-            component: () => import('../views/listaDocumenti/ListaDocumentiVistaDaConsumer'),
+            component: () => import('../views/areaRiservata/listaDocumenti/ListaDocumentiVistaDaConsumer'),
             meta: {
               // TODO: require essere consumer
               requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
@@ -81,14 +103,9 @@ const routes = [
             }
           }
         ]
-      },
-
-      {
-        path: process.env.VUE_APP_ROUTER_PATH_IMPOSTAZIONI_ACCOUNT,
-        component: () => import('../views/ImpostazioniAccount')
       }
 
-    ]
+    ],
   }
 
 ]
@@ -120,6 +137,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
           if(isUtenteAutenticato) {
             // Autenticato
+            routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";
 
             if( routeDestinazione.matched.some(route => route.meta.requiresIdUploader) ) {
 
@@ -207,7 +225,6 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
             }
           } else {
             // Non autenticato
-
             next( router.creaRouteAutenticazioneConInfoRichiesta( routeDestinazione ) );
 
           }
@@ -239,6 +256,9 @@ router.creaRouteAutenticazioneConInfoRichiesta = routeRichiesta => {
   return {
     name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN, // redirect a login
     params: {
+
+      [process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO]: "false",  // TODO : migliorare questo sistema che permette al componente App.vue di capire se l'utente è autenticato, per poi informare Header
+
       // memorizzo la route richiesta e la passo al componente di login così può fare redirect dopo il login a ciò che aveva richiesto
       [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: routeRichiesta.fullPath,
       [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(routeRichiesta.params),

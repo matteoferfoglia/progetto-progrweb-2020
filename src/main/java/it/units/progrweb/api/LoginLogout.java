@@ -78,7 +78,6 @@ public class LoginLogout {
 class CampiFormLogin {
     private String username;
     private String password;
-    private String csrfToken;
 
     CampiFormLogin(){}
 
@@ -98,11 +97,4 @@ class CampiFormLogin {
         this.password = EncoderPrevenzioneXSS.encodeForJava(password==null ? "" : password);
     }
 
-    public String getCsrfToken() {
-        return csrfToken;
-    }
-
-    public void setCsrfToken(String csrfToken) {
-        this.csrfToken = EncoderPrevenzioneXSS.encodeForJava(csrfToken==null ? "" : csrfToken);
-    }
 }

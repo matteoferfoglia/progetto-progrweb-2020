@@ -172,7 +172,7 @@ public class AuthenticationDatabaseEntry {
                 boolean giaModificatoIlDatabase = false;
                 Supplier<AuthenticationDatabaseEntry> modificaDatabase = () -> {
                     if( ! giaModificatoIlDatabase ) // stile closure: questo flag non è modificabile dall'esterno del metodo in cui è definito
-                        DatabaseHelper.salvaEntitaAdesso(authenticationDatabaseEntry);  // importante che le modifiche vengano apportate subito per i cambi di password
+                        DatabaseHelper.salvaEntita(authenticationDatabaseEntry);  // importante che le modifiche vengano apportate subito per i cambi di password
                     return authenticationDatabaseEntry;
                 };
 

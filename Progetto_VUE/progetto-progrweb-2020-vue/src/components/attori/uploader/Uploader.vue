@@ -50,14 +50,14 @@
 
 <script>
 import {richiestaDelete, richiestaGet, richiestaPost} from "../../../utils/http";
-import Form from "../../FormConCsrfToken";
+import Form from "../../layout/FormConCsrfToken";
 import SchedaUnConsumer from "./SchedaUnConsumer";
 import {unisciOggetti} from "../../../utils/utilitaGenerale";
 
 export default {
   name: "Uploader",
   components: {Form, SchedaUnConsumer},
-  emits: ['csrf-token-modificato'], // Fonte: https://stackoverflow.com/a/64220977
+  emits: ['csrf-token-ricevuto'], // Fonte: https://stackoverflow.com/a/64220977
   data() {
     return {
 
@@ -153,14 +153,14 @@ export default {
      * oltre ad aggiornarlo in questo componente.*/
     setCsrfToken( nuovoCsrfToken ) {
       this.csrfToken = nuovoCsrfToken;
-      this.$emit('csrf-token-modificato', nuovoCsrfToken);
+      this.$emit('csrf-token-ricevuto', nuovoCsrfToken);
     },
 
     /** Funzione per l'eliminazione del Consumer con
      * identificativo specificato nel parametro.*/
     eliminaConsumer( idConsumer ) {
 
-      const parametriRichiestaDelete = {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
+      const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
 
       richiestaDelete( process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER + "/" + idConsumer, parametriRichiestaDelete )
         .then( () => {
@@ -188,7 +188,7 @@ export default {
 
         // Richiesta di aggiunta consumer
         richiestaPost(process.env.VUE_APP_URL_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
-            unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_CSRF_INPUT_FIELD_NAME]: this.csrfToken}))
+            unisciOggetti(proprietaConsumerDaAggiungere, {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken}))
             .then( idConsumerAppenaCreato => {
 
               // Aggiungi le info del consumer alla mappa in questo componente

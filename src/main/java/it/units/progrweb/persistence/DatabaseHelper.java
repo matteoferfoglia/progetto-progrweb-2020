@@ -47,19 +47,14 @@ public abstract class DatabaseHelper {
 
     }
 
-    /** Salva un'entità nel database e ne restituisce l'identificativo. */
+    /** Salva un'entità (subito) nel database e ne restituisce l'identificativo. */
     public static<Entita> Object salvaEntita(Entita entita) {
         return database.save().entity(entita).now().getId();
     }
 
     /** Salva più di un'entità nel database. */
-    public static<Entita> void salvaEntita(Entita ...entita) {
+    public static<Entita> void salvaPiuEntita(Entita ...entita) {
         database.save().entities(entita).now();
-    }
-
-    /** Salva subito un'entità nel database. */
-    public static<Entita> void salvaEntitaAdesso(Entita entita) {
-        database.save().entity(entita).now();
     }
 
     /** Data una query ed i nomi degli attributi su cui eseguire la proiezione,

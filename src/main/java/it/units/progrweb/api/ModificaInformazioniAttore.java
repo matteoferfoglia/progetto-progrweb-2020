@@ -130,7 +130,7 @@ public class ModificaInformazioniAttore {
         }
         // TODO controllare che alcune informazioni vengano effettivamnte modificate, evitiamo un accesso in scrittura al DB per non modificare alcunché
 
-        DatabaseHelper.salvaEntitaAdesso( attoreDaModificare );
+        DatabaseHelper.salvaEntita( attoreDaModificare );
 
     }
 

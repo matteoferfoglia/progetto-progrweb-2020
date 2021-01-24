@@ -5,8 +5,10 @@ import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.utils.RegexHelper;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Rappresentazione di un Consumer.
@@ -17,6 +19,9 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     // TODO : implementare questa classe
 
+    /** RegEx per validare lo username di un {@link Uploader}.*/
+    private final String REGEX_VALIDITA_USERNAME_CONSUMER = RegexHelper.REGEX_CODICE_FISCALE;
+
     public Consumer() {
         super();
         setTipoAttore(Consumer.class.getSimpleName());
@@ -24,6 +29,9 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     public Consumer(String username, String nominativo, String email) {
         super(username, nominativo, email);
+        if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_CONSUMER, username) ) {   // TODO : metodo da verificare
+            throw new IllegalArgumentException("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_CONSUMER + "\"");
+        }
         setTipoAttore(Consumer.class.getSimpleName());
     }
 

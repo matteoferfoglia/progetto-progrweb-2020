@@ -165,7 +165,7 @@ public class DatabaseTest {
     }
 
 
-    /** Test per {@link DatabaseHelper#salvaEntitaAdesso(Object)}.*/
+    /** Test per {@link DatabaseHelper#salvaEntita(Object)}.*/
     @ParameterizedTest
     @MethodSource("generaEntitaDaSalvareNelDatabase")
     void testSalvataggioImmediatoEntita(Class classeEntita, Object entita){
@@ -174,7 +174,7 @@ public class DatabaseTest {
 
             assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entita salvate all'inizializzazione del datastore
 
-            DatabaseHelper.salvaEntitaAdesso(entita);
+            DatabaseHelper.salvaEntita(entita);
 
             assertEquals(1, DatabaseHelper.contaEntitaNelDatabase());
 

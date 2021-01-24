@@ -1,6 +1,7 @@
 <template>
   <h2>Login > Accedi</h2>
-    <Form @submit.prevent="validaEdInviaForm" @csrf-token-ricevuto="csrfToken = $event">
+    <Form @submit="validaEdInviaForm"
+          @csrf-token-ricevuto="aggiornaCsrfToken($event)">
       <div>
       <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
       <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
@@ -16,10 +17,17 @@
 
 import {richiestaPost} from "../../utils/http";
 import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/http";
-import Form from "../../components/FormConCsrfToken";
+import Form from "../../components/layout/FormConCsrfToken";
 
 export default {
   name: 'LoginUtenteGiaRegistrato',
+  emits: [
+    /** Evento emesso quando viene ricevuto il token CSRF dal server.*/
+    'csrf-token-ricevuto',
+
+    /** Evento emesso se la procedura di login va a buon fine.*/
+    'login'
+  ],
   components: {Form},
   data: function () {
     return {
@@ -29,6 +37,11 @@ export default {
     }
   },
   methods: {
+
+    aggiornaCsrfToken(nuovoValore) {
+      this.csrfToken = nuovoValore;
+      this.$emit('csrf-token-ricevuto', nuovoValore);
+    },
 
     validaEdInviaForm() {
 
@@ -42,10 +55,8 @@ export default {
         this.password = "";
       }
 
-      /** Se il login va a buon fine, viene impostato lo header <i>Authorization</i>
-       * per le successive richieste HTTP.
-       * Poi si viene reindirizzati alla pagina root di questa web application che
-       * provvederà a mostrare i contenuti corretti per l'utente.
+      /** Se il login va a buon fine, bisogna impostare lo header <i>Authorization</i>
+       * per le successive richieste HTTP e reindirizzare alla schermata principale.
        * @param tokenAutenticazione è il token di autenticazione ricevuto.
        */
       const loginRiuscito = tokenAutenticazione => {
@@ -60,10 +71,7 @@ export default {
           [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA])
         };
 
-        this.$router.push({ // inoltro con parametri
-          name   : process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
-          params : parametriRouter
-        });
+        this.$emit('login', parametriRouter);
 
       }
 
@@ -84,9 +92,9 @@ export default {
         // TODO: refactoring: questo stesso metodo c'è anche nel form di registrazione nuovo consumer: potrebbe essere astratto per evitare duplicazione di codice, creando un metodo che riceve l' oggetto campiFormDaInviareAlServer e l' indirizzo del server, quindi provvede all' invio.
 
         const campiFormDaInviareAlServer = {
-          [process.env.VUE_APP_LOGIN_USERNAME_INPUT_FIELD_NAME] : this.username,
-          [process.env.VUE_APP_LOGIN_PASSWORD_INPUT_FIELD_NAME] : this.password,
-          [process.env.VUE_APP_CSRF_INPUT_FIELD_NAME] : this.csrfToken
+          [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] : this.username,
+          [process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME] : this.password,
+          [process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME] : this.csrfToken
         };
 
         richiestaPost(process.env.VUE_APP_URL_LOGIN, campiFormDaInviareAlServer)
