@@ -45,7 +45,8 @@ public class FiltroCSRF implements Filter {
             "/api/uploader/aggiungiConsumerPerQuestoUploader",
             "/api/uploader/cancellaConsumerPerQuestoUploader",
             "/api/uploader/documenti/eliminaDocumento",
-            "/api/uploader/documenti/uploadDocumento"
+            "/api/uploader/documenti/uploadDocumento",
+            "/api//administrator/aggiungiAttore"
     };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
 
     /** Nome del parametro che nella richiesta HTTP (proveniente dal client)

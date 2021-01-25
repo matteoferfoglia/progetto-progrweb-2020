@@ -12,6 +12,7 @@ import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -172,7 +173,7 @@ public class RelazioneUploaderConsumerFile {
         List<File> listaFile = occorrenzeRelazione.stream()
                                                   .map( relazione -> {
                                                       try {
-                                                          return File.getEntitaFromDbById( relazione.getIdFile() );
+                                                          return File.getEntitaDaDbById( relazione.getIdFile() );
                                                       } catch (NotFoundException notFoundException) {
                                                           return null;
                                                       }
@@ -181,6 +182,53 @@ public class RelazioneUploaderConsumerFile {
                                                   .collect(Collectors.toList());
 
         return listaFile;
+
+    }
+
+
+    public static List<RelazioneUploaderConsumerFile>
+    getOccorrenzeFiltratePerUploaderEPeriodoTemporale(Long identificativoUploader,
+                                                      PeriodoTemporale periodoTemporaleDiRiferimento) {
+
+        // TODO : unire questa classe con File (per avere unica entità nel database) e spostarci tutti i metodi
+        //          in tal modo questo metodo eseguirà solo una query che sarà più veloce e restituirà meno
+        //          occorrenze dal database (costo minore)
+
+        List<RelazioneUploaderConsumerFile> occorrenzeFiltratePerUploader =
+                getOccorrenzeFiltratePerUploader( identificativoUploader );
+
+        List<File> listaFileCaricatiDaUploaderNelPeriodoTemporaleDiRiferimento =
+                occorrenzeFiltratePerUploader
+                        .stream()
+                        .map( occorrenzaRelazione -> {
+                            File file;
+                            try {
+                                file = File.getEntitaDaDbById( occorrenzaRelazione.idFile );
+                            } catch (NotFoundException notFoundException) {
+                                file = null;
+                            }
+                            return file;
+                        })
+                        .filter( Objects::nonNull )
+                        .filter( file ->
+                                file.getDataEdOraDiCaricamento().isAfter( periodoTemporaleDiRiferimento.getDataIniziale() ) &&
+                                    file.getDataEdOraDiVisualizzazione().isBefore( periodoTemporaleDiRiferimento.getDataFinale() )
+                        )
+                        .collect(Collectors.toList());
+
+        List<Long> identificativiFileFiltrati =
+                listaFileCaricatiDaUploaderNelPeriodoTemporaleDiRiferimento
+                    .stream()
+                    .map( File::getIdentificativoFile )
+                    .collect(Collectors.toList());
+
+        List<RelazioneUploaderConsumerFile> occorrenzeFiltratePerUploaderEPeriodoTemporale =
+                occorrenzeFiltratePerUploader
+                        .stream()
+                        .filter( occorrenza -> identificativiFileFiltrati.contains( occorrenza.getIdFile() ) )
+                        .collect(Collectors.toList());
+
+        return occorrenzeFiltratePerUploaderEPeriodoTemporale;
 
     }
 

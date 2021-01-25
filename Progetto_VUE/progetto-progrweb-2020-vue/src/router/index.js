@@ -42,7 +42,7 @@ const routes = [
     // Autenticazione
 
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
-    component: () => import('../views/pagineApplicazione/PaginaAutenticazione'),
+    component: () => import('../views/PaginaAutenticazione'),
     children: [
       {
         path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
@@ -62,7 +62,7 @@ const routes = [
     // Area riservata
 
     path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
-    component: () => import('../views/pagineApplicazione/AreaRiservata'),
+    component: () => import('../views/AreaRiservata'),
     props: true,
     meta: {
       requiresAuth: true
@@ -84,11 +84,12 @@ const routes = [
             path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
                 process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
             name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
-            component: () => import('../views/areaRiservata/listaDocumenti/ListaDocumentiDiUnConsumerVistaDaUploader'),
+            component: () => import('../components/attori/uploader/ListaDocumentiDiUnConsumerVistaDaUploader'),
             meta: {
               // TODO: require essere uploader
               requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
               requiresNomeConsumer: true, // per sapere il nome del consumer
+              requiresEssereUploader: true// TODO : a questa route ci si può accedere solo se si è un Uploader
             }
           },
           {
@@ -98,8 +99,9 @@ const routes = [
             component: () => import('../views/areaRiservata/listaDocumenti/ListaDocumentiVistaDaConsumer'),
             meta: {
               // TODO: require essere consumer
-              requiresIdUploader: true, // per sapere la lista di documenti proveniente da quale Uploader
-              requiresLogoUploader: true// logo Uploader
+              requiresIdUploader: true,   // per sapere la lista di documenti proveniente da quale Uploader
+              requiresLogoUploader: true, // logo Uploader
+              requiresEssereConsumer: true// TODO : a questa route ci si può accedere solo se si è un Consumer
             }
           }
         ]

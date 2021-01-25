@@ -78,16 +78,20 @@ export const camelCaseToHumanReadable = testoDaConvertire => {
 /** Questa funzione restituisce un identificativo numerico univoco
  * all'interno del progetto, finché non viene ricaricata la pagina
  * (es. per elementi HTML).
- * I valori generati che soddisfano la proprietà di univocirtà sono
- * compresi tra {@link Number.MIN_SAFE_INTEGER} e
- * {@link Number.MAX_SAFE_INTEGER}. I valori sono generati in modo
- * incrementale.*/
+ * I valori generati che soddisfano la proprietà di univocità sono
+ * compresi tra zero e {@link Number.MAX_SAFE_INTEGER} (compresi),
+ * dopodiché il conteggio ricomincia da 0.
+ * I valori sono generati in modo incrementale.*/
 export const generaIdUnivoco = (() => {
 
-    let contatore = Number.MIN_SAFE_INTEGER;
+    let contatore = 0;
 
     return () => {
-        contatore = contatore + 1 ;
+
+        if( contatore < Number.MAX_SAFE_INTEGER )
+            contatore = contatore + 1 ;
+        else contatore = 0
+
         return contatore;
     }
 

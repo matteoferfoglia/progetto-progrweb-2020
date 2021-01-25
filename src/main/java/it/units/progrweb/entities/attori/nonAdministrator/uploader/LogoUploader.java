@@ -3,6 +3,7 @@ package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 import it.units.progrweb.utils.Base64Helper;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,4 +83,23 @@ class LogoUploader implements Serializable {
                 "" : mediaType;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LogoUploader that = (LogoUploader) o;
+
+        if (!Arrays.equals(logo, that.logo)) return false;
+        return estensioneFileContenenteLogo != null ?
+                estensioneFileContenenteLogo.equals(that.estensioneFileContenenteLogo) :
+                that.estensioneFileContenenteLogo == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(logo);
+        result = 31 * result + (estensioneFileContenenteLogo != null ? estensioneFileContenenteLogo.hashCode() : 0);
+        return result;
+    }
 }

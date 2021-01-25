@@ -1,5 +1,6 @@
 package it.units.progrweb.api.uploader;
 
+import it.units.progrweb.api.administrator.GestioneAttori;
 import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
@@ -203,6 +204,7 @@ public class GestioneConsumer {
     public Response eliminaConsumer(@PathParam("identificativoConsumerDaEliminare") Long identificativoConsumerDaEliminare,
                                     @Context HttpServletRequest httpServletRequest) {
 
+        // TODO : che succede se il consumer che si sta cercando di eliminare non esiste ?? aggiungere controllo
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
         RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(identificativoConsumerDaEliminare, identificativoUploader);
@@ -212,6 +214,39 @@ public class GestioneConsumer {
                    .entity("Consumer eliminato")    // TODO : var ambiene con messaggi errore
                    .build();
 
+
+    }
+
+    /** Modifica di un {@link Consumer} dalla lista di quelli serviti
+     * dall'Uploader che ne ha fatto richiesta. */
+    @Path("/modificaConsumer")
+    @POST   // non si è usato PUT perché l'url identifica il servizio che gestisce la modifica della risorsa
+            // Fonte (https://tools.ietf.org/html/rfc7231#section-4.3.3):
+            // The target resource in a POST request is intended to handle the
+            //   enclosed representation according to the resource's own semantics,
+            //   whereas the enclosed representation in a PUT request is defined as
+            //   replacing the state of the target resource.
+        // TODO : valutare se sostituire con metodo PUT
+    public Response modificaConsumer(Consumer consumerDaModificare_ricevutoDaClient,
+                                     @Context HttpServletRequest httpServletRequest) {
+
+        Long identificativoConsumerDaModificare = consumerDaModificare_ricevutoDaClient.getIdentificativoAttore();
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+
+        if( RelazioneUploaderConsumerFile.
+                isConsumerServitoDaUploader(identificativoUploader,
+                                            identificativoConsumerDaModificare) ) {
+
+            return GestioneAttori.modificaAttore_metodoStatico(consumerDaModificare_ricevutoDaClient);
+
+        } else {
+
+            return Response
+                    .status( Response.Status.BAD_REQUEST )
+                    .entity("Consumer non gestito dall'Uploader che ne ha richiesto la modifica.")    // TODO : var ambiene con messaggi errore
+                    .build();
+
+        }
 
     }
 

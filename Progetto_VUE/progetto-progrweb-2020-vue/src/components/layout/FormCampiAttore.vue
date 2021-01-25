@@ -6,18 +6,19 @@
       <label v-if="flag_mostrareLabelCampiInput"
              :for="idUsername">{{ usernameCodFisc }}</label>
       <input type="text"
-             v-model="username"
+             v-model="username_wrapper"
              maxlength="100"
              :pattern="usernameCodFisc==='Codice fiscale' ? REGEX_CODICE_FISCALE : '^.*$'"
              :id="idUsername"
              :placeholder="usernameCodFisc"
+             :readonly="! username_readOnly"
              autocomplete="on">
     </p>
     <p>
       <label v-if="flag_mostrareLabelCampiInput"
              :for="idNominativo">Nominativo</label>
       <input type="text"
-             v-model="nominativo"
+             v-model="nominativo_wrapper"
              :id="idNominativo"
              placeholder="Nominativo"
              maxlength="100"
@@ -27,15 +28,17 @@
       <label v-if="flag_mostrareLabelCampiInput"
              :for="idEmail">Email</label>
       <input type="email"
-             v-model="email"
+             v-model="email_wrapper"
              :id="idEmail"
              :pattern="REGEX_EMAIL"
              placeholder="xxxxxx@example.com"
              maxlength="100"
              autocomplete="email">
     </p>
-    <slot><!-- Qui possono essere aggiunti altri campi
-              input / contenuti dal componente padre --></slot>
+    <slot>
+      <!-- Qui possono essere aggiunti altri campi input / contenuti dal componente
+           padre, in particolare bisognerebbe mettere <input type="submit"> -->
+    </slot>
   </FormConCsrfToken>
 
 </template>
@@ -70,7 +73,14 @@ export default {
      * specificato nell'apposita proprietà.*/
     "flag_inviaDatiForm",
 
-    "flag_mostrareLabelCampiInput",  // true se si vogliono mostrare le label vicino ai campi di input
+    /** Flag: true se si vogliono mostrare le label vicino ai
+     * campi di input.*/
+    "flag_mostrareLabelCampiInput",
+
+    /** Flag: true se il campo username <strong>non</strong>
+     * può essere modificato. Se non specificato, si considera
+     * che il campo può essere modficato.*/
+    "username_readOnly",
 
     /** Proprietà che permette al componente padre
      * di specificare a quale url inviare i dati di
@@ -82,6 +92,14 @@ export default {
      * proprietà deve essere un oggetto.*/
     "datiAggiuntiviDaInviareAlServer",
 
+    // Valori per il form (solo se specificati)
+    /** Valore per il campo username.*/
+    "username",
+    /** Valore per il campo nominativo.*/
+    "nominativo",
+    /** Valore per il campo email.*/
+    "email",
+
     /**Token CSRF da usare.*/
     "csrfToken"
   ],
@@ -91,15 +109,16 @@ export default {
       REGEX_EMAIL          : process.env.VUE_APP_REGEX_EMAIL,
       REGEX_CODICE_FISCALE : process.env.VUE_APP_REGEX_CODICE_FISCALE,
 
-      isQuestoFormRiferitoAConsumer_wrapper: this.isQuestoFormRiferitoAConsumer, // wrapper per la property
+      isQuestoFormRiferitoAConsumer_wrapper: this.isQuestoFormRiferitoAConsumer, // wrapper per la prop
+      username_readOnly_wrapper: !! this.username_readOnly,  // wrapper per la prop (doppio '!' per considerare valori truthy/falsy)
 
       // Se è un consumer ha un codice fiscale, altrimenti ha uno username (gestito tramite watch)
       usernameCodFisc: undefined,
 
-      // Dati v-model nel form
-      username: "",
-      nominativo: "",
-      email: "",
+      // Dati v-model nel form: se definiti nelle prop usa quelli altrimenti stringa vuota
+      username_wrapper  : this.username   ? this.username   : "",
+      nominativo_wrapper: this.nominativo ? this.nominativo : "",
+      email_wrapper     : this.email      ? this.email      : "",
 
       // Valori ID per gli elementi input (univoci nel progetto)
       idUsername: generaIdUnivoco(),
@@ -129,9 +148,9 @@ export default {
         if( flag_inviaDatiForm ) {
           const datiDaInviare = unisciOggetti(
             {
-              [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME]  : this.username,
-              [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME]: this.nominativo,
-              [process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME]     : this.email,
+              [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME]  : this.username_wrapper,
+              [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME]: this.nominativo_wrapper,
+              [process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME]     : this.email_wrapper,
               [process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]      : this.csrfToken_wrapper
             },
             this.datiAggiuntiviDaInviareAlServer
@@ -141,9 +160,9 @@ export default {
           promise
             .then( risposta => {
               // pulizia dei campi del form
-              this.username   = "";
-              this.nominativo = "";
-              this.email      = "";
+              this.username_wrapper   = "";
+              this.nominativo_wrapper = "";
+              this.email_wrapper      = "";
               return risposta
             })
             .catch( console.error );            // tiene traccia dell'eventuale errore

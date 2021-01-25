@@ -59,10 +59,10 @@
 
 
 
-  <Consumer      v-if="isConsumer()" />
-  <!-- <Uploader      v-else-if="isUploader()"
-                 @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"  /> -->
-  <Administrator v-else-if="isAdministrator()" />
+  <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
+          Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
+          Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
+          gli attori per nome -->
 
 </template>
 
@@ -70,14 +70,12 @@
 
 // Questo componente mostra la schermata principale di un attore autenticato
 
-import Consumer from "../../components/attori/Consumer";
-import Administrator from "../../components/attori/Administrator";
 import FormCampiAttore from "../../components/layout/FormCampiAttore";
 
 export default {
   name: "SchermataPrincipaleAttore",
   inheritAttrs: false,
-  components: {FormCampiAttore, Administrator, Consumer},
+  components: {FormCampiAttore},
   emits: ['csrf-token-ricevuto','nominativo-attore-modificato'],
   props: ['tipoAttoreAutenticato', 'csrfToken'],
   data() {

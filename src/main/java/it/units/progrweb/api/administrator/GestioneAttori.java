@@ -10,9 +10,7 @@ import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,6 +26,35 @@ import java.util.Objects;
  */
 @Path("/administrator")
 public class GestioneAttori {
+
+    /** Eliminazione di un {@link Attore} dal sistema. */
+    @Path("/eliminaAttore/{identificativoAttoreDaEliminare}")
+    @DELETE
+    public Response eliminaConsumer(@PathParam("identificativoAttoreDaEliminare") Long identificativoAttoreDaEliminare,
+                                    @Context HttpServletRequest httpServletRequest) {
+
+        // TODO : questo metodo è molto simile a quello per l'eliminazione dei Consumer da parte di un Uploader (Refactoring??)
+
+        // Ricerca dell'attore da eliminare
+        boolean attoreEliminato = Attore.eliminaAttoreDaIdentificativo( identificativoAttoreDaEliminare );
+
+        if( attoreEliminato ) {
+
+            return Response
+                    .status( Response.Status.OK )
+                    .entity("Attore eliminato")    // TODO : var ambiente con messaggi errore
+                    .build();
+
+        } else {
+            return Response
+                    .status( Response.Status.BAD_REQUEST )  // TODO : fare un metodo che gestisca le BAD_REQUEST con tutte quelle usate nell'intero progetto, che prenda il messaggio d'errore come parametro
+                                                        // TODO : vedere se bisogna modificare dei BAD_REQUEST con dei NOT_FOUND
+                    .entity( "Impossibile eliminare l'attore " + identificativoAttoreDaEliminare )
+                    .build();
+        }
+
+
+    }
 
     /** Metodo per l'aggiunta di un {@link Attore}.
      * Se la procedura va a buon fine, restituisce l'identificativo
@@ -110,6 +137,48 @@ public class GestioneAttori {
         }
 
     }
+
+
+    /** Modifica di un {@link Attore} di quelli presenti nel sistema. */
+    @Path("/modificaConsumer")
+    @POST  // TODO : valutare se sostituire con metodo PUT (perché in realtà è idempotente)
+    public Response modificaAttore(Attore attoreDaModificare_ricevutoDaClient) {
+
+        return modificaAttore_metodoStatico(attoreDaModificare_ricevutoDaClient);
+
+    }
+
+    /** {@link #modificaAttore(Attore)}.*/  // Metodo creato per riutilizzo del codice
+    public static Response modificaAttore_metodoStatico( Attore attoreDaModificare_ricevutoDaClient ) {
+
+        Long identificativoAttoreDaModificare = attoreDaModificare_ricevutoDaClient.getIdentificativoAttore();  // deve essere specificato nella request
+        Attore attoreDaModificare_trovatoInDB = Attore.getAttoreDaIdentificativo( identificativoAttoreDaModificare );
+
+        if( attoreDaModificare_trovatoInDB != null ) {
+
+            attoreDaModificare_trovatoInDB.setEmail(attoreDaModificare_ricevutoDaClient.getEmail());
+            attoreDaModificare_trovatoInDB.setNominativo(attoreDaModificare_ricevutoDaClient.getNominativo());
+            // attoreDaModificare_trovatoInDB.setUsername(attoreDaModificare_ricevutoDaClient.getUsername()); // modifica username non permessa (da requisiti)
+            if( attoreDaModificare_ricevutoDaClient instanceof Uploader ) {
+                // SE si sta modificando un Uploader
+                // TODO : permettere anche la modifica del logo
+            }
+
+            if( ! attoreDaModificare_trovatoInDB.equals(attoreDaModificare_ricevutoDaClient) ) {
+                // Se non ci sono modifiche, risparmio l'inutile accesso in scrittura al DB
+                DatabaseHelper.salvaEntita(attoreDaModificare_ricevutoDaClient);
+            }
+
+            return Response.ok().build();
+
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Attore " + identificativoAttoreDaModificare + " non trovato nel sistema." )
+                    .build();
+        }
+
+    }
+
 
 }
 

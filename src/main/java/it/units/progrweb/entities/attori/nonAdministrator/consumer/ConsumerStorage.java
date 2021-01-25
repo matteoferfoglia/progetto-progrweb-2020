@@ -40,7 +40,7 @@ class ConsumerStorage extends Consumer {
 
         return occorrenzeTrovate.stream()
                                 .map( occorrenza -> {
-                                    try { return File.getEntitaFromDbById(occorrenza.getIdFile()); }
+                                    try { return File.getEntitaDaDbById(occorrenza.getIdFile()); }
                                     catch (NotFoundException notFoundException) { return null; }
                                 })
                                 .filter( Objects::nonNull )

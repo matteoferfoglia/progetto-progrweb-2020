@@ -153,9 +153,17 @@ public abstract class DatabaseHelper {
     }
 
     /** Elimina l'entità corrispondente all'identificativo specificato
-     * come parametro.*/
+     * come parametro. Azione asincrona.*/
     public static void cancellaEntitaById(Long idEntitaDaEliminare, Class classeEntita) {
         database.delete().type(classeEntita).id(idEntitaDaEliminare);
+    }
+
+    /** Elimina l'entità corrispondente all'identificativo specificato
+     * come parametro. Azione sincrona (attende l'eliminazione e genera
+     * un'eccezione se causata dalla computazione richiesta).*/
+    public static void cancellaAdessoEntitaById(Long idEntitaDaEliminare, Class classeEntita)
+            throws Exception{
+        database.delete().type(classeEntita).id(idEntitaDaEliminare).now();
     }
 
     /** Restituisce il numero di entità nel database.*/

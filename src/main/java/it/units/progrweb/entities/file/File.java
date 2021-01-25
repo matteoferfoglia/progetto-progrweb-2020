@@ -62,7 +62,7 @@ public abstract class File {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
     }
 
-    protected DateTime getDataEdOraDiCaricamento() {
+    public DateTime getDataEdOraDiCaricamento() {
         return DateTime.convertiDaString( dataEdOraDiCaricamento );
     }
 
@@ -74,7 +74,7 @@ public abstract class File {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
     }
 
-    protected DateTime getDataEdOraDiVisualizzazione() {
+    public DateTime getDataEdOraDiVisualizzazione() {
         return DateTime.convertiDaString( dataEdOraDiVisualizzazione );
     }
 
@@ -149,7 +149,7 @@ public abstract class File {
     /** Dato l'identificativo di un {@link File}, scarica
      * dal database il {@link File} corrispondente.
      * @throws NotFoundException se l'entità non si trova.*/
-    public static File getEntitaFromDbById(Long idFile)
+    public static File getEntitaDaDbById(Long idFile)
             throws NotFoundException {
 
         return  (File) DatabaseHelper.getById(idFile, File.class);
@@ -285,7 +285,7 @@ public abstract class File {
 
             if( relazioneFileAttore != null ) {
 
-                File file = File.getEntitaFromDbById(identificativoFile);
+                File file = File.getEntitaDaDbById(identificativoFile);
                 InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
                 return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
                                .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")

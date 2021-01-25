@@ -196,7 +196,8 @@ export default {
             (() => { // Richiesta di modifica al server
 
               // Salvo la variabile nella funzione perché, trattandosi di richieste
-              // asincrone, intanto il valore della variabile potrebbe cambiare.
+              // asincrone, intanto il valore della variabile potrebbe cambiare
+              // (questo è il motivo di utilizzo di una funzione: closure)
               const nominativoModificato = this.nuovoNominativo;
 
               richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData)

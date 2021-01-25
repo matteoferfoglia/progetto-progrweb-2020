@@ -196,6 +196,7 @@ const onErrorHandler = errore => {
         eliminaTokenAutenticazione();
         router.redirectVersoPaginaAutenticazione( router.currentRoute );
     } else if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO ) {
+        alert("La pagina deve essere ricaricata perché è rimasta inutilizzata per troppo tempo.");  // il vero motivo è che è scaduto il token CSRF
         router.go(0);   // refresh della pagina per aggiornare token (che è risultato invalido)
     }
 

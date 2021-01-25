@@ -2,7 +2,6 @@ package it.units.progrweb.entities.attori.administrator;
 
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.utils.datetime.DateTime;
 
 /**
  * Rappresentazione di un attore con il ruolo di Administrator.
@@ -19,7 +18,7 @@ public abstract class Administrator extends Attore {
 
     public Administrator(String username, String nominativo, String email) {
         super(username, nominativo, email);  // TODO
-        super.tipoAttore = Administrator.class.getSimpleName();
+        setTipoAttore(Administrator.class.getSimpleName());
     }
 
 
@@ -28,19 +27,5 @@ public abstract class Administrator extends Attore {
         return new AdministratorStorage(username, nominativo, email);    // TODO
     }
 
-
-
-    /** Restituisce il {@link Resoconto resoconto} del mese precedente*/
-    public static Resoconto resocontoUploaders() {
-        // TODO : metodo da implementare
-        return new Resoconto();
-    }
-
-    /** Restituisce il {@link Resoconto resoconto} nel periodo temporale
-     * specificato nei parametri (estremi inclusi).*/
-    public static Resoconto resocontoUploaders(DateTime dataIniziale, DateTime dataFinale) {
-        // TODO : metodo da implementare
-        return new Resoconto(dataIniziale, dataFinale);
-    }
 }
 

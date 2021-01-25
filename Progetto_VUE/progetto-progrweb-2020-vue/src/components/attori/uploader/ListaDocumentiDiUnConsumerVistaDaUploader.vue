@@ -28,13 +28,16 @@
 </template>
 
 <script>
-import TabellaDocumenti from "./TabellaDocumenti";
+import TabellaDocumenti from "../../../views/areaRiservata/listaDocumenti/TabellaDocumenti";
 import {richiestaGet, richiestaPostConFile} from "../../../utils/http";
 import {MappaDocumenti, ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../../utils/documenti";
 
 export default {
   name: "ListaDocumentiDiUnConsumerVistaDaUploader",
   components: {TabellaDocumenti},
+
+  // props (specifico consumer cui questo componente si riferisce) ottenute da Vue Router
+
   data() {
     return {
 

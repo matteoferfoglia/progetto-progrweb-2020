@@ -15,7 +15,6 @@ import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
-import javax.ws.rs.core.Response;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -49,7 +48,7 @@ public abstract class Attore implements UserPrincipal {
     protected String email;
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
-    protected String tipoAttore;
+    protected TipoAttore tipoAttore;
 
     /** Tipi di attori permessi nel sistema.*/
     public enum TipoAttore {
@@ -62,7 +61,7 @@ public abstract class Attore implements UserPrincipal {
             this.nomeTipoAttore = nomeTipoAttore;
         }
 
-        public String getNomeTipoAttore() {
+        public String getTipoAttore() {
             return nomeTipoAttore;
         }
     }
@@ -95,7 +94,7 @@ public abstract class Attore implements UserPrincipal {
 
     /** Restituisce il tipo di un attore.*/
     public String getTipoAttore() {
-        return tipoAttore;
+        return tipoAttore.getTipoAttore();
     }
 
     /** Restituisce il nome del field contenente lo username
@@ -162,11 +161,13 @@ public abstract class Attore implements UserPrincipal {
     }
 
     public void setNominativo(String nominativo) {
-        this.nominativo = EncoderPrevenzioneXSS.encodeForJava(nominativo);
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(nominativo) )
+            this.nominativo = EncoderPrevenzioneXSS.encodeForJava(nominativo);
     }
 
     public void setUsername(String username) {
-        this.username = EncoderPrevenzioneXSS.encodeForJava( username );
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(username) )
+            this.username = EncoderPrevenzioneXSS.encodeForJava( username );
     }
 
     /** Modifica l'email solo se il nuovo valore è in un formato valido,
@@ -178,8 +179,9 @@ public abstract class Attore implements UserPrincipal {
 
     }
 
+    /** @throws IllegalArgumentException – Se il parametro non è valido.*/
     public void setTipoAttore(String tipoAttore) {
-        this.tipoAttore = tipoAttore;
+        this.tipoAttore = TipoAttore.valueOf(tipoAttore);
     }
 
 
@@ -201,6 +203,17 @@ public abstract class Attore implements UserPrincipal {
             return  (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
         } catch (NotFoundException e) {
             return null;
+        }
+    }
+
+    /** Elimina l'attore corrispondente all'identificativo dato nel parametro.
+     * @return true se l'eliminazione viene completata, false se si verificano errori.*/
+    public static boolean eliminaAttoreDaIdentificativo(Long identificativoAttore) {
+        try {
+            DatabaseHelper.cancellaAdessoEntitaById(identificativoAttore, Attore.class);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -227,7 +240,8 @@ public abstract class Attore implements UserPrincipal {
     }
 
 
-
+    /** Due attori sono considerati equivalenti se hanno gli stessi
+     * {@link #username}, {@link #nominativo} ed {@link #email}.*/
     @Override
     public boolean equals(Object o) {
 

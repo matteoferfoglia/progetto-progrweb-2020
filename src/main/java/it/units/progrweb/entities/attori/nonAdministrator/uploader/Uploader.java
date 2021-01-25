@@ -31,7 +31,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
 
     public Uploader() {
         super();
-        super.tipoAttore = Uploader.class.getSimpleName();
+        setTipoAttore( Uploader.class.getSimpleName() );
     }
 
     /** Costruttore.
@@ -52,7 +52,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
         }
 
         this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
-        super.tipoAttore = Uploader.class.getSimpleName();
+        setTipoAttore( Uploader.class.getSimpleName() );
     }
 
     /** Crea un attore di questa classe.*/
@@ -108,5 +108,25 @@ public abstract class Uploader extends UtenteNonAdministrator {
         return NOME_PROPRIETA_LOGO;
     }
 
+    /** Verifica l'equivalenza del logo, oltre a quanto verificato
+     * dal metodo della super classe.*/
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
+        Uploader uploader = (Uploader) o;
+
+        return immagineLogoUploader != null ?
+                immagineLogoUploader.equals(uploader.immagineLogoUploader) :
+                uploader.immagineLogoUploader == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (immagineLogoUploader != null ? immagineLogoUploader.hashCode() : 0);
+        return result;
+    }
 }

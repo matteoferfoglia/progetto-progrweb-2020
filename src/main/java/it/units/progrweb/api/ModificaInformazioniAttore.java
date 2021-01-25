@@ -68,7 +68,7 @@ public class ModificaInformazioniAttore {
 
             // Aggiorno prima AuthDb : se ci sono problemi non accedo altre volte (non necessarie) al database
             //  (tutti gli attori sono registrati nell'AuthDB)
-            if (isStringaValida(vecchiaPassword) && isStringaValida(nuovaPassword)) {
+            if (UtilitaGenerale.isStringaNonNullaNonVuota(vecchiaPassword) && UtilitaGenerale.isStringaNonNullaNonVuota(nuovaPassword)) {
                 // Se qui, allora la richiesta richiede di modificare la psswd in AuthDb
                 optionalModificaAuthDb = AuthenticationDatabaseEntry.modificaPassword(username, vecchiaPassword, nuovaPassword);
             }
@@ -121,27 +121,16 @@ public class ModificaInformazioniAttore {
     private static void modificaInfoAttore(@NotNull Attore attoreDaModificare,
                                            String nuovoNominativo, String nuovaEmail) {
 
-        if( isStringaValida(nuovoNominativo) ) {
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovoNominativo) ) {
             attoreDaModificare.setNominativo( nuovoNominativo );
         }
 
-        if( isStringaValida(nuovaEmail) ) {
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovaEmail) ) {
             attoreDaModificare.setEmail( nuovaEmail );
         }
         // TODO controllare che alcune informazioni vengano effettivamnte modificate, evitiamo un accesso in scrittura al DB per non modificare alcunché
 
         DatabaseHelper.salvaEntita( attoreDaModificare );
-
-    }
-
-    /** Verifica la validità di una stringa ai fini della modifica
-     * delle informazioni di un {@link Attore} da parte di {@link ModificaInformazioniAttore}.*/
-    private static boolean isStringaValida(String stringa) {
-
-        if( stringa == null ) return false;
-        if( stringa.trim().isEmpty() ) return false;
-
-        return true;
 
     }
 

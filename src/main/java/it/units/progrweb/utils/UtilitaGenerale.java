@@ -189,4 +189,14 @@ public class UtilitaGenerale {
                                                 indiceSeparatoreEstensioneNelNome;
         return nomeFile.substring(indiceSeparatoreEstensioneNelNome);
     }
+
+    /** Verifica che una stringa non sia nè nulla nè vuota.*/
+    public static boolean isStringaNonNullaNonVuota(String stringa) {
+
+        if( stringa == null ) return false;
+        if( stringa.trim().isEmpty() ) return false;
+
+        return true;
+
+    }
 }
