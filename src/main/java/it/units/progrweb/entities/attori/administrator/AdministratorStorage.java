@@ -2,8 +2,6 @@ package it.units.progrweb.entities.attori.administrator;
 
 import com.googlecode.objectify.annotation.Subclass;
 
-import java.util.Map;
-
 /**
  * Classe rappresentante un'entità {@link Administrator}
  * da memorizzare nel database.
@@ -17,9 +15,9 @@ class AdministratorStorage extends Administrator {
         super();
     }
 
-    @Override
-    public Map<String, ?> getMappaAttributi_Nome_Valore() {
-        return null;    // TODO : metodo da implementare
+    /** Copy-constructor.*/
+    private AdministratorStorage( AdministratorStorage administrator ) {
+        this( administrator.username, administrator.nominativo, administrator.email );
     }
 
     public AdministratorStorage(String username, String nominativo, String email) {

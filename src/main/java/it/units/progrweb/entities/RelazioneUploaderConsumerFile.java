@@ -212,7 +212,7 @@ public class RelazioneUploaderConsumerFile {
                         .filter( Objects::nonNull )
                         .filter( file ->
                                 file.getDataEdOraDiCaricamento().isAfter( periodoTemporaleDiRiferimento.getDataIniziale() ) &&
-                                    file.getDataEdOraDiVisualizzazione().isBefore( periodoTemporaleDiRiferimento.getDataFinale() )
+                                    file.getDataEdOraDiCaricamento().isBefore( periodoTemporaleDiRiferimento.getDataFinale() )
                         )
                         .collect(Collectors.toList());
 

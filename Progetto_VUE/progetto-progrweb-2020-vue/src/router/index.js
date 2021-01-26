@@ -81,10 +81,18 @@ const routes = [
         props: true,
         children: [
           {
+            path: process.env.VUE_APP_ROUTER_PATH_SCHEDA_UN_ATTORE + '/:' +
+                    process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE,
+            name: process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
+            // TODO : aggiungere controllo: prima di instradare verificare che ci siano le property e se non ci sono richiederle al server
+            component: () => import('../components/attori/SchedaDiUnAttore'),
+            props: true
+          },
+          {
             path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
                 process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
             name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
-            component: () => import('../components/attori/uploader/ListaDocumentiDiUnConsumerVistaDaUploader'),
+            component: () => import('../components/attori/uploader/ListaDocumentiPerConsumerVistaDaUploader'),
             meta: {
               // TODO: require essere uploader
               requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer

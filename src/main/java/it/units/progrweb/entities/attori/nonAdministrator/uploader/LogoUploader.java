@@ -83,6 +83,10 @@ class LogoUploader implements Serializable {
                 "" : mediaType;
     }
 
+    public String getEstensioneFileContenenteLogo() {
+        return estensioneFileContenenteLogo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

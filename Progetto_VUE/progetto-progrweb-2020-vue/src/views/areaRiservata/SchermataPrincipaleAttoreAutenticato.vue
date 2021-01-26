@@ -12,6 +12,7 @@
                      :flag_inviaDatiForm="flag_inviareDatiFormAggiuntaConsumer"
                      :isQuestoFormRiferitoAConsumer="true"
                      :csrfToken="csrfToken_wrapper"
+                     :isContentType_JSON="true"
                      @submit="flag_inviareDatiFormAggiuntaConsumer = true"
                      @dati-form-inviati="formAggiuntaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
@@ -33,6 +34,7 @@
                      :isQuestoFormRiferitoAConsumer="false"
                      :csrfToken="csrfToken_wrapper"
                      :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer"
+                     :isContentType_JSON="true"
                      @submit="flag_inviareDatiFormAggiuntaAttoreNonConsumer = true"
                      @dati-form-inviati="formAggiuntaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
@@ -58,6 +60,15 @@
   </section>
 
 
+  <!-- TODO : cancellare il seguito del template: qua ci va router-view che mostri ElencoAttori
+              Se si tratta di un Administrator attualmente autenticato, dargli la possibilità di scegliere se guardare la lista di Uploader o di Administrator-->
+  <ElencoAttori :tipoAttoreAutenticato="tipoAttoreAutenticato"
+                :tipiAttoreCuiQuestoElencoSiRiferisce="'Uploader'"
+                :csrfToken="csrfToken_wrapper"
+                @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/><!-- TODO : mettere valore corretto, non 'Uploader' literal -->
+  <!-- TODO : cancellare questo <ElencoAttori :tipoAttoreAutenticato="tipoAttoreAutenticato"
+                :csrfToken="csrfToken_wrapper"
+                @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/>  -->
 
   <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
           Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
@@ -71,11 +82,12 @@
 // Questo componente mostra la schermata principale di un attore autenticato
 
 import FormCampiAttore from "../../components/layout/FormCampiAttore";
+import ElencoAttori from "../../components/attori/ElencoAttori";
 
 export default {
   name: "SchermataPrincipaleAttore",
   inheritAttrs: false,
-  components: {FormCampiAttore},
+  components: {ElencoAttori, FormCampiAttore},
   emits: ['csrf-token-ricevuto','nominativo-attore-modificato'],
   props: ['tipoAttoreAutenticato', 'csrfToken'],
   data() {

@@ -1,19 +1,24 @@
 package it.units.progrweb.api;
 
 import it.units.progrweb.api.consumer.RichiestaDocumenti;
-import it.units.progrweb.api.consumer.RichiestaInfoSuUploader;
 import it.units.progrweb.api.uploader.GestioneConsumer;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.lang.reflect.Field;
 
 /**
  * Classe che espone i servizi di richieste informazioni,
@@ -88,17 +93,15 @@ public class RichiestaInfo {
     }
 
 
-    /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(Long)}, questo metodo restituisce
-     * il nome della proprietà contenente il nome dell'Uploader.*/
-    @Path("/nomeProprietaNomeUploader")        // TODO : variabile d'ambiente
+    /** Restituisce il nome della proprietà contenente il nome di un {@link Attore}.*/
+    @Path("/nomeProprietaNomeAttore")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldNomeUploader() {
-        return Uploader.getNomeFieldNominativoAttore();
+    public String getNomeFieldNomeAttore() {
+        return Attore.getNomeFieldNominativoAttore();
     }
 
-    /** Con riferimento a {@link RichiestaInfoSuUploader#getUploader(Long)}, questo metodo restituisce
-     * il nome della proprietà contenente il logo dell'Uploader.*/
+    /** Restituisce il nome della proprietà contenente il logo dell'Uploader.*/
     @Path("/nomeProprietaLogoUploader")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -106,36 +109,78 @@ public class RichiestaInfo {
         return Uploader.getNomeFieldLogoUploader();
     }
 
-
-    /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
-     * il nome della proprietà contenente il nome del {@link Consumer}.*/
-    @Path("/nomeProprietaNomeConsumer")        // TODO : variabile d'ambiente
+    /** Restituisce il nome della proprietà contenente lo username di un {@link Attore}.*/
+    @Path("/nomeProprietaUsernameAttore")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldNomeConsumer() {
-        return Consumer.getNomeFieldNominativoAttore();
+    public String getNomeFieldUsernameAttore() {
+        return Attore.getNomeFieldUsernameAttore();
     }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
     /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
      * il nome della proprietà contenente lo username del {@link Consumer}.*/
-    @Path("/nomeProprietaUsernameConsumer")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaEmailAttore")        // TODO : variabile d'ambiente
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldUsernameConsumer() {
-        return Consumer.getNomeFieldUsernameAttore();
+    public String getNomeFieldEmailAttore() {
+        return Attore.getNomeFieldEmailAttore();
     }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
 
-    /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
-     * il nome della proprietà contenente lo username del {@link Consumer}.*/
-    @Path("/nomeProprietaEmailConsumer")        // TODO : variabile d'ambiente
+    /** Dato l'identificativo di un Uploader, restituisce l'oggetto JSON
+     * con le properties di quell'Uploader.*/
+    @Path("/proprietaUploader/{identificativoUploader}")        // TODO : variabile d'ambiente
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldEmailConsumer() {
-        return Consumer.getNomeFieldEmailAttore();
+    @Produces(MediaType.APPLICATION_JSON )
+    public Uploader getUploader(@PathParam("identificativoUploader") Long identificativoUploader,
+                                @Context HttpServletRequest httpServletRequest ) {
+
+        // TODO : aggiungere Disclaimer che le proprietà di un Uploader sono visibili a tutti gli
+        //        gli utenti autenticati della piattaforma che vengano a conoscenza di questo url
+
+        Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
+
+        if( Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
+                .equals(Consumer.class.getSimpleName()) ) { // Consumer non vede username dell'Uploader
+
+            try {
+                Field fieldUsername = Attore.class.getDeclaredField("username");
+                fieldUsername.setAccessible(true);
+                fieldUsername.set(uploader, null);
+            } catch (IllegalAccessException | NoSuchFieldException exception) {
+                Logger.scriviEccezioneNelLog(RichiestaInfo.class,
+                        "Potrebbe essere stato modificato, nella classe, ll'attributo con lo username di un attore.",
+                        exception);
+            }
+
+        }
+
+        return uploader;
+
+
     }
-    // TODO : metodi analoghi in RichiestaInfoSuUploader ... refactoring?
+
+    /** Dato come @PathParam l'identificativo di un Uploader, restituisce
+     * la rappresentazione codificata in base64 del suo logo.*/
+    @Path("/logoUploader/{identificativoUploader}")
+    @GET
+    public Response getLogoUploaderBase64(@PathParam("identificativoUploader") Long identificativoUploader) {
+
+        // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
+
+        // TODO : aggiungere Disclaimer che le proprietà di un Uploader sono visibili a tutti gli
+        //        gli utenti autenticati della piattaforma che vengano a conoscenza di questo url
+
+        Uploader uploader = Uploader.getAttoreDaIdentificativo( identificativoUploader );
+        if( uploader != null) {
+            return Response.ok()
+                    .entity( uploader.getImmagineLogoBase64() )
+                    .build();
+        } else {
+            return NotFoundException.creaResponseNotFound("Uploader non trovato.");
+        }
+
+
+    }
 
 
 }

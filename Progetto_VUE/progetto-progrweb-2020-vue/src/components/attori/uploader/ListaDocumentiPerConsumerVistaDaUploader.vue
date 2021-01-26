@@ -5,21 +5,23 @@
 
   <section>
     <p>Consumer: {{ nomeConsumer }}</p>
-    <TabellaDocumenti :nomiColonneIntestazione  ="nomiPropDocumenti"
-                      :elencoDocumentiDaMostrare="mappaDocumentiPerUnConsumer"
-                      :nomePropLinkDownload     ="NOME_PROP_DOWNLOAD_DOCUMENTO"
-                      :nomePropLinkElimina      ="NOME_PROP_DELETE_DOCUMENTO"
+    <TabellaDocumenti :nomiColonneIntestazione  = "nomiPropDocumenti"
+                      :elencoDocumentiDaMostrare= "mappaDocumentiPerUnConsumer"
+                      :nomePropLinkDownload     = "NOME_PROP_DOWNLOAD_DOCUMENTO"
+                      :nomePropLinkElimina      = "NOME_PROP_DELETE_DOCUMENTO"
                       @documento-eliminato="rimuoviDocumentoDaLista"/>
   </section>
 
-  <form @submit.prevent="caricaNuovoDocumento" :id="idForm_caricaNuovoDocumento">  <!-- TODO : aggiungere csrf token -->
+  <FormConCsrfToken :id="idForm_caricaNuovoDocumento"
+                    @submit="caricaNuovoDocumento"
+                    @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)">
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
     <p>Carica un nuovo documento per {{ nomeConsumer }}:</p>
     <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
     <label>Lista di hashtag <input type="text" v-model="listaHashtag" placeholder="hashtag1, hashtag2"></label>
-    <label>Documento        <input type="file" required></label><!-- TODO : caricare documento-->
+    <label>Documento        <input type="file" required></label>
     <input type="submit" value="Carica">
-  </form>
+  </FormConCsrfToken>
 
   <button @click="chiudiListaDocumentiUnConsumer">Chiudi</button>
 
@@ -31,13 +33,25 @@
 import TabellaDocumenti from "../../../views/areaRiservata/listaDocumenti/TabellaDocumenti";
 import {richiestaGet, richiestaPostConFile} from "../../../utils/http";
 import {MappaDocumenti, ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../../utils/documenti";
+import FormConCsrfToken from "../../layout/FormConCsrfToken";
 
 export default {
   name: "ListaDocumentiDiUnConsumerVistaDaUploader",
-  components: {TabellaDocumenti},
+  components: {FormConCsrfToken, TabellaDocumenti},
+  emits: [
+    /** Evento emesso quando viene ricevuto il token CSRF dal server.*/
+    'csrf-token-ricevuto'
+  ],
+  props: [
+    /** Nome della proprietà nell'oggetto rappresentante un attore
+     * contenente il nominativo di quell'attore.*/
+    "NOME_PROP_NOMINATIVO",
 
-  // props (specifico consumer cui questo componente si riferisce) ottenute da Vue Router
+    /** Valore del token CSRF ricevuto dal padre.*/
+    "csrfToken"
 
+    // Altre props (specifiche per l'attore cui questo componente si riferisce) sono ottenute da Vue Router
+  ],
   data() {
     return {
 
@@ -78,7 +92,10 @@ export default {
 
       // PROPRIETA CARICAMENTO NUOVO DOCUMENTO:
       nomeDocumento: "",
-      listaHashtag: ""
+      listaHashtag: "",
+
+      // Wrapper
+      csrfToken_wrapper: this.csrfToken
 
     }
   },
@@ -102,6 +119,14 @@ export default {
       if( nuovaRoute.name === process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER ) {
         this.caricaQuestoComponente();
       }
+    },
+
+    csrfToken : {
+      immediate: true,
+      handler( nuovoValore ) {
+        this.csrfToken_wrapper = nuovoValore;
+      },
+      deep: true
     }
 
   },
@@ -133,9 +158,8 @@ export default {
     async caricaQuestoComponente() {
 
       // Carica proprietà da Vue Router
-      this.nomeConsumer = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER];
-      this.idConsumer   = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER];
-
+      this.nomeConsumer = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE][this.NOME_PROP_NOMINATIVO];
+      this.idConsumer   = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
 
       // Richiede mappa idFile-propFile per questo consumer
       await richiestaGet( process.env.VUE_APP_URL_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER + "/" + this.idConsumer )
@@ -189,10 +213,11 @@ export default {
 
       // Costruzione dei parametri da inviare
       const formData = new FormData();
-      formData.append( this.nomeParametro_contenutoDocumento, documento );
+      formData.append( process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME, this.csrfToken_wrapper );
       formData.append( this.nomeParametro_nomeDocumento, this.nomeDocumento );
       formData.append( this.nomeParametro_idConsumerDestinatario, this.idConsumer );
       formData.append( this.nomeParametro_listaHashtag, this.listaHashtag.trim().toLowerCase() );
+      formData.append( this.nomeParametro_contenutoDocumento, documento );
 
       // Controllo validità campi del form
       const formValido = documento && this.nomeDocumento;  // che siano truthy
@@ -218,6 +243,8 @@ export default {
             );
 
             // Pulisci i campi
+            this.nomeDocumento = "";
+            this.listaHashtag  = "";
             document.getElementById(this.idForm_caricaNuovoDocumento).reset();
 
           })

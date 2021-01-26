@@ -8,12 +8,16 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.UtilitaGenerale;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -140,42 +144,111 @@ public class GestioneAttori {
 
 
     /** Modifica di un {@link Attore} di quelli presenti nel sistema. */
-    @Path("/modificaConsumer")
+    @Path("/modificaAttore")    // TODO : non si può usare direttamente il metodo in ModficaInformazioniAttore?
     @POST  // TODO : valutare se sostituire con metodo PUT (perché in realtà è idempotente)
-    public Response modificaAttore(Attore attoreDaModificare_ricevutoDaClient) {
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
+    public Response modificaAttore(@Context HttpServletRequest httpServletRequest,
+                                   @FormDataParam("identificativoAttore") Long identificativoAttore,
+                                   @FormDataParam("username")             String nuovoUsername,
+                                   @FormDataParam("nominativo")           String nuovoNominativo,
+                                   @FormDataParam("email")                String nuovaEmail,
+                                   @FormDataParam("immagineLogo")         InputStream nuovoLogo,                  // TODO : vedere dove è usato il componente Form*.vue che si occupa di inviare queste informazioni e cercare di creare un unico servizio sul server che gestisca tutto
+                                   @FormDataParam("immagineLogo")         FormDataContentDisposition dettagliNuovoLogo) {
 
-        return modificaAttore_metodoStatico(attoreDaModificare_ricevutoDaClient);
+        // TODO : in Vue aggiungere l'input[type=file] per modificare l'immagine logo
+
+        Attore attoreDaModificare_attualmenteSalvatoInDB = Attore.getAttoreDaIdentificativo( identificativoAttore );
+        if( attoreDaModificare_attualmenteSalvatoInDB != null ) {
+
+            // Creazione dell'attore con le modifiche richieste dal client (Attore è
+            // una classe astratta, Jersey non riesce a deserializzare )
+            // TODO : trovare modo migliore
+
+            Attore attore_conModificheRichiesteDalClient = attoreDaModificare_attualmenteSalvatoInDB.clone();
+            attore_conModificheRichiesteDalClient.setUsername( nuovoUsername );
+            attore_conModificheRichiesteDalClient.setNominativo( nuovoNominativo );
+            attore_conModificheRichiesteDalClient.setEmail( nuovaEmail );
+
+            if( attoreDaModificare_attualmenteSalvatoInDB instanceof Uploader &&
+                nuovoLogo != null && dettagliNuovoLogo != null) {
+
+                ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
+                        .setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
+                                         UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
+
+            }
+
+            return modificaAttore_metodoStatico(attore_conModificheRichiesteDalClient, attoreDaModificare_attualmenteSalvatoInDB);
+
+        } else {
+            // Attore non trovato nel DB
+            return Response.status( Response.Status.NOT_FOUND )
+                           .entity( "Attore [" + identificativoAttore + "] non trovato." )
+                           .build();
+        }
 
     }
 
-    /** {@link #modificaAttore(Attore)}.*/  // Metodo creato per riutilizzo del codice
-    public static Response modificaAttore_metodoStatico( Attore attoreDaModificare_ricevutoDaClient ) {
+    // Metodo creato per riutilizzo del codice
+    /** Questo medio si occupa di modificare le informazioni di un attore.
+     * @param attoreDaModificare_conModificheRichiesteDaClient E' l'attore
+     *                       con le modifiche richieste dal cliente.
+     * @param attore_attualmenteSalvatoInDB E' lo stesso attore, ma con le
+     *                       informazioni attualmente salvate nel database.*/
+    public static Response modificaAttore_metodoStatico( Attore attoreDaModificare_conModificheRichiesteDaClient,
+                                                         Attore attore_attualmenteSalvatoInDB ) {
 
-        Long identificativoAttoreDaModificare = attoreDaModificare_ricevutoDaClient.getIdentificativoAttore();  // deve essere specificato nella request
-        Attore attoreDaModificare_trovatoInDB = Attore.getAttoreDaIdentificativo( identificativoAttoreDaModificare );
+        // Funzionamento di questo metodo: clona l'attore dal DB, una copia la sovrascrive
+        // coi nuovi dati mandati dal client (se non nulli) e se risultano delle modifiche
+        // (rispetto al clone), le salva nel DB.
+        // Le modifiche vanno fatte sull'oggetto ottenuto dal DB, altrimenti poi quando si
+        // salva, viene creata una nuova entità anziché sovrascrivere quella esistente.
 
-        if( attoreDaModificare_trovatoInDB != null ) {
+        if( attore_attualmenteSalvatoInDB != null &&
+                attoreDaModificare_conModificheRichiesteDaClient != null) {
 
-            attoreDaModificare_trovatoInDB.setEmail(attoreDaModificare_ricevutoDaClient.getEmail());
-            attoreDaModificare_trovatoInDB.setNominativo(attoreDaModificare_ricevutoDaClient.getNominativo());
-            // attoreDaModificare_trovatoInDB.setUsername(attoreDaModificare_ricevutoDaClient.getUsername()); // modifica username non permessa (da requisiti)
-            if( attoreDaModificare_ricevutoDaClient instanceof Uploader ) {
+            Attore copia_attore_attualmenteSalvatoInDB = attore_attualmenteSalvatoInDB.clone();
+
+            attore_attualmenteSalvatoInDB.setEmail(attoreDaModificare_conModificheRichiesteDaClient.getUsername());
+            attore_attualmenteSalvatoInDB.setNominativo(attoreDaModificare_conModificheRichiesteDaClient.getNominativo());
+            // attore_attualmenteSalvatoInDB.setUsername(attoreDaModificare_conModificheRichiesteDaClient.getUsername()); // modifica username non permessa (da requisiti)
+            if( attoreDaModificare_conModificheRichiesteDaClient instanceof Uploader ) {
                 // SE si sta modificando un Uploader
-                // TODO : permettere anche la modifica del logo
+                Uploader uploader_attualmenteSalvatoInDB = (Uploader) attore_attualmenteSalvatoInDB;
+                uploader_attualmenteSalvatoInDB
+                        .setImmagineLogo( uploader_attualmenteSalvatoInDB.getImmagineLogo(),
+                                          uploader_attualmenteSalvatoInDB.getEstensioneImmagineLogo() );
+                attore_attualmenteSalvatoInDB = uploader_attualmenteSalvatoInDB;
             }
 
-            if( ! attoreDaModificare_trovatoInDB.equals(attoreDaModificare_ricevutoDaClient) ) {
+            if( ! attore_attualmenteSalvatoInDB.equals(copia_attore_attualmenteSalvatoInDB) ) {
                 // Se non ci sono modifiche, risparmio l'inutile accesso in scrittura al DB
-                DatabaseHelper.salvaEntita(attoreDaModificare_ricevutoDaClient);
+                DatabaseHelper.salvaEntita(attore_attualmenteSalvatoInDB);
             }
 
-            return Response.ok().build();
+            return Response.ok()
+                           .type( MediaType.APPLICATION_JSON )
+                           .entity( attoreDaModificare_conModificheRichiesteDaClient )
+                           .build();
+            // TODO : riesce a convertire in JSON se è astratto ?
 
         } else {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Attore " + identificativoAttoreDaModificare + " non trovato nel sistema." )
+                    .entity("Attore da modificare non trovato nel sistema." )
                     .build();
         }
+
+    }
+
+    /** Restituisce un array con gli identificativi di tutti gli {@link Uploader}.*/
+    @Path("/elencoUploader")
+    @GET
+    @Produces( MediaType.APPLICATION_JSON )
+    public long[] getElencoIdentificativiUploader() {
+
+        // TODO : refactoring c'è un metodo molto simile in Uploader
+        return Uploader.getListaIdentificativiTuttiGliUploaderNelSistema()
+                       .stream().mapToLong( i -> i ).toArray();
 
     }
 

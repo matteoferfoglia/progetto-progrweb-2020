@@ -43,8 +43,8 @@ public class RichiestaResocontoAttori {
                                             @Context HttpServletResponse httpServletResponse                  )
             throws IOException {
 
-        DateTime dataIniziale = DateTime.convertiDaString(EncoderPrevenzioneXSS.encodeForJava(dataInizio));
-        DateTime dataFinale   = DateTime.convertiDaString(EncoderPrevenzioneXSS.encodeForJava(dataFine));
+        DateTime dataIniziale = DateTime.convertiDaString_htmlInputDate(EncoderPrevenzioneXSS.encodeForJava(dataInizio));
+        DateTime dataFinale   = DateTime.convertiDaString_htmlInputDate(EncoderPrevenzioneXSS.encodeForJava(dataFine));
         PeriodoTemporale periodoTemporale = new PeriodoTemporale( dataIniziale, dataFinale );
 
         Uploader uploaderPerCuiSiRichiedeResoconto = (Uploader)

@@ -1,5 +1,5 @@
 <template>
-  <h2>Resoconto di {{ nomeUploaderCuiQuestoResocontoSiRiferisce }}</h2>
+  <h3>Resoconto</h3>
   <form @submit.prevent="richiediResocontoNelPeriodo(dataInizio, dataFine)">
     <!-- Token CSRF non usato perché questo form non modifica lo stato nel sistema -->
     <p>Periodo di riferimento:
@@ -160,10 +160,13 @@ export default {
 
       const parametriRequest = {
         [process.env.VUE_APP_FORM_DATA_INIZIALE_INPUT_FIELD_NAME] : dataIniziale,
-        [process.env.VUE_APP_FORM_DATA_INIZIALE_INPUT_FIELD_NAME] : dataFinale,
+        [process.env.VUE_APP_FORM_DATA_FINALE_INPUT_FIELD_NAME]   : dataFinale,
       };
 
-      return richiestaGet( process.env.VUE_APP_URL_RICHIESTA_RESOCONTO_DI_UN_UPLOADER, parametriRequest );
+      const urlRichiestaResocontoPerQuestoUploader =
+          process.env.VUE_APP_URL_RICHIESTA_RESOCONTO_DI_UN_UPLOADER + '/' + this.identificativoUploader;
+
+      return richiestaGet( urlRichiestaResocontoPerQuestoUploader, parametriRequest );
 
     }
 

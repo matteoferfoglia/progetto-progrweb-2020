@@ -1,12 +1,10 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
+import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.file.File;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Classe rappresentante un'entità {@link Uploader}
@@ -17,27 +15,27 @@ import java.util.Map;
 @Subclass(index = false)
 class UploaderStorage extends Uploader {
 
-    // TODO : implementare questa classe
+    @Serialize
+    private LogoUploader immagineLogoUploader;
 
     private UploaderStorage() {
         super();    // TODO
     }
 
-    /** Vedere {@link Uploader}.*/
+    /** Vedere {@link Uploader}.
+     * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
+     * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)*/
     public UploaderStorage(String username, String nominativo, String email,
                  byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
-     super(username, nominativo, email, immagineLogo, estensioneFileContenenteImmagineLogo);
+        super(username, nominativo, email);
+        this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
+        setTipoAttore( Uploader.class.getSimpleName() );
     }
 
-    @Override
-    public Map<String, ?> getMappaAttributi_Nome_Valore() {
-
-         Map<String, String> mappa_nomeAttributo_valore = new HashMap<>(2);
-         mappa_nomeAttributo_valore.put(Uploader.getNomeFieldNominativoAttore(), getNominativo());
-         mappa_nomeAttributo_valore.put(Uploader.getNomeFieldLogoUploader(), getImmagineLogoBase64());
-
-         return mappa_nomeAttributo_valore;
-
+    /** Copy-constructor.*/
+    private UploaderStorage( UploaderStorage uploader ) {
+        this( uploader.username, uploader.nominativo, uploader.email, uploader.immagineLogoUploader.getLogo(),
+                uploader.immagineLogoUploader.getEstensioneFileContenenteLogo() );
     }
 
     public byte[] getImmagineLogoBytes() {
@@ -81,6 +79,48 @@ class UploaderStorage extends Uploader {
         // TODO : eliminare il file specificato
         // TODO : pensare alla strategia di eliminazione: per i consumer che hanno già ricevuto il file? O già visualizzato?
         return true;   // TODO !!!
+    }
+
+    /** Modifica l'immagine logo dell'Uploader.*/
+    public void setImmagineLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo){
+        this.immagineLogoUploader.setLogo(immagineLogo_bytes, estensioneFileContenenteLogo);
+    }
+
+    @Override
+    public byte[] getImmagineLogo() {
+        return immagineLogoUploader.getLogo();
+    }
+
+    @Override
+    public String getEstensioneImmagineLogo() {
+        return immagineLogoUploader.getEstensioneFileContenenteLogo();
+    }
+
+    /** Restituisce l'immagine logo in formato Base64.*/
+    public String getLogo_base64() {
+        return immagineLogoUploader.getLogo_base64();
+    }
+
+    /** Verifica l'equivalenza del logo, oltre a quanto verificato
+     * dal metodo della super classe.*/
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        UploaderStorage uploader = (UploaderStorage) o;
+
+        return immagineLogoUploader != null ?
+                immagineLogoUploader.equals(uploader.immagineLogoUploader) :
+                uploader.immagineLogoUploader == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (immagineLogoUploader != null ? immagineLogoUploader.hashCode() : 0);
+        return result;
     }
 
 }

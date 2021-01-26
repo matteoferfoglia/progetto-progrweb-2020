@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * Rappresentazione di un Consumer.
  * @author Matteo Ferfoglia
  */
-@Subclass
+@Subclass(index = true)
 public abstract class Consumer extends UtenteNonAdministrator {
 
     // TODO : implementare questa classe
@@ -41,7 +41,8 @@ public abstract class Consumer extends UtenteNonAdministrator {
     public static Consumer getAttoreDaIdentificativo(Long identificativoConsumer ) {
 
         Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoConsumer);
-        return attoreTrovatoInDb instanceof Consumer ? (Consumer) attoreTrovatoInDb : null;
+        return attoreTrovatoInDb instanceof ConsumerStorage ?
+                new ConsumerProxy((ConsumerStorage) attoreTrovatoInDb) : null;
 
     }
 

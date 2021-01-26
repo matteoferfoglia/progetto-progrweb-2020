@@ -176,6 +176,12 @@ public abstract class DatabaseHelper {
         return database.load().type(classe).count();    // TODO : testare
     }
 
+    /** Restituisce la lista di entità di una certa classe (specificata nel
+     * parametro) salvate nel database.*/
+    public static List<?> listaEntitaNelDatabase(Class classe) {
+        return database.load().type(classe).list();    // TODO : testare
+    }
+
     /** Restituisce true se la query cercata produce almeno
      * un risultato.
      */

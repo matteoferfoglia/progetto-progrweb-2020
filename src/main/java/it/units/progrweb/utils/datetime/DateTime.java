@@ -2,6 +2,7 @@ package it.units.progrweb.utils.datetime;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 
@@ -17,7 +18,11 @@ public class DateTime implements Comparable<DateTime> {
 
     /** Pattern da utilizzare per la conversione da un'istanza di
      * questa classe in una {@link String} e viceversa.*/
-    private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd HH:mm:ss X";
+    private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd   HH:mm:ss";
+
+    /** Pattern utilizzato per il formato "date" nei gli elementi
+     * di input[type=date] in HTML.*/
+    private static final String PATTERN_HTML_INPUT_DATA = "yyyy-MM-dd";
 
     /** Istante temporale rappresentato da quest'istanza. */
     private Instant istanteTemporale;
@@ -39,8 +44,17 @@ public class DateTime implements Comparable<DateTime> {
      * </ul>
      */
     public DateTime(String stringaCorrispondenteAdUnDateTime, DateTimeFormatter formatter) {
-        LocalDateTime localDateTime = LocalDateTime.parse(stringaCorrispondenteAdUnDateTime, formatter);
+
+        LocalDateTime localDateTime;
+        try{
+            localDateTime = LocalDateTime.parse(stringaCorrispondenteAdUnDateTime, formatter);
+        } catch (DateTimeParseException e) {
+            // Se manca l'ora nella stringa rappresentante il DateTime, si considera ad inizio giornata
+            localDateTime = LocalDate.parse(stringaCorrispondenteAdUnDateTime, formatter).atStartOfDay();
+        }
+
         this.istanteTemporale = localDateTime.toInstant(UTC_ZONE_OFFSET);
+
     }
 
     /** Crea un'istanza di questa classe in base alla data e l'ora (UTC) specificata.
@@ -77,7 +91,8 @@ public class DateTime implements Comparable<DateTime> {
 
     /** Rappresentazione temporale della giornata odierna. */
     public static DateTime oggi() {
-        return new DateTime(LocalDate.now().atStartOfDay(UTC_ZONE_OFFSET).toInstant()); // restituisce il primo secondo valido della giornata odierna
+        return new DateTime(LocalDate.now().atStartOfDay(UTC_ZONE_OFFSET).toInstant());
+        // restituisce il primo secondo valido della giornata odierna. Fonte:
         // https://docs.oracle.com/javase/tutorial/datetime/iso/date.html
         // https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html#atStartOfDay--
         // https://docs.oracle.com/javase/8/docs/api/java/time/ZoneOffset.html#UTC
@@ -104,7 +119,16 @@ public class DateTime implements Comparable<DateTime> {
     public static DateTime convertiDaString(String dataEdOraDiCaricamento) {
         return dataEdOraDiCaricamento==null ? null :
                 new DateTime( dataEdOraDiCaricamento,
-                             DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
+                        DateTimeFormatter.ofPattern(PATTERN_CONVERSIONE_IN_STRING) );
+    }
+
+    /** Metodo per ottenere un'istanza di questa classe
+     * a partire da un valore di tipo {@link String} ottenuto
+     * da un campo di input html di tipo "date".*/
+    public static DateTime convertiDaString_htmlInputDate(String dataEdOraDiCaricamento) {
+        return dataEdOraDiCaricamento==null ? null :
+                new DateTime( dataEdOraDiCaricamento,
+                        DateTimeFormatter.ofPattern(PATTERN_HTML_INPUT_DATA) );
     }
 
 

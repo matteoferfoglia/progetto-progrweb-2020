@@ -11,6 +11,7 @@ import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -19,9 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -95,25 +94,28 @@ public class GestioneConsumer {
 
     /** Dato l'identificativo di un {@link Consumer} come @PathParam
      * restituisce l'oggetto JSON in cui ogni proprietà dell'oggetto
-     * rappresenta un {@link Consumer} ed il corrispettivo valore è
-     * un oggetto con le proprietà di quel {@link Consumer}.
+     * rappresenta un attributo di quel {@link Consumer}.
      */
     @Path("/proprietaConsumer/{identificativoConsumer}")
     @GET
-    // Risposta costruita in modo personalizzato
-    public Response getConsumer(@PathParam("identificativoConsumer") Long identificativoConsumer) {
+    @Produces( MediaType.APPLICATION_JSON )
+    public Consumer getConsumer(@PathParam("identificativoConsumer") Long identificativoConsumer) {
 
         // TODO : verificare correttezza
 
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
-        Consumer consumer = Consumer.getAttoreDaIdentificativo(identificativoConsumer);
-        Map<String,?> mappaProprietaUploader_nome_valore;
+        return Consumer.getAttoreDaIdentificativo(identificativoConsumer);
+        /*
+        // TODO : cancellare questa parte
+        Map<String,?> mappaProprieta_nome_valore;
         if( consumer != null )
-            mappaProprietaUploader_nome_valore = consumer.getMappaAttributi_Nome_Valore();
-        else mappaProprietaUploader_nome_valore = new HashMap<>(0);
+            mappaProprieta_nome_valore = consumer.getMappaAttributi_Nome_Valore();
+        else mappaProprieta_nome_valore = new HashMap<>(0);
 
-        return UtilitaGenerale.rispostaJsonConMappa(mappaProprietaUploader_nome_valore);
+        return UtilitaGenerale.rispostaJsonConMappa(mappaProprieta_nome_valore);
+
+         */
 
     }
 
@@ -227,25 +229,56 @@ public class GestioneConsumer {
             //   whereas the enclosed representation in a PUT request is defined as
             //   replacing the state of the target resource.
         // TODO : valutare se sostituire con metodo PUT
-    public Response modificaConsumer(Consumer consumerDaModificare_ricevutoDaClient,
-                                     @Context HttpServletRequest httpServletRequest) {
+    @Consumes( MediaType.MULTIPART_FORM_DATA )
+    public Response modificaConsumer(@FormDataParam("username")   String nuovoUsername,
+                                     @FormDataParam("nominativo") String nuovoNominativo,
+                                     @FormDataParam("email")      String nuovaEmail,
+                                     @FormDataParam("identificativoAttore") Long identificativoConsumerDaModificare,
+                                     @Context HttpServletRequest  httpServletRequest) {
 
-        Long identificativoConsumerDaModificare = consumerDaModificare_ricevutoDaClient.getIdentificativoAttore();
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+        if( identificativoConsumerDaModificare != null ) {
+            Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
-        if( RelazioneUploaderConsumerFile.
-                isConsumerServitoDaUploader(identificativoUploader,
-                                            identificativoConsumerDaModificare) ) {
+            if( RelazioneUploaderConsumerFile.
+                    isConsumerServitoDaUploader(identificativoUploader,
+                            identificativoConsumerDaModificare) ) {
 
-            return GestioneAttori.modificaAttore_metodoStatico(consumerDaModificare_ricevutoDaClient);
+                Consumer consumer_attualmenteSalvatoInDB =
+                        (Consumer) Attore.getAttoreDaIdentificativo( identificativoConsumerDaModificare );
 
+                if( consumer_attualmenteSalvatoInDB != null ) {
+
+                    Consumer consumer_conModificheRichiesteDalClient = (Consumer) consumer_attualmenteSalvatoInDB.clone();
+                    consumer_conModificheRichiesteDalClient.setNominativo(nuovoNominativo);
+                    consumer_conModificheRichiesteDalClient.setEmail(nuovaEmail);
+                    consumer_attualmenteSalvatoInDB.setUsername(nuovoUsername);
+
+                    return GestioneAttori.modificaAttore_metodoStatico( consumer_conModificheRichiesteDalClient,
+                                                                        consumer_attualmenteSalvatoInDB         );
+
+                } else {
+                    Logger.scriviEccezioneNelLog( GestioneConsumer.class,
+                                                 "Consumer [" + identificativoConsumerDaModificare + "] " +
+                                                     "collegato ad un Uploader ma non trovato nel sistema.",
+                                                 new NotFoundException() );
+
+                    return Response.serverError().build();
+
+                }
+
+            } else {
+
+                return Response
+                        .status( Response.Status.BAD_REQUEST )
+                        .entity("Consumer non gestito dall'Uploader che ne ha richiesto la modifica.")    // TODO : var ambiene con messaggi errore
+                        .build();
+
+            }
         } else {
-
             return Response
                     .status( Response.Status.BAD_REQUEST )
-                    .entity("Consumer non gestito dall'Uploader che ne ha richiesto la modifica.")    // TODO : var ambiene con messaggi errore
+                    .entity("Specirficare l'identificativo del Consumer da specificare.")    // TODO : var ambiene con messaggi errore
                     .build();
-
         }
 
     }

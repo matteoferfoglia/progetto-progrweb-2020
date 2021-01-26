@@ -15,12 +15,13 @@ import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -29,7 +30,7 @@ import java.util.Map;
  * @author Matteo Ferfoglia
  */
 @Entity
-public abstract class Attore implements UserPrincipal {
+public abstract class Attore implements UserPrincipal, Cloneable {
 
     // TODO : implementare questa classe
 
@@ -94,7 +95,7 @@ public abstract class Attore implements UserPrincipal {
 
     /** Restituisce il tipo di un attore.*/
     public String getTipoAttore() {
-        return tipoAttore.getTipoAttore();
+        return tipoAttore == null ? "" : tipoAttore.getTipoAttore();
     }
 
     /** Restituisce il nome del field contenente lo username
@@ -283,18 +284,37 @@ public abstract class Attore implements UserPrincipal {
     public String toString() {
         return "Attore{" +
                 "identificativo='" + identificativoAttore + '\'' +
-                "username='" + username + '\'' +
+                ", username='" + username + '\'' +
                 ", nominativo='" + nominativo + '\'' +
                 ", email='" + email + '\'' +
                 '}';
     }
 
 
-    /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
-     * di un'istanza di questa classe. Devono essere presenti le proprietà
-     * i cui nomi sono restituiti dai metodi {@link #getNomeFieldNominativoAttore()},
-     * {@link #getNomeFieldEmailAttore()} e {@link #getNomeFieldUsernameAttore()}.*/
-    abstract public Map<String, ?> getMappaAttributi_Nome_Valore(); // TODO : metodo analogo anche in Consumer : si può mettere nella classe padre?
+    /** Restituisce una copia di questo attore
+     * (<a href="https://stackoverflow.com/a/18146676">Fonte</a>).
+     * @return Il clone dell'istanza data, oppure null se si verificano
+     *         dei problemi durante lo'operazione.
+     */
+    @Override
+    public Attore clone() {
+
+        try {
+
+            Constructor<? extends Attore> costruttoreAttore =
+                    this.getClass().getDeclaredConstructor( this.getClass() );
+
+            costruttoreAttore.setAccessible( true );
+            return costruttoreAttore.newInstance( this );
+
+        } catch (NoSuchMethodException | InstantiationException |
+                IllegalAccessException | InvocationTargetException e) {
+            Logger.scriviEccezioneNelLog(Attore.class, "Errore nella creazione del clone di un attore", e);
+            return null;
+        }
+
+    }
+
 
 }
 

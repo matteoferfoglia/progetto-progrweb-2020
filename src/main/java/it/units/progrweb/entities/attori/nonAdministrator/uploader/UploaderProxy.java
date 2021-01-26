@@ -1,6 +1,6 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
-import java.util.Map;
+import it.units.progrweb.utils.Logger;
 
 /**
  * @author Matteo Ferfoglia
@@ -11,12 +11,32 @@ public class UploaderProxy extends Uploader {
     /** Immagine logo dell'uploader codificato in base 64.*/
     private final String logoUploaderBase64;
 
-    /** Vedere {@link Uploader#getMappaAttributi_Nome_Valore()} .*/
-    private final Map<String, ?> mappaAttributiUploader_nome_valore;
-
     public UploaderProxy(UploaderStorage uploaderStorage) {
+        super( uploaderStorage );
         this.logoUploaderBase64 = uploaderStorage.getImmagineLogoBase64();
-        this.mappaAttributiUploader_nome_valore = uploaderStorage.getMappaAttributi_Nome_Valore();
+    }
+
+    /** Copy-constructor.*/
+    private UploaderProxy( UploaderProxy uploader ) {
+        super( uploader );
+        this.logoUploaderBase64 = uploader.getImmagineLogoBase64();
+    }
+
+    /** Restituisce il nome dell'attributo di questa classe con il logo dell'{@link Uploader}.*/
+    public static String getNomeFieldLogoUploader() {
+        final String NOME_FIELD_LOGO = "logoUploaderBase64";
+
+        // Verifica che il field esista
+        try {
+            UploaderProxy.class.getDeclaredField( NOME_FIELD_LOGO );
+        } catch (NoSuchFieldException e) {
+            // Se viene modificato il nome dell'attributo, ci si accorge subito dal log
+            Logger.scriviEccezioneNelLog( UploaderProxy.class,
+                                          "Forse è stato modificato il nome dell'attributo contenente il logo",
+                                          e);
+        }
+
+        return NOME_FIELD_LOGO;
     }
 
     @Override
@@ -25,8 +45,13 @@ public class UploaderProxy extends Uploader {
     }
 
     @Override
-    public Map<String, ?> getMappaAttributi_Nome_Valore() {
-        return mappaAttributiUploader_nome_valore;
+    public byte[] getImmagineLogo() {
+        return new byte[0];
+    }
+
+    @Override
+    public String getEstensioneImmagineLogo() {
+        return null;
     }
 
 }

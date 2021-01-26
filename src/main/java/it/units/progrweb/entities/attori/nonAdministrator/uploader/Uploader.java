@@ -1,30 +1,23 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
-import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.FormatoUsernameInvalido;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Matteo Ferfoglia
  */
-@Subclass
+@Subclass(index = true)
 public abstract class Uploader extends UtenteNonAdministrator {
-
-    @Serialize
-    protected LogoUploader immagineLogoUploader;
-
-    /** Nome della proprietà che contiene il logo dell'{@link Uploader},
-     * nelle risposte fornite ai client. Vedere {@link #getNomeFieldLogoUploader()}*/
-    final static String NOME_PROPRIETA_LOGO = "Immagine logo";
 
     /** RegEx per validare lo username di un {@link Uploader}.*/
     private final static String REGEX_VALIDITA_USERNAME_UPLOADER = "^\\w{4}$";
@@ -38,12 +31,9 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * @param username
      * @param nominativo
      * @param email
-     * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
-     * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)
      * @throws IllegalArgumentException Se lo username non è valido.
      */
-    public Uploader(String username, String nominativo, String email,
-                    byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
+    public Uploader(String username, String nominativo, String email) {
         // TODO
         super(username, nominativo, email);
 
@@ -51,8 +41,11 @@ public abstract class Uploader extends UtenteNonAdministrator {
             throw new FormatoUsernameInvalido("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_UPLOADER + "\"");
         }
 
-        this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
-        setTipoAttore( Uploader.class.getSimpleName() );
+    }
+
+    /** Copy-constructor.*/
+    public Uploader(Uploader uploader) {
+        this( uploader.username, uploader.nominativo, uploader.email );
     }
 
     /** Crea un attore di questa classe.*/
@@ -65,26 +58,16 @@ public abstract class Uploader extends UtenteNonAdministrator {
         return a instanceof Uploader ? (Uploader) a : null;
     }
 
-    /** Restituisce l'immagine logo dell'Uploader
-     * codificata in Base64.*/
-    public String getImmagineLogoBase64(){
-        return immagineLogoUploader.getLogo_base64();
+    /** Restituisce la lista degli identificativi di tutti gli {@link Uploader}
+     * registrati nel sistema.*/
+    public static List<Long> getListaIdentificativiTuttiGliUploaderNelSistema() {
+
+        return DatabaseHelper.listaEntitaNelDatabase(Uploader.class)
+                             .stream()
+                             .map( uploader -> ((Uploader)uploader).getIdentificativoAttore() )
+                             .collect(Collectors.toList());
+
     }
-
-    /** Modifica l'immagine logo dell'Uploader.*/
-    public void setImmagineLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo){
-        this.immagineLogoUploader.setLogo(immagineLogo_bytes, estensioneFileContenenteLogo);
-    }
-
-    /**
-
-    /** Restituisce una mappa { "Nome attributo" -> "Valore attributo" }
-     * di un'istanza di questa classe. L'attributo con l'immagine logo
-     * deve avere come nome quello restituito da {@link #getNomeFieldLogoUploader()}
-     * e come valore la codifica Base64 dell'immagine. L'attributo con
-     * il nome deve avere come nome quello restituito da {@link #getNomeFieldNominativoAttore()}.*/
-    @Override
-    abstract public Map<String, ?> getMappaAttributi_Nome_Valore();
 
     /** Restituisce la lista dei documenti caricati dall'{@link Uploader}
      * specificato nel periodo temporale specificato.*/
@@ -98,35 +81,33 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * @return L'uploader cercato, oppure null in caso di errore.*/
     public static Uploader cercaUploaderDaIdentificativo(Long identificativoUploader ) {
         Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoUploader);
-        return attoreTrovatoInDb instanceof Uploader ? (Uploader) attoreTrovatoInDb : null;
+        return attoreTrovatoInDb instanceof UploaderStorage ?
+                new UploaderProxy((UploaderStorage) attoreTrovatoInDb) : null;
     }
 
     /** Restituisce il nome del field contenente il logo
-     * di un Uploader nell'oggetto nel valore della mappa
-     * restituita da {@link #getMappaAttributi_Nome_Valore()}.*/
+     * di un Uploader.*/
     public static String getNomeFieldLogoUploader() {
-        return NOME_PROPRIETA_LOGO;
+        return UploaderProxy.getNomeFieldLogoUploader();
     }
 
-    /** Verifica l'equivalenza del logo, oltre a quanto verificato
-     * dal metodo della super classe.*/
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
 
-        Uploader uploader = (Uploader) o;
-
-        return immagineLogoUploader != null ?
-                immagineLogoUploader.equals(uploader.immagineLogoUploader) :
-                uploader.immagineLogoUploader == null;
+    /** Restituisce l'immagine logo dell'Uploader
+     * codificata in Base64.*/  // TODO : refactoring (informazioni sono mal frammentate tra questa classe, la proxy e la storage)
+    public String getImmagineLogoBase64(){
+        if( this instanceof UploaderStorage )
+            return ((UploaderStorage)this).getLogo_base64();
+        return "";
     }
 
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (immagineLogoUploader != null ? immagineLogoUploader.hashCode() : 0);
-        return result;
+    public void setImmagineLogo(byte[] convertiInputStreamInByteArray, String estensioneDaNomeFile) {
+        if ( this instanceof UploaderStorage ) {
+            this.setImmagineLogo(convertiInputStreamInByteArray, estensioneDaNomeFile);
+        }
     }
+
+    abstract public byte[] getImmagineLogo();
+    abstract public String getEstensioneImmagineLogo();
+
+
 }

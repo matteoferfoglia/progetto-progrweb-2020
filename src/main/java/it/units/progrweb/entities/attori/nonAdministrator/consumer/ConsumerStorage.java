@@ -6,9 +6,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -20,8 +18,14 @@ import java.util.stream.Collectors;
 // TODO : serve Proxy pattern?
 @Subclass(index = false)
 class ConsumerStorage extends Consumer {
+
     private ConsumerStorage(String username, String nominativo, String email) {
         super(username, nominativo, email);
+    }
+
+    /** Copy-constructor.*/
+    private ConsumerStorage( ConsumerStorage consumer ) {
+        this( consumer.username, consumer.nominativo, consumer.email );
     }
 
     private ConsumerStorage(){}
@@ -45,18 +49,6 @@ class ConsumerStorage extends Consumer {
                                 })
                                 .filter( Objects::nonNull )
                                 .collect( Collectors.toList() );
-
-    }
-
-    @Override
-    public Map<String, ?> getMappaAttributi_Nome_Valore() {
-
-        Map<String, String> mappa = new HashMap<>();
-        mappa.put(getNomeFieldNominativoAttore(), getNominativo());
-        mappa.put(getNomeFieldEmailAttore(), getEmail());
-        mappa.put(getNomeFieldUsernameAttore(), getUsername());
-
-        return mappa;
 
     }
 

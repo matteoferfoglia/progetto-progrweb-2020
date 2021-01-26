@@ -94,7 +94,7 @@ export default {
             .then( nome => this.nomeAttoreAttualmenteAutenticato = nome );
 
             // Richiede nomi delle properties negli oggetti ricevuti dal server
-      await richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_UPLOADER)                 // richiede nome prop con nome uploader
+      await richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_ATTORE)                 // richiede nome prop con nome uploader
             .then( nomePropNomeUploader => this.NOME_PROP_NOME_UPLOADER = nomePropNomeUploader )
             .then( () => richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_LOGO_UPLOADER) )  // richiede nome prop con logo uploader
             .then( nomePropLogoUploader => this.NOME_PROP_LOGO_UPLOADER = nomePropLogoUploader )

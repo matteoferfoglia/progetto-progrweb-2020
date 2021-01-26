@@ -47,8 +47,13 @@
     <init-param>
       <param-name>jersey.config.server.provider.classnames</param-name>
       <param-value>org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
+
         <!-- Necessario per jersey-media-multipart (Fonte: https://stackoverflow.com/a/25312655): -->
-        org.glassfish.jersey.filter.LoggingFilter;org.glassfish.jersey.media.multipart.MultiPartFeature</param-value>
+        org.glassfish.jersey.filter.LoggingFilter;org.glassfish.jersey.media.multipart.MultiPartFeature;
+
+        <!-- Tiene traccia delle eccezioni di Jersey "non mappate" ( Fonte: https://stackoverflow.com/a/45758691) -->
+        it.units.progrweb.api.DebugMapper
+      </param-value>
     </init-param>
     <init-param>
       <param-name>jersey.config.server.provider.packages</param-name>

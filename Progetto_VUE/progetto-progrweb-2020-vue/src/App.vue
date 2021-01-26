@@ -90,12 +90,14 @@ export default {
       richiestaGet(process.env.VUE_APP_URL_LOGOUT, parametriRichiestaGet)
           .catch( risposta => console.log("Logout fallito: " + risposta) )
           .finally( () => { // logout sul client
-            this.csrfToken = undefined;
-            this.tipoAttoreAutenticato = undefined;
-            this.nomeAttoreAutenticato = undefined;
-            this.isUtenteAutenticato = false;
             eliminaTokenAutenticazione();
-            this.$router.push({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH})
+            this.$router.push({name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN})
+                .then( () => {
+                  this.csrfToken = undefined;
+                  this.tipoAttoreAutenticato = undefined;
+                  this.nomeAttoreAutenticato = undefined;
+                  this.isUtenteAutenticato = false;
+                });
           });
 
     }
@@ -123,7 +125,6 @@ export default {
 const getTipoAttoreAttualmenteAutenticato = async () => {
 
   return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO)
-      .then(  risposta       => risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
@@ -137,7 +138,6 @@ const getTipoAttoreAttualmenteAutenticato = async () => {
 const getNomeAttoreAttualmenteAutenticato = async () => {
 
   return richiestaGet(process.env.VUE_APP_URL_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
-      .then(  risposta       =>  risposta )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
