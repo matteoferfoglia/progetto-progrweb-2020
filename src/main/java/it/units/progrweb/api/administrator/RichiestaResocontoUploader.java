@@ -21,7 +21,7 @@ import java.io.IOException;
  * @author Matteo Ferfoglia
  */
 @Path("/administrator/resocontoUploader")
-public class RichiestaResocontoAttori {
+public class RichiestaResocontoUploader {
 
     /** Restituisce il {@link Resoconto} dei documenti caricati dall'
      * {@link Uploader} specificato nel parametro durante il periodo

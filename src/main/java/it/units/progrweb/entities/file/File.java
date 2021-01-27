@@ -216,7 +216,7 @@ public abstract class File {
 
                              nomeAttributiInQuestaClasseDaNonMostrare = new String[]{
                                      "identificativoFile",
-                                     "indirizzoIpVisualizzazione",
+                                     "indirizzoIpVisualizzatore",
                                      "dataEdOraDiVisualizzazione"
                              };
 
@@ -226,7 +226,8 @@ public abstract class File {
                                            // Informa se il field non si trova
                                            Logger.scriviEccezioneNelLog(File.class,
                                                    "L'attributo \"" + nomeUnAttributo + "\"" +
-                                                           " non si trova nella classe: forse è stato rinominato",
+                                                           " non si trova nella classe " + File.class.getName() +
+                                                           ": forse è stato rinominato",
                                                    new NoSuchFieldException());
                                        }
                                    });

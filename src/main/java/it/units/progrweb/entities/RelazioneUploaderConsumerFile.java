@@ -186,6 +186,13 @@ public class RelazioneUploaderConsumerFile {
     }
 
 
+    /** Restituisce la lista delle occorrenze, filtrate in base
+     * all'{@link Uploader} ed al {@link PeriodoTemporale}
+     * specificati nei parametri. Nel filtraggio, per il periodo
+     * temporale, si considerano gli estremi inclusi (ad esempio,
+     * se il periodo temporale ha come data finale il 27 gennaio,
+     * allora si considerano tutti i documenti fino all'istante
+     * antecedente il 28 gennaio, ultimo istante compreso).*/
     public static List<RelazioneUploaderConsumerFile>
     getOccorrenzeFiltratePerUploaderEPeriodoTemporale(Long identificativoUploader,
                                                       PeriodoTemporale periodoTemporaleDiRiferimento) {
@@ -211,8 +218,8 @@ public class RelazioneUploaderConsumerFile {
                         })
                         .filter( Objects::nonNull )
                         .filter( file ->
-                                file.getDataEdOraDiCaricamento().isAfter( periodoTemporaleDiRiferimento.getDataIniziale() ) &&
-                                    file.getDataEdOraDiCaricamento().isBefore( periodoTemporaleDiRiferimento.getDataFinale() )
+                                file.getDataEdOraDiCaricamento().isAfter( periodoTemporaleDiRiferimento.getDataIniziale().adInizioGiornata() ) &&
+                                    file.getDataEdOraDiCaricamento().isBefore( periodoTemporaleDiRiferimento.getDataFinale().aFineGiornata() )
                         )
                         .collect(Collectors.toList());
 
@@ -222,13 +229,10 @@ public class RelazioneUploaderConsumerFile {
                     .map( File::getIdentificativoFile )
                     .collect(Collectors.toList());
 
-        List<RelazioneUploaderConsumerFile> occorrenzeFiltratePerUploaderEPeriodoTemporale =
-                occorrenzeFiltratePerUploader
-                        .stream()
-                        .filter( occorrenza -> identificativiFileFiltrati.contains( occorrenza.getIdFile() ) )
-                        .collect(Collectors.toList());
-
-        return occorrenzeFiltratePerUploaderEPeriodoTemporale;
+        return occorrenzeFiltratePerUploader
+                .stream()
+                .filter( occorrenza -> identificativiFileFiltrati.contains( occorrenza.getIdFile() ) )
+                .collect(Collectors.toList());
 
     }
 
