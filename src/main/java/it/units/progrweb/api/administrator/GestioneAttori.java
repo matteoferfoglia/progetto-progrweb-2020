@@ -17,6 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -172,9 +173,16 @@ public class GestioneAttori {
             if( attoreDaModificare_attualmenteSalvatoInDB instanceof Uploader &&
                 nuovoLogo != null && dettagliNuovoLogo != null) {
 
-                ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
-                        .setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
-                                         UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
+                try {
+                    ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
+                            .setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
+                                             UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
+                } catch (IOException e) {
+                    // Dimensione immagine logo eccessiva   // TODO : testare
+                    return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
+                                   .entity( e.getMessage() )
+                                   .build();
+                }
 
             }
 
@@ -215,9 +223,15 @@ public class GestioneAttori {
             if( attoreDaModificare_conModificheRichiesteDaClient instanceof Uploader ) {
                 // SE si sta modificando un Uploader
                 Uploader uploader_attualmenteSalvatoInDB = (Uploader) attore_attualmenteSalvatoInDB;
-                uploader_attualmenteSalvatoInDB
-                        .setImmagineLogo( uploader_attualmenteSalvatoInDB.getImmagineLogo(),
-                                          uploader_attualmenteSalvatoInDB.getEstensioneImmagineLogo() );
+                try {
+                    uploader_attualmenteSalvatoInDB
+                            .setImmagineLogo( uploader_attualmenteSalvatoInDB.getImmagineLogo(),
+                                              uploader_attualmenteSalvatoInDB.getEstensioneImmagineLogo() );
+                } catch (IOException e) {
+                    return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
+                                   .entity( e.getMessage() )
+                                   .build();
+                }
                 attore_attualmenteSalvatoInDB = uploader_attualmenteSalvatoInDB;
             }
 

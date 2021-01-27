@@ -6,6 +6,8 @@ import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.file.File;
 
+import java.io.IOException;
+
 /**
  * Classe rappresentante un'entità {@link Uploader}
  * da memorizzare nel database.
@@ -24,16 +26,19 @@ class UploaderStorage extends Uploader {
 
     /** Vedere {@link Uploader}.
      * @param immagineLogo  Array di bytes corrispondenti all'immagine logo di questo UploaderStorage.
-     * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes)*/
+     * @param estensioneFileContenenteImmagineLogo  Estensione dell'immagine (per sapere come interpretare l'array di bytes).
+     * @throws IOException Se l'immagine ha dimensioni eccessive. Vedere {@link LogoUploader#LogoUploader(byte[], String)}.*/
     public UploaderStorage(String username, String nominativo, String email,
-                 byte[] immagineLogo, String estensioneFileContenenteImmagineLogo) {
+                 byte[] immagineLogo, String estensioneFileContenenteImmagineLogo)
+            throws IOException {
         super(username, nominativo, email);
         this.immagineLogoUploader = new LogoUploader(immagineLogo, estensioneFileContenenteImmagineLogo) ;
         setTipoAttore( Uploader.class.getSimpleName() );
     }
 
-    /** Copy-constructor.*/
-    private UploaderStorage( UploaderStorage uploader ) {
+    /** Copy-constructor. Vedere {@link #UploaderStorage(String, String, String, byte[], String)}*/
+    private UploaderStorage( UploaderStorage uploader )
+            throws IOException {
         this( uploader.username, uploader.nominativo, uploader.email, uploader.immagineLogoUploader.getLogo(),
                 uploader.immagineLogoUploader.getEstensioneFileContenenteLogo() );
     }
@@ -82,7 +87,8 @@ class UploaderStorage extends Uploader {
     }
 
     /** Modifica l'immagine logo dell'Uploader.*/
-    public void setImmagineLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo){
+    public void setImmagineLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo)
+            throws IOException {
         this.immagineLogoUploader.setLogo(immagineLogo_bytes, estensioneFileContenenteLogo);
     }
 
@@ -98,7 +104,7 @@ class UploaderStorage extends Uploader {
 
     /** Restituisce l'immagine logo in formato Base64.*/
     public String getLogo_base64() {
-        return immagineLogoUploader.getLogo_base64();
+        return immagineLogoUploader.getLogo_dataUrl();
     }
 
     /** Verifica l'equivalenza del logo, oltre a quanto verificato

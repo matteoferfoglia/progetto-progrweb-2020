@@ -2,6 +2,7 @@ package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
 import it.units.progrweb.utils.Base64Helper;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,6 +14,11 @@ import java.util.Map;
  */
 class LogoUploader implements Serializable {
 
+    /** Dimensione massima ammessa per l'imagine logo.
+     * Nota: un'entry del Datastore di Google può avere
+     * dimensione massima complessiva di 1 MB.*/
+    public static final long DIMENSIONE_MASSIMA_LOGO_IN_BYTE = 512*1024;
+
     /**
      * File contenente il logo, rappresentato come array di byte.
      */
@@ -23,17 +29,23 @@ class LogoUploader implements Serializable {
      */
     private String estensioneFileContenenteLogo;
 
-    LogoUploader(byte[] logoInBytes, String estensioneFileContenenteLogo) {
-        this.logo = logoInBytes;
-        this.estensioneFileContenenteLogo = estensioneFileContenenteLogo;
+    /**
+     * Costruttore.
+     * @param logoInBytes
+     * @param estensioneFileContenenteLogo
+     * @throws IOException Vedere {@link #setLogo(byte[], String)}.
+     */
+    LogoUploader(byte[] logoInBytes, String estensioneFileContenenteLogo)
+            throws IOException {
+        this.setLogo( logoInBytes, estensioneFileContenenteLogo );
     }
 
     /**
      * Restituisce la rappresentazione Base64 dell'immagine, come Data URL
      * (<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Fonte</a>).
      */
-    public String getLogo_base64() {
-        return "data:" + getMediaTypeLogo() + ";base64," + Base64Helper.encodeToBase64UrlEncoded(logo); // TODO : verificare che sia corretto usare la versione url encoded del base64
+    public String getLogo_dataUrl() {
+        return "data:" + getMediaTypeLogo() + ";base64," + Base64Helper.encodeToBase64_rfc2045_encoder(logo); // TODO : verificare che sia corretto usare la versione url encoded del base64
     }
 
     /**
@@ -45,11 +57,19 @@ class LogoUploader implements Serializable {
 
     /**
      * Modifica il logo.
+     * @throws IOException Se il logo caricato ha una dimensione superiore
+     *                     a quanto specificato in {@link #DIMENSIONE_MASSIMA_LOGO_IN_BYTE}.
      */
-    public void setLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo) {
-        // TODO : controllare la dimensione complessiva dell'immagine (l'entità complessiva in Datastore può essere max 1 MB)
-        this.logo = immagineLogo_bytes;
-        this.estensioneFileContenenteLogo = estensioneFileContenenteLogo;
+    public void setLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo)
+            throws IOException {
+
+        if( immagineLogo_bytes.length > DIMENSIONE_MASSIMA_LOGO_IN_BYTE ) {
+            throw new IOException("La dimensione dell'immagine deve essere inferiore a " +
+                    Math.ceil(DIMENSIONE_MASSIMA_LOGO_IN_BYTE / 1024.0) + " KB.");
+        } else {
+            this.logo = immagineLogo_bytes;
+            this.estensioneFileContenenteLogo = estensioneFileContenenteLogo;
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -50,7 +51,12 @@ public abstract class Uploader extends UtenteNonAdministrator {
 
     /** Crea un attore di questa classe.*/
     public static Uploader creaAttore( String username, String nominativo, String email ) {
-        return new UploaderStorage(username, nominativo, email, null, "");
+        try {
+            return new UploaderStorage(username, nominativo, email, null, "");
+        } catch (IOException e) {
+            // logo impostato a null, non può generare un'eccezione a causa di dimensioni eccessive.
+            return null;
+        }
     }
 
     public static Uploader getAttoreDaIdentificativo(Long identificativoAttore) {
@@ -100,7 +106,9 @@ public abstract class Uploader extends UtenteNonAdministrator {
         return "";
     }
 
-    public void setImmagineLogo(byte[] convertiInputStreamInByteArray, String estensioneDaNomeFile) {
+    /** @throws IOException Se le dimensioni del logo sono eccessive. Vedere {@link LogoUploader#setLogo(byte[], String)}. */
+    public void setImmagineLogo(byte[] convertiInputStreamInByteArray, String estensioneDaNomeFile)
+            throws IOException {
         if ( this instanceof UploaderStorage ) {
             this.setImmagineLogo(convertiInputStreamInByteArray, estensioneDaNomeFile);
         }
