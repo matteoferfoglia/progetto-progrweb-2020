@@ -1,8 +1,31 @@
 <template>
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
+  <form v-if=" mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
+    <!-- Form per filtraggio documenti rispetto ad hashtag -->
+    <p>Hashtags: </p>
+    <ol>
+      <li v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
+          :key="hashtag">
+        <p>
+          <input type="checkbox"
+                 @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
+                            Se cliccato, mostra documenti con questo hashtag
+                            Fonte: https://stackoverflow.com/a/41001483 */"
+                 :checked="listaHashtagDaMostrare.includes(hashtag)"/>
+          {{ hashtag }}
+        </p>
+      </li>
+    </ol>
+    <p>
+      <input type="button"
+             @click="mostraTuttiIDocumenti"
+             value="Mostra tutto">
+    </p>
+  </form>
+
   <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
-                    v-if="mappaDocumentiPerUnConsumer.get().size > 0"          >
+                    v-if="mappaDocumentiDaMostrare.get().size > 0"          >
     <!-- Eliminazione di un documento comporta il cambio di stato (serve token CSRF) -->
 
     <table>
@@ -16,7 +39,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(documento, indice) in Object.fromEntries(mappaDocumentiPerUnConsumer.get())"
+      <tr v-for="(documento, indice) in Object.fromEntries(mappaDocumentiDaMostrare.get())"
           :key="indice"><!-- Ogni riga è un documento -->
         <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
                                                                                      nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
@@ -57,9 +80,21 @@
 </template>
 
 <script>
+
+/** Questo componente Vue implementa i requisiti descritti nella sezione
+ * <cite>Lista Documenti - Consumers</cite>.
+ * Nota: questo componente fa spesso uso del tipo Map
+ * (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">Fonte</a>),
+ * in quanto ne ha semplificato l'implementazione.*/
+
+
 import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
 import {richiestaDelete, richiestaGet} from "../../utils/http";
-import {MappaDocumenti, ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
+import {
+  creaIndiceDeiFileRispettoAgliHashtagCheContengono,
+  MappaDocumenti,
+  ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
+} from "../../utils/documenti";
 import FormConCsrfToken from "../layout/FormConCsrfToken";
 export default {
   name: "TabellaDocumenti",
@@ -103,26 +138,45 @@ export default {
 
       // Variabili inizializzate in created() in base ai dati ricevuti dal server
 
+      /** Mappa in cui ogni chiave è un hashtag ed il corrispettivo
+       * valore è un array di identificativi (posting-list) di documenti
+       * aventi tale hashtag, tra quelli mostrati in {@link #mappaDocumenti}.*/
+      mappa_hashtag_idDocumenti: new Map(),
+
       /** Mappa dei documenti per uno specifico Consumer.
        * Ogni entry rappresenta un documento nella forma:
        *    [ idDocumento, { oggetto con proprietà del documento } ]
        */
-      mappaDocumentiPerUnConsumer: new MappaDocumenti(),
+      mappaDocumenti: new MappaDocumenti(), // TODO : serve una classe MappaDocumenti? Se l'oggetto non viene passato tramite props non basta una Map normale da usare qua?
+
+      /** Come {@link #mappaDocumenti}, ma contiene solo i documenti da
+       * mostrare, a seguito dell'eventuale filtraggio dell'utente.*/
+      mappaDocumentiDaMostrare: new MappaDocumenti(),
+
+      /** Lista di hashtag risultanti dal filtraggio: i documenti
+       * mostrati all'utente contengono (per poter essere mostrati
+       * da questo componente) almeno uno degli hashtag presenti in
+       * questo attributo.*/
+      listaHashtagDaMostrare: [],            // modificato dinamicamente in base al filtraggio dell'utente
 
       /** Nome delle colonne di intestazione della tabella coi documenti.*/
       nomiPropDocumenti: [],
 
-      /** In un documento, il nome della property (se presente)
+      /** In un documento, è il nome della property (se presente)
        * il cui valore è un link di download di quel documento.*/
       NOME_PROP_LINK_DOWNLOAD_DOCUMENTO: "Download",
 
-      /** In un documento, il nome della property (se presente)
+      /** In un documento, è il nome della property (se presente)
        * il cui valore è un link di eliminazione di quel documento.*/
       NOME_PROP_LINK_DELETE_DOCUMENTO: "Elimina",
 
-      /** In un documento, il nome della property (se presente)
+      /** In un documento, è il nome della property (se presente)
        * il cui valore è il nome di quel documento.*/
       NOME_PROP_NOME_DOCUMENTO: undefined,
+
+      /** In un documento, è il nome della property il cui valore
+       * è la lista di hashtag di quel documento.*/
+      NOME_PROP_LISTA_HASHTAG_DOCUMENTO: undefined,
 
       /** "Import" della funzione per usarla nel template.*/
       camelCaseToHumanReadable: camelCaseToHumanReadable,
@@ -136,47 +190,117 @@ export default {
 
     // TODO : aggiungere un "loader" (flag layoutCaricato)
 
-    // Richiede mappa idFile-propFile per questo attore
-    richiestaGet( this.urlRichiestaElencoDocumentiPerUnAttore )
-        // Crea mappa
-        .then( rispostaConMappaFile_id_prop => new Map(Object.entries( rispostaConMappaFile_id_prop ) ) )
-        // Ordina mappa
-        .then( ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti )
+    const caricamentoComponente = async () => {
 
-        // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
-        .then( mappa =>
-            new Map(
-                Array.from( mappa.entries() )
-                     .map( unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento) )
-            )
-        )
+          // Richiede mappa idFile-propFile per questo attore
+      await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore)
 
-        // Salva la mappa
-        .then( mappa => this.mappaDocumentiPerUnConsumer.set( mappa ) )
-        .catch( console.error );
+              // Crea l'indice degli hashtag
+              .then(rispostaConMappaFile_id_prop => {
+                richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
+                    .then(nomePropertyHashtags => {
+                      this.mappa_hashtag_idDocumenti =
+                          creaIndiceDeiFileRispettoAgliHashtagCheContengono(rispostaConMappaFile_id_prop, nomePropertyHashtags);
+                      this.nomeProprietaHashtagInListaDocumenti = nomePropertyHashtags;
+                    });
+                return rispostaConMappaFile_id_prop;
+              })
+
+              // Crea mappa
+              .then(rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)))
+              // Ordina mappa
+              .then(ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti)
+
+              // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
+              .then(mappa =>
+                  new Map(
+                      Array.from(mappa.entries())
+                          .map(unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento))
+                  )
+              )
+
+              // Salva la mappa
+              .then(mappa => {
+                this.mappaDocumenti.set(mappa);
+                this.mappaDocumentiDaMostrare.set(mappa);
+              })
+              .catch(console.error);
 
 
-    // Richiede il nome della property di un documento contenente il nome del documento stesso
-    richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
-        .then( nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp )
-        .catch( console.error );
+      // Richiede il nome della property di un documento contenente il nome del documento stesso
+      await richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
+              .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
+              .catch(console.error);
 
 
-    // Richiede l'elenco dei nomi delle properties dei documenti
-    richiestaGet( process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI )
-        // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
-        // documento (da creare dinamicamente), poi salva l'array
-        .then( nomiPropDocumenti => {
-          nomiPropDocumenti.push( this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO );
-          if( this.urlEliminazioneDocumento ) {
-            nomiPropDocumenti.push( this.NOME_PROP_LINK_DELETE_DOCUMENTO )
-          }
-          this.nomiPropDocumenti = nomiPropDocumenti;
-        })
-        .catch( console.error );
+      // Richiede l'elenco dei nomi delle properties dei documenti
+      await richiestaGet(process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
+              // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
+              // documento (da creare dinamicamente), poi salva l'array
+              .then(nomiPropDocumenti => {
+                nomiPropDocumenti.push(this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO);
+                if (this.urlEliminazioneDocumento) {
+                  nomiPropDocumenti.push(this.NOME_PROP_LINK_DELETE_DOCUMENTO)
+                }
+                this.nomiPropDocumenti = nomiPropDocumenti;
+              })
+              .catch(console.error);
+
+    };
+
+
+    caricamentoComponente()
+      .then( () => this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() ) )  // All'inizio mostra tutti gli hashtag
+      .catch( errore => {
+        console.error( "Errore durante il caricamento del componente " + this.$options.name + ": " + errore );
+        alert( "Errore durante il caricamento." );
+      })
 
   },
   methods: {
+
+    /** Resetta tutti gli hashtag e mostra tutti i documenti disponibili.*/
+    mostraTuttiIDocumenti() {
+      this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() ).sort();
+      this.mappaDocumentiDaMostrare.set( this.mappaDocumenti.get() );
+    },
+
+    /** Dati un hashtag ed un flag booleano, questa funzione aggiorna
+     * l'array dei documenti da mostrare: se il flag è true, allora
+     * saranno mostrati tutti i documenti che contengono l'hashtag passato
+     * come parametro. Per poter essere mostrato, un documento deve
+     * avere tra gli hashtag almeno uno tra quelli compresi nella lista
+     * di hashtag da mostrare.*/
+    mostraDocumentiConHashtagFiltrato(hashtag, daMostrare) {
+
+      // TODO : da testare
+
+      // Aggiorna lista di hashtag da mostrare
+      if(daMostrare) {
+        this.listaHashtagDaMostrare.push(hashtag);
+      } else {
+        this.listaHashtagDaMostrare = this.listaHashtagDaMostrare
+                                          .filter( hashtagDaMostrare => hashtagDaMostrare!==hashtag);
+      }
+
+      const listaIdDocumentiDaMostrare = new Set(                                   // utilizzo Set per evitare chiavi di documenti duplicate
+          Array.from(this.mappa_hashtag_idDocumenti.entries())
+               .filter( entry => this.listaHashtagDaMostrare.includes(entry[0]) ) // entry[0] è la chiave (l'hashtag)
+               .flatMap( entry => entry[1] )                               // entry[1] è l'array con gli id dei file che contengono l'hashtag specificato in entry[0]
+          // Fonte (flatMap): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
+      );
+
+      this.mappaDocumentiDaMostrare.set( new Map(
+          this.mappaDocumenti.getArrayEntries() // filter non si applica su Map, quindi converto in Array, poi riconverto il risultato in Map
+              .filter( entryDocumento => Array.from(listaIdDocumentiDaMostrare.values())
+                                              .includes(entryDocumento[0]) )
+      )); // entryDocumento[0] è l'id di un documento
+      // Risultato filter: nella mappa restano solo i documenti che hanno id tra quelli filtrati prima
+
+      // Osservazione: elencoDocumenti non viene sovrascritto, quindi l'ordine di visualizzazione è mantenuto
+      // TODO : verificare che si mantenga l'ordine di visualizzazione dei documenti
+
+    },
 
     /** Funzione per eliminare un documento dall'elenco attualmente mostrato,
      * a seguito della richiesta di eliminazione da parte dell'utente.
@@ -188,7 +312,7 @@ export default {
       const idDocumentoEliminato = urlEliminazioneDocumento
           .substring(urlEliminazioneDocumento.lastIndexOf("/")+1);
 
-      this.mappaDocumentiPerUnConsumer.get().delete(idDocumentoEliminato);
+      this.mappaDocumenti.get().delete(idDocumentoEliminato);
 
     },
 
@@ -268,9 +392,9 @@ export default {
       );
 
       // Aggiungi il documento all'elenco di quelli mostrati da questo componente
-      this.mappaDocumentiPerUnConsumer.set(
+      this.mappaDocumenti.set(
           new Map( [ ...oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere,  // merge della nuova entry in cima alla mappa
-                     ... this.mappaDocumentiPerUnConsumer.get() ] )
+                     ... this.mappaDocumenti.get() ] )
       );
     }
 

@@ -33,17 +33,17 @@ export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocument
 
     // Iterazione sulle properties dell'oggetto,
     //  fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
-    for (const [idDocumento, documento] of elencoDocumenti) {
+    for (const [idDocumento, documento] of Object.entries(elencoDocumenti) ) {
 
         // Ogni documento è un oggetto in cui una property è l'array degli hashtag
         const hashtagsDiQuestoDocumento = documento[nomePropertyHashtagDocumenti];  // array degli hashtag
 
         if( isArray(hashtagsDiQuestoDocumento) && hashtagsDiQuestoDocumento.length > 0) {
             hashtagsDiQuestoDocumento.forEach(hashtag => {
-                hashtag = hashtag.toLowerCase().trim();       // preprocessing di ogni hashtag prima di salvarlo nell'indice
+                hashtag = hashtag.toLowerCase().trim();           // preprocessing di ogni hashtag prima di salvarlo nell'indice
                 if (indice_Hashtag_Documenti.has(hashtag)) {
                     indice_Hashtag_Documenti.get(hashtag)                                 // recupera entry corretta dalla mappa
-                        .push(idDocumento); // aggiunge alla posting list (array) l'id di questo documento
+                                            .push(idDocumento);   // aggiunge alla posting list (array) l'id di questo documento
                 } else {
                     // hashtag non ancora presente nell'indice, quindi posting list da creare
                     indice_Hashtag_Documenti.set(hashtag, [idDocumento]);   // crea un array quale valore di questa entry
@@ -107,7 +107,7 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti = mappaDocume
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyDataCaricamentoDocumenti = async () => {
 
-    return richiestaGet(process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER_NOME_PROP_DATA_CARICAMENTO)
+    return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_CARICAMENTO_IN_DOCUMENTI)
         .then(  risposta       => risposta )
         .catch( rispostaErrore => {
             console.error("Errore durante la ricezione del nome dell'attributo " +
@@ -126,7 +126,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
  * risolta con valore il nome dell'attributo restituito dal server.*/
 const getNomePropertyDataVisualizzazioneDocumenti = async () => {
 
-    return richiestaGet(process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER_NOME_PROP_DATA_VISUALIZZAZIONE)
+    return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTI)
         .then(  risposta       => risposta )
         .catch( rispostaErrore => {
             console.error("Errore durante la ricezione del nome dell'attributo " +
@@ -177,6 +177,11 @@ export class MappaDocumenti{
      * rappresentata da questa istanza.*/
     set(nuovaMappaDocumenti) {
         this.mappaDocumenti.mappa = nuovaMappaDocumenti;
+    }
+
+    /** Restituisce l'array delle entries di questa mappa.*/
+    getArrayEntries() {
+        return Array.from( this.get().entries() );
     }
 
 }

@@ -160,10 +160,10 @@ public class RichiestaInfo {
     }
 
     /** Dato come @PathParam l'identificativo di un Uploader, restituisce
-     * la rappresentazione codificata in base64 del suo logo.*/
+     * la rappresentazione codificata come data URL del suo logo.*/
     @Path("/logoUploader/{identificativoUploader}")
     @GET
-    public Response getLogoUploaderBase64(@PathParam("identificativoUploader") Long identificativoUploader) {
+    public Response getLogoUploader_dataUrl(@PathParam("identificativoUploader") Long identificativoUploader) {
 
         // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
 

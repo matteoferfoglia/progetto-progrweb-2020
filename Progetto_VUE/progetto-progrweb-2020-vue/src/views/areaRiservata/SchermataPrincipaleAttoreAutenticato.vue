@@ -65,7 +65,8 @@
                :NOME_PROP_NOMINATIVO ="NOME_PROP_NOME_ATTORE"
                :NOME_PROP_USERNAME   ="NOME_PROP_USERNAME_ATTORE"
                :NOME_PROP_EMAIL      ="NOME_PROP_EMAIL_ATTORE"
-               @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/><!-- TODO : mettere valore corretto, non 'Uploader' literal -->
+               @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/><!-- TODO : mettere valore corretto, non 'Uploader' literal (devi farlo da Vue router perché Admin può visualizzare sia Admin sia Uploader (in base a cosa clicca), Uploader può visualizzare Consumer, Consumer può visualizzare Uplaoder
+               ) -->
 
 
 </template>

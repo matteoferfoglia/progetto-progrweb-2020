@@ -19,7 +19,6 @@
                     :urlEliminazioneDocumento="urlEliminazioneDocumento"
                     :oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere=
                         "oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato"
-                    :puoEliminareUnDocumento="true"
                     :csrfToken="csrfToken_wrapper"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
                     @nuovo-documento-mostrato=

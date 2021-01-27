@@ -156,7 +156,7 @@ name: "SchedaDiUnAttore",
        * Richiesta di download gestita dal componente che si occupa
        * della visualizzazione dei documenti.*/
       urlDownloadDocumentoPerConsumer:
-        process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO___RICHIESTA_DA_CONSUMER,
+        process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO__RICHIESTA_DA_CONSUMER,
 
     /** Flag: true se l'utente attualmente autenticato può modificare
        * le informazioni di un attore mostrate da questo componente.*/
