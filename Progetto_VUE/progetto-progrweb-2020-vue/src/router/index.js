@@ -75,11 +75,17 @@ const routes = [
 
       {
         // Schermata principale dell'area riservata
-        path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA, // percorso default
+        path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,             // percorso default per area riservata
         name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
         component: () => import('../views/areaRiservata/SchermataPrincipaleAttoreAutenticato'),
         props: true,
         children: [
+          {
+            path: '',                                                 // percorso default per area riservata    // TODO : nei percorsi di default children bisogna usare percorso vuoto ('') perché questo è il pah relativo (appeso in coda a quello del padre)
+            alias: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
+            name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI,
+            component: () => import('../components/attori/ElencoAttori')
+          },
           {
             path: process.env.VUE_APP_ROUTER_PATH_SCHEDA_UN_ATTORE + '/:' +
                     process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE,
@@ -89,6 +95,7 @@ const routes = [
             props: true
           },
           {
+            // TODO : non credo che questa route serva: l'elenco dei documenti sta dentro la scheda di un attore !!
             path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
                 process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
             name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
@@ -101,6 +108,7 @@ const routes = [
             }
           },
           {
+            // TODO : non credo che questa route serva: l'elenco dei documenti sta dentro la scheda di un attore !!
             path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" +
                 process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
             name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,

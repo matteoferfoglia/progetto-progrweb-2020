@@ -2,7 +2,7 @@
 
   <!-- ###################   AGGIUNTA CONSUMER   ################### -->
   <section id="aggiuntaConsumer"
-           v-if="isUploader()">
+           v-if="isUploader()"><!-- TODO : creare componente "AggiuntaConsumer" ed "AggiuntaUploaderOAdmin" -->
     <p>
       Da questo form è possibile aggiungere un nuovo <i>{{ tipoAttore_consumer }}</i>
       tra quelli registrati nella piattaforma.
@@ -59,21 +59,14 @@
     </FormCampiAttore>
   </section>
 
+  <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato"
+               :tipiAttoreCuiQuestoElencoSiRiferisce="'Uploader'"
+               :csrfToken="csrfToken_wrapper"
+               :NOME_PROP_NOMINATIVO ="NOME_PROP_NOME_ATTORE"
+               :NOME_PROP_USERNAME   ="NOME_PROP_USERNAME_ATTORE"
+               :NOME_PROP_EMAIL      ="NOME_PROP_EMAIL_ATTORE"
+               @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/><!-- TODO : mettere valore corretto, non 'Uploader' literal -->
 
-  <!-- TODO : cancellare il seguito del template: qua ci va router-view che mostri ElencoAttori
-              Se si tratta di un Administrator attualmente autenticato, dargli la possibilità di scegliere se guardare la lista di Uploader o di Administrator-->
-  <ElencoAttori :tipoAttoreAutenticato="tipoAttoreAutenticato"
-                :tipiAttoreCuiQuestoElencoSiRiferisce="'Uploader'"
-                :csrfToken="csrfToken_wrapper"
-                @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/><!-- TODO : mettere valore corretto, non 'Uploader' literal -->
-  <!-- TODO : cancellare questo <ElencoAttori :tipoAttoreAutenticato="tipoAttoreAutenticato"
-                :csrfToken="csrfToken_wrapper"
-                @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/>  -->
-
-  <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
-          Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
-          Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
-          gli attori per nome -->
 
 </template>
 
@@ -82,12 +75,12 @@
 // Questo componente mostra la schermata principale di un attore autenticato
 
 import FormCampiAttore from "../../components/layout/FormCampiAttore";
-import ElencoAttori from "../../components/attori/ElencoAttori";
+import {richiestaGet} from "../../utils/http";
 
 export default {
   name: "SchermataPrincipaleAttore",
   inheritAttrs: false,
-  components: {ElencoAttori, FormCampiAttore},
+  components: {FormCampiAttore},
   emits: ['csrf-token-ricevuto','nominativo-attore-modificato'],
   props: ['tipoAttoreAutenticato', 'csrfToken'],
   data() {
@@ -123,9 +116,46 @@ export default {
 
       /** Dati aggiuntivi (oggetto) che il {@link FormCampiAttore} deve
        * inviare al server, oltre a quelli già specificati nel componente stesso.*/
-      datiAggiuntiviDaInviareAlServer: {} // default: oggetto vuoto
+      datiAggiuntiviDaInviareAlServer: {}, // default: oggetto vuoto
+
+      /** Nell'oggetto restituito dal server contenente le informazioni di un
+       * Attore, il nome dell'Attore è salvato nella proprietà con il nome
+       * indicato in questa variabile.*/
+      NOME_PROP_NOME_ATTORE: undefined,
+
+      /** Nell'oggetto restituito dal server contenente le informazioni di un
+       * Attore, l'email dell'Attore è salvata nella proprietà con il nome
+       * indicato in questa variabile.*/
+      NOME_PROP_EMAIL_ATTORE: undefined,
+
+      /** Nell'oggetto restituito dal server contenente le informazioni di un
+       * Attore, lo username dell'Attore è salvato nella proprietà con il nome
+       * indicato in questa variabile.*/
+      NOME_PROP_USERNAME_ATTORE: undefined,
 
     }
+
+  },
+  created() {
+
+    // TODO : aggiungere una proprieta isLayoutCaricato (visto che created() non può avere comportamento asincrono)
+
+    // richiede il nome della prop contenente il nominativo di un attore nell'oggetto
+    // che sarà restituito dal server con le info di un attore
+    richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_NOME_ATTORE )
+        .then( nomePropNomeAttore => this.NOME_PROP_NOME_ATTORE = nomePropNomeAttore )
+
+        // richiede il nome della prop contenente l'email
+        .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_EMAIL_ATTORE ) )
+        .then( nomePropEmailAttore => this.NOME_PROP_EMAIL_ATTORE = nomePropEmailAttore )
+
+        // richiede il nome della prop contenente lo username
+        .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_USERNAME_ATTORE ) )
+        .then( nomePropUsernameAttore => this.NOME_PROP_USERNAME_ATTORE = nomePropUsernameAttore )
+
+        .then( () => this.$router.push({ name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI }) ) // TODO : rivedere questo (vue router non caricava route figlia default (non caricava proprio la router-view) ma aggiornando funzionava correttamente
+
+        .catch( console.error );
 
   },
   methods: {

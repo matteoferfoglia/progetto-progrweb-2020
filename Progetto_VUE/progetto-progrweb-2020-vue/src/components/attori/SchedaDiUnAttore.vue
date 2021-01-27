@@ -1,10 +1,10 @@
 <template>
 
   <header>
-    <h2>{{ tipoAttoreCuiQuestaSchedaSiRiferisce }}: {{ nominativo }}</h2>
+    <h2>{{ tipiAttoreCuiQuestoElencoSiRiferisce }}: {{ nominativo }}</h2>
   </header>
   <section :id="idQuestoComponente">
-    <small>
+    <small v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
       Modificare i campi del form per modificare i dati dell'utente nel sistema.
     </small>
     <FormCampiAttore :flag_mostrareLabelCampiInput="true"
@@ -24,23 +24,28 @@
                      @ripristina-valori-prop="ripristinaValoriProperty = false"
                      @dati-form-inviati="formModificaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
-      <input type="file" v-if="mostrareInputFilePerModificaLogoUploader" :name="LOGO_INPUT_FIELD_NAME">
-      <button @click.prevent="eliminaAttore()" v-if="! isConsumerAttualmenteAutenticato()">Elimina</button>
-      <input type="submit" value="Modifica informazioni" v-if="! isConsumerAttualmenteAutenticato()">
+      <input type="file" :name="LOGO_INPUT_FIELD_NAME"         v-if="mostrareInputFilePerModificaLogoUploader()" >
+      <input type="submit" value="Modifica informazioni"       v-if="! isConsumerAttualmenteAutenticato()">
+      <button @click.prevent="eliminaAttore()"                 v-if="! isConsumerAttualmenteAutenticato()">Elimina</button>
       <button @click.prevent="ripristinaValoriProperty = true" v-if="! isConsumerAttualmenteAutenticato()">Annulla tutte le modifiche</button>
     </FormCampiAttore>
   </section>
 
-  <ResocontoDiUnAttore UnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
+  <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
                        :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"
                        v-if="isAdministratorAttualmenteAutenticato()" />
 
   <ListaDocumentiPerConsumerVistaDaUploader v-if="isUploaderAttualmenteAutenticato()"
+                                            :idConsumer="idAttoreCuiQuestaSchedaSiRiferisce"
                                             :csrfToken="csrfToken_wrapper"
-                                            :NOME_PROP_NOMINATIVO="NOME_PROP_NOMINATIVO"
                                             @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
-  <TabellaDocumenti v-if="isConsumerAttualmenteAutenticato()" />
+  <TabellaDocumenti v-if="isConsumerAttualmenteAutenticato()"
+                    :csrfToken="csrfToken_wrapper"
+                    @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
+
+
+  <button @click="chiudiSchedaAttore">Chiudi</button>
 
 
 
@@ -65,14 +70,10 @@ name: "SchedaDiUnAttore",
   props: [
 
     /** Indica il tipo di attore che sta visualizzando questo componente.*/
-    "tipoAttoreAttualmenteAutenticato",
+    "tipoAttoreAutenticato",
 
     /** Indica il tipo di attore a cui si riferisce questa scheda.*/
-    "tipoAttoreCuiQuestaSchedaSiRiferisce",
-
-    /** Flag: true se questo componente deve mostrare il campo di input
-     * da usare per modificare il logo di un Uploader.*/
-    "mostrareInputFilePerModificaLogoUploader",
+    "tipiAttoreCuiQuestoElencoSiRiferisce",
 
     // Nomi delle proprietà di un attore  // TODO : servono ? Non si può semplicemente iterare sulle prop dell'oggetto "attore"?
     /** Nome della proprietà contenente lo username di un attore nell'oggetto
@@ -149,54 +150,68 @@ name: "SchedaDiUnAttore",
   },
   created() {
 
-    // Caricamento proprietà da Vue-Router
-    this.idAttoreCuiQuestaSchedaSiRiferisce        = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
-    this.proprietaAttoreCuiQuestaSchedaSiRiferisce = JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
-
-    this.datiAggiuntiviDaInviareAlServer_onSubmit = {
-      /** Identificativo dell'attore a cui si riferisce questa scheda.*/
-      [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_IDENTIFICATIVO_ATTORE]: this.idAttoreCuiQuestaSchedaSiRiferisce
-    }
-
-    if( this.proprietaAttoreCuiQuestaSchedaSiRiferisce ) {
-      // Verifica che le proprietà da mostrare siano ben definite
-
-      this.username   = this.NOME_PROP_USERNAME   ?
-          ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] ?
-              this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] : "" ) : "";
-
-      this.nominativo = this.NOME_PROP_NOMINATIVO   ?
-          ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO] ?
-              this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO] : "" ) : "";
-
-      this.email      = this.NOME_PROP_EMAIL   ?
-          ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL] ?
-              this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL] : "" ) : "";
-    }
+    this.caricaQuestoComponente();
 
   },
   methods:{
 
+    /** Metodo per i caricamento di questo componente.*/
+    caricaQuestoComponente() {
+
+      // Caricamento proprietà da Vue-Router
+      this.idAttoreCuiQuestaSchedaSiRiferisce        = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
+      this.proprietaAttoreCuiQuestaSchedaSiRiferisce = JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
+
+      this.datiAggiuntiviDaInviareAlServer_onSubmit = {
+        /** Identificativo dell'attore a cui si riferisce questa scheda.*/
+        [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_IDENTIFICATIVO_ATTORE]: this.idAttoreCuiQuestaSchedaSiRiferisce
+      }
+
+      if( this.proprietaAttoreCuiQuestaSchedaSiRiferisce ) {
+        // Verifica che le proprietà da mostrare siano ben definite
+
+        this.username   = this.NOME_PROP_USERNAME   ?
+            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] ?
+                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] : "" ) : "";
+
+        this.nominativo = this.NOME_PROP_NOMINATIVO   ?
+            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO] ?
+                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO] : "" ) : "";
+
+        this.email      = this.NOME_PROP_EMAIL   ?
+            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL] ?
+                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL] : "" ) : "";
+      }
+
+    },
+
     // TODO : i metodi isConsumer() / isUploader() / isAdministrator()  sono presenti in più componenti => refactoring
+
+    /** Restituisce true se è possibile modificare il logo di un uploader.*/
+    mostrareInputFilePerModificaLogoUploader() {
+      return this.isAdministratorAttualmenteAutenticato() &&
+          this.tipiAttoreCuiQuestoElencoSiRiferisce ===
+          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+    },
 
     /** Restituisce true se l'utente attualmente autenticato
      * è un Consumer, false altrimenti.*/
     isConsumerAttualmenteAutenticato() {
-      return this.tipoAttoreAttualmenteAutenticato ===
+      return this.tipoAttoreAutenticato ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
     },
 
     /** Restituisce true se l'utente attualmente autenticato
      * è un Uploader, false altrimenti.*/
     isUploaderAttualmenteAutenticato() {
-      return this.tipoAttoreAttualmenteAutenticato ===
+      return this.tipoAttoreAutenticato ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
     },
 
     /** Restituisce true se l'utente attualmente autenticato
      * è un Uploader, false altrimenti.*/
     isAdministratorAttualmenteAutenticato() {
-      return this.tipoAttoreAttualmenteAutenticato ===
+      return this.tipoAttoreAutenticato ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
     },
 
@@ -242,11 +257,34 @@ name: "SchedaDiUnAttore",
           .finally( () => {
             this.flag_inviaDatiForm = false;
           });
+    },
+
+    /** Chiude la scheda dell'attore attualmente mostrato.*/
+    chiudiSchedaAttore() {
+      this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
     }
 
 
   },
   watch: {
+
+    /** Aggiorna il contenuto della pagina se cambia la route, ad
+     * es.: si chiedono i dati di un altro Attore
+     * (<a href="https://stackoverflow.com/a/50140702">Fonte</a>)*/
+    /*'$route' : {      // TODO : se cambia id attore, modificare la vista (prova '$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]')
+      immediate: true,
+      deep: true,
+      handler (nuovaRoute) {
+        // Se la nuova route fa riferimento a questo componente,
+        // Allora devo caricare i nuovi dati
+        // Altrimenti non devo fare nulla
+        if ( nuovaRoute.name ===
+              process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE ) {
+          this.caricaQuestoComponente();
+        }
+      }
+    },*/
+
     csrfToken : {
       immediate: true,
       deep: true,

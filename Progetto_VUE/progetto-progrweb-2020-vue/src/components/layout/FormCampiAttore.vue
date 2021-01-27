@@ -152,6 +152,7 @@ export default {
       nominativo_wrapper: "",
       email_wrapper     : "",
 
+      // Wrapper necessario per specificare il comportamento di default se la property non è specificata
       resetCampiInputDopoInvioForm_wrapper: this.resetCampiInputDopoInvioForm===undefined ?
                                               true : this.resetCampiInputDopoInvioForm,
 

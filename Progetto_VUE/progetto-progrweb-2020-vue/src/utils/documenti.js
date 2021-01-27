@@ -25,7 +25,7 @@ import {richiestaGet} from "./http";
  *                        hashtag di quel documento: questo parametro
  *                        corrisponde al nome di tale property.
  * @return indice dei documenti, indicizzati rispetto agli hashtag
- *         che contengono, implementato tramite Map.
+ *         che contengono, implementato tramite Map.    // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
  */
 export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocumenti, nomePropertyHashtagDocumenti) => {
 
@@ -62,7 +62,7 @@ export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocument
  * documento nell'entry di quella chiave e come valore l'oggetto che
  * rappresenta il documento stesso.
  * Restituisce la mappa risultante come valore di una Promise risolta,
- * ammesso che la procedura vada a buon fine.*/
+ * ammesso che la procedura vada a buon fine.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
 export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti = mappaDocumenti => {
 
     return getNomePropertyDataCaricamentoDocumenti()
@@ -168,10 +168,13 @@ export class MappaDocumenti{
         this.mappaDocumenti = { mappa: new Map()};
     }
 
+    /** @return la mappa rappresentata da questa istanza.*/
     get() {
         return this.mappaDocumenti.mappa;
     }
 
+    /** @param nuovaMappaDocumenti La nuova mappa che deve essere
+     * rappresentata da questa istanza.*/
     set(nuovaMappaDocumenti) {
         this.mappaDocumenti.mappa = nuovaMappaDocumenti;
     }

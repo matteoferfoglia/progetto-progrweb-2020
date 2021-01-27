@@ -2,6 +2,13 @@
 
   <!-- Componente per mostrare un elenco di attori -->
 
+
+
+  <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
+          Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
+          Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
+          gli attori per nome -->
+
     <ol>
       <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
           :key="attore[0]/*Id dell'attore*/">
@@ -12,20 +19,12 @@
             [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1])
               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
           }
-        }">
-          {{ attore[1][NOME_PROP_NOME_ATTORE] }}
+        }"
+                     >
+          {{ attore[1][NOME_PROP_NOMINATIVO] }}
         </router-link>
       </li>
     </ol>
-
-  <router-view :csrfToken="csrfToken_wrapper"
-               :tipoAttoreAttualmenteAutenticato="tipoAttoreAutenticato"
-               :tipoAttoreCuiQuestaSchedaSiRiferisce="tipiAttoreCuiQuestoElencoSiRiferisce"
-               :mostrareInputFilePerModificaLogoUploader="mostrareInputFilePerModificaLogoUploader()"
-               :NOME_PROP_NOMINATIVO ="NOME_PROP_NOME_ATTORE"
-               :NOME_PROP_USERNAME   ="NOME_PROP_USERNAME_ATTORE"
-               :NOME_PROP_EMAIL      ="NOME_PROP_EMAIL_ATTORE"
-               @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/>
 
 </template>
 
@@ -34,6 +33,7 @@ import {richiestaGet} from "../../utils/http";
 
 export default {
   name: "ElencoAttori",
+  inheritAttrs: false,
   emits: [
       /** Evento emesso quando riceve un token CSRF da un componente figlio.*/
       'csrf-token-ricevuto'
@@ -44,6 +44,10 @@ export default {
 
     /** Tipi di attore cui questo elenco si riferisce (Administrator/Consumer/Uploader).*/
     "tipiAttoreCuiQuestoElencoSiRiferisce",
+
+    /** Nome della proprietà contenente il nominativo di un attore nell'oggetto
+     * che lo rappresenta.*/
+    "NOME_PROP_NOMINATIVO",
 
     /** Token CSRF ricevuto dal padre.*/
     "csrfToken"
@@ -57,25 +61,7 @@ export default {
       /** Mappa { idAttore => oggettoConProprietaAttore },
        * ordinata alfabeticamente rispetto al nome dell'Attore.*/
       mappa_idAttore_proprietaAttore: new Map(),
-
-      /** Nell'oggetto restituito dal server contenente le informazioni di un
-       * Attore, il nome dell'Attore è salvato nella proprietà con il nome
-       * indicato in questa variabile.
-       * Vedere valori di {@link #mappa_idAttore_proprietaAttore}*/
-      NOME_PROP_NOME_ATTORE: undefined,
-
-      /** Nell'oggetto restituito dal server contenente le informazioni di un
-       * Attore, l'email dell'Attore è salvata nella proprietà con il nome
-       * indicato in questa variabile.
-       * Vedere valori di {@link #mappa_idAttore_proprietaAttore}*/
-      NOME_PROP_EMAIL_ATTORE: undefined,
-
-      /** Nell'oggetto restituito dal server contenente le informazioni di un
-       * Attore, lo username dell'Attore è salvato nella proprietà con il nome
-       * indicato in questa variabile.
-       * Vedere valori di {@link #mappa_idAttore_proprietaAttore}*/
-      NOME_PROP_USERNAME_ATTORE: undefined,
-
+      
       // Parametri Vue-Router
       /** Nome della route che conduce alla scheda di un attore.*/
       NOME_ROUTE_SCHEDA_ATTORE:           process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
@@ -93,21 +79,8 @@ export default {
 
       // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
 
-          // richiede il nome della prop contenente il nominativo di un attore nell'oggetto
-          // che sarà restituito dal server con le info dell'attore
-      await richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_NOME_ATTORE )
-          .then( nomePropNomeAttore => this.NOME_PROP_NOME_ATTORE = nomePropNomeAttore )
-
-          // richiede il nome della prop contenente l'email
-          .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_EMAIL_ATTORE ) )
-          .then( nomePropEmailAttore => this.NOME_PROP_EMAIL_ATTORE = nomePropEmailAttore )
-
-          // richiede il nome della prop contenente lo username
-          .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_USERNAME_ATTORE ) )
-          .then( nomePropUsernameAttore => this.NOME_PROP_USERNAME_ATTORE = nomePropUsernameAttore )
-
           // Richiede l'elenco degli Attori associati con questo attualmente autenticato
-          .then( () => getElencoAttori( this.tipoAttoreAutenticato ) )
+      await getElencoAttori( this.tipoAttoreAutenticato )
 
           // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
           // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
@@ -118,7 +91,7 @@ export default {
               this.mappa_idAttore_proprietaAttore =
                   new Map( [...mappa_idAttore_proprietaAttore.entries()]
                           .sort((a,b) =>
-                              a[1][this.NOME_PROP_NOME_ATTORE] - b[1][this.NOME_PROP_NOME_ATTORE] ) ) )
+                              a[1][this.NOME_PROP_NOMINATIVO] - b[1][this.NOME_PROP_NOMINATIVO] ) ) )
 
           .catch( console.error ) ;
 
@@ -129,13 +102,6 @@ export default {
 
   },
   methods: {
-
-    /** Restituisce true se è possibile modificare il logo di un uploader.*/
-    mostrareInputFilePerModificaLogoUploader() {
-      return this.isAdministratorAttualmenteAutenticato() &&
-          this.tipiAttoreCuiQuestoElencoSiRiferisce ===
-            process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
-    },
 
     /** Restituisce true se l'attore attualmente autenticato è un Administrator.*/
     isAdministratorAttualmenteAutenticato() {
