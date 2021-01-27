@@ -1,8 +1,10 @@
 <template v-if="layoutCaricato">
 
+  <!-- TODO : cancellare questo package -->
+
   <header>
     <img class="logoUploader"
-         src="{{ this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] }}"
+         src="{{ this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_ATTORE] }}"
          alt="Logo dell'Uploader">
 
     <!-- Mostra hashtag associati ai documenti mostrati e permette di filtrare -->
@@ -47,7 +49,7 @@ import {
   creaIndiceDeiFileRispettoAgliHashtagCheContengono, MappaDocumenti,
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
 } from "../../../utils/documenti";
-import TabellaDocumenti from "./TabellaDocumenti";
+import TabellaDocumenti from "../../../components/attori/TabellaDocumenti";
 
 export default {
 
@@ -151,7 +153,7 @@ export default {
 
               // Crea l'indice degli hashtag
               .then( elencoDocumenti => {
-                richiestaGet(process.env.VUE_APP_URL_GET_DOCUMENTI_PER_CONSUMER_NOME_PROP_HAHSTAGS)
+                richiestaGet(process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER_NOME_PROP_HAHSTAGS)
                   .then( nomePropertyHashtags => {
                     this.mappa_hashtag_idDocumenti =
                         creaIndiceDeiFileRispettoAgliHashtagCheContengono(elencoDocumenti, nomePropertyHashtags);
@@ -168,7 +170,7 @@ export default {
               .then( elencoDocumenti => {
                 elencoDocumenti.forEach( (propsDocumento, idDocumento) =>
                     propsDocumento[this.NOME_PROP_URL_DOWNLOAD_IN_LISTA_DOCUMENTI] =
-                        process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_PER_CONSUMER + "/" + idDocumento );
+                        process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO___RICHIESTA_DA_CONSUMER + "/" + idDocumento );
 
                 this.elencoDocumenti.set( elencoDocumenti );
 
@@ -207,7 +209,7 @@ export default {
  *                    mostrare i documenti.*/
 const getElencoDocumentiPerQuestoConsumer = async idUploader => {           // TODO : passare come parametro l'id dell'Uploader e richiedere documenti solo da quell'Uploader
 
-  return richiestaGet(process.env.VUE_APP_URL_GET_DOCUMENTI_PER_CONSUMER + "/" + idUploader)
+  return richiestaGet(process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER + "/" + idUploader)
         .then(  risposta       => {
           // Conversione da oggetto a mappa (Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries#converting_an_object_to_a_map)
           return new Map(Object.entries(risposta));

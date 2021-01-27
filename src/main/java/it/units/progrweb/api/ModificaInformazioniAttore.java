@@ -19,6 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -76,7 +77,14 @@ public class ModificaInformazioniAttore {
             if (optionalModificaAuthDb.isPresent()) {
 
                 if (Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest).equals(Uploader.class.getSimpleName())) {
-                    modificaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
+                    try {
+                        modificaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
+                    } catch (IOException e) {
+                        // Dimensioni logo eccessive
+                        return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )  // TODO : codice duplicato dal metodo API di modifica Attori degli Administrator
+                                       .entity( e.getMessage() )
+                                       .build();
+                    }
                 } else {
                     modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
                 }
@@ -102,10 +110,12 @@ public class ModificaInformazioniAttore {
     }
 
     /** Aggiorna nel database gli attributi di un {@link Uploader}
-     * con quelli forniti nei parametri (solo se validi).*/
+     * con quelli forniti nei parametri (solo se validi).
+     * @throws IOException Se il logo ha una dimensione eccessiva.*/
     private void modificaInfoUploader(@NotNull Uploader uploaderDaModificare,
                                       InputStream nuovoLogo, FormDataContentDisposition dettagliNuovoLogo,
-                                      String nuovoNominativo, String nuovaEmail) {
+                                      String nuovoNominativo, String nuovaEmail)
+            throws IOException {
 
         if( dettagliNuovoLogo != null ) {
             // TODO : verificare che sia null quando NON c'è il logo e che NON sia null quando c'è il logo

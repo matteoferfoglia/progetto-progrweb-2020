@@ -1,6 +1,6 @@
 <template>
   <h3>Resoconto</h3>
-  <form @submit.prevent="richiediResocontoNelPeriodo(dataInizio, dataFine)">
+  <form @submit.prevent="richiediEMostraResocontoNelPeriodo(dataInizio, dataFine)">
     <!-- Token CSRF non usato perché questo form non modifica lo stato nel sistema -->
     <p>Periodo di riferimento:
       <label>da
@@ -23,7 +23,7 @@
   </form>
   <dl>
     <!-- Fonte: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl#wrapping_name-value_groups_in_htmlelementdiv_elements -->
-    <div v-for="(valoreProp, nomeProp) in resoconto" :key="valoreProp">
+    <div v-for="(valoreProp, nomeProp) in resoconto" :key="nomeProp">
       <dt>{{camelcaseToHumanReadable( nomeProp )}}</dt>
       <dd>{{ valoreProp }}</dd>
     </div>
@@ -84,9 +84,7 @@ export default {
     this.dataInizio = restituisciArrayDaDate_yyyy_mm_dd(dataPrimoGiornoMesePrecedente) .join("-");
     this.dataFine   = restituisciArrayDaDate_yyyy_mm_dd(dataUltimoGiornoMesePrecedente).join("-");
 
-    this.richiediResocontoNelPeriodo(this.dataInizio, this.dataFine)
-          .then( resoconto => this.resoconto = resoconto )
-          .catch( console.error );
+    this.richiediEMostraResocontoNelPeriodo(this.dataInizio, this.dataFine);
 
   },
 
@@ -156,7 +154,7 @@ export default {
      * @param dataIniziale Data iniziale del periodo (Stringa, formato: yyyy-mm-dd).
      * @param dataFinale Data finale del periodo (Stringa, formato: yyyy-mm-dd).
      * @return La Promise associata alla richiesta asincrona effettuata al server.*/
-    richiediResocontoNelPeriodo( dataIniziale, dataFinale ) {
+    richiediEMostraResocontoNelPeriodo(dataIniziale, dataFinale ) {
 
       const parametriRequest = {
         [process.env.VUE_APP_FORM_DATA_INIZIALE_INPUT_FIELD_NAME] : dataIniziale,
@@ -164,9 +162,11 @@ export default {
       };
 
       const urlRichiestaResocontoPerQuestoUploader =
-          process.env.VUE_APP_URL_RICHIESTA_RESOCONTO_DI_UN_UPLOADER + '/' + this.identificativoUploader;
+          process.env.VUE_APP_URL_RICHIESTA_RESOCONTO_DI_UN_UPLOADER__RICHIESTA_DA_ADMIN + '/' + this.identificativoUploader;
 
-      return richiestaGet( urlRichiestaResocontoPerQuestoUploader, parametriRequest );
+      return richiestaGet( urlRichiestaResocontoPerQuestoUploader, parametriRequest )
+              .then( resoconto => this.resoconto = resoconto )
+              .catch( console.error );
 
     }
 

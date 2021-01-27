@@ -88,11 +88,11 @@ export default {
     return {
 
       /** Url per richiedere al server di aggiungere un consumer.*/
-      urlAggiuntaNuovoConsumer: process.env.VUE_APP_URL_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER,
+      urlAggiuntaNuovoConsumer: process.env.VUE_APP_URL_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER,
 
       /** Url per richiedere al server di aggiungere un attore,
        * senza eventuali parametri aggiunti in coda.*/
-      urlAggiuntaNuovoAttore: process.env.VUE_APP_URL_AGGIUNGI_ATTORE,
+      urlAggiuntaNuovoAttore: process.env.VUE_APP_URL_AGGIUNGI_ATTORE__RICHIESTA_DA_ADMIN,
 
       /** Flag: se impostato a true, i dati del form di aggiunta nuovo consumer vengono inviati al server.*/
       flag_inviareDatiFormAggiuntaConsumer: false,

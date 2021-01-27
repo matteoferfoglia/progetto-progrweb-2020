@@ -1,34 +1,68 @@
 <template>
 
   <header>
-    <h2>{{ tipiAttoreCuiQuestoElencoSiRiferisce }}: {{ nominativo }}</h2>
+    <img :src="logoBase64_dataUrl"
+         v-if="isQuestaSchedaRiferitaAdUnUploader"/>
+    <h2>{{ nominativo }}</h2>
   </header>
-  <section :id="idQuestoComponente">
+
+  <section :id="idHtmlQuestoComponente">
     <small v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
       Modificare i campi del form per modificare i dati dell'utente nel sistema.
     </small>
-    <FormCampiAttore :flag_mostrareLabelCampiInput="true"
-                     :urlInvioFormTramitePost="urlModificaInfoAttore"
-                     :flag_inviaDatiForm="flag_inviaDatiForm"
-                     :isQuestoFormRiferitoAConsumer="isQuestaSchedaRiferitaAdUnConsumer"
-                     :username_readOnly="true"
-                     :tuttiICampi_readOnly="isConsumerAttualmenteAutenticato()"
-                     :username="isConsumerAttualmenteAutenticato() ? null : username"
-                     :nominativo="nominativo"
-                     :email="email"
-                     :resetCampiInputDopoInvioForm="false"
-                     :ripristinaValoriProp = "ripristinaValoriProperty"
-                     :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer_onSubmit"
-                     :csrfToken="csrfToken_wrapper"
-                     @submit="flag_inviaDatiForm = true"
-                     @ripristina-valori-prop="ripristinaValoriProperty = false"
-                     @dati-form-inviati="formModificaAttoreInviato($event)"
-                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
-      <input type="file" :name="LOGO_INPUT_FIELD_NAME"         v-if="mostrareInputFilePerModificaLogoUploader()" >
-      <input type="submit" value="Modifica informazioni"       v-if="! isConsumerAttualmenteAutenticato()">
-      <button @click.prevent="eliminaAttore()"                 v-if="! isConsumerAttualmenteAutenticato()">Elimina</button>
-      <button @click.prevent="ripristinaValoriProperty = true" v-if="! isConsumerAttualmenteAutenticato()">Annulla tutte le modifiche</button>
-    </FormCampiAttore>
+    <div :id="idHtmlContenitoreFormModificaAttore">
+      <FormCampiAttore :flag_mostrareLabelCampiInput="true"
+                       :urlInvioFormTramitePost="urlModificaInfoAttore"
+                       :flag_inviaDatiForm="flag_inviaDatiForm"
+                       :isQuestoFormRiferitoAConsumer="isQuestaSchedaRiferitaAdUnConsumer"
+                       :username_readOnly="true"
+                       :tuttiICampi_readOnly="isConsumerAttualmenteAutenticato()"
+                       :username="isConsumerAttualmenteAutenticato() ? null : username"
+                       :nominativo="nominativo"
+                       :email="email"
+                       :resetCampiInputDopoInvioForm="false"
+                       :ripristinaValoriProp = "ripristinaValoriProperty"
+                       :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer_onSubmit"
+                       :csrfToken="csrfToken_wrapper"
+                       @submit="flag_inviaDatiForm = true"
+                       @ripristina-valori-prop="ripristinaValoriProperty = false"
+                       @dati-form-inviati="formModificaAttoreInviato($event)"
+                       @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
+
+        <input type="file" :name="LOGO_INPUT_FIELD_NAME"
+               v-if="mostrareInputFilePerModificaLogoUploader()" ><!-- TODO : testare la modifica del logo -->
+
+        <button @click="document.querySelector('#' + idHtmlContenitoreFormModificaAttore + ' form').submit"
+                v-if="! isConsumerAttualmenteAutenticato()">
+          <!-- Fonte icona: https://icons.getbootstrap.com/icons/pen/ --><!-- TODO : icone da aggiungere via CSS -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+            <path d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+          </svg>
+          Modifica utente
+        </button>
+
+        <button @click.prevent="eliminaAttore()"
+                v-if="! isConsumerAttualmenteAutenticato()">
+          <!-- Fonte icona: https://icons.getbootstrap.com/icons/x-circle/ --><!-- TODO : icone da aggiungere via CSS -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+          Elimina utente
+        </button>
+
+        <button @click.prevent="ripristinaValoriProperty = true"
+                v-if="! isConsumerAttualmenteAutenticato()">
+          <!-- Fonte icona: https://icons.getbootstrap.com/icons/arrow-counterclockwise/ --><!-- TODO : icone da aggiungere via CSS -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+          </svg>
+          Annulla modifiche
+        </button>
+
+      </FormCampiAttore>
+    </div>
   </section>
 
   <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
@@ -41,6 +75,9 @@
                                             @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
   <TabellaDocumenti v-if="isConsumerAttualmenteAutenticato()"
+                    :urlRichiestaElencoDocumentiPerUnAttore=
+                        "urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader"
+                    :urlDownloadDocumento="urlDownloadDocumentoPerConsumer"
                     :csrfToken="csrfToken_wrapper"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
@@ -55,10 +92,10 @@
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
 import {generaIdUnivoco} from "../../utils/utilitaGenerale";
-import {richiestaDelete} from "../../utils/http";
+import {richiestaDelete, richiestaGet} from "../../utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
-import TabellaDocumenti from "../../views/areaRiservata/listaDocumenti/TabellaDocumenti";
+import TabellaDocumenti from "./TabellaDocumenti";
 export default {
 name: "SchedaDiUnAttore",
   components: {TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
@@ -98,19 +135,43 @@ name: "SchedaDiUnAttore",
       // Proprietà ottenute da Vue Router caricate durante created()
       /** Identificativo dell'attore a cui questa scheda si riferisce.*/
       idAttoreCuiQuestaSchedaSiRiferisce: "",
+
       /** Oggetto con le proprietà dell'attore a cui questa scheda si riferisce.*/
       proprietaAttoreCuiQuestaSchedaSiRiferisce: {},
 
-      /** Flag: true se l'utente attualmente autenticato può modificare
+
+
+
+
+      /** Immagine logo (se l'attore rappresentato da questa scheda ne
+       * ha uno) codificato in Base64.*/
+      logoBase64_dataUrl: "",                                       // inizializzata in created()
+
+      /** URL per la richiesta dell'elenco dei documenti destinati al Consumer
+       * attualmente autenticato e caricati dall'Uploader di cui si sta caricando
+       * la scheda.*/
+      urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader: "", // inizializzata in created()
+
+      /** URL per la richiesta del download di uno specifico documento.
+       * Richiesta di download gestita dal componente che si occupa
+       * della visualizzazione dei documenti.*/
+      urlDownloadDocumentoPerConsumer:
+        process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO___RICHIESTA_DA_CONSUMER,
+
+    /** Flag: true se l'utente attualmente autenticato può modificare
        * le informazioni di un attore mostrate da questo componente.*/
       utenteAutenticatoPuoModificareInfoAttore: ! this.isConsumerAttualmenteAutenticato(),
 
       /** ID html di questo componente.*/
-      idQuestoComponente: "schedaAttore-" + generaIdUnivoco(),
+      idHtmlQuestoComponente: "schedaAttore-" + generaIdUnivoco(),
 
       /** Flag: true se questa scheda si riferisce ad un Consumer.*/
       isQuestaSchedaRiferitaAdUnConsumer: this.isUploaderAttualmenteAutenticato(), // Se è un Uploader a visualizzare,
                                                                 // allora sta guardando la scheda di un Consumer
+
+      /** Flag: true se questa scheda si riferisce ad un Uploader.*/
+      isQuestaSchedaRiferitaAdUnUploader: this.tipiAttoreCuiQuestoElencoSiRiferisce ===
+                                            process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
 
       /** Nome del campo di input per caricare il nuovo logo di un Uploader.*/
       LOGO_INPUT_FIELD_NAME: process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME,
@@ -118,8 +179,8 @@ name: "SchedaDiUnAttore",
       /** Url a cui i dati del form devono essere inviati
        * per la modifica delle informazioni di un attore.*/
       urlModificaInfoAttore: this.isUploaderAttualmenteAutenticato() ?  // url e permessi diversi in base a chi chiede la modifica
-                             process.env.VUE_APP_URL_MODIFICA_CONSUMER_RICHIESTA_DA_UPLOADER :
-                             process.env.VUE_APP_URL_MODIFICA_ATTORE_RICHIESTA_DA_ADMIN,
+                             process.env.VUE_APP_URL_MODIFICA_CONSUMER__RICHIESTA_DA_UPLOADER :
+                             process.env.VUE_APP_URL_MODIFICA_ATTORE__RICHIESTA_DA_ADMIN,
 
       /** Oggetto coi dati aggiuntivi da inviare al server insieme al
        * form quando si clicca submit.*/
@@ -138,13 +199,20 @@ name: "SchedaDiUnAttore",
       ripristinaValoriProperty: false,
 
       // Valori da mostrare (impostati da created)
+      /** Username dell'attore a cui si riferisce questa scheda.*/
       username  : "",
+      /** Nominativo dell'attore a cui si riferisce questa scheda.*/
       nominativo: "",
+      /** email dell'attore a cui si riferisce questa scheda.*/
       email     : "",
 
 
       // Wrapper
       csrfToken_wrapper: this.csrfToken,
+
+      /** Valore per l'attributo id del contenitore del form per
+       * la modifica di un attore.*/
+      idHtmlContenitoreFormModificaAttore: generaIdUnivoco(),
 
     }
   },
@@ -159,8 +227,22 @@ name: "SchedaDiUnAttore",
     caricaQuestoComponente() {
 
       // Caricamento proprietà da Vue-Router
-      this.idAttoreCuiQuestaSchedaSiRiferisce        = this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
-      this.proprietaAttoreCuiQuestaSchedaSiRiferisce = JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
+      this.idAttoreCuiQuestaSchedaSiRiferisce =
+          this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
+
+      this.proprietaAttoreCuiQuestaSchedaSiRiferisce =
+          JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
+
+      richiestaGet( process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce )
+        .then( immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl )
+        .catch( console.error );
+
+      this.logoBase64_dataUrl =
+          this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
+
+      this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
+          process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
+          "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
 
       this.datiAggiuntiviDaInviareAlServer_onSubmit = {
         /** Identificativo dell'attore a cui si riferisce questa scheda.*/
@@ -218,8 +300,8 @@ name: "SchedaDiUnAttore",
     /** Richiede al server l'eliminazione di un attore.*/
     eliminaAttore() {
       const urlEliminazioneAttore = ( this.isUploaderAttualmenteAutenticato() ?
-              process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER  :
-              process.env.VUE_APP_URL_DELETE_ATTORE ) +
+              process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
+              process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) +
           "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
 
       const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};

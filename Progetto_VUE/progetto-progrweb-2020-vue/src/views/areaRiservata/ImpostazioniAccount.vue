@@ -211,7 +211,7 @@ export default {
                     alert("Modifiche salvate!");
                   })
                   .catch(errore => {
-                    alert("Si è verificato un errore durante l'aggiornamento delle informazioni.");
+                    alert("Si è verificato un errore durante l'aggiornamento delle informazioni. " + errore.data );
                     console.error(errore);
                   })
 

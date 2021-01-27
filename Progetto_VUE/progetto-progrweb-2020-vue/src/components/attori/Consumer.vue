@@ -82,7 +82,7 @@ export default {
       /** Identificativo del consumer di cui si vogliono visualizzare i documenti.*/
       vueRouter_idUploader: process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
       /** Nome del consumer di cui si vogliono visualizzare i documenti.*/
-      vueRouter_logoUploader: process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER
+      vueRouter_logoUploader: process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_ATTORE
 
     }
   },
@@ -131,7 +131,7 @@ export default {
  * Se la richiesta va a buon fine, tale mappa viene restituita come
  * valore di una promise risolta.*/
 const getIdentificativi_uploader_file = async () => {
-  return richiestaGet(process.env.VUE_APP_URL_GET_MAPPA_FILE_PER_QUESTO_CONSUMER)
+  return richiestaGet(process.env.VUE_APP_URL_GET_MAPPA__UPLOADER_DOCUMENTI__PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER)
       .then(  risposta       =>  new Map(Object.entries(risposta)) )
       .catch( rispostaErrore => {
         console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );

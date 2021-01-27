@@ -19,8 +19,7 @@
             [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1])
               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
           }
-        }"
-                     >
+        }">
           {{ attore[1][NOME_PROP_NOMINATIVO] }}
         </router-link>
       </li>
@@ -65,7 +64,11 @@ export default {
       // Parametri Vue-Router
       /** Nome della route che conduce alla scheda di un attore.*/
       NOME_ROUTE_SCHEDA_ATTORE:           process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
+      /** Nome del parametro nella route contenente l'identificativo dell'attore
+       * di cui si vedrà la scheda a seguito dell'inoltro nella route.*/
       NOME_PARAM_ID_ATTORE_router:        process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE,
+      /** Nome del parametro nella route contenente l'oggetto con le proprietà
+       *  dell'attore di cui si vedrà la scheda a seguito dell'inoltro nella route.*/
       NOME_PARAM_PROPRIETA_ATTORE_router: process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE,
 
       // Wrapper
@@ -130,9 +133,9 @@ const getElencoAttori = async tipoAttoreAttualmenteAutenticato => {
   const urlRichiesta = tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ?
                         process.env.VUE_APP_URL_GET_ELENCO_UPLOADER_PER_QUESTO_ADMINISTRATOR :  // TODO : amministratore deve poter cercare sia Uploader sia Administrator
                         ( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ?
-                           process.env.VUE_APP_URL_GET_ELENCO_CONSUMER_PER_QUESTO_UPLOADER :
+                           process.env.VUE_APP_URL_GET_ELENCO_CONSUMER__RICHIESTA_DA_UPLOADER :
                                 ( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ?
-                                   process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER : "" )
+                                   process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER : "" )
                         );
 
 
@@ -154,7 +157,7 @@ const getInfoAttore = async (idAttore, tipoAttoreAttualmenteAutenticato) => {// 
   let urlRichiesta = tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ?
                       process.env.VUE_APP_URL_GET_INFO_UPLOADER :
                       (tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ?
-                              process.env.VUE_APP_URL_GET_INFO_CONSUMER :
+                              process.env.VUE_APP_URL_GET_INFO_CONSUMER__RICHIESTA_DA_UPLOADER :
                               (tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ?
                                   process.env.VUE_APP_URL_GET_INFO_UPLOADER : "")
                       );

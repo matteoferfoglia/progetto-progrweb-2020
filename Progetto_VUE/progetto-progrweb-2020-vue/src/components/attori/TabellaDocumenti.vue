@@ -19,18 +19,31 @@
       <tr v-for="(documento, indice) in Object.fromEntries(mappaDocumentiPerUnConsumer.get())"
           :key="indice"><!-- Ogni riga è un documento -->
         <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
-                                                                                   nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
+                                                                                     nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
             :key="propertyQuestaColonna" >
           {{ documento[propertyQuestaColonna] }}
         </td>
-        <td v-if="NOME_PROP_LINK_DOWNLOAD_DOCUMENTO">
+        <td v-if="urlDownloadDocumento">
           <a :href=documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO]
              download
-             @click.prevent="scaricaDocumento(documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO], documento[NOME_PROP_NOME_DOCUMENTO])">Download</a> <!-- Link download documento -->
+             @click.prevent="scaricaDocumento(documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO],
+                                              documento[NOME_PROP_NOME_DOCUMENTO])">
+            <!-- Link download, Fonte icona: https://icons.getbootstrap.com/icons/cloud-download/ --><!-- TODO : icone da aggiungere via CSS -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
+              <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
+              <path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/>
+            </svg>
+          </a>
         </td>
-        <td v-if="NOME_PROP_LINK_DELETE_DOCUMENTO">
+        <td v-if="urlEliminazioneDocumento">
           <a :href="documento[NOME_PROP_LINK_DELETE_DOCUMENTO]"
-             @click.prevent="eliminaDocumento(documento[NOME_PROP_LINK_DELETE_DOCUMENTO])">Elimina</a> <!-- Link eliminazione documento -->
+             @click.prevent="eliminaDocumento(documento[NOME_PROP_LINK_DELETE_DOCUMENTO])">
+            <!-- Link eliminazione, Fonte icona: https://icons.getbootstrap.com/icons/trash/  --><!-- TODO : icone da aggiungere via CSS -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+            </svg>
+          </a>
         </td>
       </tr>
       </tbody>
@@ -44,10 +57,10 @@
 </template>
 
 <script>
-import {camelCaseToHumanReadable} from "../../../utils/utilitaGenerale";
-import {richiestaDelete, richiestaGet} from "../../../utils/http";
-import {MappaDocumenti, ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../../utils/documenti";
-import FormConCsrfToken from "../../../components/layout/FormConCsrfToken";
+import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
+import {richiestaDelete, richiestaGet} from "../../utils/http";
+import {MappaDocumenti, ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti} from "../../utils/documenti";
+import FormConCsrfToken from "../layout/FormConCsrfToken";
 export default {
   name: "TabellaDocumenti",
   components: {FormConCsrfToken},
@@ -62,17 +75,16 @@ export default {
   ],
   props: [
 
-    /** Identificativo dell'attore associato con questi documenti: se è un
-     * Uploader che li sta visualizzando, allora questo identificativo è
-     * quello del Consumer a cui i documenti sono destinati, viceversa,
-     * se è un Consumer a visualizzare, questo identificativo è quello del-
-     * l'Uploader che li ha caricati.*/
-    "idAttoreRiferimentoDocumenti",
+    /** URL verso cui richiedere l'elenco dei documenti per un attore.*/
+    "urlRichiestaElencoDocumentiPerUnAttore",
 
-    /** Flag: true se l'utente che sta visualizzando questa lista può
-     * eliminare un documento dalla lista. Se non specificato, si assume
-     * che l'utente <strong>non</strong> non possa eliminare documenti.*/
-    "puoEliminareUnDocumento",
+    /** URL verso cui richiedere il download di un documento.*/
+    "urlDownloadDocumento",
+
+    /** URL verso cui richiedere la cancellazione di un documento.
+     * Se questa prop non è specificata, si assume che l'utente
+     * <strong>non</strong> possa eliminare documenti.*/
+    "urlEliminazioneDocumento",
 
     /** Nuovo documento da aggiungere alla lista. Vedere descrizione
      * nel componente padre. Quando cambia stato ed è definito, il
@@ -102,11 +114,11 @@ export default {
 
       /** In un documento, il nome della property (se presente)
        * il cui valore è un link di download di quel documento.*/
-      NOME_PROP_LINK_DOWNLOAD_DOCUMENTO: "Link download",
+      NOME_PROP_LINK_DOWNLOAD_DOCUMENTO: "Download",
 
       /** In un documento, il nome della property (se presente)
        * il cui valore è un link di eliminazione di quel documento.*/
-      NOME_PROP_LINK_DELETE_DOCUMENTO: "Link eliminazione",
+      NOME_PROP_LINK_DELETE_DOCUMENTO: "Elimina",
 
       /** In un documento, il nome della property (se presente)
        * il cui valore è il nome di quel documento.*/
@@ -124,9 +136,8 @@ export default {
 
     // TODO : aggiungere un "loader" (flag layoutCaricato)
 
-    // Richiede mappa idFile-propFile per questo consumer
-    richiestaGet( process.env.VUE_APP_URL_GET_MAPPA_FILE_DI_UPLOADER_PER_CONSUMER +
-                    "/" + this.idAttoreRiferimentoDocumenti )
+    // Richiede mappa idFile-propFile per questo attore
+    richiestaGet( this.urlRichiestaElencoDocumentiPerUnAttore )
         // Crea mappa
         .then( rispostaConMappaFile_id_prop => new Map(Object.entries( rispostaConMappaFile_id_prop ) ) )
         // Ordina mappa
@@ -157,7 +168,7 @@ export default {
         // documento (da creare dinamicamente), poi salva l'array
         .then( nomiPropDocumenti => {
           nomiPropDocumenti.push( this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO );
-          if( this.puoEliminareUnDocumento ) {
+          if( this.urlEliminazioneDocumento ) {
             nomiPropDocumenti.push( this.NOME_PROP_LINK_DELETE_DOCUMENTO )
           }
           this.nomiPropDocumenti = nomiPropDocumenti;
@@ -228,10 +239,10 @@ export default {
       const idDocumento = unDocumento[0];
       const propDocumento = unDocumento[1];
 
-      propDocumento[this.NOME_PROP_LINK_DELETE_DOCUMENTO] = process.env.VUE_APP_URL_DELETE_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+      propDocumento[this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO] = this.urlDownloadDocumento + "/" + idDocumento;
 
-      if( this.puoEliminareUnDocumento ) {
-        propDocumento[this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO] = process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO_DI_QUESTO_UPLOADER + "/" + idDocumento;
+      if( this.urlEliminazioneDocumento ) {
+        propDocumento[this.NOME_PROP_LINK_DELETE_DOCUMENTO] = this.urlEliminazioneDocumento + "/" + idDocumento;
       }
 
       return [idDocumento, propDocumento];

@@ -93,32 +93,6 @@ const routes = [
             // TODO : aggiungere controllo: prima di instradare verificare che ci siano le property e se non ci sono richiederle al server
             component: () => import('../components/attori/SchedaDiUnAttore'),
             props: true
-          },
-          {
-            // TODO : non credo che questa route serva: l'elenco dei documenti sta dentro la scheda di un attore !!
-            path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_UPLOADER + "/:" +
-                process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER,
-            name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
-            component: () => import('../components/attori/uploader/ListaDocumentiPerConsumerVistaDaUploader'),
-            meta: {
-              // TODO: require essere uploader
-              requiresIdConsumer: true,   // per sapere la lista di documenti destinata a quale consumer
-              requiresNomeConsumer: true, // per sapere il nome del consumer
-              requiresEssereUploader: true// TODO : a questa route ci si può accedere solo se si è un Uploader
-            }
-          },
-          {
-            // TODO : non credo che questa route serva: l'elenco dei documenti sta dentro la scheda di un attore !!
-            path: process.env.VUE_APP_ROUTER_PATH_LISTA_DOCUMENTI_VISTA_DA_CONSUMER + "/:" +
-                process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER,
-            name: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_CONSUMER,
-            component: () => import('../views/areaRiservata/listaDocumenti/ListaDocumentiVistaDaConsumer'),
-            meta: {
-              // TODO: require essere consumer
-              requiresIdUploader: true,   // per sapere la lista di documenti proveniente da quale Uploader
-              requiresLogoUploader: true, // logo Uploader
-              requiresEssereConsumer: true// TODO : a questa route ci si può accedere solo se si è un Consumer
-            }
           }
         ]
       }
@@ -165,13 +139,13 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                     process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER +
                     " mancante nella route.");
                 next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
-              } else if ( ! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) {
+              } else if ( ! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_ATTORE] ) {
                 // Se qui, nella route manca il logo dell'uploader
 
-                richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" +
+                richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" +
                     routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) // Richiede il logo dell'Uploader al server
                     .then( logoBase64 => {
-                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] = logoBase64 ;
+                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_ATTORE] = logoBase64 ;
                       next();
                     })
                     .catch( errore => {

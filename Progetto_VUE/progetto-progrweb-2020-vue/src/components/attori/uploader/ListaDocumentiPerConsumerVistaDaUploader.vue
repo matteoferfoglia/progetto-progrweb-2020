@@ -14,7 +14,9 @@
     <input type="submit" value="Carica">
   </FormConCsrfToken>
 
-  <TabellaDocumenti :idAttoreRiferimentoDocumenti="idConsumer"
+  <TabellaDocumenti :urlRichiestaElencoDocumentiPerUnAttore="urlRichiestaElencoDocumentiPerUnConsumer"
+                    :urlDownloadDocumento="urlDownloadDocumento"
+                    :urlEliminazioneDocumento="urlEliminazioneDocumento"
                     :oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere=
                         "oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato"
                     :puoEliminareUnDocumento="true"
@@ -26,7 +28,7 @@
 </template>
 
 <script>
-import TabellaDocumenti from "../../../views/areaRiservata/listaDocumenti/TabellaDocumenti";
+import TabellaDocumenti from "../TabellaDocumenti";
 import {richiestaPostConFile} from "../../../utils/http";
 import FormConCsrfToken from "../../layout/FormConCsrfToken";
 
@@ -59,6 +61,10 @@ export default {
       nomeParametro_idConsumerDestinatario:    "identificativoConsumerDestinatario",
       nomeParametro_listaHashtag:              "listaHashtag",
 
+      // URL GESTIONE DOCUMENTI
+      urlRichiestaElencoDocumentiPerUnConsumer: process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_UPLOADER + "/" + this.idConsumer,
+      urlDownloadDocumento:                     process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO__RICHIESTA_DA_UPLOADER,
+      urlEliminazioneDocumento:                 process.env.VUE_APP_URL_DELETE_DOCUMENTO__RICHIESTA_DA_UPLOADER,
 
       // PROPRIETA CARICAMENTO NUOVO DOCUMENTO:
       nomeDocumento: "",
@@ -113,7 +119,7 @@ export default {
       const formValido = documento && this.nomeDocumento;  // che siano truthy
 
       if( formValido )
-        richiestaPostConFile( process.env.VUE_APP_URL_POST_CARICA_DOCUMENTO_DI_QUESTO_UPLOADER, formData)
+        richiestaPostConFile( process.env.VUE_APP_URL_POST_CARICA_DOCUMENTO__RICHIESTA_DA_UPLOADER, formData)
           .then( oggetto_idDocumento_proprietaDocumento_documentoAppenaCaricato => {
             // Server restituisce una mappa avente per chiave l'id del file aggiunto
             //  e per valore l'oggetto con le properties del file: l'unica entry è
