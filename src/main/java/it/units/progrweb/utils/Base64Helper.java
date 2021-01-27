@@ -8,25 +8,38 @@ import java.util.Base64;
  */
 public class Base64Helper {
 
-    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
-    private static final Base64.Decoder base64Decoder = Base64.getUrlDecoder();
+    private static final Base64.Encoder BASE64_URLENCODER = Base64.getUrlEncoder();
+    private static final Base64.Decoder BASE64_URLDECODER = Base64.getUrlDecoder();
+    private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
+    private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 
-    public static String encodeToBase64UrlEncoded(String stringDaCodificare) {
+    public static String encodeToBase64UrlEncoded( String stringDaCodificare ) {
         if( stringDaCodificare == null )
             return "";
-        return encodeToBase64UrlEncoded(stringDaCodificare.getBytes(StandardCharsets.UTF_8));
+        return encodeToBase64UrlEncoded( stringDaCodificare.getBytes( StandardCharsets.UTF_8 ) );
     }
 
-    public static String encodeToBase64UrlEncoded(byte[] byteDaCodificare) {
+    public static String encodeToBase64UrlEncoded( byte[] byteDaCodificare ) {
         if( byteDaCodificare == null )
             return "";
-        return base64Encoder.withoutPadding()
-                .encodeToString(byteDaCodificare);
+        return BASE64_URLENCODER.withoutPadding().encodeToString( byteDaCodificare );
     }
 
-    public static String decodeFromBase64UrlEncodedToString(String stringDaDecodificare) {
+    public static String encodeToBase64_rfc2045_encoder( byte[] byteDaCodificare ) {
+        if( byteDaCodificare == null )
+            return "";
+        return BASE64_ENCODER.withoutPadding().encodeToString( byteDaCodificare );
+    }
+
+    public static String decodeFromBase64UrlEncodedToString( String stringDaDecodificare ) {
         if( stringDaDecodificare == null )
             return "";
-        return new String(base64Decoder.decode(stringDaDecodificare));
+        return new String( BASE64_URLDECODER.decode( stringDaDecodificare ) );
+    }
+
+    public static String decodeFromBase64_rfc2045_decoder( String stringDaDecodificare ) {
+        if( stringDaDecodificare == null )
+            return "";
+        return new String( BASE64_DECODER.decode( stringDaDecodificare ) );
     }
 }
