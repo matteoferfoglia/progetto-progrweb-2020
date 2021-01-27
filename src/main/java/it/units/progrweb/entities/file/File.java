@@ -216,8 +216,7 @@ public abstract class File {
 
                              nomeAttributiInQuestaClasseDaNonMostrare = new String[]{
                                      "identificativoFile",
-                                     "indirizzoIpVisualizzatore",
-                                     "dataEdOraDiVisualizzazione"
+                                     "indirizzoIpVisualizzatore"
                              };
 
                              Arrays.stream(nomeAttributiInQuestaClasseDaNonMostrare)
