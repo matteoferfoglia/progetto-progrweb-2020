@@ -85,25 +85,29 @@ export const aggiungiDocumentoAdIndiceHashtag =
 }
 
 /** Ordina la mappa dei documenti in base alla data di caricamento
- * e portando in testa quelli ancora non visualizzati..
+ * e portando in testa quelli ancora non visualizzati.
  * La mappa dei documenti deve avere come chiave l'identificativo del
  * documento nell'entry di quella chiave e come valore l'oggetto che
  * rappresenta il documento stesso.
  * Restituisce la mappa risultante come valore di una Promise risolta,
- * ammesso che la procedura vada a buon fine.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
-export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti = mappaDocumenti => {
+ * ammesso che la procedura vada a buon fine.
+ * @param mappaDocumenti La mappa dei documenti.
+ * @param nomePropDataVisualizzazione In un documento, è il nome della property
+ *                                con la data di visualizzazione di quel documento.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
+export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
+    (mappaDocumenti, nomePropDataVisualizzazione) => {
 
     return getNomePropertyDataCaricamentoDocumenti()
 
         // Ordina mappa in base alla data di caricamento ( Fonte: https://stackoverflow.com/a/50427905 )
         .then( nomePropertyDataCaricamento =>
-            mappaDocumenti = new Map([...mappaDocumenti]
-                .sort( (a,b) => a[1][nomePropertyDataCaricamento] < b[1][nomePropertyDataCaricamento] ? 1 : -1 ))
+            mappaDocumenti = new Map(
+                [...mappaDocumenti].sort( (a,b) =>
+                            a[1][nomePropertyDataCaricamento] < b[1][nomePropertyDataCaricamento] ? 1 : -1 )
+            )
         )
 
-        // Crea l'array con l'id dei documenti non ancora visualizzati
-        .then( getNomePropertyDataVisualizzazioneDocumenti )
-        .then( nomePropDataVisualizzazione =>
+        .then( () =>
             Array.from(   mappaDocumenti.entries() )
                  .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] == null ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
                  .map(    entryDocumento => entryDocumento[0] )                                      // salva l'id dei documenti risultanti dal filtraggio
@@ -152,7 +156,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
  * quel documento da parte del Consumer.
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyDataVisualizzazioneDocumenti = async () => {
+export const getNomePropertyDataVisualizzazioneDocumenti = async () => {
 
     return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTI)
         .then(  risposta       => risposta )
@@ -223,5 +227,16 @@ export class MappaDocumenti{
     delete( chiave ) {
         return this.get().delete( chiave );
     }
+
+    /** Restituisce il valore corrispondente alla chiave passata come parametro.
+     * <strong>Non</strong> restituisce un clone del valore, quindi, se il
+     * valore è un oggetto, è possibile modificarlo e tali modifiche saranno
+     * riflesse direttamente nella mappa.
+     * @return L'elemento nella mappa associato con la chiave data, oppure
+     *         undefined se la chiave non viene trovata.*/
+    getDaChiave(chiave ) {
+        return this.get().get(chiave);
+    }
+
 
 }

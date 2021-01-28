@@ -18,6 +18,8 @@ import java.io.IOException;
 /**
  * Classe che espone i servizi relativi al {@link Resoconto} da mostrare
  * ad un {@link Administrator}, come da specifiche.
+ * Nel {@link Resoconto} vengono conteggiati anche i documenti eliminati
+ * dagli {@link Uploader}.
  * @author Matteo Ferfoglia
  */
 @Path("/administrator/resocontoUploader")

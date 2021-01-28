@@ -51,8 +51,7 @@
         <td v-if="urlDownloadDocumento">
           <a :href=documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO]
              download
-             @click.prevent="scaricaDocumento(documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO],
-                                              documento[NOME_PROP_NOME_DOCUMENTO])">
+             @click.prevent="scaricaDocumento(documento)">
             <!-- Link download, Fonte icona: https://icons.getbootstrap.com/icons/cloud-download/ --><!-- TODO : icone da aggiungere via CSS -->
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
               <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
@@ -62,7 +61,7 @@
         </td>
         <td v-if="urlEliminazioneDocumento">
           <a :href="documento[NOME_PROP_LINK_DELETE_DOCUMENTO]"
-             @click.prevent="eliminaDocumento(documento[NOME_PROP_LINK_DELETE_DOCUMENTO])">
+             @click.prevent="eliminaDocumento(documento)">
             <!-- Link eliminazione, Fonte icona: https://icons.getbootstrap.com/icons/trash/  --><!-- TODO : icone da aggiungere via CSS -->
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
@@ -95,6 +94,7 @@ import {richiestaDelete, richiestaGet} from "../../utils/http";
 import {
   aggiungiDocumentoAdIndiceHashtag,
   creaIndiceDeiFileRispettoAgliHashtagCheContengono,
+  getNomePropertyDataVisualizzazioneDocumenti,
   MappaDocumenti,
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
 } from "../../utils/documenti";
@@ -132,6 +132,9 @@ export default {
 
     /** Nome del Consumer a cui questi documenti si riferiscono.*/
     "nomeConsumer",
+
+    /** Tipo attore attualmente autenticato.*/
+    "tipoAttoreAutenticato",
 
     /** Token CSRF ricevuto dal padre.*/
     "csrfToken"
@@ -181,6 +184,10 @@ export default {
        * è la lista di hashtag di quel documento.*/
       NOME_PROP_LISTA_HASHTAG_DOCUMENTO: undefined,
 
+      /** In un documento, è il nome della property il cui valore
+       * è la data di visualizzazione di quel documento.*/
+      NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO: undefined,
+
       /** "Import" della funzione per usarla nel template.*/
       camelCaseToHumanReadable: camelCaseToHumanReadable,
 
@@ -195,8 +202,12 @@ export default {
 
     const caricamentoComponente = async () => {
 
-          // Richiede mappa idFile-propFile per questo attore
-      await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore)
+              // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
+      await getNomePropertyDataVisualizzazioneDocumenti()
+              .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
+
+              // Richiede mappa idFile-propFile per questo attore
+              .then( () => richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) )
 
               // Crea l'indice degli hashtag
               .then(rispostaConMappaFile_id_prop => {
@@ -212,7 +223,8 @@ export default {
               // Crea mappa
               .then(rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)))
               // Ordina mappa
-              .then(ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti)
+              .then( mappa => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( mappa,
+                                              this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO ))
 
               // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
               .then(mappa =>
@@ -234,7 +246,6 @@ export default {
       await richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
               .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
               .catch(console.error);
-
 
       // Richiede l'elenco dei nomi delle properties dei documenti
       await richiestaGet(process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
@@ -308,14 +319,12 @@ export default {
     /** Funzione per eliminare un documento dall'elenco attualmente mostrato,
      * a seguito della richiesta di eliminazione da parte dell'utente.
      * Questo metodo <strong>non</strong> richiede al server l'eliminazione
-     * d tale documento*/
-    rimuoviDocumentoDaListaAttualmenteMostrata(urlEliminazioneDocumento) {
-
-      // Id del documento appeso in fondo all'url
-      const idDocumentoEliminato = urlEliminazioneDocumento
-          .substring(urlEliminazioneDocumento.lastIndexOf("/")+1);
+     * d tale documento.
+     * @param idDocumentoEliminato Identificativo del documento da eliminare.*/
+    rimuoviDocumentoDaListaAttualmenteMostrata(idDocumentoEliminato) {
 
       this.mappaDocumenti.delete(idDocumentoEliminato);
+      this.mappaDocumentiDaMostrare.delete(idDocumentoEliminato); // TODO : creare una specie di proxy, in modo che la mappa dei documenti da mostrare sia un sottoinsieme di tutti i documenti, senza fare le stesse operazioni su entrambe le variabili
 
       // Ricrea indice degli hashtag
       this.mappa_hashtag_idDocumenti =
@@ -330,9 +339,16 @@ export default {
     },
 
     /** Metodo per il download di un documento (dipende dall'URL)
-     * (<a href="https://stackoverflow.com/q/33247716">Fonte</a>).*/
-    scaricaDocumento( urlDocumento, nomeDocumento ) {
-      richiestaGet( urlDocumento )
+     * (<a href="https://stackoverflow.com/q/33247716">Fonte</a>).
+     * @param documento Documento da scaricare.*/
+    scaricaDocumento( documento ) {
+
+      const nomeDocumento = documento[this.NOME_PROP_NOME_DOCUMENTO];
+      const urlDownloadDocumento = documento[this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO];
+
+      const idDocumento = this.getIdDocumentoDaUrlDownloadEliminazione( urlDownloadDocumento );
+
+      richiestaGet( urlDownloadDocumento )
         .then( risposta => {
           const blob = new Blob( [risposta], {type: "octet/stream"} );
 
@@ -347,18 +363,49 @@ export default {
 
         })
         .catch( console.error );
+
+      if( this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
+        // Se un consumer ha scaricato il documento, si aggiorna la vista per mostrare la data/ora
+        // (richiesta al server per conformità nel formato scelto dal server) a meno che tale
+        // data/ora non sia già scritta (perché il documento era già stato visualizzato)
+
+        if( ! documento[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] ) {
+          richiestaGet(process.env.VUE_APP_URL_GET_DATAORA_VISUALIZZAZIONE_DOCUMENTO + '/' + idDocumento)
+              .then(dataOraVisualizzazione => {
+                // TODO : trovare soluzione in MappaDocumenti per evitare questa duplicazione di codice
+                this.mappaDocumenti.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
+                    dataOraVisualizzazione;
+                this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
+                    dataOraVisualizzazione;
+              })
+              .catch(console.error);
+        }
+      }
     },
 
-    /** Metodo per la cancellazione di un documento (dipende dall'URL).*/
-    eliminaDocumento( urlEliminazioneDocumento ) {
+    /** Metodo per la cancellazione di un documento (dipende dall'URL).
+     * @param documento Documento da eliminare.*/
+    eliminaDocumento( documento ) {
+
+      const urlEliminazioneDocumento = documento[this.NOME_PROP_LINK_DELETE_DOCUMENTO];
+
+      // Id del documento appeso in fondo all'url
+      const idDocumentoEliminato = this.getIdDocumentoDaUrlDownloadEliminazione(urlEliminazioneDocumento);
+
       richiestaDelete( urlEliminazioneDocumento, {
         [process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken_wrapper
       })
           .then( () => {
-            this.rimuoviDocumentoDaListaAttualmenteMostrata(urlEliminazioneDocumento);
+            this.rimuoviDocumentoDaListaAttualmenteMostrata(idDocumentoEliminato);
             alert("Documento eliminato");
           })
           .catch( console.error );
+
+    },
+
+    /** Dato l'url di download o eliminazione di un documento, ne restituisce l'url.*/
+    getIdDocumentoDaUrlDownloadEliminazione( url ) {
+      return url.substring( url.lastIndexOf("/") + 1 );
     },
 
     /** Data un'entry della mappa restituita dal server quando

@@ -17,6 +17,7 @@
   <TabellaDocumenti :urlRichiestaElencoDocumentiPerUnAttore="urlRichiestaElencoDocumentiPerUnConsumer"
                     :urlDownloadDocumento="urlDownloadDocumento"
                     :urlEliminazioneDocumento="urlEliminazioneDocumento"
+                    :tipoAttoreAutenticato="tipoAttore_uploader"
                     :oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere=
                         "oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato"
                     :csrfToken="csrfToken_wrapper"
@@ -64,6 +65,9 @@ export default {
       urlRichiestaElencoDocumentiPerUnConsumer: process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_UPLOADER + "/" + this.idConsumer,
       urlDownloadDocumento:                     process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO__RICHIESTA_DA_UPLOADER,
       urlEliminazioneDocumento:                 process.env.VUE_APP_URL_DELETE_DOCUMENTO__RICHIESTA_DA_UPLOADER,
+
+      // Copia da variabile d'ambiente
+      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
 
       // PROPRIETA CARICAMENTO NUOVO DOCUMENTO:
       nomeDocumento: "",

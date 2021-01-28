@@ -62,8 +62,25 @@ public abstract class File {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
     }
 
+    /** Dato l'identificativo di un'istanza di questa classe, restituisce la data
+     * e l'ora di visualizzazione.
+     * @throws NotFoundException Se il {@link File} non si trova.*/
+    public static String getDataOraVisualizzazione(Long identificativoFile)
+            throws NotFoundException{
+
+        return DateTime.convertiInString(
+                    File.getEntitaDaDbById( identificativoFile )
+                        .getDataEdOraDiVisualizzazione()
+                );
+
+
+    }
+
+    /** Restituisce true se il file è stato eliminato, false altrimenti.*/
+    abstract public boolean isEliminato();
+
     public DateTime getDataEdOraDiCaricamento() {
-        return DateTime.convertiDaString( dataEdOraDiCaricamento );
+        return DateTime.convertiDaString( dataEdOraDiCaricamento );     // TODo : vedere in DateTime un metodo di conversione che fornisce un output più carino
     }
 
     protected void setNomeDocumento(String nomeDocumento) {
@@ -285,7 +302,7 @@ public abstract class File {
 
             if( relazioneFileAttore != null ) {
 
-                File file = File.getEntitaDaDbById(identificativoFile);
+                File file = File.getEntitaDaDbById(identificativoFile); // TODO : gestire il caso di file eliminato
                 InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
                 return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
                                .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
@@ -312,4 +329,7 @@ public abstract class File {
         return fileStorage;
 
     }
+
+    /** Rimuove il contenuto di un file.*/
+    public abstract boolean elimina();
 }

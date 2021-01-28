@@ -59,7 +59,7 @@ public abstract class DatabaseHelper {
 
     /** Data una query ed i nomi degli attributi su cui eseguire la proiezione,
      * questo metodo esegue la query e restituisce la proiezione richiesta
-     * del risultato. Comunque viene restituita l'intera entità.*/ // TODO : indagare meglio sul funzionamento di questo metodo
+     * del risultato. Comunque viene restituita l'intera entità.*/ // TODO : indagare meglio sul funzionamento di questo metodo (IMPORTANTE!!)
     public static List<?> proiezione(Query<Object> query, String ...nomiAttributiProiettare ) {
         if( query!= null && nomiAttributiProiettare.length>0 )
             return query.project( nomiAttributiProiettare ).distinct(true).list();
@@ -247,12 +247,23 @@ public abstract class DatabaseHelper {
 
     }
 
-    /** Crea e restituisce una Query, date due condizioni poste in AND.*/
+    /** Crea e restituisce una Query, date due condizioni poste in AND.*/   // TODO : da rivedere ed eventuale refactoring
     public static<Attributo> Query<?> creaERestituisciQueryAnd(Class classeEntita,
                                                     String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                                     String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
         return creaERestituisciQuery(classeEntita, nomeAttributo1, operatoreCondizione1, valoreCondizione1)
                 .filter(nomeAttributo2+operatoreCondizione2.operatore, valoreCondizione2);
+    }
+
+    /** Crea e restituisce una Query, date due condizioni poste in AND.*/
+    public static<Attributo> Query<?> creaERestituisciQueryAnd(Class classeEntita,
+                                                               String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                                               String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
+                                                               String nomeAttributo3,OperatoreQuery operatoreCondizione3, Attributo valoreCondizione3) {
+        return creaERestituisciQueryAnd( classeEntita,
+                                         nomeAttributo1, operatoreCondizione1, valoreCondizione1,
+                                         nomeAttributo2, operatoreCondizione2, valoreCondizione2 )
+                .filter(nomeAttributo3+operatoreCondizione3.operatore, valoreCondizione3);
     }
 
 

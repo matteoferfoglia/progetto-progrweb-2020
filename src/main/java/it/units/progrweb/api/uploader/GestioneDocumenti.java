@@ -4,7 +4,6 @@ import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
-import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
@@ -54,18 +53,13 @@ public class GestioneDocumenti {
                                 @Context HttpServletRequest httpServletRequest) {
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
-        try {
 
-            if( RelazioneUploaderConsumerFile.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
-                return Response
-                        .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                        .entity("File " + idFileDaEliminare + " eliminato")    // TODO : var ambiene con messaggi errore
-                        .build();
-            else return Autenticazione.creaResponseForbidden("Non autorizzato a cancellare il file.");
-
-        } catch (NotFoundException notFoundException) {
-            return NotFoundException.creaResponseNotFound("File " + idFileDaEliminare + " non trovato.");
-        }
+        if( RelazioneUploaderConsumerFile.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
+            return Response
+                    .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
+                    .entity("File " + idFileDaEliminare + " eliminato")    // TODO : var ambiene con messaggi errore
+                    .build();
+        else return Autenticazione.creaResponseForbidden("Non autorizzato a cancellare il file.");
 
     }
 
@@ -95,34 +89,41 @@ public class GestioneDocumenti {
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
 
-        List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+        if( contenuto != null && dettagliFile != null ) {
+            List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
+            Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
-        String estensioneFile = UtilitaGenerale.getEstensioneDaNomeFile(dettagliFile.getFileName());
+            String estensioneFile = UtilitaGenerale.getEstensioneDaNomeFile(dettagliFile.getFileName());
 
-        // Prima di caricare il file, verifica che il destinatario esista.
-        Consumer destinatario = Consumer.getAttoreDaIdentificativo( identificativoConsumerDestinatario );
-        if( destinatario != null ) {
+            // Prima di caricare il file, verifica che il destinatario esista.
+            Consumer destinatario = Consumer.getAttoreDaIdentificativo( identificativoConsumerDestinatario );
+            if( destinatario != null ) {
 
-            // Se qui, allora destinatario esiste
+                // Se qui, allora destinatario esiste
 
-            File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
-                    identificativoUploader, identificativoConsumerDestinatario );
+                File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
+                        identificativoUploader, identificativoConsumerDestinatario );
 
-            Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploader);
-            inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
+                Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploader);
+                inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
 
-            // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
-            Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
+                // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
+                Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
 
-            return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
+                return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
 
+            } else {
+
+                return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
+                        .entity( "Consumer " + identificativoConsumerDestinatario + " non trovato nel sistema." )
+                        .build();
+
+            }
         } else {
 
-            return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
-                           .entity( "Consumer " + identificativoConsumerDestinatario + " non trovato nel sistema." )
+            return Response.status( 422, "Unprocessable Entity" )
+                           .entity( "Caricare un file valido." )
                            .build();
-
         }
 
     }

@@ -1,7 +1,9 @@
 package it.units.progrweb.api.consumer;
 
+import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -9,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +65,37 @@ public class RichiestaDocumenti {
                                 @Context HttpServletRequest httpServletRequest) {
 
         return File.creaResponseConFile(identificativoFile, httpServletRequest, true);
+
+    }
+
+    /** Restituisce la data e l'ora di visualizzazione da parte del
+     * {@link Consumer} che ne fa richiesta del {@link File} il cui
+     * identificativo è specificato come @PathParam.
+     * Se l'attore che ha fatto richiesta non ha l'autorizzazione ad
+     * accedere al file, si considera che il file richieso non esista.
+     * @return la data e l'ora di visualizzazione richista (come stringa)
+     *          oppure una stringa vuota se il file non è stato trovato
+     *          o non è stato visualizzato.*/
+    @Path("/dataOraVisualizzazione/{identificativoFile}")
+    @GET
+    @Produces( MediaType.TEXT_PLAIN )
+    public String getDataOraVisualizzazioneFile( @PathParam("identificativoFile") Long identificativoFile,
+                                                 @Context HttpServletRequest httpServletRequest             ) {
+
+        Long identificatoreRichiedente = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+        try {
+
+            boolean isAutorizzato =
+                    null != RelazioneUploaderConsumerFile.attorePuoAccedereAFile( identificatoreRichiedente, identificativoFile );
+
+            if( !isAutorizzato )
+                return "";
+
+            return File.getDataOraVisualizzazione( identificativoFile );
+
+        } catch (NotFoundException notFoundException) {
+            return "";
+        }
 
     }
 

@@ -63,7 +63,12 @@ class LogoUploader implements Serializable {
     public void setLogo(byte[] immagineLogo_bytes, String estensioneFileContenenteLogo)
             throws IOException {
 
-        if( immagineLogo_bytes.length > DIMENSIONE_MASSIMA_LOGO_IN_BYTE ) {
+        if( immagineLogo_bytes == null ) {
+
+            this.logo = null;
+            this.estensioneFileContenenteLogo = "";
+
+        } else if( immagineLogo_bytes.length > DIMENSIONE_MASSIMA_LOGO_IN_BYTE ) {
             throw new IOException("La dimensione dell'immagine deve essere inferiore a " +
                     Math.ceil(DIMENSIONE_MASSIMA_LOGO_IN_BYTE / 1024.0) + " KB.");
         } else {

@@ -44,7 +44,11 @@ class ConsumerStorage extends Consumer {
 
         return occorrenzeTrovate.stream()
                                 .map( occorrenza -> {
-                                    try { return File.getEntitaDaDbById(occorrenza.getIdFile()); }
+                                    try {
+                                        File file = File.getEntitaDaDbById(occorrenza.getIdFile());
+                                        return file!=null && file.isEliminato() ? null : file;    // TODO : questa dovrebbe essere prerogativa della classe File di non mostrare ai Consumer quelli eliminati
+                                                // TODO : refactor per eliminare codice duplicato da RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer
+                                    }
                                     catch (NotFoundException notFoundException) { return null; }
                                 })
                                 .filter( Objects::nonNull )

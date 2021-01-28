@@ -155,6 +155,7 @@ export default {
       };
 
       richiestaElencoAttoriAlServer()
+
         .then( () => {
 
           if( this.isConsumerAttualmenteAutenticato() &&
@@ -168,6 +169,7 @@ export default {
             this.$router.push({
               name: this.NOME_ROUTE_SCHEDA_ATTORE,
               params: {
+                [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] : false,// vedere componente SchedaAttore
                 [this.NOME_PARAM_ID_ATTORE_router]       : entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
                 [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
                 // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
@@ -240,7 +242,7 @@ export default {
       }
     },
 
-    'tipoAttoreAutenticato': {
+    tipoAttoreAutenticato: {
       immediate: true,
       deep: true,
       handler: function(nuovoValore) {

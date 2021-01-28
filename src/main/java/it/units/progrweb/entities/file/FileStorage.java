@@ -10,7 +10,6 @@ import it.units.progrweb.utils.datetime.DateTime;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,18 +28,22 @@ class FileStorage extends File {
     /** Il file. */
     private byte[] file;   // byte[] automaticamente convertito in Blob nel datastore
 
+    /** Flag: true se il file è stato eliminato.*/
+    private boolean eliminato;
+
 
     private FileStorage(){}
 
     /** Crea un nuovo file, con nome ed hashtags specificati. */
     public FileStorage(String nomeDocumento, byte[] contenuto, List<String> hashtags) {
         super(nomeDocumento, DateTime.adesso());
-        this.file = contenuto;
+        this.file         = contenuto;
         this.listaHashtag = hashtags;
+        this.eliminato    = false;
     }
 
     public byte[] getFile() {
-        return file;
+        return file != null ? file : new byte[0];
     }
 
     /** Vedere {@link #getContenutoFile(File, String, boolean)}.*/
@@ -49,7 +52,8 @@ class FileStorage extends File {
                                         boolean salvaDatiVisualizzazione) {
 
         if( salvaDatiVisualizzazione && file.getDataEdOraDiVisualizzazione() == null ) {
-            // Si tiene traccia solo del primo accesso al file
+            // Si tiene traccia di data e ora solo del primo accesso al file
+
             file.setDataEdOraDiVisualizzazione( DateTime.adesso() );
             file.setIndirizzoIpVisualizzazione( indirizzoIpVisualizzazione );
             DatabaseHelper.salvaEntita( file );
@@ -59,24 +63,25 @@ class FileStorage extends File {
         return new ByteArrayInputStream(file.getFile());
     }
 
-    /** Elimina questo file dal database ed imposta tutti i suoi campi a null.
+    /** Elimina questo file dal database. Il file (inteso come bytes) viene
+     * eliminato, ma tutti gli attributi rimangono nel database.
      * @return true se la procedura va a buon fine, false altrimenti.*/
+    @Override
     public boolean elimina() {
         // TODO : da implementare e testare (pensare se meglio usare strategie diverse)
-        Field[] attributiDiQuestoOggetto = this.getClass().getDeclaredFields();
 
-        Arrays  .stream(attributiDiQuestoOggetto)
-                .forEach(attributo -> {
-                    attributo.setAccessible(true);
-                    try {
-                        attributo.set(this, null);
-                    } catch (IllegalAccessException exception) {
-                        Logger.scriviEccezioneNelLog(this.getClass(), exception);
-                    }
-                });
+        file      = null;
+        eliminato = true;
 
-        return true;    // todo : metodo da implementare
+        DatabaseHelper.salvaEntita(this);
 
+        return true;
+
+    }
+
+    @Override
+    public boolean isEliminato() {
+        return eliminato;
     }
 
     @Override
@@ -102,4 +107,5 @@ class FileStorage extends File {
     public List<String> getListaHashtag() {
         return listaHashtag;
     }
+
 }

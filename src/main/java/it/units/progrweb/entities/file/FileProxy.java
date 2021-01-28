@@ -30,6 +30,18 @@ public class FileProxy extends File {
         this.listaHashtag = fileStorage.getListaHashtag();
     }
 
+    /** L'istanza proxy restituisce sempre false.*/
+    @Override
+    public boolean isEliminato() {
+        return false;
+    }
+
+    /** L'istanza proxy restituisce sempre false.*/
+    @Override
+    public boolean elimina() {
+        return false;
+    }
+
     @Override
     public Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati){     // TODO : testare
         return rappresentazioneJson;

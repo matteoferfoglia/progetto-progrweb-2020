@@ -80,11 +80,20 @@
                     :urlRichiestaElencoDocumentiPerUnAttore=
                         "urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader"
                     :urlDownloadDocumento="urlDownloadDocumentoPerConsumer"
+                    :tipoAttoreAutenticato="tipoAttoreAutenticato"
                     :csrfToken="csrfToken_wrapper"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
 
-  <button @click="chiudiSchedaAttore">Chiudi</button>
+  <button @click="chiudiSchedaAttore"
+          v-if="mostrarePulsanteChiusuraQuestaSchedaAttore===true" >
+    <!-- Fonte (icona): https://icons.getbootstrap.com/icons/x-circle/ --><!-- TODO : mettere icona in CSS -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
+      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+    </svg>
+    Chiudi
+  </button>
 
 
 
@@ -138,6 +147,12 @@ name: "SchedaDiUnAttore",
       /** Oggetto con le proprietà dell'attore a cui questa scheda si riferisce.*/
       proprietaAttoreCuiQuestaSchedaSiRiferisce: {},
 
+      /** Flag: true se bisogna mostrare il pulsante per la chiusura della
+       * scheda dell'attore mostrata da questo componente. Dipende dai
+       * parametri ricevuti da Vue-Router. Inizializzata in created().*/
+      mostrarePulsanteChiusuraQuestaSchedaAttore: true,
+
+
       /** Indica il tipo di attore a cui si riferisce questa scheda.*/
       tipoAttoreCuiQuestaSchedaSiRiferisce: undefined,                     // inizializzata in created()
 
@@ -156,7 +171,7 @@ name: "SchedaDiUnAttore",
       urlDownloadDocumentoPerConsumer:
         process.env.VUE_APP_URL_DOWNLOAD_DOCUMENTO__RICHIESTA_DA_CONSUMER,
 
-    /** Flag: true se l'utente attualmente autenticato può modificare
+      /** Flag: true se l'utente attualmente autenticato può modificare
        * le informazioni di un attore mostrate da questo componente.*/
       utenteAutenticatoPuoModificareInfoAttore: ! this.isConsumerAttualmenteAutenticato(),
 
@@ -230,7 +245,17 @@ name: "SchedaDiUnAttore",
           this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
 
       this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
-                                                  process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER
+                                                  process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+
+      if( this.$route && this.$route.params &&  // controllare che sia definita
+          this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] ) {
+        this.mostrarePulsanteChiusuraQuestaSchedaAttore =
+            this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE];
+        this.mostrarePulsanteChiusuraQuestaSchedaAttore = this.mostrarePulsanteChiusuraQuestaSchedaAttore === undefined ?
+            true : this.mostrarePulsanteChiusuraQuestaSchedaAttore;
+      } else {
+        this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
+      }
 
       if( this.isQuestaSchedaRiferitaAdUnUploader ) {
         richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)

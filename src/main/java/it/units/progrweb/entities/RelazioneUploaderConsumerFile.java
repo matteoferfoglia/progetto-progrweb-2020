@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
 @Entity
 public class RelazioneUploaderConsumerFile {
 
+    // TODO : DEVE restare un'entità che rappresenti la relazione tra uploader e consumer
+    //          ma la maggior parte del codice in questa classe dovrebbe stare in FileStorage (=> fondere)
+
     @Id
     /** Identificativo per {@link File}.*/
     private Long idFile;
@@ -45,13 +48,22 @@ public class RelazioneUploaderConsumerFile {
     @Index
     private Long identificativoConsumer;
 
+    /** Flag: true se il file è stato eliminato.*/
+    @Index  // TODO : refactoring ! Follia indicizzare un flag che nemmeno dovrebbe essere qui (usato solo in isConsumerServitoDaUploader) => ristrutturare lo schema del DB
+    private boolean eliminato;  // TODO : questo c'è anche in FileStorage
+
     /** Dissocia il {@link Consumer} il cui identificativo è dato
      * dall'{link {@link Uploader}} il cui identificativo è dato.*/
     public static void dissociaConsumerDaUploader(Long identificativoConsumerDaDissociare, Long identificativoUploader) {
         List<RelazioneUploaderConsumerFile> occorrenzeDaEliminare =
                 getOccorrenzeFiltratePerUploaderEConsumer(identificativoUploader, identificativoConsumerDaDissociare);
 
-        DatabaseHelper.cancellaEntita(occorrenzeDaEliminare);
+        occorrenzeDaEliminare.stream()
+                             .forEach( occorrenzaDaEliminare -> {
+                                 // elimina tutte le occorrenze cosicché il consumer risulterà dissociato.
+                                 eliminaFileDiUploader(occorrenzaDaEliminare.idFile,
+                                                       occorrenzaDaEliminare.identificativoUploader);
+                             });
 
         // TODO : elimare la relazione tra consumer ed uploader
     }
@@ -61,7 +73,7 @@ public class RelazioneUploaderConsumerFile {
      * l'occorrenza di {@link RelazioneUploaderConsumerFile} corrispondente
      * al file cercato. Altrimenti restituisce null.
      * Se il file non esiste, genera un'eccezione {@link NotFoundException}.*/
-    public static RelazioneUploaderConsumerFile attorePuoAccedereAFile(Long identificativoAttoreDaHttpServletRequest,
+    public static RelazioneUploaderConsumerFile attorePuoAccedereAFile(Long identificativoAttore,
                                                                        Long identificativoFile)
             throws NotFoundException {
 
@@ -70,8 +82,8 @@ public class RelazioneUploaderConsumerFile {
         RelazioneUploaderConsumerFile relazioneUploaderConsumerFile = (RelazioneUploaderConsumerFile)
                     DatabaseHelper.getById(identificativoFile, RelazioneUploaderConsumerFile.class);
 
-        if ( relazioneUploaderConsumerFile.getIdentificativoConsumer().equals( identificativoAttoreDaHttpServletRequest )
-                || relazioneUploaderConsumerFile.getIdentificativoUploader().equals( identificativoAttoreDaHttpServletRequest ) )
+        if ( relazioneUploaderConsumerFile.getIdentificativoConsumer().equals( identificativoAttore )
+                || relazioneUploaderConsumerFile.getIdentificativoUploader().equals( identificativoAttore ) )
             return relazioneUploaderConsumerFile;
 
         else return null;
@@ -83,25 +95,49 @@ public class RelazioneUploaderConsumerFile {
      * identificativo è specificato nel parametro, elimina il file
      * e restituisce true. Altrimenti restituisce false e non elimina
      * il file.
-     * Se il file non esiste, genera un'eccezione {@link NotFoundException}.*/
-    public static boolean eliminaFileDiUploader(Long idFileDaEliminare, Long identificativoUploader)
-            throws NotFoundException {
+     * Se il file non esiste, resituisce false.*/
+    public static boolean eliminaFileDiUploader(Long idFileDaEliminare, Long identificativoUploader) {
 
         // TODO : verificare questo metodo
 
         RelazioneUploaderConsumerFile relazioneUploaderConsumerFile =
-                attorePuoAccedereAFile( identificativoUploader, idFileDaEliminare );
+                null;
+        try {
+            relazioneUploaderConsumerFile = attorePuoAccedereAFile( identificativoUploader, idFileDaEliminare );
 
-        if( relazioneUploaderConsumerFile != null ) {
+            if( relazioneUploaderConsumerFile != null ) {
 
-            DatabaseHelper.cancellaEntitaById(idFileDaEliminare, RelazioneUploaderConsumerFile.class);
-            DatabaseHelper.cancellaEntitaById(idFileDaEliminare, File.class);   // elimina a cascata anche il file
+                RelazioneUploaderConsumerFile relazioneConFileDaEliminare =
+                        RelazioneUploaderConsumerFile.getEntitaDaDbByID( idFileDaEliminare );
+                File fileDaEliminare = File.getEntitaDaDbById( idFileDaEliminare );
 
-            return true;
-        } else {
+                if( fileDaEliminare.elimina() ) {
+                    relazioneConFileDaEliminare.eliminato = true;
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } else {
+                return false;
+            }
+
+        } catch (NotFoundException notFoundException) {
             return false;
         }
 
+    }
+
+    /** Restituisce l'occorrenza di relazione associata al file il cui identificativo
+     * è fornito come parametro, oppure null se non viene trovata.*/
+    public static RelazioneUploaderConsumerFile getEntitaDaDbByID(Long idFile) {
+        try {
+            return (RelazioneUploaderConsumerFile)
+                    DatabaseHelper.getById( idFile, RelazioneUploaderConsumerFile.class );
+
+        } catch (NotFoundException notFoundException) {
+            return null;
+        }
     }
 
     public Long getIdentificativoUploader() {
@@ -121,7 +157,8 @@ public class RelazioneUploaderConsumerFile {
     private RelazioneUploaderConsumerFile( Long identificativoConsumer, Long identificativoUploader, Long idFile ) {
         this.identificativoConsumer = identificativoConsumer;
         this.identificativoUploader = identificativoUploader;
-        this.idFile = idFile;
+        this.idFile    = idFile;
+        this.eliminato = false;
     }
 
     /** Interroga il database e restituisce le occorrenze di questa entità
@@ -129,8 +166,9 @@ public class RelazioneUploaderConsumerFile {
      * Consumer} i cui identificativi sono specificati come parametri.
      * @return
      */
-    public static List<RelazioneUploaderConsumerFile> getOccorrenzeFiltratePerUploaderEConsumer(Long identificativoUploader,
-                                                                                                Long identificativoConsumer) {
+    public static List<RelazioneUploaderConsumerFile>
+    getOccorrenzeFiltratePerUploaderEConsumer( Long identificativoUploader,
+                                               Long identificativoConsumer ) {
 
         // TODO : verificare che funzioni
 
@@ -146,6 +184,7 @@ public class RelazioneUploaderConsumerFile {
                                 nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer)
                         .stream()
                         .map( ris -> (RelazioneUploaderConsumerFile)ris )
+                        .filter( ris -> ! ris.eliminato )   // TODO : cerca tutti i posti in cui c'è .eliminato => non va bene ! Refactor e pensa ad una struttura migliore
                         .collect( Collectors.toList() );
 
             } else {
@@ -173,7 +212,9 @@ public class RelazioneUploaderConsumerFile {
         List<File> listaFile = occorrenzeRelazione.stream()
                                                   .map( relazione -> {
                                                       try {
-                                                          return File.getEntitaDaDbById( relazione.getIdFile() );
+                                                          File file = File.getEntitaDaDbById( relazione.getIdFile() );
+                                                          return file != null && file.isEliminato() ?
+                                                                    null : file; // TODO : deve essere prerogativa della classe File
                                                       } catch (NotFoundException notFoundException) {
                                                           return null;
                                                       }
@@ -274,7 +315,12 @@ public class RelazioneUploaderConsumerFile {
                     nomeAttributoConsumer
             )
                     .stream()
-                    .map( occorrenzaDellaRelazione -> ((RelazioneUploaderConsumerFile)occorrenzaDellaRelazione).getIdentificativoConsumer() )
+                    .filter( occorrenzaRelazione ->
+                            ! ((RelazioneUploaderConsumerFile)occorrenzaRelazione).eliminato )      // TODO : rivedere in tutti i metodi di questa classe la gestione del file eliminato
+                    .map( occorrenzaRelazione ->
+                            ((RelazioneUploaderConsumerFile)occorrenzaRelazione)
+                                    .getIdentificativoConsumer() )
+
                     .collect(Collectors.toList());
 
             return risultato;
@@ -293,7 +339,8 @@ public class RelazioneUploaderConsumerFile {
      * ed il corrispettivo valore, questo metodo interroga il database e
      * restituisce la lista di tutte le occorrenza in cui l'attributo il
      * cui nome è specificato nel parametro ha il valore specificato nel
-     * parametro corrispondente.*/
+     * parametro corrispondente. Gli attributi su cui si esegui la query
+     * devono essere indicizzati.*/
     private static List<RelazioneUploaderConsumerFile> queryRelazioneUploaderConsumerFiles(String nomeAttributo,
                                                                                            Long valoreAttributo) {
 
@@ -399,14 +446,17 @@ public class RelazioneUploaderConsumerFile {
     public static boolean isConsumerServitoDaUploader( Long identificativoUploader, Long identificativoConsumer ) {
         // TODO : verificare funzioni
         try {
-            Field uploader_field = RelazioneUploaderConsumerFile.class.getDeclaredField("identificativoUploader");  // eccezione se non esiste questo field
-            Field consumer_field = RelazioneUploaderConsumerFile.class.getDeclaredField("identificativoConsumer");  // eccezione se non esiste questo field
+            Field uploader_field  = RelazioneUploaderConsumerFile.class.getDeclaredField("identificativoUploader");  // eccezione se non esiste questo field
+            Field consumer_field  = RelazioneUploaderConsumerFile.class.getDeclaredField("identificativoConsumer");  // eccezione se non esiste questo field
+            Field eliminato_field = RelazioneUploaderConsumerFile.class.getDeclaredField("eliminato");               // eccezione se non esiste questo field
             
             return DatabaseHelper.esisteNelDatabase(
                     RelazioneUploaderConsumerFile.class,
                     DatabaseHelper.creaERestituisciQueryAnd( RelazioneUploaderConsumerFile.class,
-                                     uploader_field.getName(), DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
-                                     consumer_field.getName(), DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer ) );
+                                     uploader_field.getName(),  DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
+                                     consumer_field.getName(),  DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
+                                     eliminato_field.getName(), DatabaseHelper.OperatoreQuery.UGUALE, false
+                            ) );
 
         } catch (NoSuchFieldException e) {
             Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
