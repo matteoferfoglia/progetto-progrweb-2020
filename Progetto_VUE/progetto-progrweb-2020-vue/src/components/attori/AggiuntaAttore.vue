@@ -63,11 +63,22 @@
 
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
+import {unisciOggetti} from "../../utils/utilitaGenerale";
 export default {
   name: "AggiuntaAttore",
   components: {FormCampiAttore},
   props: ['tipoAttoreAutenticato', 'csrfToken'],
-  emits: ['csrf-token-ricevuto','nominativo-attore-modificato'],
+  emits: [
+    'csrf-token-ricevuto',
+    'nominativo-attore-modificato',
+
+    /** Evento emesso quando viene aggiunto un nuovo attore (dopo
+     * che il server ha confermato l'aggiunta. Il valore è un oggetto
+     * rappresentante l'attore, con gli stessi attributi indicati nel
+     * form per l'aggiunta dell'attore stesso ed anche l'identificativo
+     * ricevuto dal server dopo aver confermato l'aggiunta.*/
+    "aggiunto-nuovo-attore"
+  ],
   data() {
     return {
 
@@ -126,13 +137,13 @@ export default {
      */
     formAggiuntaAttoreInviato ( oggetto ) {
       oggetto.promiseRispostaServer
-          .then( rispostaServer => {
+          .then( identificativoAttore => {
 
             let messaggioInformativo;
             if( this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME] ) {
               // Administrator ha aggiunto un attore
               messaggioInformativo = "Attore " + oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
-                  " [" + rispostaServer + "] aggiunto, la sua password è: " +
+                  " [" + identificativoAttore + "] aggiunto, la sua password è: " +
                   this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME] +
                   ". Si consiglia di modificare la password al primo accesso.";
 
@@ -145,6 +156,10 @@ export default {
               messaggioInformativo = "Consumer " + oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
                   " aggiunto.";
             }
+
+            this.$emit("aggiunto-nuovo-attore", unisciOggetti({
+              [process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD]: identificativoAttore
+            },oggetto.datiInviati));
 
             alert( messaggioInformativo );
 

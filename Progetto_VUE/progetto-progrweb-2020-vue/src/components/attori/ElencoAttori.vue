@@ -5,6 +5,7 @@
   <AggiuntaAttore :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
                   :csrfToken="csrfToken_wrapper"
                   @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
+                  @aggiunto-nuovo-attore="aggiungiNuovoAttoreAllElenco($event)"
                   @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"/>
 
 
@@ -145,11 +146,10 @@ export default {
                                                    this.tipiAttoreCuiQuestoElencoSiRiferisce ) )
 
             // Ordina la mappa degli Attori (con relative proprietà) alfabeticamente e la salva nelle proprietà di questo componente
-            .then( mappa_idAttore_proprietaAttore =>
-                this.mappa_idAttore_proprietaAttore =
-                    new Map( [...mappa_idAttore_proprietaAttore.entries()]
-                        .sort((a,b) =>
-                            a[1][this.NOME_PROP_NOMINATIVO] - b[1][this.NOME_PROP_NOMINATIVO] ) ) )
+            .then( mappa_idAttore_proprietaAttore => {
+              this.mappa_idAttore_proprietaAttore = mappa_idAttore_proprietaAttore;
+              this.ordinaElencoAttori();
+            })
 
             .catch( console.error ) ;
       };
@@ -183,6 +183,37 @@ export default {
         .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
 
     },
+
+    /** Aggiunge il nuovo attore, appena aggiunto dall'utente, all'elenco mostrato.*/
+    aggiungiNuovoAttoreAllElenco( nuovoAttore ) {
+      this.mappa_idAttore_proprietaAttore
+          .set( nuovoAttore[process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD],
+                nuovoAttore );
+      this.ordinaElencoAttori();
+    },
+
+    /** Ordina per nominativo l'elenco degli attori. Le modifiche vengono
+     * apportate sullo stesso oggetto (stesso indirizzo in memoria).*/
+    ordinaElencoAttori() {
+
+      // TODO : cercare metodo più efficiente
+
+      // Algoritmo: copia le entries dell'elenco, ordinale, poi elimina
+      // tutte le entries dall'elenco vero ed aggiungi una ad una quelle
+      // dall'elenco ordinato.
+
+      const copiaOrdinataEntriesDellElencoAttori =
+        [...this.mappa_idAttore_proprietaAttore].sort( (a,b) =>
+            a[1][this.NOME_PROP_NOMINATIVO].toLowerCase() > b[1][this.NOME_PROP_NOMINATIVO].toLowerCase() ? 1 : -1 );
+
+      const chiaviInElenco = Array.from(this.mappa_idAttore_proprietaAttore.keys());
+      chiaviInElenco.forEach( chiave => this.mappa_idAttore_proprietaAttore.delete(chiave) );
+
+      copiaOrdinataEntriesDellElencoAttori.forEach( entryUnAttore =>
+          this.mappa_idAttore_proprietaAttore.set( entryUnAttore[0], entryUnAttore[1] ) );
+
+    },
+
 
     /** Restituisce il tipo degli attori di cui bisogna mostrare l'elenco.*/
     qualeTipoAttoriDiCuiMostrareElenco() {

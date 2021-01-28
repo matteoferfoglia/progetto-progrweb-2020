@@ -274,7 +274,7 @@ name: "SchedaDiUnAttore",
 
       this.datiAggiuntiviDaInviareAlServer_onSubmit = {
         /** Identificativo dell'attore a cui si riferisce questa scheda.*/
-        [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_IDENTIFICATIVO_ATTORE]: this.idAttoreCuiQuestaSchedaSiRiferisce
+        [process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD]: this.idAttoreCuiQuestaSchedaSiRiferisce
       }
 
       if( this.proprietaAttoreCuiQuestaSchedaSiRiferisce ) {
