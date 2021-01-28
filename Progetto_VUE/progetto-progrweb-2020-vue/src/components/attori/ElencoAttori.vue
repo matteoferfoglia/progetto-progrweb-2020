@@ -25,6 +25,8 @@
       </li>
     </ol>
 
+
+
 </template>
 
 <script>
@@ -100,11 +102,51 @@ export default {
 
     }
 
-    caricaQuestoComponente().then( () => this.layoutCaricato = true )
-                            .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
+    caricaQuestoComponente()
+        .then( () => {
+
+          if( this.isConsumerAttualmenteAutenticato() &&
+                this.mappa_idAttore_proprietaAttore.size === 1 ) {
+            // Da requisiti:
+            // Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,mostra direttamente la
+            // lista dei documenti caricati da questi (in sintesi, non si mostra la schermata di scelta Uploader).
+
+            const entryMappa_unicoAttore = Array.from( this.mappa_idAttore_proprietaAttore.entries() )[0];
+
+            this.$router.push({
+              name: this.NOME_ROUTE_SCHEDA_ATTORE,
+              params: {
+                [this.NOME_PARAM_ID_ATTORE_router]       : entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
+                [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
+                // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
+              }
+            });
+
+          }
+
+          this.layoutCaricato = true;
+        })
+        .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
 
   },
   methods: {
+
+    /** Restituisce true se bisogna mostrare l'elenco degli attori (come da requisiti).*/
+    mostrareElencoAttori() {
+
+      if( ! this.isConsumerAttualmenteAutenticato() ) { // TODO : refactor : in molti componenti c'è isUploader() / isUploaderAttualmenteAutenticato() o simili ==> mettere tutto in un unico JS
+        return true;
+      } else {
+        return this.mappa_idAttore_proprietaAttore.size > 1;
+      }
+
+    },
+
+    /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
+    isConsumerAttualmenteAutenticato() {
+      return this.tipoAttoreAutenticato ===
+          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+    },
 
     /** Restituisce true se l'attore attualmente autenticato è un Administrator.*/
     isAdministratorAttualmenteAutenticato() {
