@@ -2,6 +2,11 @@
 
   <!-- Componente per mostrare un elenco di attori -->
 
+  <AggiuntaAttore :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
+                  :csrfToken="csrfToken_wrapper"
+                  @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
+                  @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"/>
+
 
 
   <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
@@ -49,9 +54,11 @@
 
 <script>
 import {richiestaGet} from "../../utils/http";
+import AggiuntaAttore from "./AggiuntaAttore";
 
 export default {
   name: "ElencoAttori",
+  components: {AggiuntaAttore},
   inheritAttrs: false,
   emits: [
       /** Evento emesso quando riceve un token CSRF da un componente figlio.*/
