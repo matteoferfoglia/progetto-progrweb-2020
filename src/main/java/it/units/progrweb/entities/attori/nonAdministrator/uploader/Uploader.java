@@ -5,14 +5,12 @@ import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.FormatoUsernameInvalido;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 import it.units.progrweb.entities.file.File;
-import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author Matteo Ferfoglia
@@ -68,10 +66,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * registrati nel sistema.*/
     public static List<Long> getListaIdentificativiTuttiGliUploaderNelSistema() {
 
-        return DatabaseHelper.listaEntitaNelDatabase(Uploader.class)
-                             .stream()
-                             .map( uploader -> ((Uploader)uploader).getIdentificativoAttore() )
-                             .collect(Collectors.toList());
+        return Attore.getListaIdentificativiTuttiGliAttoriNelSistema( Uploader.class );
 
     }
 

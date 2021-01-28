@@ -156,7 +156,6 @@ public class RichiestaInfo {
 
         return uploader;
 
-
     }
 
     /** Dato come @PathParam l'identificativo di un Uploader, restituisce

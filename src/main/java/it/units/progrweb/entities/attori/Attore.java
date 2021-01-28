@@ -22,6 +22,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -237,6 +238,19 @@ public abstract class Attore implements UserPrincipal, Cloneable {
                     new NoSuchFieldException());
             return null;
         }
+
+    }
+
+    /** Restituisce la lista degli identificativi di tutti gli Attori della
+     * classe data nel parametro registrati nel sistema.*/
+    public static List<Long> getListaIdentificativiTuttiGliAttoriNelSistema( Class classeAttore ) {
+
+        // TODO : refactoring: metodo molto simile in Uploader (si potrebbe fare un metodo nella classe Attore)
+
+        return DatabaseHelper.listaEntitaNelDatabase(classeAttore)
+                .stream()
+                .map( attore -> ((Attore)attore).getIdentificativoAttore() )
+                .collect(Collectors.toList());
 
     }
 

@@ -9,6 +9,23 @@
           Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
           gli attori per nome -->
 
+  <nav v-if="isAdministratorAttualmenteAutenticato()" id="sceltaTipoAttoreDiCuiMostrareElenco">
+    Visualizza elenco
+    <!-- Administrator può scegliere se visualizzare Uploader o altri Administrator -->
+    <router-link :to="{
+        name: $route.name,  // questa stessa route (non bisogna cambiare componente, ma solo scegliere che cosa mostrare)
+        params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_uploader}
+      }">
+      Uploader
+    </router-link>
+    <router-link :to="{
+        name: $route.name,
+        params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_administrator}
+      }">
+      Administrator
+    </router-link>
+  </nav>
+
     <ol>
       <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
           :key="attore[0]/*Id dell'attore*/">
@@ -16,7 +33,8 @@
           name: NOME_ROUTE_SCHEDA_ATTORE,
           params: {
             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
-            [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1])
+            [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
+            [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
           }
         }">
@@ -43,9 +61,6 @@ export default {
     /** Tipo attore attualmente autenticato.*/
     "tipoAttoreAutenticato",
 
-    /** Tipi di attore cui questo elenco si riferisce (Administrator/Consumer/Uploader).*/
-    "tipiAttoreCuiQuestoElencoSiRiferisce",
-
     /** Nome della proprietà contenente il nominativo di un attore nell'oggetto
      * che lo rappresenta.*/
     "NOME_PROP_NOMINATIVO",
@@ -62,7 +77,7 @@ export default {
       /** Mappa { idAttore => oggettoConProprietaAttore },
        * ordinata alfabeticamente rispetto al nome dell'Attore.*/
       mappa_idAttore_proprietaAttore: new Map(),
-      
+
       // Parametri Vue-Router
       /** Nome della route che conduce alla scheda di un attore.*/
       NOME_ROUTE_SCHEDA_ATTORE:           process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
@@ -72,41 +87,71 @@ export default {
       /** Nome del parametro nella route contenente l'oggetto con le proprietà
        *  dell'attore di cui si vedrà la scheda a seguito dell'inoltro nella route.*/
       NOME_PARAM_PROPRIETA_ATTORE_router: process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE,
+      /** Nel caso in cui vi sia attualmente autenticato un Administrator, gli
+       * viene data la possibilità (tramite router-link) di scegliere se vedere
+       * la lista di attori di tipo Administrator o Uploader: ciò dipende dal
+       * valore di questo parametro.*/
+      NOME_PARAM_TIPO_ATTORE: process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE,
+
+      /** Tipi di attore cui questo elenco si riferisce (Administrator/Consumer/Uploader).*/
+      tipiAttoreCuiQuestoElencoSiRiferisce: undefined,
+
 
       // Wrapper
+      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
       csrfToken_wrapper: this.csrfToken,
+
+      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template  // TODO : serve ? C'è anche in SchermataPrincipaleAttoreAutenticato
+      tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER,
+      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
+      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR
 
     }
   },
   created() {
 
-    const caricaQuestoComponente = async () => {
+    this.caricamentoQuestoComponente();
 
-      // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
+  },
+  methods: {
 
-          // Richiede l'elenco degli Attori associati con questo attualmente autenticato
-      await getElencoAttori( this.tipoAttoreAutenticato )
+    /** Metodo per il caricamento dell'intero componente (incluse le
+     * richieste al server per l'elenco degli attori).*/
+    async caricamentoQuestoComponente() {
 
-          // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
-          // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
-          .then( arrayIdAttore => getMappa_idAttore_proprietaAttore( arrayIdAttore, this.tipoAttoreAutenticato ) )
+      this.layoutCaricato = false;
 
-          // Ordina la mappa degli Attori (con relative proprietà) alfabeticamente e la salva nelle proprietà di questo componente
-          .then( mappa_idAttore_proprietaAttore =>
-              this.mappa_idAttore_proprietaAttore =
-                  new Map( [...mappa_idAttore_proprietaAttore.entries()]
-                          .sort((a,b) =>
-                              a[1][this.NOME_PROP_NOMINATIVO] - b[1][this.NOME_PROP_NOMINATIVO] ) ) )
+      this.tipiAttoreCuiQuestoElencoSiRiferisce =  this.qualeTipoAttoriDiCuiMostrareElenco();
 
-          .catch( console.error ) ;
+      const richiestaElencoAttoriAlServer = async () => {
+        // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
 
-    }
+        // Richiede l'elenco degli Attori associati con questo attualmente autenticato
+        await getElencoAttori( this.tipoAttoreAutenticato_wrapper,
+                               this.tipiAttoreCuiQuestoElencoSiRiferisce )
 
-    caricaQuestoComponente()
+            // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
+            // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
+            .then( arrayConIdTuttiGliAttoriDaMostrare =>
+                getMappa_idAttore_proprietaAttore( arrayConIdTuttiGliAttoriDaMostrare,
+                                                   this.tipoAttoreAutenticato_wrapper,
+                                                   this.tipiAttoreCuiQuestoElencoSiRiferisce ) )
+
+            // Ordina la mappa degli Attori (con relative proprietà) alfabeticamente e la salva nelle proprietà di questo componente
+            .then( mappa_idAttore_proprietaAttore =>
+                this.mappa_idAttore_proprietaAttore =
+                    new Map( [...mappa_idAttore_proprietaAttore.entries()]
+                        .sort((a,b) =>
+                            a[1][this.NOME_PROP_NOMINATIVO] - b[1][this.NOME_PROP_NOMINATIVO] ) ) )
+
+            .catch( console.error ) ;
+      };
+
+      richiestaElencoAttoriAlServer()
         .then( () => {
 
           if( this.isConsumerAttualmenteAutenticato() &&
-                this.mappa_idAttore_proprietaAttore.size === 1 ) {
+              this.mappa_idAttore_proprietaAttore.size === 1 ) {
             // Da requisiti:
             // Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,mostra direttamente la
             // lista dei documenti caricati da questi (in sintesi, non si mostra la schermata di scelta Uploader).
@@ -128,33 +173,75 @@ export default {
         })
         .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
 
-  },
-  methods: {
+    },
 
-    /** Restituisce true se bisogna mostrare l'elenco degli attori (come da requisiti).*/
-    mostrareElencoAttori() {
+    /** Restituisce il tipo degli attori di cui bisogna mostrare l'elenco.*/
+    qualeTipoAttoriDiCuiMostrareElenco() {
 
-      if( ! this.isConsumerAttualmenteAutenticato() ) { // TODO : refactor : in molti componenti c'è isUploader() / isUploaderAttualmenteAutenticato() o simili ==> mettere tutto in un unico JS
-        return true;
+      let tipoAttoreDiCuiMostrareElenco;  // valore restituito da questo metodo
+
+      if( this.isAdministratorAttualmenteAutenticato() ) {
+
+        tipoAttoreDiCuiMostrareElenco = this.tipoAttore_uploader; // valore default
+
+        if( this.$route && this.$route.params &&  // Verifica che non siano undefined o null
+            this.$route.params[this.NOME_PARAM_TIPO_ATTORE]) {
+          let varComodoPerValutareSeParametroDefinito =
+              this.$route.params[this.NOME_PARAM_TIPO_ATTORE];
+          if( varComodoPerValutareSeParametroDefinito ) {
+            tipoAttoreDiCuiMostrareElenco = varComodoPerValutareSeParametroDefinito;
+          }
+        }
+
+      } else if ( this.isConsumerAttualmenteAutenticato() ) {
+        tipoAttoreDiCuiMostrareElenco = this.tipoAttore_uploader;
       } else {
-        return this.mappa_idAttore_proprietaAttore.size > 1;
+        tipoAttoreDiCuiMostrareElenco = this.tipoAttore_consumer;
       }
+
+      return tipoAttoreDiCuiMostrareElenco;
 
     },
 
     /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
     isConsumerAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato ===
+      return this.tipoAttoreAutenticato_wrapper ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
     },
 
     /** Restituisce true se l'attore attualmente autenticato è un Administrator.*/
     isAdministratorAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato ===
+      return this.tipoAttoreAutenticato_wrapper ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
     }
   },
   watch: {
+
+    /**
+     * Osserva nel parametro della route se cambia il tipo degli attori di cui
+     * si vuole vedere l'elenco.
+     */
+    '$route.params': {
+      // TODO : rivedere il meccanismo che permette agli Administrator di scegliere tra ElencoAttori di Uploader o di Consumer
+      immediate: true,
+      handler: function() {
+        const nuovoTipoAttoriDiCuiMostrareElenco = this.qualeTipoAttoriDiCuiMostrareElenco();
+        if( nuovoTipoAttoriDiCuiMostrareElenco !== this.tipoAttoriDiCuiMostrareElenco ) {
+          this.tipoAttoriDiCuiMostrareElenco = nuovoTipoAttoriDiCuiMostrareElenco;
+          this.caricamentoQuestoComponente();
+        }
+      }
+    },
+
+    'tipoAttoreAutenticato': {
+      immediate: true,
+      deep: true,
+      handler: function(nuovoValore) {
+        this.tipoAttoreAutenticato_wrapper = nuovoValore;
+        this.caricamentoQuestoComponente();
+      }
+    },
+
     csrfToken : {
       immediate: true,
       deep: true,
@@ -169,23 +256,35 @@ export default {
  * con questo Uploader. Se la richiesta va a buon fine, questa
  * funzione restituisce una promise risolta il cui valore è
  * l'array con i valori richiesti.
+ * @param tipoAttoreAttualmenteAutenticato Tipo dell'attore attualmente autenticato
+ * @param tipoAttoriDiCuiMostrareElenco Tipo degli attori che dovranno essere presenti
+ *                                      nell'elenco restituito dal server (es. Consumer
+ *                                      dovrà richiedere elenco di Uploader).
  */
-const getElencoAttori = async tipoAttoreAttualmenteAutenticato => {
+const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiMostrareElenco ) => {
 
-  const urlRichiesta = tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ?
-                        process.env.VUE_APP_URL_GET_ELENCO_UPLOADER_PER_QUESTO_ADMINISTRATOR :  // TODO : amministratore deve poter cercare sia Uploader sia Administrator
-                        ( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ?
-                           process.env.VUE_APP_URL_GET_ELENCO_CONSUMER__RICHIESTA_DA_UPLOADER :
-                                ( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ?
-                                   process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER : "" )
-                        );
+  let urlRichiesta;
 
+  if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
+    urlRichiesta = process.env.VUE_APP_URL_GET_ELENCO_ATTORI_PER_QUESTO_ADMINISTRATOR  +
+        "/" + tipoAttoriDiCuiMostrareElenco;  // tipo attori richiesti appeso come @PathParam
+  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ) {
+    urlRichiesta = process.env.VUE_APP_URL_GET_ELENCO_CONSUMER__RICHIESTA_DA_UPLOADER;
+  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
+    urlRichiesta = process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER;
+  } else {
+    urlRichiesta = "";
+  }
 
-  return richiestaGet( urlRichiesta )
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento della lista di attori: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-      });
+  if( urlRichiesta ) {
+    return richiestaGet( urlRichiesta )
+        .catch( rispostaErrore => {
+          console.error("Errore durante il caricamento della lista di attori: " + rispostaErrore );
+          return Promise.reject(rispostaErrore);
+        });
+  } else {
+    return [];
+  }
 
 }
 
@@ -193,16 +292,28 @@ const getElencoAttori = async tipoAttoreAttualmenteAutenticato => {
  * è passato come parametro. Se la richiesta va a buon fine, viene
  * restituita una Promise risolta contenente un array di due elementi,
  * in cui il primo contiene l'identificativo dell'Attore ed il secondo
- * contiene un oggetto in cui ogni property è una proprietà dell'Attore.*/
-const getInfoAttore = async (idAttore, tipoAttoreAttualmenteAutenticato) => {// TODO : rivedere a cosa serve (probabilmente sbagliato, l'url??)
+ * contiene un oggetto in cui ogni property è una proprietà dell'Attore.
+ *
+ * @param idAttore Identificativo dell'attore per cui si richiedono le informazioni.
+ * @param tipoAttoreAttualmenteAutenticato Tipo di attore attualmente autenticato.
+ * @param tipoAttoriDiCuiRichiedereInfo Tipo di attore per cui si richiedono le informazioni.*/
+const getInfoAttore = async (idAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo) => {
 
-  let urlRichiesta = tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ?
-                      process.env.VUE_APP_URL_GET_INFO_UPLOADER :
-                      (tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ?
-                              process.env.VUE_APP_URL_GET_INFO_CONSUMER__RICHIESTA_DA_UPLOADER :
-                              (tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ?
-                                  process.env.VUE_APP_URL_GET_INFO_UPLOADER : "")
-                      );
+  let urlRichiesta;
+
+  if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
+    if( tipoAttoriDiCuiRichiedereInfo === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
+      urlRichiesta = process.env.VUE_APP_URL_GET_INFO_ADMINISTRATOR__RICHIESTA_DA_ADMINISTRATOR;
+    } else {
+      urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
+    }
+  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ) {
+    urlRichiesta = process.env.VUE_APP_URL_GET_INFO_CONSUMER__RICHIESTA_DA_UPLOADER;
+  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
+    urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
+  } else {
+    urlRichiesta = "";
+  }
 
   urlRichiesta += "/" + idAttore;
 
@@ -216,14 +327,16 @@ const getInfoAttore = async (idAttore, tipoAttoreAttualmenteAutenticato) => {// 
  * Attori e per valori l'oggetto con le proprietà dell'Attore
  * indicato dalla chiave.
  */
-const getMappa_idAttore_proprietaAttore = async (arrayIdAttore, tipoAttoreAttualmenteAutenticato) => {
+const getMappa_idAttore_proprietaAttore = async (arrayIdAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo) => {
 
   // TODO : verificare correttezza
 
   // Richiede al server info su ogni Attore nell'array
 
     // TODO : si può evitare duplicazione di codice ? Stesso pattern usato anche in Consumer
-  return Promise.all( arrayIdAttore.map( idAttore => getInfoAttore( idAttore, tipoAttoreAttualmenteAutenticato ) )) //  una Promise per ogni Attore, quindi Promise.all per poi aspettarle tutte (Fonte: https://stackoverflow.com/a/31414472)
+  return Promise.all( arrayIdAttore.map( idAttore => getInfoAttore( idAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo ) ))
+                //  una Promise per ogni Attore, quindi Promise.all per poi aspettarle tutte (Fonte: https://stackoverflow.com/a/31414472)
+
                 .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
                 .catch( rispostaErrore =>
                     console.error("Errore durante il caricamento delle informazioni sugli Attori: " +
@@ -234,4 +347,7 @@ const getMappa_idAttore_proprietaAttore = async (arrayIdAttore, tipoAttoreAttual
 </script>
 
 <style scoped>
+  #sceltaTipoAttoreDiCuiMostrareElenco a:first-child::after {
+    content: " | ";
+  }
 </style>

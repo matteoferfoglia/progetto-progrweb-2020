@@ -59,14 +59,13 @@
     </FormCampiAttore>
   </section>
 
-  <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato"
-               :tipiAttoreCuiQuestoElencoSiRiferisce="'Uploader'"
+
+  <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
                :csrfToken="csrfToken_wrapper"
                :NOME_PROP_NOMINATIVO ="NOME_PROP_NOME_ATTORE"
                :NOME_PROP_USERNAME   ="NOME_PROP_USERNAME_ATTORE"
                :NOME_PROP_EMAIL      ="NOME_PROP_EMAIL_ATTORE"
-               @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/><!-- TODO : mettere valore corretto, non 'Uploader' literal (devi farlo da Vue router perché Admin può visualizzare sia Admin sia Uploader (in base a cosa clicca), Uploader può visualizzare Consumer, Consumer può visualizzare Uplaoder
-               ) -->
+               @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/>
 
 
 </template>
@@ -104,10 +103,13 @@ export default {
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,  //wrapper (prop non è modificabile)
       csrfToken_wrapper: this.csrfToken,
 
-      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template
+      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template  // TODO : serve ? C'è anche in ElencoAttori
       tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER,
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
       tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR,
+
+      /** Tipo degli attori di cui mostrare l'elenco.*/
+      tipoAttoriDiCuiMostrareElenco: undefined, // valutato in base alle azioni dell'utente, NON alla creazione di questo componente
 
       // Parametro del form
       nomeParametroForm_qualificaAttoreDaAggiungere: process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME,
@@ -139,7 +141,7 @@ export default {
   },
   created() {
 
-    // TODO : aggiungere una proprieta isLayoutCaricato (visto che created() non può avere comportamento asincrono)
+    // TODO : aggiungere una proprietà isLayoutCaricato (visto che created() non può avere comportamento asincrono)
 
     // richiede il nome della prop contenente il nominativo di un attore nell'oggetto
     // che sarà restituito dal server con le info di un attore
@@ -154,12 +156,17 @@ export default {
         .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_USERNAME_ATTORE ) )
         .then( nomePropUsernameAttore => this.NOME_PROP_USERNAME_ATTORE = nomePropUsernameAttore )
 
-        .then( () => this.$router.push({ name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI }) ) // TODO : rivedere questo (vue router non caricava route figlia default (non caricava proprio la router-view) ma aggiornando funzionava correttamente
+        .then( this.instradaVersoElencoAttori )
 
         .catch( console.error );
 
   },
   methods: {
+
+    /** Metodo per instradare (Vue-Router) all'elenco attori.*/
+    instradaVersoElencoAttori() {
+      this.$router.push({ name:   process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI });
+    },
 
     /** Crea l'oggetto coi dati aggiuntivi da inviare al server
      * per l'aggiunta di un nuovo attore, oltre a quelli normalmente
@@ -226,6 +233,10 @@ export default {
     }
   },
   watch: {
+
+    /** Watch per il tipo di attore attualmente autenticato (potrebbe
+     * fare logout e potrebbe autenticarsi subito dopo un attore
+     * con un'altra qualifica).*/
     tipoAttoreAutenticato: {
       immediate: true,
       deep: true,
@@ -233,6 +244,7 @@ export default {
         this.tipoAttoreAutenticato_wrapper = nuovoValore;
       }
     },
+
     csrfToken : {
       immediate: true,
       deep: true,
@@ -246,5 +258,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

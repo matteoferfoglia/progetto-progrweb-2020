@@ -1,7 +1,10 @@
 <template>
 
+  <!-- TODO : rivedere e semplificare questa scheda -->
+
   <header>
     <img :src="logoBase64_dataUrl"
+         alt=""
          v-if="isQuestaSchedaRiferitaAdUnUploader"/>
     <h2>{{ nominativo }}</h2>
   </header>
@@ -10,7 +13,6 @@
     <small v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
       Modificare i campi del form per modificare i dati dell'utente nel sistema.
     </small>
-    <div :id="idHtmlContenitoreFormModificaAttore">
       <FormCampiAttore :flag_mostrareLabelCampiInput="true"
                        :urlInvioFormTramitePost="urlModificaInfoAttore"
                        :flag_inviaDatiForm="flag_inviaDatiForm"
@@ -32,7 +34,7 @@
         <input type="file" :name="LOGO_INPUT_FIELD_NAME"
                v-if="mostrareInputFilePerModificaLogoUploader()" ><!-- TODO : testare la modifica del logo -->
 
-        <button @click="document.querySelector('#' + idHtmlContenitoreFormModificaAttore + ' form').submit"
+        <button @click="document.querySelector('#' + idHtmlQuestoComponente + ' form').submit"
                 v-if="! isConsumerAttualmenteAutenticato()">
           <!-- Fonte icona: https://icons.getbootstrap.com/icons/pen/ --><!-- TODO : icone da aggiungere via CSS -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
@@ -62,12 +64,12 @@
         </button>
 
       </FormCampiAttore>
-    </div>
   </section>
 
   <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
                        :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"
-                       v-if="isAdministratorAttualmenteAutenticato()" />
+                       v-if="isAdministratorAttualmenteAutenticato() &&
+                             isQuestaSchedaRiferitaAdUnUploader" />
 
   <ListaDocumentiPerConsumerVistaDaUploader v-if="isUploaderAttualmenteAutenticato()"
                                             :idConsumer="idAttoreCuiQuestaSchedaSiRiferisce"
@@ -109,9 +111,6 @@ name: "SchedaDiUnAttore",
     /** Indica il tipo di attore che sta visualizzando questo componente.*/
     "tipoAttoreAutenticato",
 
-    /** Indica il tipo di attore a cui si riferisce questa scheda.*/
-    "tipiAttoreCuiQuestoElencoSiRiferisce",
-
     // Nomi delle proprietà di un attore  // TODO : servono ? Non si può semplicemente iterare sulle prop dell'oggetto "attore"?
     /** Nome della proprietà contenente lo username di un attore nell'oggetto
      * che lo rappresenta.*/
@@ -139,18 +138,17 @@ name: "SchedaDiUnAttore",
       /** Oggetto con le proprietà dell'attore a cui questa scheda si riferisce.*/
       proprietaAttoreCuiQuestaSchedaSiRiferisce: {},
 
-
-
-
+      /** Indica il tipo di attore a cui si riferisce questa scheda.*/
+      tipoAttoreCuiQuestaSchedaSiRiferisce: undefined,                     // inizializzata in created()
 
       /** Immagine logo (se l'attore rappresentato da questa scheda ne
        * ha uno) codificato in Base64.*/
-      logoBase64_dataUrl: "",                                       // inizializzata in created()
+      logoBase64_dataUrl: undefined,                                       // inizializzata in created()
 
       /** URL per la richiesta dell'elenco dei documenti destinati al Consumer
        * attualmente autenticato e caricati dall'Uploader di cui si sta caricando
        * la scheda.*/
-      urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader: "", // inizializzata in created()
+      urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader: undefined, // inizializzata in created()
 
       /** URL per la richiesta del download di uno specifico documento.
        * Richiesta di download gestita dal componente che si occupa
@@ -170,8 +168,7 @@ name: "SchedaDiUnAttore",
                                                                 // allora sta guardando la scheda di un Consumer
 
       /** Flag: true se questa scheda si riferisce ad un Uploader.*/
-      isQuestaSchedaRiferitaAdUnUploader: this.tipiAttoreCuiQuestoElencoSiRiferisce ===
-                                            process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
+      isQuestaSchedaRiferitaAdUnUploader: undefined,                       // inizializzata in created()
 
       /** Nome del campo di input per caricare il nuovo logo di un Uploader.*/
       LOGO_INPUT_FIELD_NAME: process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME,
@@ -208,11 +205,7 @@ name: "SchedaDiUnAttore",
 
 
       // Wrapper
-      csrfToken_wrapper: this.csrfToken,
-
-      /** Valore per l'attributo id del contenitore del form per
-       * la modifica di un attore.*/
-      idHtmlContenitoreFormModificaAttore: generaIdUnivoco(),
+      csrfToken_wrapper: this.csrfToken
 
     }
   },
@@ -233,12 +226,22 @@ name: "SchedaDiUnAttore",
       this.proprietaAttoreCuiQuestaSchedaSiRiferisce =
           JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
 
-      richiestaGet( process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce )
-        .then( immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl )
-        .catch( console.error );
+      this.tipoAttoreCuiQuestaSchedaSiRiferisce =
+          this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
 
-      this.logoBase64_dataUrl =
-          this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
+      this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
+                                                  process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER
+
+      if( this.isQuestaSchedaRiferitaAdUnUploader ) {
+        richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
+            .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
+            .catch(console.error);
+
+        this.logoBase64_dataUrl =
+            this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
+      } else {
+        this.logoBase64_dataUrl = "";
+      }
 
       this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
           process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
@@ -272,7 +275,7 @@ name: "SchedaDiUnAttore",
     /** Restituisce true se è possibile modificare il logo di un uploader.*/
     mostrareInputFilePerModificaLogoUploader() {
       return this.isAdministratorAttualmenteAutenticato() &&
-          this.tipiAttoreCuiQuestoElencoSiRiferisce ===
+          this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
     },
 

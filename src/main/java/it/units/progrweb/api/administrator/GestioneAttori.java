@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -254,15 +255,43 @@ public class GestioneAttori {
 
     }
 
-    /** Restituisce un array con gli identificativi di tutti gli {@link Uploader}.*/
-    @Path("/elencoUploader")
+    /** Restituisce un array con gli identificativi di tutti gli Attori del
+     * tipo indicato nel @PathParam.*/
+    @Path("/elencoAttori/{tipoAttoriDiCuiMostrareElenco}")
     @GET
     @Produces( MediaType.APPLICATION_JSON )
-    public long[] getElencoIdentificativiUploader() {
+    public long[] getElencoIdentificativiUploader( @PathParam("tipoAttoriDiCuiMostrareElenco") String tipoAttoriDiCuiMostrareElenco) {
 
         // TODO : refactoring c'è un metodo molto simile in Uploader
-        return Uploader.getListaIdentificativiTuttiGliUploaderNelSistema()
-                       .stream().mapToLong( i -> i ).toArray();
+
+        List<Long> listaIdentificativiAttoriDaRestituire;
+
+        if( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Uploader.getTipoAttore() ) ) {
+            listaIdentificativiAttoriDaRestituire =
+                    Uploader.getListaIdentificativiTuttiGliUploaderNelSistema();
+
+        } else if ( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Administrator.getTipoAttore() ) ) {
+            listaIdentificativiAttoriDaRestituire =
+                    Administrator.getListaIdentificativiTuttiGliAdministratorNelSistema();
+
+        } else {
+            return new long[]{};
+        }
+
+        return listaIdentificativiAttoriDaRestituire.stream().mapToLong(i -> i).toArray();
+
+    }
+
+    /** Dato l'identificativo di un {@link Administrator}, restituisce l'oggetto JSON
+     * con le properties di quell'{@link Administrator}.*/
+    @Path("/proprietaAdministrator/{identificativoAdministrator}")        // TODO : variabile d'ambiente
+    @GET
+    @Produces(MediaType.APPLICATION_JSON )
+    public Administrator getAdministrator(@PathParam("identificativoAdministrator") Long identificativoAdministrator,
+                                @Context HttpServletRequest httpServletRequest ) {
+
+        Administrator administrator = Administrator.cercaAdministratorDaIdentificativo(identificativoAdministrator);
+        return administrator;
 
     }
 

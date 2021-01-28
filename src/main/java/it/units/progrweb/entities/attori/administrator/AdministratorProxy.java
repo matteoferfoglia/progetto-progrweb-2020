@@ -14,4 +14,11 @@ public class AdministratorProxy extends Administrator {
         this( administrator.username, administrator.nominativo, administrator.email );
     }
 
+    /** Crea un'istanza di questa classe a partire da una di {@link AdministratorStorage}.*/
+    public AdministratorProxy(AdministratorStorage administratorStorage) {
+        // TODO: serve questo metodo ?
+        this( administratorStorage.getUsername(),
+              administratorStorage.getNominativo(),
+              administratorStorage.getEmail() );
+    }
 }

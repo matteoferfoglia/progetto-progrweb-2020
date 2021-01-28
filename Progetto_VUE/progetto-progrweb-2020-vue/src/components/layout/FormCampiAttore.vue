@@ -34,7 +34,7 @@
              maxlength="100"
              :readonly="tuttiICampi_readOnly_wrapper"
              autocomplete="email">
-      <a :href="'mailto:' + email_wrapper"></a>
+      <a :href="'mailto:' + email_wrapper" v-if="email_wrapper"></a>
     </p>
     <slot>
       <!-- Qui possono essere aggiunti altri campi input / contenuti dal componente
@@ -236,7 +236,7 @@ export default {
                 this.username_wrapper   = "";
                 this.nominativo_wrapper = "";
                 this.email_wrapper      = "";
-                document.querySelector("#" + this.idHtml + " form").reset();
+                document.querySelector("#" + this.idHtml).reset();
               }
 
               return risposta
@@ -324,6 +324,6 @@ export default {
     text-decoration: none;
   }
   a[href^="mailto"]::before {
-    content: "✉ ";
+    content: " ✉";
   }
 </style>

@@ -29,7 +29,7 @@ import {richiestaGet} from "./http";
  */
 export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocumenti, nomePropertyHashtagDocumenti) => {
 
-    const indice_Hashtag_ListaDocumenti = new Map();
+    const indice_Hashtag_ListaDocumenti = new Map();    // TODO : rivedere se servono tutte queste conversioni Map -> Object -> Entries -> ... ??? (Già dal metodo invocante... non si può fare tutto come Map o tutto come oggetto?)
 
     // Iterazione sulle properties dell'oggetto,
     //  fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries

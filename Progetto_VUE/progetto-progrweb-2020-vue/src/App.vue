@@ -109,6 +109,7 @@ export default {
      * Il parametro nella route è salvato come String.
      */
     '$route': {
+      immediate: true,
       handler: function(nuovaRoute) {
         const eraUtenteAutenticato = this.isUtenteAutenticato;
         this.isUtenteAutenticato =

@@ -28,7 +28,8 @@ describe("Test in " + __filename + ": Indicizza documenti rispetto hashtag.",() 
             indiceHashtagDocumentiAtteso.set("agosto", ["166"]);
         }
 
-        const indiceHashtagDocumentiCalcolato = creaIndiceDeiFileRispettoAgliHashtagCheContengono(mappaDocumenti, NOME_PROP_HASHTAGS_IN_DOC);
+        const indiceHashtagDocumentiCalcolato = creaIndiceDeiFileRispettoAgliHashtagCheContengono( Object.fromEntries(mappaDocumenti),
+                                                                                                   NOME_PROP_HASHTAGS_IN_DOC );
 
         expect(areMappeEquivalenti(indiceHashtagDocumentiCalcolato,indiceHashtagDocumentiAtteso)).toBe(true);
     });
