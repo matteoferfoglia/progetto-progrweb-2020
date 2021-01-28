@@ -1,19 +1,21 @@
-<template>
+<template><!-- TODO : rivedere questo componente -->
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
   <form v-if=" mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
     <!-- Form per filtraggio documenti rispetto ad hashtag -->
-    <p>Hashtags: </p>
+    <p>Filtra per hashtag: </p>
     <ol>
       <li v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
           :key="hashtag">
         <p>
-          <input type="checkbox"
-                 @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
-                            Se cliccato, mostra documenti con questo hashtag
-                            Fonte: https://stackoverflow.com/a/41001483 */"
-                 :checked="listaHashtagDaMostrare.includes(hashtag)"/>
-          {{ hashtag }}
+          <label>
+            <input type="checkbox"
+                   @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
+                              Se cliccato, mostra documenti con questo hashtag
+                              Fonte: https://stackoverflow.com/a/41001483 */"
+                   :checked="listaHashtagDaMostrare.includes(hashtag)"/>
+            {{ hashtag }}
+          </label>
         </p>
       </li>
     </ol>
@@ -39,7 +41,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(documento, indice) in Object.fromEntries(mappaDocumentiDaMostrare.get())"
+      <tr v-for="(documento, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
           :key="indice"><!-- Ogni riga è un documento -->
         <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
                                                                                      nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
@@ -91,6 +93,7 @@
 import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
 import {richiestaDelete, richiestaGet} from "../../utils/http";
 import {
+  aggiungiDocumentoAdIndiceHashtag,
   creaIndiceDeiFileRispettoAgliHashtagCheContengono,
   MappaDocumenti,
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
@@ -199,9 +202,9 @@ export default {
               .then(rispostaConMappaFile_id_prop => {
                 richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
                     .then(nomePropertyHashtags => {
+                      this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomePropertyHashtags;
                       this.mappa_hashtag_idDocumenti =
                           creaIndiceDeiFileRispettoAgliHashtagCheContengono(rispostaConMappaFile_id_prop, nomePropertyHashtags);
-                      this.nomeProprietaHashtagInListaDocumenti = nomePropertyHashtags;
                     });
                 return rispostaConMappaFile_id_prop;
               })
@@ -215,7 +218,7 @@ export default {
               .then(mappa =>
                   new Map(
                       Array.from(mappa.entries())
-                          .map(unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento))
+                           .map(unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento))
                   )
               )
 
@@ -292,7 +295,7 @@ export default {
 
       this.mappaDocumentiDaMostrare.set( new Map(
           this.mappaDocumenti.getArrayEntries() // filter non si applica su Map, quindi converto in Array, poi riconverto il risultato in Map
-              .filter( entryDocumento => Array.from(listaIdDocumentiDaMostrare.values())
+              .filter( entryDocumento => Array.from( listaIdDocumentiDaMostrare.values() )
                                               .includes(entryDocumento[0]) )
       )); // entryDocumento[0] è l'id di un documento
       // Risultato filter: nella mappa restano solo i documenti che hanno id tra quelli filtrati prima
@@ -312,7 +315,17 @@ export default {
       const idDocumentoEliminato = urlEliminazioneDocumento
           .substring(urlEliminazioneDocumento.lastIndexOf("/")+1);
 
-      this.mappaDocumenti.get().delete(idDocumentoEliminato);
+      this.mappaDocumenti.delete(idDocumentoEliminato);
+
+      // Ricrea indice degli hashtag
+      this.mappa_hashtag_idDocumenti =
+          creaIndiceDeiFileRispettoAgliHashtagCheContengono( this.mappaDocumenti.getObjetFromEntries(),
+                                                             this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO    );
+
+      // Aggiorna lista di hashtag da mostrare (se elimino un documento ed un hashtag
+      // era presenta solo in quel documento, allora devo eliminare quell'hashtag)
+      this.listaHashtagDaMostrare = this.listaHashtagDaMostrare.filter( hashtag =>
+          Array.from(this.mappa_hashtag_idDocumenti.keys()).includes( hashtag ) );
 
     },
 
@@ -391,11 +404,41 @@ export default {
           ]
       );
 
-      // Aggiungi il documento all'elenco di quelli mostrati da questo componente
+      // TODO : rivedere: c'è un metodo più furbo per aggiornare la mappa dei documenti (bisogna aggiornare anche l'elenco degli hashtag per mantenere consistenza) ?
+
+      const oggetto_Id_PropNuovoDocumento = Object.fromEntries( oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere );
+      aggiungiDocumentoAdIndiceHashtag( this.mappa_hashtag_idDocumenti,
+          oggetto_Id_PropNuovoDocumento,
+          this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO );
+
+      // nel valore della prima property dell'oggetto ci sono le properties del documento
+      const oggettoConPropNuovoDocumento = Object.values( oggetto_Id_PropNuovoDocumento )[0] ;
+
+      const listaHashtagNuovoDocumento   = oggettoConPropNuovoDocumento[this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO];
+
+      // Aggiungi gli hashtag di questo documento a quelli da mostrare
+      this.listaHashtagDaMostrare =
+          [...new Set([ ...this.listaHashtagDaMostrare, ...listaHashtagNuovoDocumento])].sort();
+      // Set() evita eventuali duplicati negli hashtag,
+      // ma non dispone di sort() quindi necessario prima riconvertire in Array
+
+
+      // Aggiungi il documento all'elenco di quelli noti a questo componente
       this.mappaDocumenti.set(
-          new Map( [ ...oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere,  // merge della nuova entry in cima alla mappa
-                     ... this.mappaDocumenti.get() ] )
+        new Map([
+          ...oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere,  // merge della nuova entry in cima alla mappa
+          ... this.mappaDocumenti.get()
+        ])
       );
+
+      // Aggiungi il documento a quelli da mostrare
+      this.mappaDocumentiDaMostrare.set(
+          new Map([
+            ...oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere,
+            ... this.mappaDocumentiDaMostrare.get()
+          ])
+      );
+
     }
 
   },

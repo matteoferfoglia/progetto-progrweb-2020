@@ -29,7 +29,7 @@ import {richiestaGet} from "./http";
  */
 export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocumenti, nomePropertyHashtagDocumenti) => {
 
-    const indice_Hashtag_Documenti = new Map();
+    const indice_Hashtag_ListaDocumenti = new Map();
 
     // Iterazione sulle properties dell'oggetto,
     //  fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
@@ -38,22 +38,50 @@ export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocument
         // Ogni documento è un oggetto in cui una property è l'array degli hashtag
         const hashtagsDiQuestoDocumento = documento[nomePropertyHashtagDocumenti];  // array degli hashtag
 
-        if( isArray(hashtagsDiQuestoDocumento) && hashtagsDiQuestoDocumento.length > 0) {
-            hashtagsDiQuestoDocumento.forEach(hashtag => {
-                hashtag = hashtag.toLowerCase().trim();           // preprocessing di ogni hashtag prima di salvarlo nell'indice
-                if (indice_Hashtag_Documenti.has(hashtag)) {
-                    indice_Hashtag_Documenti.get(hashtag)                                 // recupera entry corretta dalla mappa
-                                            .push(idDocumento);   // aggiunge alla posting list (array) l'id di questo documento
-                } else {
-                    // hashtag non ancora presente nell'indice, quindi posting list da creare
-                    indice_Hashtag_Documenti.set(hashtag, [idDocumento]);   // crea un array quale valore di questa entry
-                }
-            });
-        }
+        indicizzaQuestoDocumento( hashtagsDiQuestoDocumento, indice_Hashtag_ListaDocumenti, idDocumento );
 
     }
 
-    return indice_Hashtag_Documenti;
+    return indice_Hashtag_ListaDocumenti;
+}
+
+/** Funzione di indicizzazione usata in {@link creaIndiceDeiFileRispettoAgliHashtagCheContengono}.*/
+const indicizzaQuestoDocumento = ( hashtagsDiQuestoDocumento, indice_Hashtag_ListaDocumenti, idDocumento ) => {
+    if( isArray(hashtagsDiQuestoDocumento) && hashtagsDiQuestoDocumento.length > 0) {
+        hashtagsDiQuestoDocumento.forEach(hashtag => {
+            hashtag = hashtag.toLowerCase().trim();                // preprocessing di ogni hashtag prima di salvarlo nell'indice
+            if (indice_Hashtag_ListaDocumenti.has(hashtag)) {
+                indice_Hashtag_ListaDocumenti.get(hashtag)         // recupera entry corretta dalla mappa
+                                             .push(idDocumento);   // aggiunge alla posting list (array) l'id di questo documento
+            } else {
+                // hashtag non ancora presente nell'indice, quindi posting list da creare
+                indice_Hashtag_ListaDocumenti.set(hashtag, [idDocumento]);   // crea un array quale valore di questa entry
+            }
+        });
+    }
+};
+
+
+/** Dato un indice creato da {@link creaIndiceDeiFileRispettoAgliHashtagCheContengono}
+ * e un nuovo documento (nella stessa forma di quella attesta nella funzione
+ * {@link creaIndiceDeiFileRispettoAgliHashtagCheContengono}, questa funzione restituisce
+ * lo stesso indice aggiornato con il nuovo documento (aggiornamento "in place").
+ * @param indice_Hashtag_ListaDocumenti L'indice creato da {@link creaIndiceDeiFileRispettoAgliHashtagCheContengono}.
+ * @param nuovoDocumento Il nuovo documento da aggiungere all'indice. E' un oggetto con una
+ *                       sola property, con nome l'identificativo del documento e valore
+ *                       le sue proprietà.
+ * @param nomePropertyHashtagDocumenti Il nome della property nel nuovo documento contenente la
+ *                                      lista di hashtag.
+ */
+export const aggiungiDocumentoAdIndiceHashtag =
+    ( indice_Hashtag_ListaDocumenti, nuovoDocumento, nomePropertyHashtagDocumenti ) => {
+
+    const idDocumento   = Object.keys( nuovoDocumento )[0];
+    const propDocumento = Object.values( nuovoDocumento )[0];
+
+    const listaHashtagNuovoDocumento = propDocumento[nomePropertyHashtagDocumenti];
+    indicizzaQuestoDocumento( listaHashtagNuovoDocumento, indice_Hashtag_ListaDocumenti, idDocumento );
+
 }
 
 /** Ordina la mappa dei documenti in base alla data di caricamento
@@ -182,6 +210,18 @@ export class MappaDocumenti{
     /** Restituisce l'array delle entries di questa mappa.*/
     getArrayEntries() {
         return Array.from( this.get().entries() );
+    }
+
+    /** Restituisce un oggetto in cui ogni property è un'entry
+     * della mappa rappresentata da questa istanza.*/
+    getObjetFromEntries() {
+        return Object.fromEntries( this.get() );
+    }
+
+    /** Elimina (se presente) l'entry corrispondente alla chiave data.
+     * @return Se l'eliminazione è andata a buon fine, false altrimenti.*/
+    delete( chiave ) {
+        return this.get().delete( chiave );
     }
 
 }
