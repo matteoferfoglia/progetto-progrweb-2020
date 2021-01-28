@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Subclass(index = false)
 class ConsumerStorage extends Consumer {
 
-    private ConsumerStorage(String username, String nominativo, String email) {
+    ConsumerStorage(String username, String nominativo, String email) {
         super(username, nominativo, email);
     }
 

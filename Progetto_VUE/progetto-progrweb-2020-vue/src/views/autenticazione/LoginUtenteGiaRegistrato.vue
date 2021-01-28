@@ -93,7 +93,7 @@ export default {
 
         const campiFormDaInviareAlServer = {
           [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] : this.username,
-          [process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME] : this.password,
+          [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] : this.password,
           [process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME] : this.csrfToken
         };
 

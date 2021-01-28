@@ -125,7 +125,7 @@ export default {
      * @param tipoAttore Il tipo di attore che si vuole aggiungere.*/
     impostaValoriDaInviareAlServer( tipoAttore ) {
       this.datiAggiuntiviDaInviareAlServer = {
-        [process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME]: Math.trunc((Math.random()*10e6))+1234,  // genera una password casuale
+        [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME]: Math.trunc((Math.random()*10e6))+1234,  // genera una password casuale
         // (l'attore appena creato dovrebbe cambiarla al primo login...)
         [process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME]: tipoAttore
       }
@@ -140,11 +140,11 @@ export default {
           .then( identificativoAttore => {
 
             let messaggioInformativo;
-            if( this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME] ) {
+            if( this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] ) {
               // Administrator ha aggiunto un attore
               messaggioInformativo = "Attore " + oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
                   " [" + identificativoAttore + "] aggiunto, la sua password è: " +
-                  this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FOM_PASSWORD_INPUT_FIELD_NAME] +
+                  this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] +
                   ". Si consiglia di modificare la password al primo accesso.";
 
               const formAggiuntaUploaderOAdministrator =

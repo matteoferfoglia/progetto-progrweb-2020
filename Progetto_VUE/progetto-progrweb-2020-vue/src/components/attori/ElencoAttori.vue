@@ -32,23 +32,27 @@
     </router-link>
   </nav>
 
-    <ol>
-      <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
-          :key="attore[0]/*Id dell'attore*/">
-        <router-link :to="{
-          name: NOME_ROUTE_SCHEDA_ATTORE,
-          params: {
-            [NOME_PARAM_ID_ATTORE_router]       : attore[0],
-            [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
-            [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
-              // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
-          }
-        }">
-          {{ attore[1][NOME_PROP_NOMINATIVO] }}
-        </router-link>
-      </li>
-    </ol>
+  <ol>
+    <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
+        :key="attore[0]/*Id dell'attore*/">
+      <router-link :to="{
+        name: NOME_ROUTE_SCHEDA_ATTORE,
+        params: {
+          [NOME_PARAM_ID_ATTORE_router]       : attore[0],
+          [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
+          [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
+            // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
+        }
+      }">
+        {{ attore[1][NOME_PROP_NOMINATIVO] }}
+      </router-link>
+    </li>
+  </ol>
 
+  <p v-if="isConsumerAttualmenteAutenticato() &&
+          mappa_idAttore_proprietaAttore.size === 0">
+    Nessun <i>Uploader</i> disponibile.
+  </p>
 
 
 </template>

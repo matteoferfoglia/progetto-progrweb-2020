@@ -187,7 +187,7 @@ public class UtilitaGenerale {
         indiceSeparatoreEstensioneNelNome = indiceSeparatoreEstensioneNelNome == -1 ?  // true se manca l'estensione
                                                 nomeFile.length() :
                                                 indiceSeparatoreEstensioneNelNome;
-        return nomeFile.substring(indiceSeparatoreEstensioneNelNome);
+        return nomeFile.substring(indiceSeparatoreEstensioneNelNome+1);                // +1 per escludere il punto
     }
 
     /** Verifica che una stringa non sia nè nulla nè vuota.*/
