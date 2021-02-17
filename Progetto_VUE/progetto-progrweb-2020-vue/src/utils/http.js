@@ -101,12 +101,17 @@ export const getHttpResponseStatus = (responseHttp) => responseHttp.status;
 
 /** Effettua una richiesta GET.
  * @param url è l'url di destinazione delle request.
+ * @param oggettoConParametri è l'oggetto JavaScript contenente i parametri per la request.
+ * @param responseType_blob è un flag booleano da impostare se si vuole configurare il
+ *                          responseType di questa request al tipo 'blob'.
  * @return una Promise con la risposta ricevuta: la promise è "thenable"
  *          se non ci sono stati errori, oppure {@link #onErrorHandler}.
  */
-export const richiestaGet = (url,oggettoConParametri) => {
+export const richiestaGet = (url,oggettoConParametri,responseType_blob=false) => {
 
     const cloneConfigRichiesteHttp = aggiungiParametriAllaRequest(oggettoConParametri);
+    if(responseType_blob)
+        cloneConfigRichiesteHttp['responseType'] = 'blob';
 
     return axios.get(url, cloneConfigRichiesteHttp)
                 .then(risposta => Promise.resolve(risposta.data) )
