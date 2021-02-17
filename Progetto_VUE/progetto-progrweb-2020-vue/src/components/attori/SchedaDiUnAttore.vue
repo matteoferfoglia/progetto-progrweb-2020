@@ -34,7 +34,7 @@
         <input type="file" :name="LOGO_INPUT_FIELD_NAME"
                v-if="mostrareInputFilePerModificaLogoUploader()" ><!-- TODO : testare la modifica del logo -->
 
-        <button @click="document.querySelector('#' + idHtmlQuestoComponente + ' form').submit"
+        <button @click="modificaAttore()"
                 v-if="! isConsumerAttualmenteAutenticato()">
           <!-- Fonte icona: https://icons.getbootstrap.com/icons/pen/ --><!-- TODO : icone da aggiungere via CSS -->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
@@ -323,6 +323,12 @@ name: "SchedaDiUnAttore",
     isAdministratorAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato ===
           process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
+    },
+
+    /** Richiede al server la modifica di un attore in base ai valori attualmente
+     * inseriti nel form.*/
+    modificaAttore() {
+      document.querySelector('#' + this.idHtmlQuestoComponente + ' form').submit();
     },
 
     /** Richiede al server l'eliminazione di un attore.*/
