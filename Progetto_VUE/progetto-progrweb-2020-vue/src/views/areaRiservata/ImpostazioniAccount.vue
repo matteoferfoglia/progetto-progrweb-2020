@@ -8,6 +8,7 @@
       @submit="modificaInformazioni"
       @csrf-token-ricevuto="aggiornaCsrfToken($event)"><!-- TODO : è necessario che questo evento venga raccolta dal padre? Dovrebbe andare direttamente in area riservata perché è li il <router-view> -->
 
+    <p>Da questa pagina è possibile modificare le informazioni personali.</p>
     <small>Riempire solo i campi da aggiornare.</small>
 
     <p>
