@@ -153,6 +153,7 @@ public class RelazioneUploaderConsumerFileTest {
                     case "identificativoUploader"  : field.set(r, idUploader); break;
                     case "identificativoConsumer"  : field.set(r, idConsumer); break;
                     case "idFile"                  : field.set(r, idFile); break;
+                    case "eliminato"               : field.set(r, Math.round(Math.random())==0); break;
                     default:
                         fail("Il field \"" + field.getName() + "\" non è stato trovato: potrebbe essere necessario modificare " +
                                 "QUESTO METODO DI TEST (es. se il field è stato rinominato nella classe).");
