@@ -89,7 +89,7 @@
  * in quanto ne ha semplificato l'implementazione.*/
 
 
-import {camelCaseToHumanReadable} from "../../utils/utilitaGenerale";
+import {camelCaseToHumanReadable, capitalize} from "../../utils/utilitaGenerale";
 import {richiestaDelete, richiestaGet} from "../../utils/http";
 import {
   aggiungiDocumentoAdIndiceHashtag,
@@ -186,7 +186,11 @@ export default {
 
       /** In un documento, è il nome della property il cui valore
        * è la data di visualizzazione di quel documento.*/
-      NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO: undefined,
+      NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO: undefined,    // TODO : aggiungerle alle variabili d'ambiente senza richiederle ogni volta, oppure creare un utility da eseguire una volta sola all'accesso nell'applicazione che richieda una volta per tutte tutti i parametri
+
+      /** In un documento, è il nome della property il cui valore
+       * è la data di caricamento di quel documento.*/
+      NOME_PROP_DATA_CARICAMENTO_DOCUMENTO: undefined,
 
       /** "Import" della funzione per usarla nel template.*/
       camelCaseToHumanReadable: camelCaseToHumanReadable,
@@ -206,6 +210,10 @@ export default {
       await getNomePropertyDataVisualizzazioneDocumenti()
               .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
 
+              // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
+              .then( getNomePropertyDataCaricamentoDocumenti )
+              .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp)
+
               // Richiede mappa idFile-propFile per questo attore
               .then( () => richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) )
 
@@ -224,13 +232,22 @@ export default {
               .then(rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)))
               // Ordina mappa
               .then( mappa => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( mappa,
-                                              this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO ))
+                                              this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                                              this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO))
 
               // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
               .then(mappa =>
                   new Map(
                       Array.from(mappa.entries())
                            .map(unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento))
+                  )
+              )
+
+              // In ogni documento, modifica il formato di rappresentazione delle data
+              .then(mappa =>
+                  new Map(
+                      Array.from(mappa.entries())
+                           .map( this.formattaDate )
                   )
               )
 
@@ -445,8 +462,8 @@ export default {
       // Aggiungi url nelle properties
       oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere = new Map(
           [
-            this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(
-                Object.entries(oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere)[0]
+              this.formattaDate(this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(
+                Object.entries(oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere)[0])
             )
           ]
       );
@@ -486,6 +503,36 @@ export default {
           ])
       );
 
+    },
+
+    /** Data un'entry rappresentante un documento, ne formatta le date presenti.
+     * @param entry Array avente come primo elemento l'identificativo di un
+     *              documento come secondo elemento gli attributi di quel documento.
+     */
+    formattaDate( entry ) {
+
+      const formattaData = stringaRappresentanteData => {
+        if (!stringaRappresentanteData)
+          return stringaRappresentanteData;
+
+        return capitalize(
+            new Date(stringaRappresentanteData)
+                .toLocaleString(undefined/*varies according to default locale*/,
+                    {
+                      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    })
+        );
+      }
+
+      const proprietaQuestoDocumento = entry[1]; // è un oggetto
+      proprietaQuestoDocumento[this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO] =
+          formattaData(proprietaQuestoDocumento[this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO]);
+      proprietaQuestoDocumento[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
+          formattaData(proprietaQuestoDocumento[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO]);
+
+      return entry;
+
     }
 
   },
@@ -513,6 +560,26 @@ export default {
     }
   }
 }
+
+/** Questa funzione richiede al server il nome dell'attributo di un
+ * oggetto "documento" il cui valore è la data di caricamento di
+ * quel documento.
+ * Se la richiesta va a buon fine, viene restituita una Promise
+ * risolta con valore il nome dell'attributo restituito dal server.*/
+const getNomePropertyDataCaricamentoDocumenti = async () => {
+
+  return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_CARICAMENTO_IN_DOCUMENTI)
+      .then(  risposta       => risposta )
+      .catch( rispostaErrore => {
+        console.error("Errore durante la ricezione del nome dell'attributo " +
+            "contenente la data di caricamento dei documenti: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+        // TODO : gestire l'errore (invio mail ai gestori?)
+        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+      });
+
+}
+
 </script>
 
 <style scoped>

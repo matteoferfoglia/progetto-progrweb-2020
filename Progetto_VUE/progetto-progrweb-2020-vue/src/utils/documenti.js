@@ -93,61 +93,38 @@ export const aggiungiDocumentoAdIndiceHashtag =
  * ammesso che la procedura vada a buon fine.
  * @param mappaDocumenti La mappa dei documenti.
  * @param nomePropDataVisualizzazione In un documento, è il nome della property
- *                                con la data di visualizzazione di quel documento.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
+ *                                con la data di visualizzazione di quel documento.
+ * @param nomePropDataVisualizzazione In un documento, è il nome della property
+ *                                con la data di caricamento di quel documento.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
 export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
-    (mappaDocumenti, nomePropDataVisualizzazione) => {
-
-    return getNomePropertyDataCaricamentoDocumenti()
+    (mappaDocumenti, nomePropDataVisualizzazione, nomePropDataCaricamento) => {
 
         // Ordina mappa in base alla data di caricamento ( Fonte: https://stackoverflow.com/a/50427905 )
-        .then( nomePropertyDataCaricamento =>
-            mappaDocumenti = new Map(
-                [...mappaDocumenti].sort( (a,b) =>
-                            a[1][nomePropertyDataCaricamento] < b[1][nomePropertyDataCaricamento] ? 1 : -1 )
-            )
+
+        mappaDocumenti = new Map(
+            [...mappaDocumenti].sort( (a,b) =>
+                        a[1][nomePropDataCaricamento] < b[1][nomePropDataCaricamento] ? 1 : -1 )
         )
 
-        .then( () =>
-            Array.from(   mappaDocumenti.entries() )
-                 .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] == null ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
-                 .map(    entryDocumento => entryDocumento[0] )                                      // salva l'id dei documenti risultanti dal filtraggio
-                                                                                                     // entryDocumento è nella forma:   [chiaveDoc, {prop1Doc: val1, prop2Doc: val2}]
-        )   // restituisce array con id dei documenti non ancora visualizzati in una Promise
+        const arrayIdDocumentiNonAncoraVisualizzati = Array.from(   mappaDocumenti.entries() )
+             .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] == null ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
+             .map(    entryDocumento => entryDocumento[0] )                                      // salva l'id dei documenti risultanti dal filtraggio
+                                                                                                 // entryDocumento è nella forma:   [chiaveDoc, {prop1Doc: val1, prop2Doc: val2}]
+                                                                                                 // Restituisce array con id dei documenti non ancora visualizzati
 
         // Riordina l'elenco dei documenti portando in testa quelli ancora non letti
         // mantenendo i più recenti in ordine, subito dopo quelli non letti
-        .then( arrayIdDocumentiNonAncoraVisualizzati =>  {
-            const mappaSoloDocumentiNonLetti =
-                new Map( arrayIdDocumentiNonAncoraVisualizzati
-                             .map( id => [id, mappaDocumenti.get(id)] ) );
 
-            // Elimina dalla mappa generale dei documenti quelli già letti per non ricontarli
-            arrayIdDocumentiNonAncoraVisualizzati
-                .forEach( id => mappaDocumenti.delete(id) );
+        const mappaSoloDocumentiNonLetti =
+            new Map( arrayIdDocumentiNonAncoraVisualizzati
+                         .map( id => [id, mappaDocumenti.get(id)] ) );
 
-            // Restituisci il merge delle mappe
-            return new Map([...mappaSoloDocumentiNonLetti, ...mappaDocumenti]); // Fonte: https://stackoverflow.com/a/32000937
-        })
+        // Elimina dalla mappa generale dei documenti quelli già letti per non ricontarli
+        arrayIdDocumentiNonAncoraVisualizzati
+            .forEach( id => mappaDocumenti.delete(id) );
 
-        .catch( errore => Promise.reject("Errore durante l'ordinamento dei documenti: " + errore) );
-}
-
-/** Questa funzione richiede al server il nome dell'attributo di un
- * oggetto "documento" il cui valore è la data di caricamento di
- * quel documento.
- * Se la richiesta va a buon fine, viene restituita una Promise
- * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyDataCaricamentoDocumenti = async () => {
-
-    return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_CARICAMENTO_IN_DOCUMENTI)
-        .then(  risposta       => risposta )
-        .catch( rispostaErrore => {
-            console.error("Errore durante la ricezione del nome dell'attributo " +
-                "contenente la data di caricamento dei documenti: " + rispostaErrore );
-            return Promise.reject(rispostaErrore);
-            // TODO : gestire l'errore (invio mail ai gestori?)
-            // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-        });
+        // Restituisci il merge delle mappe (ora nell'ordinamento corretto)
+        return new Map([...mappaSoloDocumentiNonLetti, ...mappaDocumenti]); // Fonte: https://stackoverflow.com/a/32000937
 
 }
 
