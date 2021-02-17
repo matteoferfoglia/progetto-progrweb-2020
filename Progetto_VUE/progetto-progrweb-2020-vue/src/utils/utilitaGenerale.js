@@ -96,3 +96,10 @@ export const generaIdUnivoco = (() => {
     }
 
 })();
+
+/** Funzione per rendere maiscuola la prima lettera di ogni parola
+ * nella stringa data.*/
+export const capitalize = str =>
+    str.split(' ')
+       .map( unaParola => unaParola.charAt(0).toUpperCase() + unaParola.slice(1) )
+       .join(' ');
