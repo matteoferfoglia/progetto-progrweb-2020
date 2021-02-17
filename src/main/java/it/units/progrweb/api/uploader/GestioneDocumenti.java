@@ -101,7 +101,7 @@ public class GestioneDocumenti {
 
                 // Se qui, allora destinatario esiste
 
-                File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + estensioneFile, listaHashtag_list,
+                File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + "." + estensioneFile, listaHashtag_list,
                         identificativoUploader, identificativoConsumerDestinatario );
 
                 Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploader);
