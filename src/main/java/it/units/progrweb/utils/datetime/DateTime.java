@@ -18,7 +18,7 @@ public class DateTime implements Comparable<DateTime> {
 
     /** Pattern da utilizzare per la conversione da un'istanza di
      * questa classe in una {@link String} e viceversa.*/
-    private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd   HH:mm:ss";
+    private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd HH:mm:ss z";
 
     /** Pattern utilizzato per il formato "date" nei gli elementi
      * di input[type=date] in HTML.*/
