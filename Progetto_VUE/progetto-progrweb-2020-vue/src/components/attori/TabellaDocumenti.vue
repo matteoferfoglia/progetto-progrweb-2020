@@ -348,7 +348,7 @@ export default {
 
       const idDocumento = this.getIdDocumentoDaUrlDownloadEliminazione( urlDownloadDocumento );
 
-      richiestaGet( urlDownloadDocumento )
+      richiestaGet( urlDownloadDocumento, {}, true)
         .then( risposta => {
           const blob = new Blob( [risposta], {type: "octet/stream"} );
 

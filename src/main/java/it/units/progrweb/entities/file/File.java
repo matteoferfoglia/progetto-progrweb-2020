@@ -18,7 +18,6 @@ import it.units.progrweb.utils.datetime.DateTime;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -180,7 +179,7 @@ public abstract class File {
      * @param salvaDataOraVisualizzazione true se si vuole salvare la data/ora
      *                                    in cui il documento è richiesto (ignorato
      *                                    se tale data/ora è già salvata).*/
-    public static InputStream getContenutoFile(File file,
+    public static byte[] getContenutoFile(File file,
                                                String indirizzoIpVisualizzazione,
                                                boolean salvaDataOraVisualizzazione) {
         if( file instanceof FileStorage)
@@ -303,8 +302,8 @@ public abstract class File {
             if( relazioneFileAttore != null ) {
 
                 File file = File.getEntitaDaDbById(identificativoFile); // TODO : gestire il caso di file eliminato
-                InputStream inputStream = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
-                return Response.ok(inputStream, MediaType.APPLICATION_OCTET_STREAM)
+                byte[] contenutoFile = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
+                return Response.ok(contenutoFile, MediaType.APPLICATION_OCTET_STREAM)
                                .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
                                .build();
 

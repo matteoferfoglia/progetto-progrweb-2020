@@ -7,8 +7,6 @@ import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +45,7 @@ class FileStorage extends File {
     }
 
     /** Vedere {@link #getContenutoFile(File, String, boolean)}.*/
-    static InputStream getContenutoFile(FileStorage file,
+    static byte[] getContenutoFile(FileStorage file,
                                         String indirizzoIpVisualizzazione,
                                         boolean salvaDatiVisualizzazione) {
 
@@ -59,8 +57,7 @@ class FileStorage extends File {
             DatabaseHelper.salvaEntita( file );
         }
 
-        // Conversione da byte[]
-        return new ByteArrayInputStream(file.getFile());
+        return file.getFile();
     }
 
     /** Elimina questo file dal database. Il file (inteso come bytes) viene

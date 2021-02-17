@@ -165,19 +165,26 @@ public class UtilitaGenerale {
     public static byte[] convertiInputStreamInByteArray( InputStream is ) {
 
         final int CAPACITA_BUFFER_ARRAY = 16384;  // 16 KB
+        byte[] bytes = new byte[CAPACITA_BUFFER_ARRAY];
 
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        byte[] data = new byte[CAPACITA_BUFFER_ARRAY];
 
         int nRead;
         try {
-            while ((nRead = is.read(data, 0, data.length)) != -1)
-                buffer.write(data, 0, nRead);
+            while ((nRead = is.read(bytes)) != -1)
+                buffer.write(bytes, 0, nRead);
         } catch (IOException e) {
             Logger.scriviEccezioneNelLog(UtilitaGenerale.class, e);
         }
 
-        return buffer.toByteArray();
+
+        byte[] daRestituire = buffer.toByteArray();
+        try {
+            buffer.close();
+        } catch (IOException e) {
+            Logger.scriviEccezioneNelLog(UtilitaGenerale.class, e);
+        }
+        return daRestituire;
 
     }
 
