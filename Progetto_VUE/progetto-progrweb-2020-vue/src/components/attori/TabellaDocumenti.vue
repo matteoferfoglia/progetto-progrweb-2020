@@ -14,7 +14,7 @@
                               Se cliccato, mostra documenti con questo hashtag
                               Fonte: https://stackoverflow.com/a/41001483 */"
                    :checked="listaHashtagDaMostrare.includes(hashtag)"/>
-            {{ hashtag }}
+            {{ hashtag === '' ? 'Senza hashtag' : hashtag }}
           </label>
         </p>
       </li>
