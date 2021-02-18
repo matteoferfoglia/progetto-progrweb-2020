@@ -81,3 +81,27 @@ export const setTokenAutenticazione = nuovoValoreTokenAutenticazione => {
     impostaAuthorizationHeaderInRichiesteHttp(nuovoValoreTokenAutenticazione);
 }
 
+/** Restituisce il tipo dell'attore attualmente autenticato.*/
+export const getTipoAttoreAttualmenteAutenticato = async () => {
+
+    return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO)
+        .catch( rispostaErrore => {
+            console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+            return Promise.reject(rispostaErrore);
+            // TODO : gestire l'errore (invio mail ai gestori?)
+            // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
+        });
+
+}
+
+/** Restituisce il nome dell'attore attualmente autenticato.*/
+export const getNomeAttoreAttualmenteAutenticato = async () => {
+
+    return richiestaGet(process.env.VUE_APP_URL_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
+        .catch( rispostaErrore => {
+            console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+            return Promise.reject(rispostaErrore);
+        });
+
+}
+

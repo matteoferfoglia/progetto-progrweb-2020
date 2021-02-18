@@ -63,8 +63,6 @@ export default {
         .then( () => richiestaGet( process.env.VUE_APP_URL_GET_NOME_PROP_USERNAME_ATTORE ) )
         .then( nomePropUsernameAttore => this.NOME_PROP_USERNAME_ATTORE = nomePropUsernameAttore )
 
-        .then( this.instradaVersoElencoAttori )
-
         .catch( console.error );
 
   },

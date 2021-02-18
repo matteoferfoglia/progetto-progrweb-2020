@@ -60,6 +60,7 @@
 <script>
 import {richiestaGet} from "../../utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
+import {getMappa_idAttore_proprietaAttore} from "../../utils/richiesteInfoSuAttori";
 
 export default {
   name: "ElencoAttori",
@@ -332,61 +333,6 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 
 }
 
-/** Richiede le informazioni relative all'attore il cui identificativo
- * è passato come parametro. Se la richiesta va a buon fine, viene
- * restituita una Promise risolta contenente un array di due elementi,
- * in cui il primo contiene l'identificativo dell'Attore ed il secondo
- * contiene un oggetto in cui ogni property è una proprietà dell'Attore.
- *
- * @param idAttore Identificativo dell'attore per cui si richiedono le informazioni.
- * @param tipoAttoreAttualmenteAutenticato Tipo di attore attualmente autenticato.
- * @param tipoAttoriDiCuiRichiedereInfo Tipo di attore per cui si richiedono le informazioni.*/
-const getInfoAttore = async (idAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo) => {
-
-  let urlRichiesta;
-
-  if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
-    if( tipoAttoriDiCuiRichiedereInfo === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
-      urlRichiesta = process.env.VUE_APP_URL_GET_INFO_ADMINISTRATOR__RICHIESTA_DA_ADMINISTRATOR;
-    } else {
-      urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
-    }
-  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ) {
-    urlRichiesta = process.env.VUE_APP_URL_GET_INFO_CONSUMER__RICHIESTA_DA_UPLOADER;
-  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
-    urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
-  } else {
-    urlRichiesta = "";
-  }
-
-  urlRichiesta += "/" + idAttore;
-
-  return await richiestaGet( urlRichiesta )
-                .then(rispostaConProprietaAttore => [idAttore, rispostaConProprietaAttore]);  // restituisce l'entry: [ idAttore, {propQuestoAttore} ]
-}
-
-
-/** Dato l'array avente per elementi gli identificativi degli Attori,
- * richiede al server una mappa avente per chiavi gli identificativi degli
- * Attori e per valori l'oggetto con le proprietà dell'Attore
- * indicato dalla chiave.
- */
-const getMappa_idAttore_proprietaAttore = async (arrayIdAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo) => {
-
-  // TODO : verificare correttezza
-
-  // Richiede al server info su ogni Attore nell'array
-
-    // TODO : si può evitare duplicazione di codice ? Stesso pattern usato anche in Consumer
-  return Promise.all( arrayIdAttore.map( idAttore => getInfoAttore( idAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo ) ))
-                //  una Promise per ogni Attore, quindi Promise.all per poi aspettarle tutte (Fonte: https://stackoverflow.com/a/31414472)
-
-                .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
-                .catch( rispostaErrore =>
-                    console.error("Errore durante il caricamento delle informazioni sugli Attori: " +
-                                   rispostaErrore ) );
-
-}
 
 </script>
 

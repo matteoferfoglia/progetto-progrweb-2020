@@ -309,7 +309,7 @@ public class RelazioneUploaderConsumerFile {
         if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoUploader, RelazioneUploaderConsumerFile.class ) &&
                 UtilitaGenerale.esisteAttributoInClasse( nomeAttributoConsumer, RelazioneUploaderConsumerFile.class ) ) {
 
-            List<Long> risultato = DatabaseHelper.proiezione(
+            List<Long> risultato = DatabaseHelper.proiezione(       // TODO : rivedere questo metodo
                     DatabaseHelper.creaERestituisciQuery( RelazioneUploaderConsumerFile.class,
                             nomeAttributoUploader, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader ),
                     nomeAttributoConsumer
@@ -327,7 +327,7 @@ public class RelazioneUploaderConsumerFile {
 
         } else {
             Logger.scriviEccezioneNelLog(RelazioneUploaderConsumerFile.class,
-                                        "Contrallare esistenza dei Field \"" + nomeAttributoConsumer + "\" e \"" + nomeAttributoUploader + "\".",
+                                        "Controllare esistenza dei Field \"" + nomeAttributoConsumer + "\" e \"" + nomeAttributoUploader + "\".",
                                          new NoSuchFieldException() );
             return new ArrayList<>();   // lista vuota come risultato
         }

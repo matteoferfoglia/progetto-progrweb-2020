@@ -17,7 +17,11 @@
 <script>
 
 import Header from "./components/layout/Header";
-import {eliminaTokenAutenticazione, verificaAutenticazione} from "./utils/autenticazione";
+import {
+  eliminaTokenAutenticazione, getNomeAttoreAttualmenteAutenticato,
+  getTipoAttoreAttualmenteAutenticato,
+  verificaAutenticazione
+} from "./utils/autenticazione";
 import {richiestaGet} from "./utils/http";
 export default {
   name: 'App',
@@ -120,30 +124,6 @@ export default {
       }
     }
   }
-}
-
-/** Restituisce il tipo dell'attore attualmente autenticato.*/
-const getTipoAttoreAttualmenteAutenticato = async () => {
-
-  return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO)
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-      });
-
-}
-
-/** Restituisce il nome dell'attore attualmente autenticato.*/
-const getNomeAttoreAttualmenteAutenticato = async () => {
-
-  return richiestaGet(process.env.VUE_APP_URL_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
-      .catch( rispostaErrore => {
-        console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-        return Promise.reject(rispostaErrore);
-      });
-
 }
 
 </script>

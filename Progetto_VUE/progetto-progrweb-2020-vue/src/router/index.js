@@ -16,7 +16,7 @@
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import {verificaAutenticazione} from "../utils/autenticazione";
-import {richiestaGet} from "../utils/http";
+import {getProprietaAttoreTarget, getTipoAttoreTarget} from "../utils/richiesteInfoSuAttori";
 
 
 const routes = [
@@ -92,7 +92,10 @@ const routes = [
             name: process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
             // TODO : aggiungere controllo: prima di instradare verificare che ci siano le property e se non ci sono richiederle al server
             component: () => import('../components/attori/SchedaDiUnAttore'),
-            props: true
+            props: true,
+            meta: {
+              requiresInfoAttore: true  // questa route richiede di conoscere le informazioni sull'attore di cui mostrare la scheda
+            }
           }
         ]
       }
@@ -120,105 +123,80 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
   // TODO : rivedere bene i percorsi di instradamento
 
-  if( routeDestinazione.matched.some(route => route.meta.requiresAuth) ) {
-    // Gestione instradamento per route che richiede autenticazione
+  (async () => {
+    // funzione asincrona
 
-    verificaAutenticazione(routeDestinazione)
+    if( routeDestinazione.matched.some(route => route.meta.requiresAuth) ) {
+      // Gestione instradamento per route che richiede autenticazione
 
-        .then( isUtenteAutenticato => {
+      await verificaAutenticazione(routeDestinazione) // TODO: verifica autenticazione dovrebbe basarsi sul token JWT (implementare metodo in autenticazione.js)
+        .then( async isUtenteAutenticato => {
 
           if(isUtenteAutenticato) {
             // Autenticato
             routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";
 
-            if( routeDestinazione.matched.some(route => route.meta.requiresIdUploader) ) {
+            if (routeDestinazione.matched.some(route => route.meta.requiresInfoAttore)) {
 
-              if (! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER]) {
-                // Se qui, nella route manca il parametro dell'uploader
-                console.error("Parametro " +
-                    process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER +
-                    " mancante nella route.");
-                next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
-              } else if ( ! routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_ATTORE] ) {
-                // Se qui, nella route manca il logo dell'uploader
-
-                richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" +
-                    routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_UPLOADER_DI_CUI_MOSTRARE_DOCUMENTI_PER_CONSUMER] ) // Richiede il logo dell'Uploader al server
-                    .then( logoBase64 => {
-                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_LOGO_ATTORE] = logoBase64 ;
-                      next();
-                    })
-                    .catch( errore => {
-                      console.error(errore);
-                      next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
-                    });
-
-              } else {
-                next(); // instrada senza problemi se ci sono tutti i parametri
-              }
-
-            } else if ( routeDestinazione.matched.some(route => route.meta.requiresIdConsumer) ) {    // TODO : da verificare
-
-              const idConsumer = routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ];
-
-              if( ! idConsumer ) {
-
-                // Se qui, nella route manca il parametro del consumer
-                console.error("Parametro " +
-                    process.env.VUE_APP_ROUTER_PARAMETRO_ID_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER +
-                    " mancante nella route.");
-                next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
-
-              } else {
-
-                if( ! routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] ) {
-
-                  // Se qui, nella route manca il parametro col nome del consumer
-                  richiestaGet( process.env.VUE_APP_URL_GET_NOME_CONSUMER + "/" + idConsumer )
-                      .then( nomeConsumer => {
-                        // Salva il nome del consumer ed instrada
-                        routeDestinazione.params[ process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER ] = nomeConsumer;
-                        next(routeDestinazione);
-                      })
-                      .catch( errore => {
-                        console.error("Parametro " +
-                          process.env.VUE_APP_ROUTER_PARAMETRO_NOME_CONSUMER_DI_CUI_MOSTRARE_DOCUMENTI_PER_UPLOADER +
-                          " mancante nella route.\n" + errore );
-                        next({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA}); // rimanda ad area riservata
-                      });
-
-                } else {
-
-                  next(); // instrada senza problemi se ci sono tutti i parametri
+                if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
+                  // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni
+                  console.error("Identificativo dell'attore non presente, selezionare un utente dall'elenco.");
+                  next({path: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                  return;
                 }
 
-              }
+                if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]) {
+                  // Se qui, nella route manca il tipo attore
+                  await getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
+                      .then(tipoAttoreTarget =>
+                          routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] = String(tipoAttoreTarget)
+                      )
+                      .catch(errore => {
+                        console.error(errore);
+                        next({path: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                      });
+                }
 
-
-            } else if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN                 &&
-                routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
-                routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE ) {
-              // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
-              // ed era stato mandato al login, ora redirect alla pagina che stava usando
-              // con tutti i parametri che aveva prima del redirect
-              let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
-              parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1,parametriVecchiaRoute.length-1));  // TODO : testare correttezza
-                                                          // substring() rimuove "" aggiunte all'inizio ed alla fine
-              const routeRichiestaPrima = {
-                fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
-                params: parametriVecchiaRoute
-              };
-              next(routeRichiestaPrima);
-
-            } else {
-
-              next();
+                if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]) {
+                  // Se qui, nella route manca il tipo attore
+                  await getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
+                      .then(propAttoreTarget => {
+                        routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
+                            JSON.stringify(propAttoreTarget);
+                      })
+                      .catch(errore => {
+                        console.error(errore);
+                        next({path: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                      });
+                }
 
             }
+
           } else {
             // Non autenticato
             next( router.creaRouteAutenticazioneConInfoRichiesta( routeDestinazione ) );
+          }
 
+        })
+        .then( () => {
+          if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN                        &&
+              routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
+              routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE ) {
+            // TODO : questa parte deve essere ricontrollata
+            // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
+            // ed era stato mandato al login, ora redirect alla pagina che stava usando
+            // con tutti i parametri che aveva prima del redirect
+            let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
+            parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1,parametriVecchiaRoute.length-1));  // TODO : testare correttezza
+            // substring() rimuove "" aggiunte all'inizio ed alla fine
+            const routeRichiestaPrima = {
+              fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
+              params: parametriVecchiaRoute
+            };
+            next(routeRichiestaPrima);
+
+          } else {
+            next(); // instrada senza problemi se ci sono tutti i parametri
           }
 
         })
@@ -227,11 +205,17 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           next({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
         })
 
-  } else  {
-    // SE route non richiede autorizzazione, ALLORA instrada senza problemi
-    next();
+    } else  {
+      // SE route non richiede autorizzazione, ALLORA instrada senza problemi
+      next();
 
-  }
+    }
+
+  })()
+      .catch( errore => {
+        console.error(errore);
+        router.go(0); // ricarica la pagina
+      });
 
 });
 

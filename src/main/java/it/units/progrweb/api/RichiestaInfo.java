@@ -2,6 +2,7 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.api.consumer.RichiestaDocumenti;
 import it.units.progrweb.api.uploader.GestioneConsumer;
+import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
+import java.util.function.Function;
 
 /**
  * Classe che espone i servizi di richieste informazioni,
@@ -180,5 +182,71 @@ public class RichiestaInfo {
 
     }
 
+    /** Dato come @PathParam l'identificativo di un {@link Attore}, se l'utente
+     * da cui proviene la richiesta è autorizzato a saperlo, restituisce il tipo
+     * di attore di cui è stato fornito l'identificativo.*/
+    @Path("tipoAttoreTarget/{idAttoreTarget}")
+    @GET
+    public Response getTipoAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(@PathParam("idAttoreTarget") Long idAttoreTarget,
+                                                                                       @Context HttpServletRequest httpServletRequest) {
+
+        // Lambda function per restituire il tipo dell'attore corrispondente all'id fornito
+        Function<Long, Response> getTipoAttoreTarget = idAttore -> {
+            Attore attoreTarget = Attore.getAttoreDaIdentificativo(idAttore);
+            return attoreTarget==null ?
+                    Response.status(Response.Status.NOT_FOUND).entity(idAttore + " non trovato nel sistema.").build() :
+                    Response.ok().entity(attoreTarget.getTipoAttore()).type(MediaType.TEXT_PLAIN).build();
+        };
+
+        return checkPermessiERestituisciInfoSuAttore(idAttoreTarget, httpServletRequest, getTipoAttoreTarget);
+
+    }
+
+    /** Dato come @PathParam l'identificativo di un {@link Attore}, se l'utente
+     * da cui proviene la richiesta è autorizzato a saperlo, restituisce un oggetto
+     * JSON con le proprietà dell'attore target.*/
+    @Path("proprietaAttoreTarget/{idAttoreTarget}")
+    @GET
+    public Response getProprietaAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(@PathParam("idAttoreTarget") Long idAttoreTarget,
+                                                                                            @Context HttpServletRequest httpServletRequest) {
+
+        // Lambda function per restituire il tipo dell'attore corrispondente all'id fornito
+        Function<Long, Response> getProprietaAttoreTarget = idAttore -> {
+            Attore attoreTarget = Attore.getAttoreDaIdentificativo(idAttore);
+            if (attoreTarget == null)
+                return Response.status(Response.Status.NOT_FOUND).entity(idAttore + " non trovato nel sistema.").build();
+            else
+                return Response.ok().entity(attoreTarget).type(MediaType.APPLICATION_JSON).build();
+        };
+
+        return checkPermessiERestituisciInfoSuAttore(idAttoreTarget, httpServletRequest, getProprietaAttoreTarget);
+
+    }
+
+    /** Funzione di supporto per
+     * {@link #getProprietaAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(Long, HttpServletRequest)}
+     * e {@link #getTipoAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(Long, HttpServletRequest)}.*/
+    private Response checkPermessiERestituisciInfoSuAttore(Long idAttoreTarget,
+                                                           HttpServletRequest httpServletRequest,
+                                                           Function<Long, Response> creazioneRisposta) {
+        String tipoAttoreAutenticato = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
+        if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Administrator.getTipoAttore()) ) {
+            return creazioneRisposta.apply(idAttoreTarget);
+        } else {
+            // uploader e consumer devono essere in relazione per vedere uno le info dell'altro
+            Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+            Long idConsumer, idUploader;
+            if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Consumer.getTipoAttore()) ) {
+                idConsumer = idAttoreAutenticato;
+                idUploader = idAttoreTarget;
+            } else {
+                idUploader = idAttoreAutenticato;
+                idConsumer = idAttoreTarget;
+            }
+            return RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(idUploader, idConsumer) ?
+                    creazioneRisposta.apply(idAttoreTarget) :
+                    Autenticazione.creaResponseForbidden("Consumer non in relazione con Uploader.");
+        }
+    }
 
 }

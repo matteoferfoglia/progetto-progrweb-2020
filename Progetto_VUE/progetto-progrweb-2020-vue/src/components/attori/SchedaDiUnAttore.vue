@@ -220,6 +220,10 @@ name: "SchedaDiUnAttore",
 
 
       // Wrapper
+      NOME_PROP_USERNAME_wrapper  : this.NOME_PROP_USERNAME,
+      NOME_PROP_NOMINATIVO_wrapper: this.NOME_PROP_NOMINATIVO,
+      NOME_PROP_EMAIL_wrapper     : this.NOME_PROP_EMAIL,
+
       csrfToken_wrapper: this.csrfToken
 
     }
@@ -280,17 +284,17 @@ name: "SchedaDiUnAttore",
       if( this.proprietaAttoreCuiQuestaSchedaSiRiferisce ) {
         // Verifica che le proprietà da mostrare siano ben definite
 
-        this.username   = this.NOME_PROP_USERNAME   ?
-            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] ?
-                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] : "" ) : "";
+        this.username   = this.NOME_PROP_USERNAME_wrapper   ?
+            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] ?
+                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] : "" ) : "";
 
-        this.nominativo = this.NOME_PROP_NOMINATIVO   ?
-            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO] ?
-                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO] : "" ) : "";
+        this.nominativo = this.NOME_PROP_NOMINATIVO_wrapper   ?
+            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] ?
+                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] : "" ) : "";
 
-        this.email      = this.NOME_PROP_EMAIL   ?
-            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL] ?
-                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL] : "" ) : "";
+        this.email      = this.NOME_PROP_EMAIL_wrapper   ?
+            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] ?
+                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "" ) : "";
       }
 
     },
@@ -400,6 +404,38 @@ name: "SchedaDiUnAttore",
         }
       }
     },*/
+
+    // necessario wrapper per aggiornare i valori
+    NOME_PROP_USERNAME: {
+      immediate: true,
+      deep: true,
+      handler(nuovoValore) {
+        if(nuovoValore) {
+          this.NOME_PROP_USERNAME_wrapper = nuovoValore;
+          this.caricaQuestoComponente();
+        }
+      }
+    },
+    NOME_PROP_NOMINATIVO: {
+      immediate: true,
+      deep: true,
+      handler(nuovoValore) {
+        if(nuovoValore) {
+          this.NOME_PROP_NOMINATIVO_wrapper = nuovoValore;
+          this.caricaQuestoComponente();
+        }
+      }
+    },
+    NOME_PROP_EMAIL: {
+      immediate: true,
+      deep: true,
+      handler(nuovoValore) {
+        if(nuovoValore) {
+          this.NOME_PROP_EMAIL_wrapper = nuovoValore;
+          this.caricaQuestoComponente();  // TODO : ogni volta che cambia una di queste proprietà ricarica tutto ... spreco (si potrebbe usare una property inizializzata a 3 e decrementata man mano che si ottengono le property non-undefined, quindi metterci un watch che si attiva quando arriva a zero e fa partire il setup dell'applicazione)
+        }
+      }
+    },
 
     csrfToken : {
       immediate: true,
