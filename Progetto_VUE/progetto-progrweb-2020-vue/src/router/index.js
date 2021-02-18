@@ -53,7 +53,7 @@ const routes = [
       {
         path: process.env.VUE_APP_ROUTER_PATH_REGISTRAZIONE_CONSUMER,
         component: () => import('../views/autenticazione/RegistrazioneNuovoConsumer'),
-      },
+      }
     ]
   },
 
