@@ -148,7 +148,7 @@ public class RichiestaInfo {
                 fieldUsername.set(uploader, null);
             } catch (IllegalAccessException | NoSuchFieldException exception) {
                 Logger.scriviEccezioneNelLog(RichiestaInfo.class,
-                        "Potrebbe essere stato modificato, nella classe, ll'attributo con lo username di un attore.",
+                        "Potrebbe essere stato modificato, nella classe, l'attributo con lo username di un attore.",
                         exception);
             }
 
