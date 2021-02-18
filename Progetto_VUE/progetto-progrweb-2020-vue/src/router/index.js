@@ -141,8 +141,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                 if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
                   // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni
                   console.error("Identificativo dell'attore non presente, selezionare un utente dall'elenco.");
-                  next({path: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
-                  return;
+                  router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
                 }
 
                 if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]) {
@@ -153,7 +152,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                       )
                       .catch(errore => {
                         console.error(errore);
-                        next({path: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                        router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
                       });
                 }
 
@@ -166,7 +165,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                       })
                       .catch(errore => {
                         console.error(errore);
-                        next({path: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                        router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
                       });
                 }
 
@@ -179,15 +178,16 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
         })
         .then( () => {
-          if(routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN                        &&
+
+          if (routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN &&
               routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
-              routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE ) {
+              routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE) {
             // TODO : questa parte deve essere ricontrollata
             // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
             // ed era stato mandato al login, ora redirect alla pagina che stava usando
             // con tutti i parametri che aveva prima del redirect
             let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
-            parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1,parametriVecchiaRoute.length-1));  // TODO : testare correttezza
+            parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1, parametriVecchiaRoute.length - 1));  // TODO : testare correttezza
             // substring() rimuove "" aggiunte all'inizio ed alla fine
             const routeRichiestaPrima = {
               fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
@@ -196,13 +196,13 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
             next(routeRichiestaPrima);
 
           } else {
-            next(); // instrada senza problemi se ci sono tutti i parametri
+            next();
           }
 
         })
         .catch(error => {
           console.error(error);
-          next({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
+          router.push({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
         })
 
     } else  {
