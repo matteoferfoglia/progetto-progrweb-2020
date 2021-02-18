@@ -394,6 +394,8 @@ export default {
                     dataOraVisualizzazione;
                 this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
                     dataOraVisualizzazione;
+                this.formattaDate([idDocumento, this.mappaDocumenti.getDaChiave(idDocumento)]);
+                this.formattaDate([idDocumento, this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)]);
               })
               .catch(console.error);
         }
