@@ -125,8 +125,8 @@ public class GestioneConsumer {
     @Path("/aggiungiConsumerPerQuestoUploader")
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
-    public Response aggiungiConsumer(ConsumerProxy consumerDaAggiungere,
-                                     @Context HttpServletRequest httpServletRequest) {
+    public Response associaConsumerAdUploader(ConsumerProxy consumerDaAggiungere,
+                                              @Context HttpServletRequest httpServletRequest) {
 
         // TODO : rivedere ed eventualmente semplificare questo metodo
         // TODO : metodo simile in ModificaInformazioniAttore
@@ -153,13 +153,37 @@ public class GestioneConsumer {
                                    .entity( "Valori di input inseriti non validi." )
                                    .build();
                 }
-            } catch (IllegalAccessException exception) {}
+            } catch (IllegalAccessException ignored) {}
         }
 
-        String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         try {
+            Long identificativoConsumer = associaConsumerAdUploader(consumerDaAggiungere, identificativoUploader);
+            return Response
+                    .ok()
+                    .entity(identificativoConsumer)
+                    .build();
+        } catch (NotFoundException ne) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST )
+                    .entity("Il Consumer richiesto non è registrato nella piattaforma.")    // TODO : var ambienTe con messaggi errore
+                    .build();
+        }
+
+
+
+    }
+
+    /** Dato un {@link Consumer} e l'identificativo di un {@link Uploader}, questo metodo
+     * associa il {@link Consumer} all'{@link Uploader}. Se il {@link Consumer} è già associato
+     * all'{@link Uploader} allora questo metodo non fa nulla.
+     * @return L'identificativo del {@link Consumer} se l'operazione va a buon fine.
+     * @throws NotFoundException Se il {@link Consumer} non è presente nel sistema. */
+    public static Long associaConsumerAdUploader(Consumer consumerDaAggiungere, Long identificativoUploader)
+            throws NotFoundException {
+
+        String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
 
             // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
             Consumer consumerDalDB = Consumer.getAttoreDaUsername(usernameConsumerDaAggiungere);
@@ -173,29 +197,12 @@ public class GestioneConsumer {
                     // SE precedenti controlli ok, ALLORA aggiungi il consumer
                     RelazioneUploaderConsumerFile.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
 
-                    return Response
-                            .ok()
-                            .entity(consumerDalDB.getIdentificativoAttore())
-                            .build();
-
-                } else {
-                    return Response
-                            .status(Response.Status.BAD_REQUEST)
-                            .entity("Il Consumer " + consumerDalDB.getUsername() + " è già associato all'Uploader che ne ha fatto richiesta.")
-                            .build();
                 }
+                return consumerDalDB.getIdentificativoAttore();
 
             } else {
                 throw new NotFoundException();
             }
-
-        } catch (Exception e) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST )
-                    .entity("Il Consumer richiesto non è registrato nella piattaforma.")    // TODO : var ambienTe con messaggi errore
-                    .build();
-        }
-
     }
 
 

@@ -2,8 +2,9 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.api.uploader.GestioneDocumenti;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -16,6 +17,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+
+import static it.units.progrweb.api.uploader.GestioneConsumer.associaConsumerAdUploader;
 
 /**
  * Classe che implementa i web services richiesti.
@@ -42,22 +45,24 @@ public class WebService {
                                @FormDataParam("nomeFile")                           String nomeFile,
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
-        Attore mittente = Autenticazione.getAttoreDaCredenziali(usernameUploader, passwordUploader);
-        if(!(mittente instanceof Uploader)) // check autenticazione uploader mittente
-            return Autenticazione.creaResponseUnauthorized();
+    Attore mittente = Autenticazione.getAttoreDaCredenziali(usernameUploader, passwordUploader);
+    if(!(mittente instanceof Uploader)) // check autenticazione uploader mittente
+        return Autenticazione.creaResponseUnauthorized();
 
-        Consumer destinatario = Consumer.getAttoreDaUsername(codiceFiscaleConsumerDestinatario);
-        if( destinatario!=null &&
-                destinatario.getNominativo().equals(nomeCognomeConsumerDestinatario) &&
-                destinatario.getEmail().equals(emailConsumerDestinatario) )
+        try {
+            // Se consumer già associato ad uploader, semplicemente restituisce l'identificativo
+            Long identificativoUploader = associaConsumerAdUploader( new ConsumerProxy(codiceFiscaleConsumerDestinatario,
+                                                                                       nomeCognomeConsumerDestinatario,
+                                                                                       emailConsumerDestinatario),
+                                                                     mittente.getIdentificativoAttore() );
             return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
-                    mittente.getIdentificativoAttore(), destinatario.getIdentificativoAttore());
+                    mittente.getIdentificativoAttore(), identificativoUploader);
 
-        return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
-                       .entity( "Consumer non trovato nel sistema." )
-                       .build();
-
-
+        } catch (NotFoundException notFoundException) {
+            return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
+                           .entity( "Consumer non trovato nel sistema." )
+                           .build();
+        }
     }
 
 }
