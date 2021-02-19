@@ -130,7 +130,7 @@ export default {
 
     /** Metodo per il caricamento dell'intero componente (incluse le
      * richieste al server per l'elenco degli attori).*/
-    async caricamentoQuestoComponente() {
+    async caricamentoQuestoComponente() { // TODO : elenco attori ed elenco dei documenti (in SchedaDiUnAttore) dovrebbero autoaggiornarsi automaticamente dopo un intervallo specificato come parametro
 
       this.layoutCaricato = false;
 
