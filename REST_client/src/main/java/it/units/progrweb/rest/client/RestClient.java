@@ -1,6 +1,5 @@
 package it.units.progrweb.rest.client;
 
-import com.sun.org.apache.bcel.internal.generic.RET;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
@@ -11,10 +10,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Matteo Ferfoglia
@@ -27,46 +22,51 @@ public class RestClient {
     /** Istanza del client.*/
     private final Client client;
 
-    public RestClient(String webServiceUri, String username, String password) {
+    public RestClient(String webServiceUri) {
         this.restWebServiceUri = webServiceUri;
         this.client =  ClientBuilder.newClient();
-        this.client.property("username", username)
-                   .property("password", password)
-                   .register(MultiPartFeature.class);
+        this.client.register(MultiPartFeature.class);
     }
 
-    public Response inviaFileAConsumer(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
+    public Response inviaFileAConsumer(String usernameUploader, String passwordUploader,
+                                       String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                                        String nomeFile, String listaHashtag, File file) {
 
-        FileDaCaricare fileDaCaricare = new FileDaCaricare(codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
+        FileDaCaricare fileDaCaricare = new FileDaCaricare(usernameUploader, passwordUploader,
+                                                           codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
                                                            nomeFile, listaHashtag, file);
 
         return client.target(restWebServiceUri)
-                     .request(MediaType.TEXT_PLAIN)
+                     .request(MediaType.APPLICATION_JSON)
                      .post(Entity.entity(fileDaCaricare.getFormDataMultiPart(), fileDaCaricare.getFormDataMultiPart().getMediaType()));
 
     }
-    
+
 }
 
 /** Classe di supporto rappresentante un file da caricare, con tutti
  * gli attributi richiesti dal web service.*/
 class FileDaCaricare {
 
+    private final String usernameUploader;
+    private final String passwordUploader;
     private final String codiceFiscaleConsumer;
     private final String emailConsumer;
     private final String nomeCognomeConsumer;
     private final String nomeFile;
-    private final List<String> listaHashtag;
+    private final String listaHashtag;
     private final File file;
 
-    public FileDaCaricare(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
+    public FileDaCaricare(String usernameUploader, String passwordUploader,
+                          String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                           String nomeFile, String listaHashtag, File file) {
+        this.usernameUploader = usernameUploader;
+        this.passwordUploader = passwordUploader;
         this.codiceFiscaleConsumer = codiceFiscaleConsumer;
         this.emailConsumer = emailConsumer;
         this.nomeCognomeConsumer = nomeCognomeConsumer;
         this.nomeFile = nomeFile;
-        this.listaHashtag = Arrays.asList(listaHashtag.split(", "));
+        this.listaHashtag = listaHashtag;
         this.file = file;
     }
 
@@ -76,13 +76,17 @@ class FileDaCaricare {
     FormDataMultiPart getFormDataMultiPart() {
 
         FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+        FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("contenutoFile", file,
+                                                        MediaType.APPLICATION_OCTET_STREAM_TYPE);
 
-        formDataMultiPart.field("codiceFiscale", codiceFiscaleConsumer);
-        formDataMultiPart.field("emailConsumer", emailConsumer);
-        formDataMultiPart.field("nomeCognomeConsumer", nomeCognomeConsumer);
-        formDataMultiPart.field("nomeFile", nomeFile);
-        formDataMultiPart.field("listaHashtag", listaHashtag, MediaType.APPLICATION_JSON_TYPE);
-        formDataMultiPart.field("file", file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        formDataMultiPart.field("usernameUploader", usernameUploader);
+        formDataMultiPart.field("passwordUploader", passwordUploader);
+        formDataMultiPart.field("codiceFiscaleConsumerDestinatario", codiceFiscaleConsumer);
+        formDataMultiPart.field("emailConsumerDestinatario",         emailConsumer);
+        formDataMultiPart.field("nomeCognomeConsumerDestinatario",   nomeCognomeConsumer);
+        formDataMultiPart.field("nomeFile",     nomeFile);
+        formDataMultiPart.field("listaHashtag", listaHashtag);
+        formDataMultiPart.bodyPart(fileDataBodyPart);
 
         return formDataMultiPart;
 
