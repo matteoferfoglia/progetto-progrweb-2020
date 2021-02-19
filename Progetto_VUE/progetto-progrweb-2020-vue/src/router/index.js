@@ -79,9 +79,10 @@ const routes = [
         name: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA,
         component: () => import('../views/areaRiservata/SchermataPrincipaleAttoreAutenticato'),
         props: true,
+        redirect: { name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI },
         children: [
           {
-            path: '',                                                 // percorso default per area riservata    // TODO : nei percorsi di default children bisogna usare percorso vuoto ('') perché questo è il pah relativo (appeso in coda a quello del padre)
+            path: '',                                                     // percorso default per area riservata
             alias: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
             name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI,
             component: () => import('../components/attori/ElencoAttori')
@@ -141,7 +142,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                 if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
                   // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni
                   console.error("Identificativo dell'attore non presente, selezionare un utente dall'elenco.");
-                  router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                  await router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
                 }
 
                 if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]) {
@@ -179,7 +180,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
         })
         .then( () => {
 
-          if (routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN &&
+          if (routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN &&  // TODO : TESTARE
               routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
               routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE) {
             // TODO : questa parte deve essere ricontrollata
