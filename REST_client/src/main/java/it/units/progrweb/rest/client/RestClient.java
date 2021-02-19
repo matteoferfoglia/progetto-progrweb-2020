@@ -1,10 +1,18 @@
 package it.units.progrweb.rest.client;
 
+import com.sun.org.apache.bcel.internal.generic.RET;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +31,8 @@ public class RestClient {
         this.restWebServiceUri = webServiceUri;
         this.client =  ClientBuilder.newClient();
         this.client.property("username", username)
-                   .property("password", password);
+                   .property("password", password)
+                   .register(MultiPartFeature.class);
     }
 
     public Response inviaFileAConsumer(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
@@ -32,31 +41,24 @@ public class RestClient {
         FileDaCaricare fileDaCaricare = new FileDaCaricare(codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
                                                            nomeFile, listaHashtag, file);
 
-//        return client.target(restWebServiceUri)
-//                     .request(MediaType.MULTIPART_FORM_DATA_TYPE)
-//                     .post(Entity.entity(fileDaCaricare, MediaType.MULTIPART_FORM_DATA_TYPE));
-
         return client.target(restWebServiceUri)
-                     .request(MediaType.APPLICATION_JSON)
-                     //.buildPost(Entity.entity(fileDaCaricare, MediaType.APPLICATION_JSON))
-                     .buildGet()
-                     .invoke();
+                     .request(MediaType.TEXT_PLAIN)
+                     .post(Entity.entity(fileDaCaricare.getFormDataMultiPart(), fileDaCaricare.getFormDataMultiPart().getMediaType()));
+
     }
-
-
-
+    
 }
 
 /** Classe di supporto rappresentante un file da caricare, con tutti
  * gli attributi richiesti dal web service.*/
 class FileDaCaricare {
 
-    private String codiceFiscaleConsumer;
-    private String emailConsumer;
-    private String nomeCognomeConsumer;
-    private String nomeFile;
-    private List<String> listaHashtag;
-    //private File file;
+    private final String codiceFiscaleConsumer;
+    private final String emailConsumer;
+    private final String nomeCognomeConsumer;
+    private final String nomeFile;
+    private final List<String> listaHashtag;
+    private final File file;
 
     public FileDaCaricare(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                           String nomeFile, String listaHashtag, File file) {
@@ -65,56 +67,24 @@ class FileDaCaricare {
         this.nomeCognomeConsumer = nomeCognomeConsumer;
         this.nomeFile = nomeFile;
         this.listaHashtag = Arrays.asList(listaHashtag.split(", "));
-        //this.file = file;
+        this.file = file;
     }
 
-    // Standard getter/setter per JAX-RS
+    /** Restituisce un'istanza della classe {@link FormDataMultiPart} avente
+     * come campi gli attributi dell'istanza di questa classe.
+     * Fonte (ispirato da): https://stackoverflow.com/q/24637038 */
+    FormDataMultiPart getFormDataMultiPart() {
 
-    public String getCodiceFiscaleConsumer() {
-        return codiceFiscaleConsumer;
+        FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+
+        formDataMultiPart.field("codiceFiscale", codiceFiscaleConsumer);
+        formDataMultiPart.field("emailConsumer", emailConsumer);
+        formDataMultiPart.field("nomeCognomeConsumer", nomeCognomeConsumer);
+        formDataMultiPart.field("nomeFile", nomeFile);
+        formDataMultiPart.field("listaHashtag", listaHashtag, MediaType.APPLICATION_JSON_TYPE);
+        formDataMultiPart.field("file", file, MediaType.APPLICATION_OCTET_STREAM_TYPE);
+
+        return formDataMultiPart;
+
     }
-
-    public void setCodiceFiscaleConsumer(String codiceFiscaleConsumer) {
-        this.codiceFiscaleConsumer = codiceFiscaleConsumer;
-    }
-
-    public String getEmailConsumer() {
-        return emailConsumer;
-    }
-
-    public void setEmailConsumer(String emailConsumer) {
-        this.emailConsumer = emailConsumer;
-    }
-
-    public String getNomeCognomeConsumer() {
-        return nomeCognomeConsumer;
-    }
-
-    public void setNomeCognomeConsumer(String nomeCognomeConsumer) {
-        this.nomeCognomeConsumer = nomeCognomeConsumer;
-    }
-
-    public String getNomeFile() {
-        return nomeFile;
-    }
-
-    public void setNomeFile(String nomeFile) {
-        this.nomeFile = nomeFile;
-    }
-
-    public List<String> getListaHashtag() {
-        return listaHashtag;
-    }
-
-    public void setListaHashtag(List<String> listaHashtag) {
-        this.listaHashtag = listaHashtag;
-    }
-
-//    public File getFile() {
-//        return file;
-//    }
-//
-//    public void setFile(File file) {
-//        this.file = file;
-//    }
 }
