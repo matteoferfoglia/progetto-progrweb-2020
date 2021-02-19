@@ -89,9 +89,26 @@ public class GestioneDocumenti {
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
 
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+
+        return uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
+                   identificativoUploader, identificativoConsumerDestinatario);
+
+    }
+
+    /** Si occupa dell'upload di file destinati ad un {@link Consumer}.
+     * Questo metodo è di supporto per
+     * {@link #uploadFile(HttpServletRequest, InputStream, FormDataContentDisposition, Long, String, String)}.*/
+    public static Response uploadFile( HttpServletRequest httpServletRequest,
+                                       InputStream contenuto,
+                                       FormDataContentDisposition dettagliFile,
+                                       String nomeFile,
+                                       String listaHashtag,
+                                       Long identificativoUploaderMittente,
+                                       Long identificativoConsumerDestinatario ) {
+
         if( contenuto != null && dettagliFile != null ) {
             List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
-            Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
             String estensioneFile = UtilitaGenerale.getEstensioneDaNomeFile(dettagliFile.getFileName());
 
@@ -102,9 +119,9 @@ public class GestioneDocumenti {
                 // Se qui, allora destinatario esiste
 
                 File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + "." + estensioneFile, listaHashtag_list,
-                        identificativoUploader, identificativoConsumerDestinatario );
+                        identificativoUploaderMittente, identificativoConsumerDestinatario );
 
-                Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploader);
+                Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploaderMittente);
                 inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
 
                 // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
@@ -122,21 +139,22 @@ public class GestioneDocumenti {
         } else {
 
             return Response.status( 422, "Unprocessable Entity" )
-                           .entity( "Caricare un file valido." )
-                           .build();
+                    .entity( "Caricare un file valido." )
+                    .build();
         }
 
     }
+
 
     /** Invia una notifica via emil al {@link Consumer} destinatario del documento.
      * @param fileAggiunto Il file da notificare.
      * @param mittenteFile Il mittente del file.
      * @param destinatarioFile destinatario del documento.
      * @param httpServletRequest Utilizzato per creare l'url di download del documento.*/
-    private void inviaNotificaDocumentoCaricatoAlConsumerDestinatario(@NotNull File fileAggiunto,
-                                                                      @NotNull Uploader mittenteFile,
-                                                                      @NotNull Consumer destinatarioFile,
-                                                                      @Context HttpServletRequest httpServletRequest) {
+    private static void inviaNotificaDocumentoCaricatoAlConsumerDestinatario(@NotNull File fileAggiunto,
+                                                                             @NotNull Uploader mittenteFile,
+                                                                             @NotNull Consumer destinatarioFile,
+                                                                             @Context HttpServletRequest httpServletRequest) {
 
         // TODO : metodo da verificare
 

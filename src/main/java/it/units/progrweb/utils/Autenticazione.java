@@ -32,7 +32,7 @@ public class Autenticazione {
     /** Rappresentazione di un attore non presente nel database
      * di autenticazione (es. se credenziali non sono valide),
      * oppure di un attore non autenticato.*/
-    private static final Attore ATTORE_NON_AUTENTICATO = null;      // TODO : cancellare
+    public static final Attore ATTORE_NON_AUTENTICATO = null;      // TODO : cancellare
 
     /** Tempo in secondi durante il quale ad un attore che si è autenticato
      * non verranno chieste nuovamente le credenziali. */
