@@ -216,14 +216,12 @@ public abstract class File {
     public static Map<String, String> getMappa_idFile_propFile(List<File> listaFile, boolean includiMetadati) {
         // TODO : refactoring potrebbe essere meglio avere una classe documenti che risponda alle richieste di documenti, sia di Consumer sia di Uploaders
 
-        Map<String,String> mappa_idFile_propFileInJson =
-               listaFile.stream()
-                        .collect(Collectors.toMap(
-                                file -> String.valueOf( file.getIdentificativoFile() ),
-                                file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta(includiMetadati)) // Ogni elemento dello stream contiene la descrizione JSON di un file
-                            )
-                        );
-        return mappa_idFile_propFileInJson;
+        return listaFile.stream()
+                 .collect(Collectors.toMap(
+                         file -> String.valueOf( file.getIdentificativoFile() ),
+                         file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta(includiMetadati)) // Ogni elemento dello stream contiene la descrizione JSON di un file
+                     )
+                 );
     }
 
     /**
@@ -245,30 +243,29 @@ public abstract class File {
                      .filter( field -> {
 
                          // Escludi i campi i cui nomi sono presenti in questo array
-                         String[] nomeAttributiInQuestaClasseDaNonMostrare = new String[]{};
+                         List<String> nomeAttributiInQuestaClasseDaNonMostrare = new ArrayList<>();
+                         {
+                             nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoDestinatario");    // TODO : sarebbe meglio spostare questi attributi e relativi metodo in FileStorage, cosicchè non vengano mostrati
+                             nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoMittente");
 
-                         if( ! includiMetadati ) {
-
-                             nomeAttributiInQuestaClasseDaNonMostrare = new String[]{
-                                     "identificativoFile",
-                                     "indirizzoIpVisualizzatore"
-                             };
-
-                             Arrays.stream(nomeAttributiInQuestaClasseDaNonMostrare)
-                                   .forEach( nomeUnAttributo -> {
-                                       if( ! UtilitaGenerale.esisteAttributoInClasse(nomeUnAttributo, File.class) ) {
-                                           // Informa se il field non si trova
-                                           Logger.scriviEccezioneNelLog(File.class,
-                                                   "L'attributo \"" + nomeUnAttributo + "\"" +
-                                                           " non si trova nella classe " + File.class.getName() +
-                                                           ": forse è stato rinominato",
-                                                   new NoSuchFieldException());
-                                       }
-                                   });
-
+                             if (!includiMetadati) {
+                                 nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoFile");
+                                 nomeAttributiInQuestaClasseDaNonMostrare.add("indirizzoIpVisualizzatore");
+                             }
+                             nomeAttributiInQuestaClasseDaNonMostrare
+                                     .forEach(nomeUnAttributo -> {
+                                         if (!UtilitaGenerale.esisteAttributoInClasse(nomeUnAttributo, File.class)) {
+                                             // Informa se il field non si trova
+                                             Logger.scriviEccezioneNelLog(File.class,
+                                                     "L'attributo \"" + nomeUnAttributo + "\"" +
+                                                             " non si trova nella classe " + File.class.getName() +
+                                                             ": forse è stato rinominato",
+                                                     new NoSuchFieldException());
+                                         }
+                                     });
                          }
 
-                         return ! UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaNonMostrare );
+                         return ! UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaNonMostrare.toArray() );
 
                      }).toArray(Field[]::new);
     }
