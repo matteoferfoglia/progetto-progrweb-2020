@@ -4,7 +4,7 @@ import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -39,7 +39,7 @@ public class StarterDatabase implements ServletContextListener {
             "it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage",
             "it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer",
             "it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage",
-            "it.units.progrweb.entities.RelazioneUploaderConsumerFile",
+            "it.units.progrweb.entities.RelazioneUploaderConsumer",
             "it.units.progrweb.entities.AuthenticationDatabaseEntry",
             "it.units.progrweb.entities.file.File",
             "it.units.progrweb.entities.file.FileStorage"
@@ -125,11 +125,11 @@ public class StarterDatabase implements ServletContextListener {
 
                         try {
                             // Creazione relazione consumer-uploader
-                            Constructor<RelazioneUploaderConsumerFile> costruttoreRelazione = null;
-                            costruttoreRelazione = RelazioneUploaderConsumerFile.class
+                            Constructor<RelazioneUploaderConsumer> costruttoreRelazione = null;
+                            costruttoreRelazione = RelazioneUploaderConsumer.class
                                     .getDeclaredConstructor(Long.class, Long.class, Long.class);
                             costruttoreRelazione.setAccessible(true);
-                            RelazioneUploaderConsumerFile relazione = costruttoreRelazione.newInstance(idConsumer, idUploader, null);
+                            RelazioneUploaderConsumer relazione = costruttoreRelazione.newInstance(idConsumer, idUploader, null);
 
                             ofy().save()
                                     .entities(administratorTest, relazione, authConsumerTest, authUploaderTest, authAdministratorTest)

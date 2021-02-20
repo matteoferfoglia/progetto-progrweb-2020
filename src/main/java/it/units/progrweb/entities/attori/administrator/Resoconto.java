@@ -1,8 +1,8 @@
 package it.units.progrweb.entities.attori.administrator;
 
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.util.List;
@@ -28,16 +28,15 @@ public class Resoconto {
      */
     public Resoconto(Long identificativoUploader, PeriodoTemporale periodoDiRiferimento) {
 
-        List<RelazioneUploaderConsumerFile> occorrenzeDocumentiCaricatiDaUploader =
-                RelazioneUploaderConsumerFile
-                        .getOccorrenzeFiltratePerUploaderEPeriodoTemporale( identificativoUploader,
+        List<File> occorrenzeDocumentiCaricatiDaUploader =
+                File.getOccorrenzeFiltratePerUploaderEPeriodoTemporale( identificativoUploader,
                                                                             periodoDiRiferimento   );
 
         this.numeroDiDocumentiCaricati = occorrenzeDocumentiCaricatiDaUploader.size();
         this.numeroDiConsumersDiversiCuiTaliDocumentiAfferiscono =
                 occorrenzeDocumentiCaricatiDaUploader
                     .stream()
-                    .map( RelazioneUploaderConsumerFile::getIdentificativoConsumer )
+                    .map( File::getIdentificativoDestinatario )
                     .distinct()
                     .count();
     }

@@ -1,6 +1,5 @@
 package it.units.progrweb.api.uploader;
 
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
@@ -54,7 +53,7 @@ public class GestioneDocumenti {
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
-        if( RelazioneUploaderConsumerFile.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
+        if( File.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
             return Response
                     .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
                     .entity("File " + idFileDaEliminare + " eliminato")    // TODO : var ambiene con messaggi errore
@@ -118,7 +117,7 @@ public class GestioneDocumenti {
 
                 // Se qui, allora destinatario esiste
 
-                File fileAggiunto = RelazioneUploaderConsumerFile.aggiungiFile( contenuto,nomeFile + "." + estensioneFile, listaHashtag_list,
+                File fileAggiunto = File.aggiungiFile( contenuto,nomeFile + "." + estensioneFile, listaHashtag_list,
                         identificativoUploaderMittente, identificativoConsumerDestinatario );
 
                 Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploaderMittente);
@@ -224,7 +223,7 @@ public class GestioneDocumenti {
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         List<File> fileDaRestituire =
-                RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer( identificativoUploader, identificativoConsumer );
+                File.getOccorrenzeFiltrataPerUploaderEConsumer( identificativoUploader, identificativoConsumer );
 
         return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire, true ) );
 

@@ -1,11 +1,11 @@
 package it.units.progrweb.api.consumer;
 
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.datetime.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -68,7 +68,7 @@ public class RichiestaDocumenti {
 
     }
 
-    /** Restituisce la data e l'ora di visualizzazione da parte del
+    /** Restituisce la data e l'ora di visualizzazione da parte del // TODO : corretto che restituisca la data ora di visualizzazione? Non di caricamento??
      * {@link Consumer} che ne fa richiesta del {@link File} il cui
      * identificativo è specificato come @PathParam.
      * Se l'attore che ha fatto richiesta non ha l'autorizzazione ad
@@ -85,13 +85,10 @@ public class RichiestaDocumenti {
         Long identificatoreRichiedente = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
         try {
 
-            boolean isAutorizzato =
-                    null != RelazioneUploaderConsumerFile.attorePuoAccedereAFile( identificatoreRichiedente, identificativoFile );
+            File file = File.getEntitaDaDbById(identificativoFile);
 
-            if( !isAutorizzato )
-                return "";
-
-            return File.getDataOraVisualizzazione( identificativoFile );
+            return file.getIdentificativoDestinatario().equals(identificatoreRichiedente) ?
+                    DateTime.convertiInString(file.getDataEdOraDiVisualizzazione()) : "";
 
         } catch (NotFoundException notFoundException) {
             return "";

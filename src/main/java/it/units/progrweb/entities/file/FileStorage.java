@@ -17,8 +17,6 @@ import java.util.Map;
 @Subclass(index = true)
 class FileStorage extends File {
 
-    // TODO : implementare questa classe!!
-
     /** Lista di hashtag associati a questo file. */
     @Index
     private List<String> listaHashtag;
@@ -27,14 +25,16 @@ class FileStorage extends File {
     private byte[] file;   // byte[] automaticamente convertito in Blob nel datastore
 
     /** Flag: true se il file è stato eliminato.*/
+    @Index
     private boolean eliminato;
 
 
     private FileStorage(){}
 
     /** Crea un nuovo file, con nome ed hashtags specificati. */
-    public FileStorage(String nomeDocumento, byte[] contenuto, List<String> hashtags) {
-        super(nomeDocumento, DateTime.adesso());
+    public FileStorage(String nomeDocumento, byte[] contenuto, List<String> hashtags,
+                       Long identificativoMittente, Long identificativoDestinatario) {
+        super(nomeDocumento, DateTime.adesso(), identificativoMittente, identificativoDestinatario);
         this.file         = contenuto;
         this.listaHashtag = hashtags;
         this.eliminato    = false;

@@ -1,10 +1,8 @@
 package it.units.progrweb.entities.attori.nonAdministrator.consumer;
 
 import com.googlecode.objectify.annotation.Subclass;
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
-import it.units.progrweb.persistence.NotFoundException;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,23 +34,12 @@ class ConsumerStorage extends Consumer {
      * Infine, restituisce i {@link File} scaricati.
      */
     static List<File> getAnteprimaFiles(Long idConsumer, Long idUploader) {
-        // TODO     ed a marcarli come letti (a meno che non lo siano già - scritture nel DB costano!)
-        // TODO : come implementare questo metodo ? Che cosa deve fare ? Che cosa ci si aspetta in outuput??
 
-        List<RelazioneUploaderConsumerFile> occorrenzeTrovate =
-                RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerUploaderEConsumer(idUploader, idConsumer);
-
-        return occorrenzeTrovate.stream()
-                                .map( occorrenza -> {
-                                    try {
-                                        File file = File.getEntitaDaDbById(occorrenza.getIdFile());
-                                        return file!=null && file.isEliminato() ? null : file;    // TODO : questa dovrebbe essere prerogativa della classe File di non mostrare ai Consumer quelli eliminati
-                                                // TODO : refactor per eliminare codice duplicato da RelazioneUploaderConsumerFile.getListaFileDaUploaderAConsumer
-                                    }
-                                    catch (NotFoundException notFoundException) { return null; }
-                                })
-                                .filter( Objects::nonNull )
-                                .collect( Collectors.toList() );
+        return Objects.requireNonNull(File.getOccorrenzeFiltrataPerUploaderEConsumer(idUploader, idConsumer))
+                        .stream()
+                        .map( unFile -> unFile!=null && !unFile.isEliminato() ? unFile : null )
+                        .filter( Objects::nonNull )
+                        .collect( Collectors.toList() );
 
     }
 

@@ -3,25 +3,24 @@ package it.units.progrweb.entities.file;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
-import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.JsonHelper;
-import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.*;
 import it.units.progrweb.utils.datetime.DateTime;
+import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,11 +53,23 @@ public abstract class File {
     /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
     private String dataEdOraDiVisualizzazione;
 
+    /** Mittente del file.*/
+    @Index
+    private Long identificativoMittente;
+
+    /** Destinatario del file.*/
+    @Index
+    private Long identificativoDestinatario;
+
+
+
     protected File(){}
 
-    protected File(String nomeDocumento, DateTime dataEdOraDiCaricamento) {
+    protected File(String nomeDocumento, DateTime dataEdOraDiCaricamento, Long identificativoMittente, Long identificativoDestinatario) {
         this.nomeDocumento = nomeDocumento;
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
+        this.identificativoMittente = identificativoMittente;
+        this.identificativoDestinatario = identificativoDestinatario;
     }
 
     /** Dato l'identificativo di un'istanza di questa classe, restituisce la data
@@ -88,6 +99,14 @@ public abstract class File {
 
     protected void setDataEdOraDiCaricamento(DateTime dataEdOraDiCaricamento) {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
+    }
+
+    public Long getIdentificativoMittente() {
+        return identificativoMittente;
+    }
+
+    public Long getIdentificativoDestinatario() {
+        return identificativoDestinatario;
     }
 
     public DateTime getDataEdOraDiVisualizzazione() {
@@ -215,7 +234,7 @@ public abstract class File {
     public static String[] anteprimaNomiProprietaFile(boolean includiMetadati) {
         // TODO : testare questa classe
         return Arrays.stream(getAnteprimaProprietaFile(includiMetadati))
-                     .map( field -> field.getName() )
+                     .map(Field::getName)
                      .toArray(String[]::new);
     }
 
@@ -296,20 +315,18 @@ public abstract class File {
 
         try {
 
-            RelazioneUploaderConsumerFile relazioneFileAttore = RelazioneUploaderConsumerFile
-                    .attorePuoAccedereAFile( identificativoAttoreDaHttpServletRequest, identificativoFile );
-
-            if( relazioneFileAttore != null ) {
-
-                File file = File.getEntitaDaDbById(identificativoFile); // TODO : gestire il caso di file eliminato
-                byte[] contenutoFile = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
-                return Response.ok(contenutoFile, MediaType.APPLICATION_OCTET_STREAM)
-                               .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
-                               .build();
-
-            } else {
+            File file = File.getEntitaDaDbById(identificativoFile); // TODO : gestire il caso di file eliminato
+            if(!(file.getIdentificativoDestinatario().equals(identificativoAttoreDaHttpServletRequest) ||
+                      file.getIdentificativoMittente().equals(identificativoAttoreDaHttpServletRequest) ))
                 return Autenticazione.creaResponseForbidden("Accesso al file vietato.");
-            }
+
+            if(file.isEliminato())
+                throw new NotFoundException();
+
+            byte[] contenutoFile = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
+            return Response.ok(contenutoFile, MediaType.APPLICATION_OCTET_STREAM)
+                           .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
+                           .build();
 
         } catch (NotFoundException notFoundException) {
             return NotFoundException.creaResponseNotFound("File non trovato.");
@@ -319,16 +336,288 @@ public abstract class File {
 
 
     /** Crea, salva nel database e restituisce un'istanza di questa classe in base ai parametri.*/
-    public static File salvaFileInDb( String nomeFile, byte[] contenuto, List<String> listaHashtag ) {
+    public static File salvaFileInDb( String nomeFile, byte[] contenuto, List<String> listaHashtag,
+                                      Long identificativoMittente, Long identificativoDestinatario ) {
 
-        FileStorage fileStorage = new FileStorage(nomeFile, contenuto, listaHashtag);
+        FileStorage fileStorage = new FileStorage(nomeFile, contenuto, listaHashtag,
+                                                  identificativoMittente, identificativoDestinatario);
         fileStorage.setDataEdOraDiCaricamento( DateTime.adesso() );
         Long idFile = (Long) DatabaseHelper.salvaEntita( fileStorage );
         fileStorage.setIdentificativoFile( idFile );
+
         return fileStorage;
 
     }
 
     /** Rimuove il contenuto di un file.*/
     public abstract boolean elimina();
+
+    /** Interroga il database e restituisce l'occorrenza di questa entità
+     * che relaziona l'{@link Uploader} con il {@link Consumer} i cui
+     * identificativi sono specificati come parametri.
+     * @return La lista dei file caricati dall'{@link Uploader} e destinati
+     * al {@link Consumer} specificati. */
+    public static List<File>
+    getOccorrenzeFiltrataPerUploaderEConsumer(Long identificativoUploader,
+                                              Long identificativoConsumer ) {
+
+        // TODO : verificare che funzioni
+        // TODO : duplicazione di codice con RelazioneUploaderConsumer
+
+        // Parametri query
+        String nomeAttributo1 = "identificativoMittente";
+        String nomeAttributo2 = "identificativoDestinatario";
+
+        if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo1, File.class) ) {
+            if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo2, File.class)) {
+
+                List<?> risultatoQuery =
+                        DatabaseHelper.queryAnd(File.class,
+                                nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
+                                nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer);
+
+                return risultatoQuery.stream().map(unFile -> (File)unFile).collect(Collectors.toList());
+
+            } else {
+                Logger.scriviEccezioneNelLog(File.class,
+                        "Field \"" + nomeAttributo2 + "\" non trovato.",
+                        new NoSuchFieldException());
+            }
+        } else {
+            Logger.scriviEccezioneNelLog(File.class,
+                    "Field \"" + nomeAttributo1 + "\" non trovato.",
+                    new NoSuchFieldException());
+        }
+
+        return new ArrayList<>(0);   // nessun risultato dalla query
+
+    }
+
+    /** Restituisce la lista delle occorrenze, filtrate in base
+     * all'{@link Uploader} ed al {@link PeriodoTemporale}
+     * specificati nei parametri. Nel filtraggio, per il periodo
+     * temporale, si considerano gli estremi inclusi (ad esempio,
+     * se il periodo temporale ha come data finale il 27 gennaio,
+     * allora si considerano tutti i documenti fino all'istante
+     * antecedente il 28 gennaio, ultimo istante compreso).*/
+    public static List<File>
+    getOccorrenzeFiltratePerUploaderEPeriodoTemporale(Long identificativoUploader,
+                                                      PeriodoTemporale periodoTemporaleDiRiferimento) {
+
+        String nomeAttributo_identificativoMittente = "identificativoMittente";
+        String nomeAttributo_dataEdOraDiCaricamento = "dataEdOraDiCaricamento";
+
+        if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo_identificativoMittente, File.class) &&
+                UtilitaGenerale.esisteAttributoInClasse(nomeAttributo_dataEdOraDiCaricamento, File.class) ) {
+
+            return DatabaseHelper.queryAnd(File.class,
+                    nomeAttributo_identificativoMittente, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
+                    nomeAttributo_dataEdOraDiCaricamento, DatabaseHelper.OperatoreQuery.MAGGIOREOUGUALE, DateTime.convertiInString(periodoTemporaleDiRiferimento.getDataIniziale()),
+                    nomeAttributo_dataEdOraDiCaricamento, DatabaseHelper.OperatoreQuery.MINOREOUGUALE, DateTime.convertiInString(periodoTemporaleDiRiferimento.getDataFinale()))
+                    .stream()
+                    .map( unOccorrenza -> (File)unOccorrenza )
+                    .collect(Collectors.toList());
+
+        } else {
+            Logger.scriviEccezioneNelLog(File.class,
+                    "Uno o più field non trovati nella classe " + File.class.getName() + ".",
+                    new NoSuchFieldException());
+        }
+
+        return new ArrayList<>();   // nessun risultato dalla query
+
+    }
+
+    /** Interroga il database e restituisce un array con gli identificativi degli
+     * {@link Uploader} che servono il {@link Consumer} dato come parametro.*/
+    public static Long[] getElencoUploaderServentiConsumer(Long identificativoConsumer) {
+        String nomeAttributo_identificativoUploader = "identificativoMittente";
+        String nomeAttributo_identificativoConsumer = "identificativoDestinatario";
+        String nomeAttributo_flagFileEliminato = "eliminato";
+        if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo_identificativoConsumer, File.class) )
+            if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo_identificativoUploader, File.class) )
+//                // TODO : perché ofy().load().type(Entity.class).project("field1").distinct(true) non funziona?
+//                return  DatabaseHelper.proiezione(
+//                            DatabaseHelper.creaERestituisciQueryAnd(File.class,
+//                                    nomeAttributo_identificativoConsumer, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
+//                                    nomeAttributo_flagFileEliminato, DatabaseHelper.OperatoreQuery.UGUALE, false),
+//                        nomeAttributo_identificativoUploader
+//                        ).stream()
+//                         .map(unFile -> ((File)unFile).getIdentificativoMittente())
+//                         .toArray(Long[]::new);
+                return DatabaseHelper.queryAnd(File.class,
+                                    nomeAttributo_identificativoConsumer, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
+                                    nomeAttributo_flagFileEliminato, DatabaseHelper.OperatoreQuery.UGUALE, false)
+                        .stream()
+                        .map(unFile -> ((File)unFile).getIdentificativoMittente())
+                        .toArray(Long[]::new);
+            else
+                Logger.scriviEccezioneNelLog(File.class,
+                        "Field \"" + nomeAttributo_identificativoUploader + "\" non trovato.",
+                        new NoSuchFieldException());
+        else
+            Logger.scriviEccezioneNelLog(File.class,
+                    "Field \"" + nomeAttributo_identificativoConsumer + "\" non trovato.",
+                    new NoSuchFieldException());
+        return new Long[0];
+    }
+//
+//    // TODO : cancellare questo metodo se inutile
+//    /** Interroga il database e restituisce le occorrenze di questa entità
+//     * che risultano caricate dall'{@link Uploader} il cui identificativo è
+//     * specificato come parametro. */
+//    private static List<File> getOccorrenzeFiltratePerUploader(Long identificativoUploader) {
+//        return queryFiles("identificativoMittente", identificativoUploader);
+//    }
+
+    /** Dati il nome di un attributo di {@link File}
+     * ed il corrispettivo valore, questo metodo interroga il database e
+     * restituisce la lista di tutte le occorrenza in cui l'attributo il
+     * cui nome è specificato nel parametro ha il valore specificato nel
+     * parametro corrispondente. Gli attributi su cui si esegue la query
+     * devono essere indicizzati.*/
+    private static List<File> queryFiles(String nomeAttributo, Long valoreAttributo) {
+        // TODO : metodo probabilmente inutile (CANCELLARE se inutile)
+
+        if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo, File.class)) {
+
+            return DatabaseHelper.query(File.class,
+                                        nomeAttributo, DatabaseHelper.OperatoreQuery.UGUALE, valoreAttributo )
+                                 .stream()
+                                 .map( unOccorrenza -> (File)unOccorrenza )
+                                 .collect(Collectors.toList());
+
+        } else {
+            Logger.scriviEccezioneNelLog(File.class,
+                                        "Field \"" + nomeAttributo + "\" non trovato.",
+                                         new NoSuchFieldException());
+        }
+
+        return new ArrayList<>();   // nessun risultato dalla query
+    }
+
+    /** Se l'{@link Uploader} dato nel parametro è associato al
+     * {@link File} di cui si sta chiedendo l'eliminazione, il cui
+     * identificativo è specificato nel parametro, elimina il file
+     * e restituisce true. Altrimenti restituisce false e non elimina
+     * il file.
+     * Se il file non esiste, resituisce false.*/
+    public static boolean eliminaFileDiUploader(Long idFileDaEliminare, Long identificativoUploader) {
+
+        // TODO : spostare questo metodo in File e verificare questo metodo
+
+        try {
+
+            FileStorage file = (FileStorage) File.getEntitaDaDbById(idFileDaEliminare);
+
+            if( ! file.getIdentificativoMittente().equals(identificativoUploader) )
+                return false;       // un uploader non può cancellare un file non caricato da lui
+
+            if( file.elimina() )
+                return true;
+            else
+                return false;
+
+        } catch (NotFoundException notFoundException) {
+            return false;
+        }
+
+    }
+
+    /** Crea un nuovo {@link File}, caricato dall'{@link Uploader} il
+     * cui identificativo è fornito come parametro e destinato al {@link Consumer}
+     * il cui identificativo è fornito come parametro.
+     * @return L'entità appena salvata.*/
+    public static File aggiungiFile(InputStream contenutoFile, String nomeFile, List<String> listaHashtag,
+                                    Long identificativoUploader, Long identificativoConsumer ) {
+
+        // TODO : spostare nella classe File
+
+        if( listaHashtag==null )
+            listaHashtag = new ArrayList<>();
+
+        listaHashtag = listaHashtag.stream()
+                                   .map(EncoderPrevenzioneXSS::encodeForJava)
+                                   .collect( Collectors.toList() );
+
+        nomeFile = EncoderPrevenzioneXSS.encodeForJava( nomeFile );
+
+        // Salva file in DB
+        byte[] contenuto = UtilitaGenerale.convertiInputStreamInByteArray( contenutoFile );
+        return File.salvaFileInDb( nomeFile, contenuto, listaHashtag,
+                                   identificativoUploader, identificativoConsumer);
+
+    }
+
+    /** Interroga il database e restituisce le occorrenze di questa entità
+     * che risultano destinate al {@link Consumer} il cui identificativo è
+     * specificato come parametro. */
+    public static List<File> getOccorrenzeFiltratePerConsumer(Long identificativoConsumer) {
+        return queryFiles("identificativoDestinatario", identificativoConsumer);
+    }
+
+    /** Data una lista in cui ogni elemento è un'istanza di
+     * questa classe, restituisce una mappa che ha come chiave
+     * l'identificativo di un {@link Uploader} e come valore
+     * corrispondente l'array degli identificativi dei {@link File}
+     * inviati da quell'{@link Uploader} il cui identificativo è
+     * specificato nella chiave. */
+    public static Map<Long, Long[]> mappa_identificativoUploader_arrayIdFile(List<File> listaRelazioni) {
+
+        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdentificativoMittente";
+        return mappa_identificativoAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
+
+    }
+
+    /** A partire da una lista di occorrenze di questa classe data come parametro,
+     * questo metodo crea una mappa in cui ogni entry ha come valore un array
+     * di identificativi di {@link File} associati all'{@link Attore} il cui identificativo
+     * è specificato nella chiave dell'entry: in questo modo, la lista di occorrenze date
+     * viene raggruppata in base all'{@link Attore} specificato dal soprascritto metodo getter.*/
+    private static Map<Long, Long[]>
+    mappa_identificativoAttore_arrayIdFiles(List<File> listaRelazioni,
+                                            String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze) {
+
+        try {
+
+            Method getter_metodoRaggruppamentoOccorrenze =
+                    File.class.getDeclaredMethod(nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
+
+            return listaRelazioni
+                    .stream()
+                    .collect(Collectors.groupingBy(relazione -> {
+                        try {
+                            return getter_metodoRaggruppamentoOccorrenze.invoke(relazione);
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumer.class, e);
+                            return null;
+                        }
+                    }))   // raggruppa in base all'attore ( quale attore dipende dal metodo usato )
+
+                    // Ora che è raggruppato, crea mappa { attore => arrayFilesAssociatiAdAttore }
+                    .entrySet()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .map(entry -> {
+                        Long chiave = (Long) entry.getKey();
+                        Long[] arrayIdFiles = entry.getValue()
+                                .stream()
+                                .map(File::getIdentificativoFile)
+                                .filter( Objects::nonNull ) // evita le occorrenze in cui il file è null
+                                .toArray(Long[]::new);
+                        return new AbstractMap.SimpleEntry<Long,Long[]>(chiave, arrayIdFiles);
+                    })
+                    .collect(Collectors.toMap(
+                            AbstractMap.SimpleEntry::getKey,
+                            AbstractMap.SimpleEntry::getValue)
+                    );
+        } catch (NoSuchMethodException e) {
+            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumer.class,
+                            "Metodo \"" + nomeMetodoGetterDaUsarePerRaggruppareOccorrenze + "\" non trovato.",
+                                            e );
+            return new HashMap<>(); // mappa vuota
+        }
+    }
+
+
 }

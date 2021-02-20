@@ -2,7 +2,7 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.api.consumer.RichiestaDocumenti;
 import it.units.progrweb.api.uploader.GestioneConsumer;
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -243,7 +243,7 @@ public class RichiestaInfo {
                 idUploader = idAttoreAutenticato;
                 idConsumer = idAttoreTarget;
             }
-            return RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(idUploader, idConsumer) ?
+            return RelazioneUploaderConsumer.isConsumerServitoDaUploader(idUploader, idConsumer) ?
                     creazioneRisposta.apply(idAttoreTarget) :
                     Autenticazione.creaResponseForbidden("Consumer non in relazione con Uploader.");
         }

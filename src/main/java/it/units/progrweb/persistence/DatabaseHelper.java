@@ -59,12 +59,13 @@ public abstract class DatabaseHelper {
 
     /** Data una query ed i nomi degli attributi su cui eseguire la proiezione,
      * questo metodo esegue la query e restituisce la proiezione richiesta
-     * del risultato. Comunque viene restituita l'intera entità.*/ // TODO : indagare meglio sul funzionamento di questo metodo (IMPORTANTE!!)
-    public static List<?> proiezione(Query<Object> query, String ...nomiAttributiProiettare ) {
+     * del risultato. Comunque viene restituita l'intera entità, ma non vi saranno
+     * duplicati sugli attributi sui quali viene fatta la proiezione.*/ // TODO : indagare meglio sul funzionamento di questo metodo (IMPORTANTE!!)
+    public static List<?> proiezione(Query<?> query, String ...nomiAttributiProiettare ) {
         if( query!= null && nomiAttributiProiettare.length>0 )
             return query.project( nomiAttributiProiettare ).distinct(true).list();
         else
-            return new ArrayList<>();
+            return new ArrayList<>(0);
     }
 
     /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
@@ -298,6 +299,26 @@ public abstract class DatabaseHelper {
         Query query = creaERestituisciQueryAnd(classeEntita,
                 nomeAttributo1, operatoreCondizione1, valoreCondizione1,
                 nomeAttributo2, operatoreCondizione2, valoreCondizione2).limit(maxNumeroEntitaDaRestituire);
+
+
+        return query!=null ? query.list() : new ArrayList<>(0);
+
+    }
+
+    /** Come {@link #queryAnd(Class, String, OperatoreQuery, Object, String, OperatoreQuery, Object)}, ma permette
+     * di filtrare tramite fino a tre condizioni.*/
+    public static<Attributo> List<?> queryAnd(Class classeEntita,
+                                              String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                              String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
+                                              String nomeAttributo3,OperatoreQuery operatoreCondizione3, Attributo valoreCondizione3) {
+
+        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
+        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
+
+        Query<?> query = creaERestituisciQueryAnd(classeEntita,
+                nomeAttributo1, operatoreCondizione1, valoreCondizione1,
+                nomeAttributo2, operatoreCondizione2, valoreCondizione2,
+                nomeAttributo3, operatoreCondizione3, valoreCondizione3);
 
 
         return query!=null ? query.list() : new ArrayList<>(0);

@@ -47,7 +47,7 @@ public class RichiestaResocontoUploader {
 
         DateTime dataIniziale = DateTime.convertiDaString_htmlInputDate(EncoderPrevenzioneXSS.encodeForJava(dataInizio));
         DateTime dataFinale   = DateTime.convertiDaString_htmlInputDate(EncoderPrevenzioneXSS.encodeForJava(dataFine));
-        PeriodoTemporale periodoTemporale = new PeriodoTemporale( dataIniziale, dataFinale );
+        PeriodoTemporale periodoTemporale = new PeriodoTemporale( dataIniziale.adInizioGiornata(), dataFinale.aFineGiornata() );
 
         Uploader uploaderPerCuiSiRichiedeResoconto = (Uploader)
                 Attore.getAttoreDaIdentificativo( identificativoUploader );

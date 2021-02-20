@@ -1,7 +1,7 @@
 package it.units.progrweb.api.uploader;
 
 import it.units.progrweb.api.administrator.GestioneAttori;
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
+import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
@@ -47,7 +47,7 @@ public class GestioneConsumer {
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
-        return RelazioneUploaderConsumerFile.getListaConsumerDiUploader( identificativoUploader );
+        return RelazioneUploaderConsumer.getListaConsumerDiUploader( identificativoUploader );
 
     }
 
@@ -192,10 +192,10 @@ public class GestioneConsumer {
                     consumerDalDB.equals(consumerDaAggiungere) ) {
 
                 // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
-                if (!RelazioneUploaderConsumerFile.isConsumerServitoDaUploader(identificativoUploader, consumerDalDB.getIdentificativoAttore())) {
+                if (!RelazioneUploaderConsumer.isConsumerServitoDaUploader(identificativoUploader, consumerDalDB.getIdentificativoAttore())) {
 
                     // SE precedenti controlli ok, ALLORA aggiungi il consumer
-                    RelazioneUploaderConsumerFile.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
+                    RelazioneUploaderConsumer.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
 
                 }
                 return consumerDalDB.getIdentificativoAttore();
@@ -216,7 +216,7 @@ public class GestioneConsumer {
         // TODO : che succede se il consumer che si sta cercando di eliminare non esiste ?? aggiungere controllo
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
-        RelazioneUploaderConsumerFile.dissociaConsumerDaUploader(identificativoConsumerDaEliminare, identificativoUploader);
+        RelazioneUploaderConsumer.dissociaConsumerDaUploader(identificativoConsumerDaEliminare, identificativoUploader);
 
         return Response
                    .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
@@ -246,7 +246,7 @@ public class GestioneConsumer {
         if( identificativoConsumerDaModificare != null ) {
             Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
-            if( RelazioneUploaderConsumerFile.
+            if( RelazioneUploaderConsumer.
                     isConsumerServitoDaUploader(identificativoUploader,
                             identificativoConsumerDaModificare) ) {
 

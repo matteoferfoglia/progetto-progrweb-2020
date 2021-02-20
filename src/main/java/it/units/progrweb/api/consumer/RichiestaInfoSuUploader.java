@@ -1,6 +1,5 @@
 package it.units.progrweb.api.consumer;
 
-import it.units.progrweb.entities.RelazioneUploaderConsumerFile;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
@@ -33,15 +32,12 @@ public class RichiestaInfoSuUploader {
     @Path("/elencoUploader")
     @GET
     @Produces( MediaType.APPLICATION_JSON )
-    public long[] getElencoIdentificativiUploaderCheHannoCaricatoFilePerQuestoConsumer(@Context HttpServletRequest httpServletRequest) {
+    public Long[] getElencoIdentificativiUploaderCheHannoCaricatoFilePerQuestoConsumer(@Context HttpServletRequest httpServletRequest) {
 
         Long identificativoQuestoConsumer =
                 Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
-        return RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer( identificativoQuestoConsumer )
-                                            .stream()
-                                            .mapToLong( RelazioneUploaderConsumerFile::getIdentificativoUploader )
-                                            .toArray();
+        return File.getElencoUploaderServentiConsumer(identificativoQuestoConsumer);
 
     }
 
@@ -69,11 +65,10 @@ public class RichiestaInfoSuUploader {
         Map<Long, Long[]> mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer = null;
 
         if ( consumer != null) {
-            List<RelazioneUploaderConsumerFile> risultatoQuery =
-                    RelazioneUploaderConsumerFile.getOccorrenzeFiltratePerConsumer(consumer.getIdentificativoAttore());
+            List<File> risultatoQuery = File.getOccorrenzeFiltratePerConsumer(consumer.getIdentificativoAttore());
 
            mappa_idUploader_arrayIdFileCaricatiDaUploaderPerQuestoConsumer =
-                    RelazioneUploaderConsumerFile.mappa_identificativoUploader_arrayIdFile(risultatoQuery);
+                    File.mappa_identificativoUploader_arrayIdFile(risultatoQuery);
 
         }
 
