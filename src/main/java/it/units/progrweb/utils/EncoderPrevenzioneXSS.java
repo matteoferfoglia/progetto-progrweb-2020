@@ -12,7 +12,10 @@ public class EncoderPrevenzioneXSS {
 
     /** @see org.owasp.encoder.Encode#forJava(String)   */
     public static String encodeForJava (String input) {
-        return Encode.forJava(input);
+        return Encode.forJava(input.replaceAll("'","^^^^^"))
+                .replaceAll("\\^\\^\\^\\^\\^","'");
+        // replaceAll serve a "salvare" l'apostrofo dall'encoding sfruttando una particolare
+        // sequenza di caratteri di comodo.
     }
 
     /** @see org.owasp.encoder.Encode#forCssString(String)   */
