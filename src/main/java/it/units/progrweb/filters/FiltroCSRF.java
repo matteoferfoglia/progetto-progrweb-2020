@@ -11,8 +11,12 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -175,8 +179,9 @@ public class FiltroCSRF implements Filter {
             } else {
                 // Problemi con CSRF, quindi redirection login
                 HttpServletResponse response = (HttpServletResponse)resp;
-                response.sendError( HttpStatusCode_CsrfTokenInvalido.getStatusCode(),
-                                    HttpStatusCode_CsrfTokenInvalido.getReasonPhrase() );
+                response.setStatus( HttpStatusCode_CsrfTokenInvalido.getStatusCode() );
+                response.setContentType(MediaType.TEXT_PLAIN);
+                response.getWriter().write(HttpStatusCode_CsrfTokenInvalido.getReasonPhrase());
                 response.addHeader("Location", httpReq.getRequestURI());// chiede al client di ricaricare la pagina (così aggiorna i token)
 
             }
