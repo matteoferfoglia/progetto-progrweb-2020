@@ -14,6 +14,7 @@ import it.units.progrweb.utils.datetime.DateTime;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
@@ -352,11 +353,13 @@ public abstract class File {
     /** Interroga il database e restituisce l'occorrenza di questa entità
      * che relaziona l'{@link Uploader} con il {@link Consumer} i cui
      * identificativi sono specificati come parametri.
+     * Se non viene specificato l'Uploader, allora il filtraggio viene fatto
+     * solo sul Consumer.
      * @return La lista dei file caricati dall'{@link Uploader} e destinati
      * al {@link Consumer} specificati. */
     public static List<File>
     getOccorrenzeFiltrataPerUploaderEConsumer(Long identificativoUploader,
-                                              Long identificativoConsumer ) {
+                                              @NotNull Long identificativoConsumer ) {
 
         // TODO : verificare che funzioni
         // TODO : duplicazione di codice con RelazioneUploaderConsumer
@@ -368,12 +371,23 @@ public abstract class File {
         if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo1, File.class) ) {
             if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo2, File.class)) {
 
-                List<?> risultatoQuery =
-                        DatabaseHelper.queryAnd(File.class,
-                                nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
-                                nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer);
+                List<?> risultatoQuery;
 
-                return risultatoQuery.stream().map(unFile -> (File)unFile).collect(Collectors.toList());
+                if(identificativoUploader==null)
+                    risultatoQuery =
+                            DatabaseHelper.query(File.class,
+                                    nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer);
+                else
+                    risultatoQuery =
+                            DatabaseHelper.queryAnd(File.class,
+                                    nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
+                                    nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer);
+
+                return risultatoQuery
+                        .stream()
+                        .map(unFile -> (File)unFile)
+                        .filter(unFile -> !unFile.isEliminato())
+                        .collect(Collectors.toList());
 
             } else {
                 Logger.scriviEccezioneNelLog(File.class,
@@ -498,7 +512,7 @@ public abstract class File {
      * identificativo è specificato nel parametro, elimina il file
      * e restituisce true. Altrimenti restituisce false e non elimina
      * il file.
-     * Se il file non esiste, resituisce false.*/
+     * Se il file non esiste, restituisce false.*/
     public static boolean eliminaFileDiUploader(Long idFileDaEliminare, Long identificativoUploader) {
 
         // TODO : spostare questo metodo in File e verificare questo metodo
@@ -550,7 +564,7 @@ public abstract class File {
      * che risultano destinate al {@link Consumer} il cui identificativo è
      * specificato come parametro. */
     public static List<File> getOccorrenzeFiltratePerConsumer(Long identificativoConsumer) {
-        return queryFiles("identificativoDestinatario", identificativoConsumer);
+        return getOccorrenzeFiltrataPerUploaderEConsumer(null, identificativoConsumer);
     }
 
     /** Data una lista in cui ogni elemento è un'istanza di
@@ -572,7 +586,7 @@ public abstract class File {
      * è specificato nella chiave dell'entry: in questo modo, la lista di occorrenze date
      * viene raggruppata in base all'{@link Attore} specificato dal soprascritto metodo getter.*/
     private static Map<Long, Long[]>
-    mappa_identificativoAttore_arrayIdFiles(List<File> listaRelazioni,
+    mappa_identificativoAttore_arrayIdFiles(List<File> listaFile,
                                             String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze) {
 
         try {
@@ -580,7 +594,7 @@ public abstract class File {
             Method getter_metodoRaggruppamentoOccorrenze =
                     File.class.getDeclaredMethod(nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
-            return listaRelazioni
+            return listaFile
                     .stream()
                     .collect(Collectors.groupingBy(relazione -> {
                         try {
