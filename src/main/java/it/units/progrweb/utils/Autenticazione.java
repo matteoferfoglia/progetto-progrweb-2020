@@ -38,8 +38,8 @@ public class Autenticazione {
      * non verranno chieste nuovamente le credenziali. */
     private static final int TIMEOUT_AUTENTICAZIONE_IN_SECONDI = 1800;
 
-    /** Lunghezza del token CSRF associato al token di autenticazione di un client.*/
-    private static final int LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE = 128;
+    /** Lunghezza del token di autenticazione di un client.*/
+    private static final int LUNGHEZZA_TOKEN_AUTENTICAZIONE = 128;
 
     /** Nome del cookie contenente un token per il client. L'hash di questo valore
      * è presente nel token di autenticazione del client, nel claim con nome specificato
@@ -90,7 +90,7 @@ public class Autenticazione {
      * <ol>
      *     <li>
      *         Creare un cookie (<i>HttpOnly</i>) contenente un token CSRF di
-     *         lunghezza specificata in {@link #LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE}
+     *         lunghezza specificata in {@link #LUNGHEZZA_TOKEN_AUTENTICAZIONE}
      *         (questo cookie sarà inviato al client insieme alla response).
      *     </li>
      *     <li>
@@ -166,11 +166,11 @@ public class Autenticazione {
             throws NotFoundException {
 
         try {
-            String valoreTokenCsrfAutenticazione = generaTokenAlfanumerico(LUNGHEZZA_TOKEN_CSRF_AUTENTICAZIONE);
+            String valoreTokenAutenticazione = generaTokenAlfanumerico(LUNGHEZZA_TOKEN_AUTENTICAZIONE);
             Cookie cookieIdClientPerAutenticazione = CsrfCookies.creaCookieContenenteIdentificativoClient(NOME_COOKIE_CLIENT_TOKEN,
-                                                                                                          valoreTokenCsrfAutenticazione,
+                                                                                                          valoreTokenAutenticazione,
                                                                                                           TIMEOUT_AUTENTICAZIONE_IN_SECONDI);
-            String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore, valoreTokenCsrfAutenticazione);
+            String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore, valoreTokenAutenticazione);
 
             return Response.ok()
                            .cookie(cookieIdClientPerAutenticazione)
