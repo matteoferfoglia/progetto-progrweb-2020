@@ -1,14 +1,21 @@
 package it.units.progrweb.api;
 
+import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.filters.FiltroAutenticazione;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.mail.MailSender;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Classe per la gestione dell'autenticazione dei client.
@@ -69,6 +76,48 @@ public class LoginLogout {
     public String getTipoUtenteAutenticato(@Context HttpServletRequest httpServletRequest) {
         String tipoAttore = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
         return EncoderPrevenzioneXSS.encodeForHTMLContent( tipoAttore );
+
+    }
+
+    /** Reset della password dell'account che lo richiede. Viene creata una nuova
+     * password temporanea che viene inviata per mail all'account che ne ha fatto richiesta.*/
+    @Path("/resetPassword")
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    public String resetPassword( CampiFormLogin campiFormLogin ) {
+
+        // TODO : testare questo metodo che funzioni correttamente con le mail
+
+        String username = campiFormLogin.getUsername();
+
+        if(username == null)
+            return "Specificare lo username.";
+
+        try {
+            String passwordTemporanea = AuthenticationDatabaseEntry.creaPasswordTemporanea(username);
+
+            {
+                // Invio password temporanea via mail
+                Attore attore = Attore.getAttoreDaUsername(username);
+                MailSender mailSender = new MailSender();
+                try {
+                    mailSender.inviaEmail(attore.getEmail(), attore.getNominativo(),"Reset password",
+                            "E' stato richiesto il reset della password per il Suo account." +
+                                    " La nuova password è: " + passwordTemporanea + ". Si consiglia di modificare" +
+                                    " al primo accesso tale password. Se non è stata richiesta la modifica, ignorare" +
+                                    " questa email.");
+                } catch (MessagingException|UnsupportedEncodingException e) {
+                    Logger.scriviEccezioneNelLog(LoginLogout.class,
+                            "Errore nell'invio della mail per il reset della password",
+                            e);
+                    return "Errore interno, riprovare più tardi.";
+                }
+            }
+
+            return "E' stata inviata tramite email la nuova password per accedere al sistema.";
+        } catch (NotFoundException e) {
+            return "Username non trovato nel sistema";
+        }
 
     }
 

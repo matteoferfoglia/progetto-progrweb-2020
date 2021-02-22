@@ -79,7 +79,7 @@ public class Autenticazione {
 
     /** Restituisce true se l'attore è autenticato, false altrimenti.*/
     public static boolean isAttoreAutenticato(Attore attore) {
-        return attore!=null && !attore.equals(ATTORE_NON_AUTENTICATO);    // TODO : verificare corretto funzionamento di questo metodo
+        return attore != null;    // TODO : verificare corretto funzionamento di questo metodo
     }
 
     /** Date le credenziali, restituisce una {@link javax.ws.rs.core.Response}
@@ -118,7 +118,7 @@ public class Autenticazione {
         if(Autenticazione.isAttoreAutenticato(attore)) {
             try {
                 return creaResponseAutenticazionePerAttoreAutenticato(attore);
-            } catch (NotFoundException notFoundException) {}
+            } catch (NotFoundException ignored) { /*viene comunque restituita la risposta unauthorized*/}
         }
 
         // Autenticazione fallita

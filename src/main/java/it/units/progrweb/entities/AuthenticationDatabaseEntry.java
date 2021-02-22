@@ -31,6 +31,7 @@ public class AuthenticationDatabaseEntry {
     // TODO : implementare questa @Entity
 
     private final static int SALT_LENGTH = 15;
+    private final static int PASSWORD_TEMPORANEA_LENGTH = 12;
 
     /** Username.*/
     @Id
@@ -42,6 +43,9 @@ public class AuthenticationDatabaseEntry {
 
     /** Salt utilizzato. */
     private String salt;
+
+    /** Password temporanea, in chiaro.*/
+    private String passwordTemporanea;
 
     /** Crea un' entry dell'authentication database.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
@@ -71,6 +75,24 @@ public class AuthenticationDatabaseEntry {
     public static String getHashedSaltedPasswordDellAttore(String usernameAttore)
             throws NotFoundException {
         return cercaAttoreInAuthDb(usernameAttore).hashedSaltedPassword;
+    }
+
+    /** Dato uno username, genera una password casuale temporanea per quell'utente.
+     * La vecchia password resta valida. La password appena generata viene salvata
+     * in chiaro (senza né hash né salt) e viene restituita in chiaro.
+     * @param username Lo username per cui creare una password temporanea.
+     * @throws NotFoundException Se lo username dato non viene trovato.*/
+    public static String creaPasswordTemporanea(String username)
+            throws NotFoundException {
+
+        AuthenticationDatabaseEntry authenticationDatabaseEntry =
+                cercaAttoreInAuthDb(username);
+
+        authenticationDatabaseEntry.passwordTemporanea = GeneratoreTokenCasuali.generaTokenAlfanumerico(PASSWORD_TEMPORANEA_LENGTH);
+        DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
+
+        return authenticationDatabaseEntry.passwordTemporanea;
+
     }
 
 
@@ -105,8 +127,29 @@ public class AuthenticationDatabaseEntry {
     private static boolean verificaCredenziali(String passwordDaVerificare, AuthenticationDatabaseEntry authenticationEntry)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        return calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
-                .equals(authenticationEntry.hashedSaltedPassword);
+        if ( calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
+                .equals(authenticationEntry.hashedSaltedPassword) ) {
+            // Credenziali (hashedSalted) valide
+
+            // Elimina eventuali password temporanee
+            authenticationEntry.passwordTemporanea = null;
+
+            return true;
+        }
+
+        if(authenticationEntry.passwordTemporanea!=null &&
+                authenticationEntry.passwordTemporanea.equals(passwordDaVerificare)) {
+            // Se si sta accedendo con una password temporanea (salvata in chiaro), allora la si rende "hashedSalted"
+            authenticationEntry.salt = generaSalt();
+            authenticationEntry.hashedSaltedPassword =
+                    calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt);
+            authenticationEntry.passwordTemporanea = null;
+
+            return true;    // credenziali valide
+        }
+
+        // Se qui, credenziali invalide
+        return false;
     }
 
     /** Cerca l'attore in base allo username nell'AuthDB.
@@ -117,7 +160,13 @@ public class AuthenticationDatabaseEntry {
     private static AuthenticationDatabaseEntry cercaAttoreInAuthDb(String username )
             throws NotFoundException {
 
-        return (AuthenticationDatabaseEntry) DatabaseHelper.getById(username, AuthenticationDatabaseEntry.class);
+        AuthenticationDatabaseEntry authenticationDatabaseEntry =
+                (AuthenticationDatabaseEntry) DatabaseHelper.getById(username, AuthenticationDatabaseEntry.class);
+
+        if(authenticationDatabaseEntry==null)
+            throw new NotFoundException();
+
+        return authenticationDatabaseEntry;
 
     }
 

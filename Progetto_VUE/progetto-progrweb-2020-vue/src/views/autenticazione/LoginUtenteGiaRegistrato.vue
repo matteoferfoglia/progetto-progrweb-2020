@@ -2,11 +2,10 @@
   <h2>Login > Accedi</h2>
     <Form @submit="validaEdInviaForm"
           @csrf-token-ricevuto="aggiornaCsrfToken($event)">
-      <div>
       <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
       <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
       <input type="submit" value="Login">
-      </div>
+      <a @click.prevent="richiediResetPassword">Password dimenticata</a>
     </Form>
     <!-- TODO : VERIRICARE protezione csrf -->
 </template>
@@ -37,6 +36,19 @@ export default {
     }
   },
   methods: {
+
+    /** Richiede al server il reset della password.*/
+    richiediResetPassword() {
+
+      if( this.username )
+        richiestaPost(process.env.VUE_APP_URL_RESET_PASSWORD,
+            {[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME]: this.username})
+          .then( alert )  // alert con la risposta del server
+          .catch( risposta => console.log("ERRORE: " + risposta) );
+      else
+        alert("Inserire lo username");
+
+    },
 
     aggiornaCsrfToken(nuovoValore) {
       this.csrfToken = nuovoValore;
@@ -82,7 +94,6 @@ export default {
         }
 
         console.error("Errore durante l'autenticazione (" + risposta.status + " [" + risposta.statusText + "])");
-        // TODO notificare l'errore ai gestori (via mail ?)
         // TODO : refactoring : questo metodo c'è anche in RegistrazioneNuovoConsumer
 
       }

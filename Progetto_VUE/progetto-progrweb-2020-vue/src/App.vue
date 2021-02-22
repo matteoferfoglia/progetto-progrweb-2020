@@ -87,9 +87,9 @@ export default {
 
     },
 
+    /** Richiesta di logout al server. */
     logout() {
 
-      // Richiesta di logout al server
       const parametriRichiestaGet = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
       richiestaGet(process.env.VUE_APP_URL_LOGOUT, parametriRichiestaGet)
           .catch( risposta => console.log("Logout fallito: " + risposta) )
