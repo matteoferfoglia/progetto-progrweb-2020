@@ -287,6 +287,9 @@ export default {
         alert( "Errore durante il caricamento." );
       })
 
+    // Gestione dell'auto-aggiornamento della tabella  // TODO: sarebbe meglio che l'autoaggiornamento richiedesse solo i nuovi documenti e non tutti di nuovo
+    setInterval(caricamentoComponente, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
+
   },
   methods: {
 
