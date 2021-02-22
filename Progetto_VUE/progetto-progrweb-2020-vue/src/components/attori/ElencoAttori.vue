@@ -109,6 +109,9 @@ export default {
       /** Tipi di attore cui questo elenco si riferisce (Administrator/Consumer/Uploader).*/
       tipiAttoreCuiQuestoElencoSiRiferisce: undefined,
 
+      /** Timer per l'auto-aggiornamento del componente.*/
+      timerAutoUpdate: undefined,
+
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
@@ -123,8 +126,11 @@ export default {
   },
   created() {
 
-    this.caricamentoQuestoComponente();
+    this.timerAutoUpdate = setInterval(this.caricamentoQuestoComponente, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
+  },
+  beforeUnmount () {
+    clearInterval(this.timerAutoUpdate)
   },
   methods: {
 
