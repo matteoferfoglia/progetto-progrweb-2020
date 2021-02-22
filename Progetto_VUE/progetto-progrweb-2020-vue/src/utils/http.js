@@ -190,7 +190,7 @@ const aggiungiParametriAllaRequest = oggettoConParametri => {
  * Comportamento predefinito: se il server risponde con
  * {@link HTTP_STATUS_UNAUTHORIZED}, allora redirect a
  * pagina di autenticazione.*/
-const onErrorHandler = errore => {
+const onErrorHandler = async errore => {
 
     // TODO : verificare che funzioni come da aspettative
 
@@ -199,11 +199,12 @@ const onErrorHandler = errore => {
     // Redirection automatica a login
     if( errore.response.status === HTTP_STATUS_UNAUTHORIZED ) {
         eliminaTokenAutenticazione();
-        router.redirectVersoPaginaAutenticazione( router.currentRoute );
+        await router.redirectVersoPaginaAutenticazione( router.currentRoute );
+        return Promise.reject( {['data']:"Non autorizzato. Redirect alla pagina di login."} );
     } else if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO ) {
         alert("La pagina deve essere ricaricata perché è rimasta inutilizzata per troppo tempo.");  // il vero motivo è che è scaduto il token CSRF
         router.go(0);   // refresh della pagina per aggiornare token (che è risultato invalido)
+    } else {
+        return Promise.reject( errore.response );
     }
-
-    return Promise.reject( errore.response );
 }

@@ -251,12 +251,12 @@ router.creaRouteAutenticazioneConInfoRichiesta = routeRichiesta => {
  * Non interviene se si è già nella pagina di autenticazione.
  * @param routeRichiesta per poter proseguire la navigazione
  * dopo l'autenticazione.*/
-router.redirectVersoPaginaAutenticazione = routeRichiesta => {
+router.redirectVersoPaginaAutenticazione = async routeRichiesta => {
 
   if( router.currentRoute.value.path !== process.env.VUE_APP_ROUTER_PATH_LOGIN          &&
       router.currentRoute.value.path !== process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH    ) {
     console.log( "Redirection a pagina di autenticazione." );
-    router.push( router.creaRouteAutenticazioneConInfoRichiesta( routeRichiesta ) ) ;
+    await router.push(router.creaRouteAutenticazioneConInfoRichiesta(routeRichiesta)) ;
   }
 
 }
