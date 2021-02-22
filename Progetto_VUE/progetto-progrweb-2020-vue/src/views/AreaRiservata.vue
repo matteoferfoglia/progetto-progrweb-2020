@@ -39,23 +39,18 @@ export default {
   name: 'AreaRiservata',
   data() {
     return {
-      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
+
+      /** Se si tratta di un Uploader, questo attributo salva il suo
+       * logo in formato Base64.*/
       logoUploader_base64: undefined,
 
+      // Wrapper
+      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
       csrfToken_wrapper: this.csrfToken
     }
   },
   created() {
-    if(this.isUploaderAttualmenteAutenticato()) {
-      /** Carica il logo di un Uploader, assumendo che sia un Uploader il tipo attualmente autenticato.*/
-      const caricaLogoUploader = async () => {
-        await getIdentificativoAttoreAttualmenteAutenticato()
-            .then(identificativoAttore => richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore))
-            .then(immagineLogo_dataUrl => this.logoUploader_base64 = immagineLogo_dataUrl)
-            .catch(console.error);
-      }
-      caricaLogoUploader();
-    }
+    this.caricaLogoUploader();
   },
   methods: {
 
@@ -63,15 +58,26 @@ export default {
     isUploaderAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato_wrapper ===
           process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
+    },
+
+    async caricaLogoUploader () {
+      if(this.isUploaderAttualmenteAutenticato()) {
+        await getIdentificativoAttoreAttualmenteAutenticato()
+            .then(identificativoAttore => richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore))
+            .then(immagineLogo_dataUrl => this.logoUploader_base64 = immagineLogo_dataUrl)
+            .catch(console.error);
+      }
     }
+
   },
   watch: {
     tipoAttoreAutenticato: {
       immediate: true,
       deep: true,
       handler( nuovoValore ) {
-
         this.tipoAttoreAutenticato_wrapper = nuovoValore;
+        this.caricaLogoUploader();  // potrebbe essere che non fosse ancora disponibile
+                                    // l'attributo tipoAttore durante created()
       }
     },
     csrfToken : {
