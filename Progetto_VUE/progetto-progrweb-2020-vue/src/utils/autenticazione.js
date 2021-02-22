@@ -84,6 +84,8 @@ export const setTokenAutenticazione = nuovoValoreTokenAutenticazione => {
 /** Restituisce il tipo dell'attore attualmente autenticato.*/
 export const getTipoAttoreAttualmenteAutenticato = async () => {
 
+    // TODO: potrebbe essere ottenuto dal token JWT senza "sprecare" una richiesta al server
+
     return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO)
         .catch( rispostaErrore => {
             console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
@@ -97,7 +99,22 @@ export const getTipoAttoreAttualmenteAutenticato = async () => {
 /** Restituisce il nome dell'attore attualmente autenticato.*/
 export const getNomeAttoreAttualmenteAutenticato = async () => {
 
+    // TODO: potrebbe essere ottenuto dal token JWT senza "sprecare" una richiesta al server
+
     return richiestaGet(process.env.VUE_APP_URL_GET_NOME_QUESTO_ATTORE_AUTENTICATO)
+        .catch( rispostaErrore => {
+            console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+            return Promise.reject(rispostaErrore);
+        });
+
+}
+
+/** Restituisce l'identificativo dell'attore attualmente autenticato.*/
+export const getIdentificativoAttoreAttualmenteAutenticato = async () => {
+
+    // TODO: potrebbe essere ottenuto dal token JWT senza "sprecare" una richiesta al server
+
+    return richiestaGet(process.env.VUE_APP_URL_GET_IDENTIFICATIVO_QUESTO_ATTORE_AUTENTICATO)
         .catch( rispostaErrore => {
             console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
             return Promise.reject(rispostaErrore);

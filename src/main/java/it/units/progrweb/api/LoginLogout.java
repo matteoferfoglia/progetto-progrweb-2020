@@ -69,6 +69,15 @@ public class LoginLogout {
         return nomeAttore!=null ? EncoderPrevenzioneXSS.encodeForHTMLContent(nomeAttore) : "";     // TODO : aggiungere EncoderPrevenzioneXSS in tutti i metodi che restituiscono qualcosa al client
     }
 
+    /** Restituisce l'identificativo dell'attore attualmente autenticato.*/
+    @Path("/identificativoDiQuestoAttore")    // TODO : path variabile d'ambiente
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public Long identificativoDiQuestoAttoreAutenticato(@Context HttpServletRequest httpServletRequest) {
+        // TODO : aggiungerlo al token di autenticazione per evitare accessi nel database
+        return Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);     // TODO : aggiungere EncoderPrevenzioneXSS in tutti i metodi che restituiscono qualcosa al client
+    }
+
     /** Restituisce il tipo di utente autenticato. */
     @Path("/getTipoUtenteAutenticato")  // TODO : var d'ambiente
     @GET
