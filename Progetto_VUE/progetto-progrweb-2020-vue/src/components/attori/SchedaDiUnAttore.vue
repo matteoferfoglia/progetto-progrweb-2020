@@ -293,7 +293,7 @@ name: "SchedaDiUnAttore",
     /** Carica il logo di un Uploader, se questa scheda si riferisce ad un Uploader.*/
     caricaLogoUploader() {
       if( this.isQuestaSchedaRiferitaAdUnUploader ) {
-        richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
+        richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
             .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
             .catch(console.error);
 
