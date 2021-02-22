@@ -46,14 +46,15 @@ public class ModificaInformazioniAttore {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaInformazioni(@Context HttpServletRequest httpServletRequest,
-                                         @FormDataParam("nuovoNominativo")   String nuovoNominativo,
-                                         @FormDataParam("nuovaEmail")        String nuovaEmail,
-                                         @FormDataParam("vecchiaPassword")   String vecchiaPassword,
-                                         @FormDataParam("nuovaPassword")     String nuovaPassword,
-                                         @FormDataParam("nuovoLogoUploader") InputStream nuovoLogo,                  // TODO : variabili d'ambiente tutti i campi del form
-                                         @FormDataParam("nuovoLogoUploader") FormDataContentDisposition dettagliNuovoLogo) {
+                                         @FormDataParam("nominativo")      String nuovoNominativo,
+                                         @FormDataParam("email")           String nuovaEmail,
+                                         @FormDataParam("vecchiaPassword") String vecchiaPassword,
+                                         @FormDataParam("password")        String nuovaPassword,
+                                         @FormDataParam("immagineLogo")    InputStream nuovoLogo,                  // TODO : variabili d'ambiente tutti i campi del form
+                                         @FormDataParam("immagineLogo")    FormDataContentDisposition dettagliNuovoLogo) {
 
         // TODO : verirficare che questo metodo funzioni
+        // TODO : duplicazione di codice con GestioneAttori -> modificaAttore
 
         Attore attoreDaModificare = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);   // TODO: salvare info attore nel token di autenticazione per evitare accesso al db
 

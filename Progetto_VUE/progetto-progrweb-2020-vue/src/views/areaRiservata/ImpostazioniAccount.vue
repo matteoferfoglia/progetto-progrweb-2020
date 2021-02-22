@@ -111,12 +111,12 @@ export default {
       isFileLogoCaricato    : false,
       isFormModificato      : false,  // diventa true se l'utente modifica il form
 
-      // NOMI DEI PARAMETRI ATTESI DAL SERVER // TODO : variabili d'ambiente sia per client sia per server
-      nomeParametro_nominativo     : "nuovoNominativo",
-      nomeParametro_email          : "nuovaEmail",
-      nomeParametro_vecchiaPassword: "vecchiaPassword",
-      nomeParametro_nuovaPassword  : "nuovaPassword",
-      nomeParametro_nuovoLogo      : "nuovoLogo",
+      // NOMI DEI PARAMETRI ATTESI DAL SERVER
+      nomeParametro_nominativo     : process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME,
+      nomeParametro_email          : process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME,
+      nomeParametro_vecchiaPassword: process.env.VUE_APP_FORM_VECCHIA_PASSWORD_INPUT_FIELD_NAME,
+      nomeParametro_nuovaPassword  : process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME,
+      nomeParametro_nuovoLogo      : process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME,
 
 
 
