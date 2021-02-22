@@ -6,7 +6,8 @@
                   :csrfToken="csrfToken_wrapper"
                   @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
                   @aggiunto-nuovo-attore="aggiungiNuovoAttoreAllElenco($event)"
-                  @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"/>
+                  @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"
+                  v-if="! isConsumerAttualmenteAutenticato()" />
 
 
 
