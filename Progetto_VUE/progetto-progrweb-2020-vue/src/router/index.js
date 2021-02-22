@@ -133,6 +133,8 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
       await verificaAutenticazione(routeDestinazione) // TODO: verifica autenticazione dovrebbe basarsi sul token JWT (implementare metodo in autenticazione.js)
         .then( async isUtenteAutenticato => {
 
+          let flag_nextGiaInvocato = false; // per evitare di invocare più volte next()
+
           if(isUtenteAutenticato) {
             // Autenticato
             routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";
@@ -175,30 +177,35 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           } else {
             // Non autenticato
             next( router.creaRouteAutenticazioneConInfoRichiesta( routeDestinazione ) );
-            // TODO : da login, metti url '/' poi next() viene invocato sia qui sia alla riga 201 nel prossimo then()
+            flag_nextGiaInvocato = true;
           }
 
+          return flag_nextGiaInvocato;
+
         })
-        .then( () => {
+        .then( flag_nextGiaInvocato => {
 
-          if (routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN &&  // TODO : TESTARE
-              routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
-              routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE) {
-            // TODO : questa parte deve essere ricontrollata
-            // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
-            // ed era stato mandato al login, ora redirect alla pagina che stava usando
-            // con tutti i parametri che aveva prima del redirect
-            let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
-            parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1, parametriVecchiaRoute.length - 1));  // TODO : testare correttezza
-            // substring() rimuove "" aggiunte all'inizio ed alla fine
-            const routeRichiestaPrima = {
-              fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
-              params: parametriVecchiaRoute
-            };
-            next(routeRichiestaPrima);
+          if( ! flag_nextGiaInvocato ) {
 
-          } else {
-            next();
+            if (routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN &&  // TODO : TESTARE
+                routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
+                routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE) {
+              // TODO : questa parte deve essere ricontrollata
+              // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
+              // ed era stato mandato al login, ora redirect alla pagina che stava usando
+              // con tutti i parametri che aveva prima del redirect
+              let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
+              parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1, parametriVecchiaRoute.length - 1));  // TODO : testare correttezza
+              // substring() rimuove "" aggiunte all'inizio ed alla fine
+              const routeRichiestaPrima = {
+                fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
+                params: parametriVecchiaRoute
+              };
+              next(routeRichiestaPrima);
+
+            } else {
+              next();
+            }
           }
 
         })
