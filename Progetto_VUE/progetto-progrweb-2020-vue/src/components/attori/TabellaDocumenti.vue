@@ -195,6 +195,9 @@ export default {
       /** "Import" della funzione per usarla nel template.*/
       camelCaseToHumanReadable: camelCaseToHumanReadable,
 
+      /** Timer per l'auto-aggiornamento del componente.*/
+      timerAutoUpdate: undefined,
+
       // Wrapper
       csrfToken_wrapper: this.csrfToken
 
@@ -288,8 +291,11 @@ export default {
       })
 
     // Gestione dell'auto-aggiornamento della tabella  // TODO: sarebbe meglio che l'autoaggiornamento richiedesse solo i nuovi documenti e non tutti di nuovo
-    setInterval(caricamentoComponente, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
+    this.timerAutoUpdate = setInterval(caricamentoComponente, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
+  },
+  beforeUnmount () {
+    clearInterval(this.timerAutoUpdate)
   },
   methods: {
 
