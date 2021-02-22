@@ -1,60 +1,46 @@
 <template>
 
-  <!-- ###################   AGGIUNTA CONSUMER   ################### -->
-  <section id="aggiuntaConsumer"
-           v-if="isUploader()"><!-- TODO : creare componente "AggiuntaConsumer" ed "AggiuntaUploaderOAdmin" -->
-    <p>
+  <section :id="idSectionAggiuntaAttore" >
+    <p v-if="isAdministrator()">
+      Da questo form è possibile aggiungere un nuovo <i>{{ tipoAttore_uploader }}</i>
+      oppure un nuovo <i>{{ tipoAttore_administrator }}</i> alla piattaforma.
+    </p>
+    <p v-if="isUploader()">
       Da questo form è possibile aggiungere un nuovo <i>{{ tipoAttore_consumer }}</i>
       tra quelli registrati nella piattaforma.
     </p>
     <FormCampiAttore :flag_mostrareLabelCampiInput="false"
-                     :urlInvioFormTramitePost="urlAggiuntaNuovoConsumer"
-                     :flag_inviaDatiForm="flag_inviareDatiFormAggiuntaConsumer"
-                     :isQuestoFormRiferitoAConsumer="true"
-                     :csrfToken="csrfToken_wrapper"
-                     :isContentType_JSON="true"
-                     @submit="flag_inviareDatiFormAggiuntaConsumer = true"
-                     @dati-form-inviati="formAggiuntaAttoreInviato($event)"
-                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
-      <input type="submit" value="Aggiungi">
-    </FormCampiAttore>
-  </section>
-
-
-  <!-- ###################   AGGIUNTA UPLOADER/ADMINISTRATOR   ################### -->
-  <section :id="idSectionAggiuntaUploaderOAdministrator"
-           v-if="isAdministrator()">
-    <p>
-      Da questo form è possibile aggiungere un nuovo <i>{{ tipoAttore_uploader }}</i>
-      oppure un nuovo <i>{{ tipoAttore_administrator }}</i> alla piattaforma.
-    </p>
-    <FormCampiAttore :flag_mostrareLabelCampiInput="false"
-                     :urlInvioFormTramitePost="urlAggiuntaNuovoAttore"
-                     :flag_inviaDatiForm="flag_inviareDatiFormAggiuntaAttoreNonConsumer"
-                     :isQuestoFormRiferitoAConsumer="false"
+                     :urlInvioFormTramitePost="isUploader() ? urlAggiuntaNuovoConsumerPerUploader : urlAggiuntaNuovoAttorePerAdmin"
+                     :flag_inviaDatiForm="flag_inviareDatiFormAggiuntaAttore"
+                     :isQuestoFormRiferitoAConsumer="isUploader()"
                      :csrfToken="csrfToken_wrapper"
                      :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer"
                      :isContentType_JSON="true"
-                     @submit="flag_inviareDatiFormAggiuntaAttoreNonConsumer = true"
+                     @submit="flag_inviareDatiFormAggiuntaAttore = true"
                      @dati-form-inviati="formAggiuntaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
-      <p>Qualifica:
-        <label>
-          <input type="radio"
-                 :name="nomeParametroForm_qualificaAttoreDaAggiungere"
-                 :value="tipoAttore_uploader"
-                 @click="impostaValoriDaInviareAlServer(tipoAttore_uploader)"
-                 required>
-          {{ tipoAttore_uploader }}
-        </label>
-        <label>
-          <input type="radio"
-                 :name="nomeParametroForm_qualificaAttoreDaAggiungere"
-                 :value="tipoAttore_administrator"
-                 @click="impostaValoriDaInviareAlServer(tipoAttore_administrator)">
-          {{ tipoAttore_administrator }}
-        </label>
-      </p>
+
+      <div v-if="isAdministrator()">
+        <!-- Sezione solo per administrator -->
+        <p>Qualifica:
+          <label>
+            <input type="radio"
+                   :name="nomeParametroForm_qualificaAttoreDaAggiungere"
+                   :value="tipoAttore_uploader"
+                   @click="impostaTipoAttoreDaCreare(tipoAttore_uploader)"
+                   required>
+            {{ tipoAttore_uploader }}
+          </label>
+          <label>
+            <input type="radio"
+                   :name="nomeParametroForm_qualificaAttoreDaAggiungere"
+                   :value="tipoAttore_administrator"
+                   @click="impostaTipoAttoreDaCreare(tipoAttore_administrator)">
+            {{ tipoAttore_administrator }}
+          </label>
+        </p>
+      </div>
+
       <input type="submit" value="Aggiungi">
     </FormCampiAttore>
   </section>
@@ -83,34 +69,36 @@ export default {
     return {
 
       /** Url per richiedere al server di aggiungere un consumer.*/
-      urlAggiuntaNuovoConsumer: process.env.VUE_APP_URL_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER,
+      urlAggiuntaNuovoConsumerPerUploader: process.env.VUE_APP_URL_AGGIUNGI_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER,
 
       /** Url per richiedere al server di aggiungere un attore,
-       * senza eventuali parametri aggiunti in coda.*/
-      urlAggiuntaNuovoAttore: process.env.VUE_APP_URL_AGGIUNGI_ATTORE__RICHIESTA_DA_ADMIN,
+       * senza eventuali parametri aggiunti in coda, aggiunto da
+       * un Administrator.*/
+      urlAggiuntaNuovoAttorePerAdmin: process.env.VUE_APP_URL_AGGIUNGI_ATTORE__RICHIESTA_DA_ADMIN,
 
-      /** Flag: se impostato a true, i dati del form di aggiunta nuovo consumer vengono inviati al server.*/
-      flag_inviareDatiFormAggiuntaConsumer: false,
-
-      /** Flag: se impostato a true, i dati del form di aggiunta nuovo attore non-Consumer vengono inviati al server.*/
-      flag_inviareDatiFormAggiuntaAttoreNonConsumer: false,
+      /** Flag: se impostato a true, i dati del form di aggiunta nuovo attore vengono inviati al server.*/
+      flag_inviareDatiFormAggiuntaAttore: false,
 
 
       // Parametro del form
       nomeParametroForm_qualificaAttoreDaAggiungere: process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME,
 
       /** ID dell'elemento HTML usato per contenere il form di aggiunta nuovo attore.*/
-      idSectionAggiuntaUploaderOAdministrator: "aggiuntaUploaderOAdministrator",
+      idSectionAggiuntaAttore: "aggiuntaUploaderOAdministrator",
 
       /** Dati aggiuntivi (oggetto) che il {@link FormCampiAttore} deve
        * inviare al server, oltre a quelli già specificati nel componente stesso.*/
-      datiAggiuntiviDaInviareAlServer: {}, // default: oggetto vuoto
+      datiAggiuntiviDaInviareAlServer: {
+        [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME]: Math.trunc((Math.random() * 10e6)) + 1234,    // genera una password casuale
+        // (l'attore appena creato dovrebbe cambiarla al primo login...)
+        [process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME]: process.env.VUE_APP_TIPO_UTENTE__CONSUMER  // default
+      },
 
 
       // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template  // TODO : serve ? C'è anche in ElencoAttori
-      tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER,
-      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
-      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR,
+      tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
+      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
+      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR,
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
@@ -122,13 +110,9 @@ export default {
     /** Crea l'oggetto coi dati aggiuntivi da inviare al server
      * per l'aggiunta di un nuovo attore, oltre a quelli normalmente
      * gestiti da {@link FormCampiAttore}.
-     * @param tipoAttore Il tipo di attore che si vuole aggiungere.*/
-    impostaValoriDaInviareAlServer( tipoAttore ) {
-      this.datiAggiuntiviDaInviareAlServer = {
-        [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME]: Math.trunc((Math.random()*10e6))+1234,  // genera una password casuale
-        // (l'attore appena creato dovrebbe cambiarla al primo login...)
-        [process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME]: tipoAttore
-      }
+     * @param tipoAttoreDaCreare Il tipo di attore che si vuole aggiungere.*/
+    impostaTipoAttoreDaCreare(tipoAttoreDaCreare ) {
+      this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME] = tipoAttoreDaCreare
     },
 
     /** Metodo invocato quando il form per l'aggiunta di un attore viene
@@ -139,23 +123,17 @@ export default {
       oggetto.promiseRispostaServer
           .then( identificativoAttore => {
 
-            let messaggioInformativo;
-            if( this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] ) {
-              // Administrator ha aggiunto un attore
-              messaggioInformativo = "Attore " + oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
-                  " [" + identificativoAttore + "] aggiunto, la sua password è: " +
-                  this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] +
-                  ". Si consiglia di modificare la password al primo accesso.";
+            // Attore aggiunto
 
-              const formAggiuntaUploaderOAdministrator =
-                  document.querySelector("#"+this.idSectionAggiuntaUploaderOAdministrator+" form");
-              formAggiuntaUploaderOAdministrator.reset();
+            let messaggioInformativo = oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
+                " aggiunto, la sua password è: " +
+                this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] +
+                ". Si consiglia di modificare la password al primo accesso.";
 
-            } else {
-              // Uploader ha aggiunto un Consumer
-              messaggioInformativo = "Consumer " + oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
-                  " aggiunto.";
-            }
+            const formAggiuntaUploaderOAdministrator =
+                document.querySelector("#" + this.idSectionAggiuntaAttore + " form");
+            formAggiuntaUploaderOAdministrator.reset();
+
 
             this.$emit("aggiunto-nuovo-attore", unisciOggetti({
               [process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD]: identificativoAttore
@@ -169,22 +147,21 @@ export default {
             alert( "ERRORE: "+ rispostaServer.data );
           })
           .finally( () => {
-            this.flag_inviareDatiFormAggiuntaConsumer = false;
-            this.flag_inviareDatiFormAggiuntaAttoreNonConsumer = false;
+            this.flag_inviareDatiFormAggiuntaAttore = false;
           });
     },
 
     isConsumer() {
       return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
     isUploader() {
       return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
     },
     isAdministrator() {
       return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
+          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     }
   },
   watch: {

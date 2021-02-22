@@ -15,6 +15,9 @@ import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.attribute.UserPrincipal;
@@ -51,6 +54,61 @@ public abstract class Attore implements UserPrincipal, Cloneable {
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
     protected TipoAttore tipoAttore;
+
+    /** Questo metodo si occupa di modificare le informazioni di un attore.
+     * Funzionamento di questo metodo: clona l'attore ottenuto dal database,
+     * una copia la sovrascrive coi nuovi dati mandati dal client (se non
+     * nulli) e se risultano delle modifiche (rispetto al clone), le salva nel DB.
+     * Le modifiche vanno fatte sull'oggetto ottenuto dal DB, altrimenti poi quando si
+     * salva, viene creata una nuova entità anziché sovrascrivere quella esistente.
+     * @param attoreDaModificare_conModificheRichiesteDaClient E' la reappresentaazione
+     *                              dell'attore con le modifiche richieste dal cliente.
+     * @param attore_attualmenteSalvatoInDB E' lo stesso attore, ma con le
+     *                       informazioni attualmente salvate nel database.*/
+    public static Response modificaAttore(Attore attoreDaModificare_conModificheRichiesteDaClient,
+                                          Attore attore_attualmenteSalvatoInDB ) {
+
+        if( attore_attualmenteSalvatoInDB != null &&
+                attoreDaModificare_conModificheRichiesteDaClient != null) {
+
+            Attore copia_attore_attualmenteSalvatoInDB = attore_attualmenteSalvatoInDB.clone();
+
+            attore_attualmenteSalvatoInDB.setEmail(attoreDaModificare_conModificheRichiesteDaClient.getUsername());
+            attore_attualmenteSalvatoInDB.setNominativo(attoreDaModificare_conModificheRichiesteDaClient.getNominativo());
+            // attore_attualmenteSalvatoInDB.setUsername(attoreDaModificare_conModificheRichiesteDaClient.getUsername()); // modifica username non permessa (da requisiti)
+            if( attoreDaModificare_conModificheRichiesteDaClient instanceof Uploader ) {
+                // SE si sta modificando un Uploader
+                Uploader uploader_attualmenteSalvatoInDB = (Uploader) attore_attualmenteSalvatoInDB;
+                try {
+                    uploader_attualmenteSalvatoInDB
+                            .setImmagineLogo( uploader_attualmenteSalvatoInDB.getImmagineLogo(),
+                                              uploader_attualmenteSalvatoInDB.getEstensioneImmagineLogo() );
+                } catch (IOException e) {
+                    return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
+                                   .entity( e.getMessage() )
+                                   .build();
+                }
+                attore_attualmenteSalvatoInDB = uploader_attualmenteSalvatoInDB;
+            }
+
+            if( ! attore_attualmenteSalvatoInDB.equals(copia_attore_attualmenteSalvatoInDB) ) {
+                // Se non ci sono modifiche, risparmio l'inutile accesso in scrittura al DB
+                DatabaseHelper.salvaEntita(attore_attualmenteSalvatoInDB);
+            }
+
+            return Response.ok()
+                           .type( MediaType.APPLICATION_JSON )
+                           .entity( attoreDaModificare_conModificheRichiesteDaClient )
+                           .build();
+            // TODO : riesce a convertire in JSON se è astratto ?
+
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Attore da modificare non trovato nel sistema." )
+                    .build();
+        }
+
+    }
 
     /** Tipi di attori permessi nel sistema.*/
     public enum TipoAttore {
@@ -160,6 +218,11 @@ public abstract class Attore implements UserPrincipal, Cloneable {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setIdentificativoAttore(Long identificativoAttore) {
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(username) )
+            this.identificativoAttore = identificativoAttore;
     }
 
     public void setNominativo(String nominativo) {

@@ -381,7 +381,7 @@ export default {
         })
         .catch( console.error );
 
-      if( this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
+      if( this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
         // Se un consumer ha scaricato il documento, si aggiorna la vista per mostrare la data/ora
         // (richiesta al server per conformità nel formato scelto dal server) a meno che tale
         // data/ora non sia già scritta (perché il documento era già stato visualizzato)

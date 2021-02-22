@@ -18,15 +18,15 @@ export const getInfoAttore = async (idAttoreDiCuiRichiedereInfo,
 
     let urlRichiesta;
 
-    if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
-        if( tipoAttoreDiCuiRichiedereInfo === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
+    if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
+        if( tipoAttoreDiCuiRichiedereInfo === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
             urlRichiesta = process.env.VUE_APP_URL_GET_INFO_ADMINISTRATOR__RICHIESTA_DA_ADMINISTRATOR;
         } else {
             urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
         }
-    } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ) {
+    } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__UPLOADER ) {
         urlRichiesta = process.env.VUE_APP_URL_GET_INFO_CONSUMER__RICHIESTA_DA_UPLOADER;
-    } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
+    } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
         urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
     } else {
         urlRichiesta = "";

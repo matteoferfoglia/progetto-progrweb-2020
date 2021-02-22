@@ -67,7 +67,7 @@ export default {
       urlEliminazioneDocumento:                 process.env.VUE_APP_URL_DELETE_DOCUMENTO__RICHIESTA_DA_UPLOADER,
 
       // Copia da variabile d'ambiente
-      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
+      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
 
       // PROPRIETA CARICAMENTO NUOVO DOCUMENTO:
       nomeDocumento: "",

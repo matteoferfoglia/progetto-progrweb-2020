@@ -1,6 +1,6 @@
 package it.units.progrweb.api.uploader;
 
-import it.units.progrweb.api.administrator.GestioneAttori;
+import it.units.progrweb.api.CreazioneAttore;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
@@ -10,16 +10,17 @@ import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.UtilitaGenerale;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,71 +107,37 @@ public class GestioneConsumer {
         // TODO : fare refactoring (se necessario): c'è un metodo molto simile in consumer.RichiestaInfoSuUploader
 
         return Consumer.getAttoreDaIdentificativo(identificativoConsumer);
-        /*
-        // TODO : cancellare questa parte
-        Map<String,?> mappaProprieta_nome_valore;
-        if( consumer != null )
-            mappaProprieta_nome_valore = consumer.getMappaAttributi_Nome_Valore();
-        else mappaProprieta_nome_valore = new HashMap<>(0);
-
-        return UtilitaGenerale.rispostaJsonConMappa(mappaProprieta_nome_valore);
-
-         */
 
     }
 
-    /** Creazione di un {@link Consumer} che deve essere già registrato
-     * in questa piattaforma. Se la richiesta va a buon fine, restituisce
-     * l'identificativo del Consumer creato.*/
+    /** Associa il {@link ConsumerProxy} passato come parametro all'{@link Uploader}
+     * che ha fatto la richiesta. Se il {@link ConsumerProxy} non esiste nel sistema
+     * come prima cosa viene creato.
+     * Se la richiesta va a buon fine, restituisce l'identificativo del {@link Consumer}
+     * creato.*/
     @Path("/aggiungiConsumerPerQuestoUploader")
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
-    public Response associaConsumerAdUploader(ConsumerProxy consumerDaAggiungere,
+    public Response associaConsumerAdUploader( CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore ,
                                               @Context HttpServletRequest httpServletRequest) {
 
         // TODO : rivedere ed eventualmente semplificare questo metodo
         // TODO : metodo simile in ModificaInformazioniAttore
 
-        String nomeAttributoIdentificativoAttore = "identificativoAttore";  // campo non presente nei dati della richiesta
-                                                                            // Sarà null nell'istanza deserializzata, prima però verifico che esista nella classe
-
-        if( ! UtilitaGenerale.esisteAttributoInClasse( nomeAttributoIdentificativoAttore, Attore.class ) ) {
-            Logger.scriviEccezioneNelLog(this.getClass(), new NoSuchFieldException());
-            return Response.serverError().build();
-        }
-
-        // Verifica corretta deserializzazione degli attributi
-        Field[] attributi = Arrays.stream(Attore.class.getDeclaredFields())
-                                  .filter( field -> ! field.getName().equals(nomeAttributoIdentificativoAttore) )
-                                  .toArray(Field[]::new);
-
-        for ( Field attributo : attributi ) {
-            attributo.setAccessible(true);
-            try {
-                if( attributo.get(consumerDaAggiungere) == null ) {
-                    // Errore di deserializzazione
-                    return Response.status( Response.Status.BAD_REQUEST )
-                                   .entity( "Valori di input inseriti non validi." )
-                                   .build();
-                }
-            } catch (IllegalAccessException ignored) {}
-        }
-
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         try {
-            Long identificativoConsumer = associaConsumerAdUploader(consumerDaAggiungere, identificativoUploader);
+            CreazioneAttore.CampiFormAggiuntaAttore consumerAppenaAggiunto
+                    = associaConsumerAdUploader(campiFormAggiuntaAttore, identificativoUploader);
             return Response
                     .ok()
-                    .entity(identificativoConsumer)
+                    .entity(consumerAppenaAggiunto.getIdentificativoAttore())
+                    .type(MediaType.TEXT_PLAIN)
                     .build();
-        } catch (NotFoundException ne) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST )
-                    .entity("Il Consumer richiesto non è registrato nella piattaforma.")    // TODO : var ambienTe con messaggi errore
-                    .build();
+        } catch ( NoSuchAlgorithmException | InvalidKeyException  |
+                  MessagingException | UnsupportedEncodingException e) {
+            return Response.serverError().entity("Errore durante la creazione del consumer.").build();
         }
-
 
 
     }
@@ -178,31 +145,42 @@ public class GestioneConsumer {
     /** Dato un {@link Consumer} e l'identificativo di un {@link Uploader}, questo metodo
      * associa il {@link Consumer} all'{@link Uploader}. Se il {@link Consumer} è già associato
      * all'{@link Uploader} allora questo metodo non fa nulla.
-     * @return L'identificativo del {@link Consumer} se l'operazione va a buon fine.
-     * @throws NotFoundException Se il {@link Consumer} non è presente nel sistema. */
-    public static Long associaConsumerAdUploader(Consumer consumerDaAggiungere, Long identificativoUploader)
-            throws NotFoundException {
+     * Se il {@link Consumer} specificato non esiste nella piattaforma, come prima cosa lo crea,
+     * sfruttando il metodo {@link CreazioneAttore#creaNuovoAttoreECreaResponse(CreazioneAttore.CampiFormAggiuntaAttore, Attore.TipoAttore)}
+     * @return L'istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante il
+     *          {@link Consumer} appena creato, se l'operazione va a buon fine. */
+    public static CreazioneAttore.CampiFormAggiuntaAttore
+    associaConsumerAdUploader(CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore,
+                              Long identificativoUploader)
+            throws MessagingException, NoSuchAlgorithmException,
+                   InvalidKeyException, UnsupportedEncodingException {
 
-        String usernameConsumerDaAggiungere = consumerDaAggiungere.getUsername();
+        // Verifica se il Consumer esiste nella piattaforma
+        Consumer consumerDalDB = Consumer.getAttoreDaUsername(campiFormAggiuntaAttore.getUsername());
 
-            // Verifica se il Consumer esiste nella piattaforma (altrimenti eccezione)
-            Consumer consumerDalDB = Consumer.getAttoreDaUsername(usernameConsumerDaAggiungere);
-
-            if( consumerDalDB != null &&
-                    consumerDalDB.equals(consumerDaAggiungere) ) {
-
-                // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
-                if (!RelazioneUploaderConsumer.isConsumerServitoDaUploader(identificativoUploader, consumerDalDB.getIdentificativoAttore())) {
-
-                    // SE precedenti controlli ok, ALLORA aggiungi il consumer
-                    RelazioneUploaderConsumer.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
-
-                }
-                return consumerDalDB.getIdentificativoAttore();
-
-            } else {
-                throw new NotFoundException();
+        if( consumerDalDB==null ) {
+            // Creazione del consumer se non esiste già
+            try {
+                consumerDalDB = (Consumer) CreazioneAttore.creaNuovoAttore( campiFormAggiuntaAttore,
+                                                                            Attore.TipoAttore.Uploader );
+            } catch ( NoSuchAlgorithmException | InvalidKeyException |
+                      UnsupportedEncodingException | MessagingException e ) {
+                Logger.scriviEccezioneNelLog(GestioneConsumer.class,
+                        "Eccezione durante l'aggiunta di un consumer",
+                        e);
+                throw e;
             }
+        }
+
+        campiFormAggiuntaAttore.setIdentificativoAttore(consumerDalDB.getIdentificativoAttore());
+
+        // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
+        if (!RelazioneUploaderConsumer.isConsumerServitoDaUploader(identificativoUploader, consumerDalDB.getIdentificativoAttore())) {
+            // SE precedenti controlli ok, ALLORA aggiungi il consumer
+            RelazioneUploaderConsumer.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
+        }
+
+        return campiFormAggiuntaAttore;
     }
 
 
@@ -260,7 +238,7 @@ public class GestioneConsumer {
                     consumer_conModificheRichiesteDalClient.setEmail(nuovaEmail);
                     consumer_attualmenteSalvatoInDB.setUsername(nuovoUsername);
 
-                    return GestioneAttori.modificaAttore_metodoStatico( consumer_conModificheRichiesteDalClient,
+                    return Attore.modificaAttore( consumer_conModificheRichiesteDalClient,
                                                                         consumer_attualmenteSalvatoInDB         );
 
                 } else {

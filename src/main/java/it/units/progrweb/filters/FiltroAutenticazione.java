@@ -38,8 +38,7 @@ public class FiltroAutenticazione implements Filter {
 
 
     /** Verifica che la richiesta in ingresso provenga da un client autenticato
-     * oppure che la risorsa richiesta non richieda l'autenticazione.
-     */
+     * oppure che la risorsa richiesta non richieda l'autenticazione. */
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
 

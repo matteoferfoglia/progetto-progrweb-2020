@@ -133,13 +133,13 @@ export default {
     /** Restituisce true se è un uploader, false altrimenti.*/
     isUploader() {
       return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
     },
 
     /** Restituisce true se è un consumer, false altrimenti.*/
     isConsumer() {
       return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
 
     aggiornaCsrfToken( nuovoValore ) {

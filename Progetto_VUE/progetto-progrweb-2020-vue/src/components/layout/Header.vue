@@ -87,7 +87,7 @@ export default {
       return this.tipoUtenteAutenticato_wrapper;  // verifica se truthy
     },
     isAdministrator() {
-      return this.tipoUtenteAutenticato_wrapper === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
+      return this.tipoUtenteAutenticato_wrapper === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     }
   },
   watch: {

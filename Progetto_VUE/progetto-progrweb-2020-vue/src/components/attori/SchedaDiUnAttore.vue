@@ -249,7 +249,7 @@ name: "SchedaDiUnAttore",
           this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
 
       this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
-                                                  process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+                                                  process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
 
       if( this.$route && this.$route.params &&  // controllare che sia definita
           this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] ) {
@@ -305,28 +305,28 @@ name: "SchedaDiUnAttore",
     mostrareInputFilePerModificaLogoUploader() {
       return this.isAdministratorAttualmenteAutenticato() &&
           this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
     },
 
     /** Restituisce true se l'utente attualmente autenticato
      * è un Consumer, false altrimenti.*/
     isConsumerAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
 
     /** Restituisce true se l'utente attualmente autenticato
      * è un Uploader, false altrimenti.*/
     isUploaderAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER;
+          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
     },
 
     /** Restituisce true se l'utente attualmente autenticato
      * è un Uploader, false altrimenti.*/
     isAdministratorAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
+          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     },
 
     /** Richiede al server la modifica di un attore in base ai valori attualmente

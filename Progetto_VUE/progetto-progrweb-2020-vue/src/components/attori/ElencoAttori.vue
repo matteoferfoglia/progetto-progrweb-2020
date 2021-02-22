@@ -115,9 +115,9 @@ export default {
       csrfToken_wrapper: this.csrfToken,
 
       // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template  // TODO : serve ? C'è anche in SchermataPrincipaleAttoreAutenticato
-      tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER,
-      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER,
-      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR
+      tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
+      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
+      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR
 
     }
   },
@@ -251,13 +251,13 @@ export default {
     /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
     isConsumerAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER;
+          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
 
     /** Restituisce true se l'attore attualmente autenticato è un Administrator.*/
     isAdministratorAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR;
+          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     }
   },
   watch: {
@@ -310,12 +310,12 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 
   let urlRichiesta;
 
-  if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_ADMINISTRATOR ) {
+  if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
     urlRichiesta = process.env.VUE_APP_URL_GET_ELENCO_ATTORI_PER_QUESTO_ADMINISTRATOR  +
         "/" + tipoAttoriDiCuiMostrareElenco;  // tipo attori richiesti appeso come @PathParam
-  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_UPLOADER ) {
+  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__UPLOADER ) {
     urlRichiesta = process.env.VUE_APP_URL_GET_ELENCO_CONSUMER__RICHIESTA_DA_UPLOADER;
-  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE_AUTENTICATO_CONSUMER ) {
+  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
     urlRichiesta = process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER;
   } else {
     urlRichiesta = "";

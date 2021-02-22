@@ -175,6 +175,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
           } else {
             // Non autenticato
             next( router.creaRouteAutenticazioneConInfoRichiesta( routeDestinazione ) );
+            // TODO : da login, metti url '/' poi next() viene invocato sia qui sia alla riga 201 nel prossimo then()
           }
 
         })
