@@ -60,7 +60,7 @@
             <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
             <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
           </svg>
-          Annulla modifiche
+          Reset modifiche
         </button>
 
       </FormCampiAttore>
@@ -261,16 +261,7 @@ name: "SchedaDiUnAttore",
         this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
       }
 
-      if( this.isQuestaSchedaRiferitaAdUnUploader ) {
-        richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
-            .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
-            .catch(console.error);
-
-        this.logoBase64_dataUrl =
-            this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
-      } else {
-        this.logoBase64_dataUrl = "";
-      }
+      this.caricaLogoUploader();
 
       this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
           process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
@@ -297,6 +288,20 @@ name: "SchedaDiUnAttore",
                 this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "" ) : "";
       }
 
+    },
+
+    /** Carica il logo di un Uploader, se questa scheda si riferisce ad un Uploader.*/
+    caricaLogoUploader() {
+      if( this.isQuestaSchedaRiferitaAdUnUploader ) {
+        richiestaGet(process.env.VUE_APP_URL_GET_LOGO_ATTORE + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
+            .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
+            .catch(console.error);
+
+        this.logoBase64_dataUrl =
+            this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
+      } else {
+        this.logoBase64_dataUrl = "";
+      }
     },
 
     // TODO : i metodi isConsumer() / isUploader() / isAdministrator()  sono presenti in più componenti => refactoring

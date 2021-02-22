@@ -46,12 +46,12 @@ public class ModificaInformazioniAttore {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaInformazioni(@Context HttpServletRequest httpServletRequest,
-                                         @FormDataParam("nuovoNominativo")  String nuovoNominativo,
-                                         @FormDataParam("nuovaEmail")       String nuovaEmail,
-                                         @FormDataParam("vecchiaPassword")  String vecchiaPassword,
-                                         @FormDataParam("nuovaPassword")    String nuovaPassword,
-                                         @FormDataParam("nuovoLogo")        InputStream nuovoLogo,                  // TODO : variabili d'ambiente tutti i campi del form
-                                         @FormDataParam("nuovoLogo")        FormDataContentDisposition dettagliNuovoLogo) {
+                                         @FormDataParam("nuovoNominativo")   String nuovoNominativo,
+                                         @FormDataParam("nuovaEmail")        String nuovaEmail,
+                                         @FormDataParam("vecchiaPassword")   String vecchiaPassword,
+                                         @FormDataParam("nuovaPassword")     String nuovaPassword,
+                                         @FormDataParam("nuovoLogoUploader") InputStream nuovoLogo,                  // TODO : variabili d'ambiente tutti i campi del form
+                                         @FormDataParam("nuovoLogoUploader") FormDataContentDisposition dettagliNuovoLogo) {
 
         // TODO : verirficare che questo metodo funzioni
 
