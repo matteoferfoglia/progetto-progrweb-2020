@@ -49,6 +49,7 @@
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
 import {unisciOggetti} from "../../utils/utilitaGenerale";
+import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/http";
 export default {
   name: "AggiuntaAttore",
   components: {FormCampiAttore},
@@ -139,7 +140,10 @@ export default {
           })
           .catch( rispostaServer => {
             console.error( rispostaServer );
-            alert( "ERRORE: "+ rispostaServer.data );
+            if(getHttpResponseStatus(rispostaServer) === HTTP_STATUS_UNAUTHORIZED) // es. se è scaduto il token di autenticazione
+              alert("Non autorizzato. Autenticarsi.");
+            else
+              alert( "ERRORE: "+ rispostaServer.data );
           })
           .finally( () => {
             this.flag_inviareDatiFormAggiuntaAttore = false;
