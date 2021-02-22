@@ -10,6 +10,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.GeneratoreTokenCasuali;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.mail.MailSender;
 
@@ -58,7 +59,7 @@ public class CreazioneAttore {
         String email      = campiFormAggiuntaAttore.getEmail();
         String tipoAttoreDaCreare = campiFormAggiuntaAttore.getTipoAttore();
 
-        boolean parametriInputValidi = Arrays.stream(new String[]{username, password, nominativo, email, tipoAttoreDaCreare})
+        boolean parametriInputValidi = Arrays.stream(new String[]{username, nominativo, email, tipoAttoreDaCreare})
                 .noneMatch( Objects::isNull );
 
         if( parametriInputValidi ) {
@@ -221,10 +222,17 @@ public class CreazioneAttore {
             this.username = EncoderPrevenzioneXSS.encodeForJava(username);
         }
 
+        /** Se la password è nulla, come prima cosa viene generata una password
+         * alfanumerica, che poi viene restituita, altrimenti viene semplicemente
+         * restituita la password di quest'istanza.*/
         public String getPassword() {
+            if(password==null)
+                this.setPassword( GeneratoreTokenCasuali.generaTokenAlfanumerico(15) );
             return password;
         }
 
+        /** Se il parametro è nullo, viene creata una semplice password numerica,
+         * altrimenti si utilizza la password data come parametro.*/
         public void setPassword(String password) {
             this.password = EncoderPrevenzioneXSS.encodeForJava(password);
         }

@@ -53,13 +53,11 @@ public class WebService {
 
         try {
 
-            String passwordGenerata = String.valueOf((int) Math.floor(Math.random()*10e6));
-
             // Non crea nulla se il consumer esiste già
             CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore
                     = associaConsumerAdUploader( new CreazioneAttore.CampiFormAggiuntaAttore(
                                                                    codiceFiscaleConsumerDestinatario,
-                                                                   passwordGenerata,
+                                                                   null,
                                                                    nomeCognomeConsumerDestinatario,
                                                                    emailConsumerDestinatario,
                                                                    Attore.TipoAttore.Consumer.getTipoAttore(),

@@ -6,8 +6,7 @@
       oppure un nuovo <i>{{ tipoAttore_administrator }}</i> alla piattaforma.
     </p>
     <p v-if="isUploader()">
-      Da questo form è possibile aggiungere un nuovo <i>{{ tipoAttore_consumer }}</i>
-      tra quelli registrati nella piattaforma.
+      Da questo form è possibile aggiungere un nuovo <i>{{ tipoAttore_consumer }}</i>.
     </p>
     <FormCampiAttore :flag_mostrareLabelCampiInput="false"
                      :urlInvioFormTramitePost="isUploader() ? urlAggiuntaNuovoConsumerPerUploader : urlAggiuntaNuovoAttorePerAdmin"
@@ -89,8 +88,6 @@ export default {
       /** Dati aggiuntivi (oggetto) che il {@link FormCampiAttore} deve
        * inviare al server, oltre a quelli già specificati nel componente stesso.*/
       datiAggiuntiviDaInviareAlServer: {
-        [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME]: Math.trunc((Math.random() * 10e6)) + 1234,    // genera una password casuale
-        // (l'attore appena creato dovrebbe cambiarla al primo login...)
         [process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME]: process.env.VUE_APP_TIPO_UTENTE__CONSUMER  // default
       },
 
@@ -125,10 +122,8 @@ export default {
 
             // Attore aggiunto
 
-            let messaggioInformativo = oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] +
-                " aggiunto, la sua password è: " +
-                this.datiAggiuntiviDaInviareAlServer[process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME] +
-                ". Si consiglia di modificare la password al primo accesso.";
+            let messaggioInformativo =
+                oggetto.datiInviati[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] + " aggiunto.";
 
             const formAggiuntaUploaderOAdministrator =
                 document.querySelector("#" + this.idSectionAggiuntaAttore + " form");
