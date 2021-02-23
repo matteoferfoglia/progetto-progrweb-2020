@@ -17,7 +17,7 @@
           gli attori per nome -->
 
   <nav v-if="isAdministratorAttualmenteAutenticato()" id="sceltaTipoAttoreDiCuiMostrareElenco">
-    Visualizza elenco
+    Visualizza l'elenco degli
     <!-- Administrator può scegliere se visualizzare Uploader o altri Administrator -->
     <router-link :to="{
         name: $route.name,  // questa stessa route (non bisogna cambiare componente, ma solo scegliere che cosa mostrare)
@@ -344,8 +344,11 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 </script>
 
 <style scoped>
-  #sceltaTipoAttoreDiCuiMostrareElenco a.router-link-exact-active {
+  nav>a.router-link-active {
     color: #42b983;
     font-weight: bold;
+  }
+  p,nav {
+    padding: 0 1rem;
   }
 </style>
