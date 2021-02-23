@@ -1,28 +1,68 @@
 <template>
-  <h2>Login > Registrati</h2>
 
-  <form @submit.prevent="validaEdInviaForm">
+  <div class="card">
+    <h2 class="card-header">Registrazione consumer</h2>
+    <form class="card-body"
+          @submit.prevent="validaEdInviaForm">
 
-    <p><label>Codice fiscale
-      <input type="text" v-model="codiceFiscale" autocomplete="off" placeholder="Codice fiscale" :pattern="REGEX_CODICE_FISCALE" required autofocus>
-    </label></p>
-    <p><label>Nome e cognome
-      <input type="text" v-model="nominativo" autocomplete="off" placeholder="Nome e cognome" maxlength="100" required>
-    </label></p>
-    <p><label>Email
-      <input type="email" v-model="email" autocomplete="off" placeholder="xxxxxx@example.com" maxlength="100" :pattern="REGEX_EMAIL" required>
-    </label></p>
-    <p><label>Password
-      <input type="password" v-model="password" autocomplete="off" maxlength="100" required>
-    </label></p>
-    <p><label>Conferma password
-      <input type="password" v-model="confermaPassword" autocomplete="off" maxlength="100" required>
-    </label></p>
+      <p class="form-group row"><label>Codice fiscale
+        <input type="text"
+               v-model="codiceFiscale"
+               autocomplete="off"
+               placeholder="Codice fiscale"
+               :pattern="REGEX_CODICE_FISCALE"
+               class="form-control"
+               required
+               autofocus>
+      </label></p>
+      <p class="form-group row"><label>Nome e cognome
+        <input type="text"
+               v-model="nominativo"
+               autocomplete="off"
+               placeholder="Nome e cognome"
+               maxlength="100"
+               class="form-control"
+               required>
+      </label></p>
+      <p class="form-group row"><label>Email
+        <input type="email"
+               v-model="email"
+               autocomplete="off"
+               placeholder="xxxxxx@example.com"
+               maxlength="100"
+               :pattern="REGEX_EMAIL"
+               class="form-control"
+               required>
+      </label></p>
+      <div  class="form-group row d-flex justify-content-between flex-nowrap">
+        <p><label>Password
+          <input type="password"
+                 v-model="password"
+                 autocomplete="off"
+                 placeholder="Password"
+                 maxlength="100"
+                 class="form-control"
+                 required>
+        </label></p>
+        <p><label>Conferma password
+          <input type="password"
+                 v-model="confermaPassword"
+                 autocomplete="off"
+                 placeholder="Conferma password"
+                 maxlength="100"
+                 class="form-control"
+                 required>
+        </label></p>
+      </div>
 
-    <input type="submit" value="Registrati">
-    <input type="reset" value="Reset">
+      <div class="d-flex justify-content-center">
+        <input type="submit" value="Registrati" class="btn btn-primary">
+        <input type="reset" value="Reset" class="btn btn-secondary">
+      </div>
 
-  </form>
+    </form>
+  </div>
+
 </template>
 
 <script>
@@ -101,5 +141,18 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+label {
+  width: 100%;
+}
+form p {
+  display: flex;
+  justify-content: center;
+  padding: 0 5%;
+}
+div>input {
+  width: 20rem;
+  margin: 0 5%;
+}
+
 </style>
