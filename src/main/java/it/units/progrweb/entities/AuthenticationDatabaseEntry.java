@@ -100,15 +100,12 @@ public class AuthenticationDatabaseEntry {
      * credenziali sono valide, false altrimenti. */
     public static boolean verificaCredenziali(String username , String password) {
 
-        boolean credenzialiValide = false;  // default: false, in caso modificato modificato dal metodo
+        boolean credenzialiValide;  // default: false, in caso modificato modificato dal metodo
         AuthenticationDatabaseEntry authenticationEntry;
                 
         try {
             authenticationEntry = cercaAttoreInAuthDb(username);
-
-            if( authenticationEntry!= null )
-                credenzialiValide = verificaCredenziali(password, authenticationEntry);
-
+            credenzialiValide = verificaCredenziali(password, authenticationEntry);
         } catch (NotFoundException e) {
             // attore non trovato
             credenzialiValide = false;
@@ -134,6 +131,8 @@ public class AuthenticationDatabaseEntry {
             // Elimina eventuali password temporanee
             authenticationEntry.passwordTemporanea = null;
 
+            DatabaseHelper.salvaEntita(authenticationEntry);
+
             return true;
         }
 
@@ -144,6 +143,7 @@ public class AuthenticationDatabaseEntry {
             authenticationEntry.hashedSaltedPassword =
                     calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt);
             authenticationEntry.passwordTemporanea = null;
+            DatabaseHelper.salvaEntita(authenticationEntry);
 
             return true;    // credenziali valide
         }
