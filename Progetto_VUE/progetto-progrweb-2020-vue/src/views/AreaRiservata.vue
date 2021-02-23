@@ -92,4 +92,7 @@ export default {
 </script>
 
 <style>
+h1 {
+  padding: 1rem;
+}
 </style>

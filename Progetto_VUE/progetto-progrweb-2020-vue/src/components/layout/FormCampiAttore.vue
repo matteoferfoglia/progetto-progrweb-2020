@@ -3,43 +3,50 @@
   <FormConCsrfToken :id="idHtml"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
                     @submit="$emit('submit')/*Deve essere propagato*/">
-    <p v-if="username!==null">
-      <label :for="idUsername"><span v-if="flag_mostrareLabelCampiInput">{{ usernameCodFisc }}</span></label>
-      <input type="text"
-             v-model="username_wrapper"
-             maxlength="100"
-             :pattern="usernameCodFisc==='Codice fiscale' ? REGEX_CODICE_FISCALE : '^.*$'"
-             :id="idUsername"
-             :placeholder="usernameCodFisc"
-             :readonly="username_readOnly_wrapper || tuttiICampi_readOnly_wrapper"
-             autocomplete="on">
-    </p>
-    <p v-if="nominativo!==null">
-      <label :for="idNominativo"><span v-if="flag_mostrareLabelCampiInput">Nominativo</span></label>
-      <input type="text"
-             v-model="nominativo_wrapper"
-             :id="idNominativo"
-             placeholder="Nominativo"
-             maxlength="100"
-             :readonly="tuttiICampi_readOnly_wrapper"
-             autocomplete="on">
-    </p>
-    <p v-if="email!==null">
-      <label :for="idEmail"><span v-if="flag_mostrareLabelCampiInput">Email</span></label>
-      <input type="email"
-             v-model="email_wrapper"
-             :id="idEmail"
-             :pattern="REGEX_EMAIL"
-             placeholder="xxxxxx@example.com"
-             maxlength="100"
-             :readonly="tuttiICampi_readOnly_wrapper"
-             autocomplete="email">
-      <a :href="'mailto:' + email_wrapper" v-if="email_wrapper"></a>
-    </p>
-    <slot>
-      <!-- Qui possono essere aggiunti altri campi input / contenuti dal componente
-           padre, in particolare bisognerebbe mettere <input type="submit"> -->
-    </slot>
+    <div class="d-flex justify-content-around flex-wrap align-items-center">
+      <p v-if="username!==null">
+        <label :for="idUsername"><span v-if="flag_mostrareLabelCampiInput">{{ usernameCodFisc }}</span></label>
+        <input type="text"
+               v-model="username_wrapper"
+               maxlength="100"
+               :pattern="usernameCodFisc==='Codice fiscale' ? REGEX_CODICE_FISCALE : '^.*$'"
+               :id="idUsername"
+               :placeholder="usernameCodFisc"
+               :readonly="username_readOnly_wrapper || tuttiICampi_readOnly_wrapper"
+               class="form-control"
+               autocomplete="on">
+      </p>
+      <p v-if="nominativo!==null">
+        <label :for="idNominativo"><span v-if="flag_mostrareLabelCampiInput">Nominativo</span></label>
+        <input type="text"
+               v-model="nominativo_wrapper"
+               :id="idNominativo"
+               placeholder="Nominativo"
+               maxlength="100"
+               :readonly="tuttiICampi_readOnly_wrapper"
+               class="form-control"
+               autocomplete="on">
+      </p>
+      <p v-if="email!==null">
+        <label :for="idEmail"><span v-if="flag_mostrareLabelCampiInput">Email</span></label>
+        <input type="email"
+               v-model="email_wrapper"
+               :id="idEmail"
+               :pattern="REGEX_EMAIL"
+               placeholder="xxxxxx@example.com"
+               maxlength="100"
+               :readonly="tuttiICampi_readOnly_wrapper"
+               class="form-control"
+               autocomplete="email">
+        <a :href="'mailto:' + email_wrapper" v-if="email_wrapper"></a>
+      </p>
+    </div>
+    <div class="d-flex justify-content-center align-items-center form-row row">
+      <slot>
+        <!-- Qui possono essere aggiunti altri campi input / contenuti dal componente
+             padre, in particolare bisognerebbe mettere <input type="submit"> -->
+      </slot>
+    </div>
   </FormConCsrfToken>
 
 </template>
@@ -325,5 +332,8 @@ export default {
   }
   a[href^="mailto"]::before {
     content: " ✉";
+  }
+  p {
+    min-width: 30%;
   }
 </style>

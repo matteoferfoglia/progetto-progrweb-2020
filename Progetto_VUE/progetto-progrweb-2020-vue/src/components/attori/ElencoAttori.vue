@@ -24,7 +24,7 @@
         params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_uploader}
       }">
       Uploader
-    </router-link>
+    </router-link> |
     <router-link :to="{
         name: $route.name,
         params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_administrator}
@@ -344,7 +344,8 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 </script>
 
 <style scoped>
-  #sceltaTipoAttoreDiCuiMostrareElenco a:first-child::after {
-    content: " | ";
+  #sceltaTipoAttoreDiCuiMostrareElenco a.router-link-exact-active {
+    color: #42b983;
+    font-weight: bold;
   }
 </style>
