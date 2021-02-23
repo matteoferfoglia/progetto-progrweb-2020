@@ -19,11 +19,11 @@
                autocomplete="off"
                required>
       </label>
+      <input type="submit" value="Login" class="btn btn-primary order-1">
       <button @click.prevent="richiediResetPassword"
-         class="btn btn-link">
+              class="btn btn-link">
         Password dimenticata
       </button>
-      <input type="submit" value="Login" class="btn btn-primary">
     </Form>
   </div>
 
