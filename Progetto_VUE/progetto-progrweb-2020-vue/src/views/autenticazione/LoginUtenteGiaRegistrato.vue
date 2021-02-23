@@ -1,13 +1,32 @@
 <template>
-  <h2>Login > Accedi</h2>
-    <Form @submit="validaEdInviaForm"
+  <div class="card">
+    <h2 class="card-header">Login</h2>
+    <Form class="card-body d-flex justify-content-between flex-wrap"
+          @submit="validaEdInviaForm"
           @csrf-token-ricevuto="aggiornaCsrfToken($event)">
-      <label>Username<input type="text" v-model="username" autocomplete="off" required autofocus></label>
-      <label>Password<input type="password" v-model="password" autocomplete="off" required></label>
-      <input type="submit" value="Login">
-      <a @click.prevent="richiediResetPassword">Password dimenticata</a>
+      <label>Username
+        <input type="text"
+               class="form-control"
+               v-model="username"
+               autocomplete="off"
+               required
+               autofocus>
+      </label>
+      <label>Password
+        <input type="password"
+               class="form-control"
+               v-model="password"
+               autocomplete="off"
+               required>
+      </label>
+      <button @click.prevent="richiediResetPassword"
+         class="btn btn-link">
+        Password dimenticata
+      </button>
+      <input type="submit" value="Login" class="btn btn-primary">
     </Form>
-    <!-- TODO : VERIRICARE protezione csrf -->
+  </div>
+
 </template>
 
 <script>
@@ -128,4 +147,7 @@ export default {
 </script>
 
 <style>
+label {
+  width: 100%;
+}
 </style>
