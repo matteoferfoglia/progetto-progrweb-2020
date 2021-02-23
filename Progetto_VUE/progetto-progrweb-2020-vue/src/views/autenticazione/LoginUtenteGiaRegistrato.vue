@@ -150,4 +150,7 @@ export default {
 label {
   width: 100%;
 }
+input[type=submit] {
+  width: 10rem;
+}
 </style>
