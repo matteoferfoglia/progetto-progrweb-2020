@@ -130,11 +130,4 @@ export default {
 
 
 <style>
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-.card {
-  max-width: 500px;
-  margin: 5% auto;
-}
 </style>

@@ -1,20 +1,16 @@
 <template>
 
-  <header>
-    <h1>Benvenuto nella pagina di autenticazione</h1>
-    <nav>
-      <ul>
-        <li><router-link :to="PERCORSO_LOGIN">Login</router-link></li>
-        <li><router-link :to="PERCORSO_REGISTRAZIONE_CONSUMER">Registrazione Consumer</router-link></li>
+  <div>
+    <nav id="navAutenticazione">
+      <ul class="d-flex justify-content-center">
+        <li class="nav-item"><router-link :to="PERCORSO_LOGIN" class="nav-link">Login</router-link></li>
+        <li class="nav-item"><router-link :to="PERCORSO_REGISTRAZIONE_CONSUMER" class="nav-link">Registrazione Consumer</router-link></li>
       </ul>
     </nav>
-  </header>
-  <main>
-
     <router-view @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
-                 @login="$emit('login', $event)"  />
+                 @login="$emit('login', $event)" />
+  </div>
 
-  </main>
 </template>
 
 <script>
@@ -41,5 +37,21 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+div {
+  max-width: 500px;
+  margin: 5% auto;
+}
+#navAutenticazione>ul>li {
+  list-style-type: none;
+  margin: 0 1rem;
+}
+#navAutenticazione a.router-link-exact-active {
+  color: #42b983;
+  font-size: large;
+  font-weight: bold;
+}
+#navAutenticazione .nav-link:hover {
+  text-decoration: underline;
+}
 </style>
