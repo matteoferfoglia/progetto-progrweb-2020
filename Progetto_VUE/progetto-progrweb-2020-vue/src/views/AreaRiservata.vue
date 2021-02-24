@@ -1,9 +1,11 @@
 <template>
 
-  <h1>Area riservata</h1>
-  <img :src="logoUploader_base64"
-       alt="Proprio logo"
-       v-if="isUploaderAttualmenteAutenticato()">
+  <div class="d-flex justify-content-between">
+    <img :src="logoUploader_base64"
+         alt="Proprio logo"
+         v-if="isUploaderAttualmenteAutenticato()">
+    <h1>Area riservata</h1>
+  </div>
 
   <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
                :csrfToken="csrfToken_wrapper"
