@@ -28,7 +28,7 @@
           </li>
           <li class="dropdown-item">
             <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
-                              :csrfToken="csrfToken_wrapper">
+                              :csrfToken_prop="csrfToken_wrapper">
               <a @click.prevent="$emit('logout')" class="logout">
                 Logout
               </a>
