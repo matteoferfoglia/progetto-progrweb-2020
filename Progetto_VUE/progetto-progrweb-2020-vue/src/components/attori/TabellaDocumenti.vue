@@ -43,9 +43,10 @@
                     v-if="mappaDocumentiDaMostrare.get().size > 0"          >
     <!-- Eliminazione di un documento comporta il cambio di stato (serve token CSRF) -->
 
-    <table class="table table-hover">
-      <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
-      <thead class="thead-dark">
+    <div class="mx-auto table-container">
+      <table class="table table-hover">
+        <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
+        <thead class="thead-dark">
         <tr>
           <th>#</th>
           <th v-for="nomeColonna in nomiPropDocumenti"
@@ -53,8 +54,8 @@
             {{ camelCaseToHumanReadable(nomeColonna) }}
           </th>
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         <tr v-for="(documento, ignored, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
             :key="indice"><!-- Ogni riga è un documento -->
           <td>{{ indice+1 }}</td>
@@ -77,8 +78,9 @@
             </a>
           </td>
         </tr>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
 
 
   </FormConCsrfToken>
@@ -622,14 +624,18 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
   }
   .form-lista-documenti {
     padding: 0;
+    width: 100%;
     overflow: auto;
   }
   table {
-    max-width: 95%;
-    display: block;
+    display: table;
+    margin: 1rem auto;
+  }
+  .table-container {
+    width: 95%;
+    display: block; /*Necessario per max-height*/
     max-height: 500px;
     overflow: auto;
-    margin: 1rem auto;
   }
   .link-download {
     /* Fonte icona: https://icons.getbootstrap.com/icons/cloud-download/ */

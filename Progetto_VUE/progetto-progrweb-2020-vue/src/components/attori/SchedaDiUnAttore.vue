@@ -67,7 +67,7 @@
         </div></div>
       </article>
 
-      <main class="card" v-if="!(isAdministratorAttualmenteAutenticato() && !isQuestaSchedaRiferitaAdUnUploader)">
+      <article class="card" v-if="!(isAdministratorAttualmenteAutenticato() && !isQuestaSchedaRiferitaAdUnUploader)">
         <!-- Parte principale della pagina, diversa in base all'attore autenticato -->
         <h2 class="card-header">
           <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#documenti">
@@ -95,7 +95,7 @@
                             :csrfToken="csrfToken_wrapper"
                             @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
         </div></div>
-      </main>
+      </article>
 
     </div>
 

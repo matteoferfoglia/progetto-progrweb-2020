@@ -73,6 +73,9 @@ export default {
 
     }
   },
+  created() {
+    this.$router.push({name: this.nomeRouteCaricamentoDocumenti})
+  },
   watch: {
 
     csrfToken : {
