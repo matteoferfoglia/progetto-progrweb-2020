@@ -5,7 +5,7 @@
                     @submit="$emit('submit')/*Deve essere propagato*/">
     <div class="d-flex justify-content-around flex-wrap align-items-center">
       <p v-if="username!==null">
-        <label :for="idUsername"><span v-if="flag_mostrareLabelCampiInput">{{ usernameCodFisc }}</span></label>
+        <label :for="idUsername" v-if="flag_mostrareLabelCampiInput">{{ usernameCodFisc }}</label>
         <input type="text"
                v-model="username_wrapper"
                maxlength="100"
@@ -14,10 +14,11 @@
                :placeholder="usernameCodFisc"
                :readonly="username_readOnly_wrapper || tuttiICampi_readOnly_wrapper"
                class="form-control"
+               :aria-label="usernameCodFisc"
                autocomplete="on">
       </p>
       <p v-if="nominativo!==null">
-        <label :for="idNominativo"><span v-if="flag_mostrareLabelCampiInput">Nominativo</span></label>
+        <label :for="idNominativo" v-if="flag_mostrareLabelCampiInput">Nominativo</label>
         <input type="text"
                v-model="nominativo_wrapper"
                :id="idNominativo"
@@ -25,10 +26,11 @@
                maxlength="100"
                :readonly="tuttiICampi_readOnly_wrapper"
                class="form-control"
+               aria-label="Nominativo"
                autocomplete="on">
       </p>
       <p v-if="email!==null">
-        <label :for="idEmail"><span v-if="flag_mostrareLabelCampiInput">Email</span></label>
+        <label :for="idEmail" v-if="flag_mostrareLabelCampiInput">Email</label>
         <input type="email"
                v-model="email_wrapper"
                :id="idEmail"
@@ -37,6 +39,7 @@
                maxlength="100"
                :readonly="tuttiICampi_readOnly_wrapper"
                class="form-control"
+               aria-label="Email"
                autocomplete="email">
         <a :href="'mailto:' + email_wrapper" v-if="email_wrapper"></a>
       </p>

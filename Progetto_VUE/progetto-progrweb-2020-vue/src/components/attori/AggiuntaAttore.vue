@@ -196,4 +196,7 @@ label {
 section>p {
   padding: 1em;
 }
+input[type=submit] {
+  margin: 1rem auto;
+}
 </style>
