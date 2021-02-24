@@ -47,6 +47,7 @@
       <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
       <thead class="thead-dark">
         <tr>
+          <th>#</th>
           <th v-for="nomeColonna in nomiPropDocumenti"
               :key="nomeColonna">
             {{ camelCaseToHumanReadable(nomeColonna) }}
@@ -54,8 +55,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(documento, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
+        <tr v-for="(documento, ignored, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
             :key="indice"><!-- Ogni riga è un documento -->
+          <td>{{ indice+1 }}</td>
           <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
                                                                                        nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
               :key="propertyQuestaColonna" >
