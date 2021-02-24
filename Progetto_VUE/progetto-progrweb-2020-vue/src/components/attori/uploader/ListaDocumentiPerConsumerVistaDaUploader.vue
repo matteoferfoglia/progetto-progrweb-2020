@@ -9,7 +9,7 @@
                     @submit="caricaNuovoDocumento"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)">
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
-    <div class="d-flex justify-content-around align-items-center form-items-container">
+    <div class="d-flex justify-content-around align-items-center flex-wrap form-items-container">
       <label>Nome documento   <input type="text" v-model="nomeDocumento" class="form-control" required></label>
       <label>Lista di hashtag <input type="text" v-model="listaHashtag" class="form-control" placeholder="hashtag1, hashtag2"></label>
       <label>Documento        <input type="file" class="form-control-file" required></label>

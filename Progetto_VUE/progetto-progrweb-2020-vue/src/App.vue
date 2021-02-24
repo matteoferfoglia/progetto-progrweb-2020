@@ -134,7 +134,7 @@ export default {
     margin: 1rem 5%;
   }
   form,article,section p,small{
-    padding: 1em 0 0 1em;
+    padding: .5em .5em 0 .5em;
   }
   input[type=submit], button {
     margin: 1rem auto;

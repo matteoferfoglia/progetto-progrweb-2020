@@ -1,15 +1,32 @@
-<template><!-- TODO : rivedere questo componente -->
+<template>
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
-  <form v-if="mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
+  <h4>Lista documenti</h4>
+
+  <form class="filtro-hashtag d-flex flex-wrap align-items-center"
+        v-if="mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
     <!-- Form per filtraggio documenti rispetto ad hashtag -->
     <p>Filtra per hashtag: </p>
+    <p>
+      <input type="button"
+             class="btn btn-link"
+             @click="mostraTuttiIDocumenti"
+             value="Mostra tutti">
+    </p>
+    <p>
+      <input type="button"
+             class="btn btn-link"
+             @click="nascondiTuttiIDocumenti"
+             value="Nascondi tutti">
+    </p>
     <ol>
-      <li v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
+      <li class="form-check form-check-inline"
+          v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
           :key="hashtag">
         <p>
-          <label>
+          <label class="form-check-label">
             <input type="checkbox"
+                   class="form-check-input"
                    @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
                               Se cliccato, mostra documenti con questo hashtag
                               Fonte: https://stackoverflow.com/a/41001483 */"
@@ -19,49 +36,45 @@
         </p>
       </li>
     </ol>
-    <p>
-      <input type="button"
-             @click="mostraTuttiIDocumenti"
-             value="Mostra tutto">
-    </p>
   </form>
 
   <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
+                    class="form-lista-documenti"
                     v-if="mappaDocumentiDaMostrare.get().size > 0"          >
     <!-- Eliminazione di un documento comporta il cambio di stato (serve token CSRF) -->
 
-    <table>
+    <table class="table table-hover">
       <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
-      <thead>
-      <tr>
-        <td v-for="nomeColonna in nomiPropDocumenti"
-            :key="nomeColonna">
-          {{ camelCaseToHumanReadable(nomeColonna) }}
-        </td>
-      </tr>
+      <thead class="thead-dark">
+        <tr>
+          <th v-for="nomeColonna in nomiPropDocumenti"
+              :key="nomeColonna">
+            {{ camelCaseToHumanReadable(nomeColonna) }}
+          </th>
+        </tr>
       </thead>
       <tbody>
-      <tr v-for="(documento, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
-          :key="indice"><!-- Ogni riga è un documento -->
-        <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
-                                                                                     nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
-            :key="propertyQuestaColonna" >
-          {{ documento[propertyQuestaColonna] }}
-        </td>
-        <td v-if="urlDownloadDocumento">
-          <a :href=documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO]
-             download
-             class="link-download"
-             @click.prevent="scaricaDocumento(documento)">
-          </a>
-        </td>
-        <td v-if="urlEliminazioneDocumento">
-          <a :href="documento[NOME_PROP_LINK_DELETE_DOCUMENTO]"
-             class="link-delete"
-             @click.prevent="eliminaDocumento(documento)">
-          </a>
-        </td>
-      </tr>
+        <tr v-for="(documento, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
+            :key="indice"><!-- Ogni riga è un documento -->
+          <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
+                                                                                       nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
+              :key="propertyQuestaColonna" >
+            {{ documento[propertyQuestaColonna] }}
+          </td>
+          <td v-if="urlDownloadDocumento">
+            <a :href=documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO]
+               download
+               class="link-download"
+               @click.prevent="scaricaDocumento(documento)">
+            </a>
+          </td>
+          <td v-if="urlEliminazioneDocumento">
+            <a :href="documento[NOME_PROP_LINK_DELETE_DOCUMENTO]"
+               class="link-delete"
+               @click.prevent="eliminaDocumento(documento)">
+            </a>
+          </td>
+        </tr>
       </tbody>
     </table>
 
@@ -295,6 +308,12 @@ export default {
     mostraTuttiIDocumenti() {
       this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() ).sort();
       this.mappaDocumentiDaMostrare.set( this.mappaDocumenti.get() );
+    },
+
+    /** Resetta tutti gli hashtag e nasconde tutti i documenti disponibili.*/
+    nascondiTuttiIDocumenti() {
+      this.listaHashtagDaMostrare = [];
+      this.mappaDocumentiDaMostrare.set( new MappaDocumenti() );
     },
 
     /** Dati un hashtag ed un flag booleano, questa funzione aggiorna
@@ -586,6 +605,29 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
 </script>
 
 <style scoped>
+  h4 {
+    padding: 0 1rem;
+  }
+  .filtro-hashtag>p {
+    font-weight: bolder;
+  }
+  .filtro-hashtag * {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .form-lista-documenti {
+    padding: 0;
+    overflow: auto;
+  }
+  table {
+    max-width: 95%;
+    display: block;
+    max-height: 500px;
+    overflow: auto;
+    margin: 1rem auto;
+  }
   .link-download {
     /* Fonte icona: https://icons.getbootstrap.com/icons/cloud-download/ */
     content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23007bff" class="bi bi-cloud-download" viewBox="0 0 16 16"><path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/><path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708l3 3z"/></svg>');
