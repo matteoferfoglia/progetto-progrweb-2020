@@ -1,6 +1,6 @@
 <template>
 
-  <section :id="idSectionAggiuntaAttore" class="card">
+  <article :id="idSectionAggiuntaAttore" class="card">
     <p v-if="isAdministrator()">
       Da qui è possibile aggiungere un nuovo <i>{{ tipoAttore_uploader }}</i>
       oppure un nuovo <i>{{ tipoAttore_administrator }}</i> alla piattaforma.
@@ -19,30 +19,28 @@
                      @dati-form-inviati="formAggiuntaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
 
-      <div v-if="isAdministrator()" class="form-check">
+      <p v-if="isAdministrator()" class="form-check">Qualifica:
         <!-- Sezione solo per administrator -->
-        <p>Qualifica:
-          <label class="form-check-label">
-            <input type="radio"
-                   :name="nomeParametroForm_qualificaAttoreDaAggiungere"
-                   :value="tipoAttore_uploader"
-                   @click="impostaTipoAttoreDaCreare(tipoAttore_uploader)"
-                   required>
-            {{ tipoAttore_uploader }}
-          </label>
-          <label class="form-check-label">
-            <input type="radio"
-                   :name="nomeParametroForm_qualificaAttoreDaAggiungere"
-                   :value="tipoAttore_administrator"
-                   @click="impostaTipoAttoreDaCreare(tipoAttore_administrator)">
-            {{ tipoAttore_administrator }}
-          </label>
-        </p>
-      </div>
+        <label class="form-check-label">
+          <input type="radio"
+                 :name="nomeParametroForm_qualificaAttoreDaAggiungere"
+                 :value="tipoAttore_uploader"
+                 @click="impostaTipoAttoreDaCreare(tipoAttore_uploader)"
+                 required>
+          {{ tipoAttore_uploader }}
+        </label>
+        <label class="form-check-label">
+          <input type="radio"
+                 :name="nomeParametroForm_qualificaAttoreDaAggiungere"
+                 :value="tipoAttore_administrator"
+                 @click="impostaTipoAttoreDaCreare(tipoAttore_administrator)">
+          {{ tipoAttore_administrator }}
+        </label>
+      </p>
 
       <input type="submit" value="Aggiungi" class="btn btn-primary">
     </FormCampiAttore>
-  </section>
+  </article>
 
 </template>
 
@@ -186,17 +184,7 @@ export default {
 </script>
 
 <style scoped>
-.card {
-  margin: 5%;
-}
-label {
-  display: block;
-  margin-right: 5rem;
-}
-section>p {
-  padding: 1em;
-}
-input[type=submit] {
-  margin: 1rem auto;
+input[type=submit], button {
+  margin: 1rem 0;
 }
 </style>

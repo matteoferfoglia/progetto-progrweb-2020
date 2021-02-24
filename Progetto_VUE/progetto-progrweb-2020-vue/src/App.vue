@@ -130,4 +130,13 @@ export default {
 
 
 <style>
+.card {
+  margin: 5%;
+}
+article>p, article>small, section>p, section>small {
+  padding: 1em;
+}
+input[type=submit], button {
+  margin: 1rem auto;
+}
 </style>

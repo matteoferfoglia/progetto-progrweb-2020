@@ -31,20 +31,22 @@
       </p>
       <p v-if="email!==null">
         <label :for="idEmail" v-if="flag_mostrareLabelCampiInput">Email</label>
-        <input type="email"
-               v-model="email_wrapper"
-               :id="idEmail"
-               :pattern="REGEX_EMAIL"
-               placeholder="xxxxxx@example.com"
-               maxlength="100"
-               :readonly="tuttiICampi_readOnly_wrapper"
-               class="form-control"
-               aria-label="Email"
-               autocomplete="email">
-        <a :href="'mailto:' + email_wrapper" v-if="email_wrapper"></a>
+        <span class="input-group">
+          <input type="email"
+                 v-model="email_wrapper"
+                 :id="idEmail"
+                 :pattern="REGEX_EMAIL"
+                 placeholder="xxxxxx@example.com"
+                 maxlength="100"
+                 :readonly="tuttiICampi_readOnly_wrapper"
+                 class="form-control"
+                 aria-label="Email"
+                 autocomplete="email">
+          <a :href="'mailto:' + email_wrapper" v-if="email_wrapper" class="input-group-append btn btn-link"></a>
+        </span>
       </p>
     </div>
-    <div class="d-flex justify-content-center align-items-center form-row row">
+    <div class="d-flex justify-content-around align-items-center form-row row">
       <slot>
         <!-- Qui possono essere aggiunti altri campi input / contenuti dal componente
              padre, in particolare bisognerebbe mettere <input type="submit"> -->
@@ -333,8 +335,11 @@ export default {
   a[href^="mailto"] {
     text-decoration: none;
   }
-  a[href^="mailto"]::before {
-    content: " ✉";
+  a[href^="mailto"]::after {
+    content: "✉";
+  }
+  .btn-link:hover {
+    background: gray;
   }
   p {
     min-width: 30%;

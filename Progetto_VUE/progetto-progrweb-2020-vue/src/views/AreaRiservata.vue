@@ -3,6 +3,7 @@
   <div class="d-flex justify-content-between">
     <img :src="logoUploader_base64"
          alt="Proprio logo"
+         class="logo"
          v-if="isUploaderAttualmenteAutenticato()">
     <h1>Area riservata</h1>
   </div>
@@ -94,6 +95,10 @@ export default {
 </script>
 
 <style>
+img.logo {
+  max-height: 5rem;
+  width: auto;
+}
 h1 {
   padding: 1rem;
 }
