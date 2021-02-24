@@ -118,6 +118,7 @@ export default {
     'csrf-token-ricevuto'
 
   ],
+  inheritAttrs: false,
   props: [
 
     /** URL verso cui richiedere l'elenco dei documenti per un attore.*/

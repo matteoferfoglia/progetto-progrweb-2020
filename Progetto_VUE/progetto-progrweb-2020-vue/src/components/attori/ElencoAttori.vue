@@ -344,10 +344,6 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 </script>
 
 <style scoped>
-  nav>a.router-link-active {
-    color: #42b983;
-    font-weight: bold;
-  }
   p,nav {
     padding: 0 1rem;
   }

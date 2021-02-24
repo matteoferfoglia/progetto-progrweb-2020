@@ -47,9 +47,7 @@ div {
   margin: 0 1rem;
 }
 #navAutenticazione a.router-link-exact-active {
-  color: #42b983;
   font-size: large;
-  font-weight: bold;
 }
 #navAutenticazione .nav-link:hover {
   text-decoration: underline;

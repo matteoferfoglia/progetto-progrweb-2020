@@ -16,7 +16,7 @@
             Informazioni
           </button>
         </h2>
-        <div class="collapse" id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
+        <div class="collapse show" id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
 
           <p v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
@@ -102,7 +102,7 @@
     <button @click="chiudiSchedaAttore"
             class="x-circle btn btn-dark"
             v-if="mostrarePulsanteChiusuraQuestaSchedaAttore===true" >
-      Chiudi
+      Chiudi Scheda
     </button>
   </section>
 
@@ -466,6 +466,9 @@ name: "SchedaDiUnAttore",
 </script>
 
 <style scoped>
+  .accordion .card {
+    margin: 0;
+  }
   h2.card-header {
     padding: 0;
   }

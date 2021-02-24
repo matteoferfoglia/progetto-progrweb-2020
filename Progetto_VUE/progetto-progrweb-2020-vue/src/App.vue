@@ -130,6 +130,10 @@ export default {
 
 
 <style>
+  a.router-link-exact-active, a.router-link-active {
+    color: #42b983;
+    font-weight: bold;
+  }
   .card {
     margin: 1rem 5%;
   }
@@ -141,5 +145,9 @@ export default {
   }
   .form-items-container>p,label,div>p {
     min-width: 30%;
+  }
+  div>button {
+    margin-top: .5em;
+    margin-bottom: .5em;
   }
 </style>
