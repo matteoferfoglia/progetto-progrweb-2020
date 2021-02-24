@@ -184,6 +184,9 @@ export default {
 </script>
 
 <style scoped>
+label {
+  display: block;
+}
 input[type=submit], button {
   margin: 1rem 0;
 }
