@@ -3,15 +3,18 @@
   <!-- Componente per mostrare la lista di documenti di un Consumer,
        visualizzata da un Uploader -->
 
+  <p>Carica un nuovo documento per questo <i>Consumer</i>:</p>
+
   <FormConCsrfToken :id="idForm_caricaNuovoDocumento"
                     @submit="caricaNuovoDocumento"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)">
     <!-- Fonte (Upload documento): https://stackoverflow.com/a/43014086 -->
-    <p>Carica un nuovo documento per questo <i>Consumer</i>:</p>
-    <label>Nome documento   <input type="text" v-model="nomeDocumento" required></label>
-    <label>Lista di hashtag <input type="text" v-model="listaHashtag" placeholder="hashtag1, hashtag2"></label>
-    <label>Documento        <input type="file" required></label>
-    <input type="submit" value="Carica">
+    <div class="d-flex justify-content-around align-items-center form-items-container">
+      <label>Nome documento   <input type="text" v-model="nomeDocumento" class="form-control" required></label>
+      <label>Lista di hashtag <input type="text" v-model="listaHashtag" class="form-control" placeholder="hashtag1, hashtag2"></label>
+      <label>Documento        <input type="file" class="form-control-file" required></label>
+    </div>
+    <button type="submit" class="btn btn-primary carica-file mx-auto d-block"> Carica documento</button>
   </FormConCsrfToken>
 
   <TabellaDocumenti :urlRichiestaElencoDocumentiPerUnAttore="urlRichiestaElencoDocumentiPerUnConsumer"
@@ -46,8 +49,6 @@ export default {
 
     /** Valore del token CSRF ricevuto dal padre.*/
     "csrfToken"
-
-    // Altre props (specifiche per l'attore cui questo componente si riferisce) sono ottenute da Vue Router
   ],
   data() {
     return {
@@ -152,5 +153,8 @@ export default {
 </script>
 
 <style scoped>
-
+  .carica-file::before {
+    /* Fonte icona: https://icons.getbootstrap.com/icons/file-earmark-arrow-up/ */
+    content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16"><path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"/><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/></svg>');
+  }
 </style>

@@ -130,13 +130,16 @@ export default {
 
 
 <style>
-.card {
-  margin: 5%;
-}
-article>p, article>small, section>p, section>small {
-  padding: 1em;
-}
-input[type=submit], button {
-  margin: 1rem auto;
-}
+  .card {
+    margin: 1rem 5%;
+  }
+  form,article,section p,small{
+    padding: 1em 0 0 1em;
+  }
+  input[type=submit], button {
+    margin: 1rem auto;
+  }
+  .form-items-container>p,label,div>p {
+    min-width: 30%;
+  }
 </style>

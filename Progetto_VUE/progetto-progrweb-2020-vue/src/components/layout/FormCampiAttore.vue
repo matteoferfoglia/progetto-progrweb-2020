@@ -3,7 +3,7 @@
   <FormConCsrfToken :id="idHtml"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
                     @submit="$emit('submit')/*Deve essere propagato*/">
-    <div class="d-flex justify-content-around flex-wrap align-items-center">
+    <div class="d-flex justify-content-around flex-wrap align-items-center form-items-container">
       <p v-if="username!==null">
         <label :for="idUsername" v-if="flag_mostrareLabelCampiInput">{{ usernameCodFisc }}</label>
         <input type="text"
@@ -340,8 +340,5 @@ export default {
   }
   .btn-link:hover {
     background: gray;
-  }
-  p {
-    min-width: 30%;
   }
 </style>
