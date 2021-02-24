@@ -1,5 +1,4 @@
 <template>
-  <h3>Resoconto</h3>
   <form @submit.prevent="richiediEMostraResocontoNelPeriodo(dataInizio, dataFine)">
     <!-- Token CSRF non usato perché questo form non modifica lo stato nel sistema -->
     <p>Periodo di riferimento:
