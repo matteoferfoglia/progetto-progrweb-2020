@@ -19,16 +19,18 @@
   <nav v-if="isAdministratorAttualmenteAutenticato()" id="sceltaTipoAttoreDiCuiMostrareElenco">
     Visualizza l'elenco degli
     <!-- Administrator può scegliere se visualizzare Uploader o altri Administrator -->
-    <router-link :to="{
-        name: $route.name,  // questa stessa route (non bisogna cambiare componente, ma solo scegliere che cosa mostrare)
-        params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_uploader}
-      }">
+    <router-link :class=classeRouterLinkUploader
+                 :to="{
+                        name: $route.name,  // questa stessa route (non bisogna cambiare componente, ma solo scegliere che cosa mostrare)
+                        params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_uploader}
+                      }">
       Uploader
     </router-link> |
-    <router-link :to="{
-        name: $route.name,
-        params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_administrator}
-      }">
+    <router-link :class=classeRouterLinkAdministrator
+                 :to="{
+                        name: $route.name,
+                        params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_administrator}
+                      }">
       Administrator
     </router-link>
   </nav>
@@ -37,14 +39,14 @@
     <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
         :key="attore[0]/*Id dell'attore*/">
       <router-link :to="{
-        name: NOME_ROUTE_SCHEDA_ATTORE,
-        params: {
-          [NOME_PARAM_ID_ATTORE_router]       : attore[0],
-          [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
-          [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
-            // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
-        }
-      }">
+                          name: NOME_ROUTE_SCHEDA_ATTORE,
+                          params: {
+                            [NOME_PARAM_ID_ATTORE_router]       : attore[0],
+                            [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
+                            [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
+                              // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
+                          }
+                        }">
         {{ attore[1][NOME_PROP_NOMINATIVO] }}
       </router-link>
     </li>
@@ -113,6 +115,16 @@ export default {
       /** Timer per l'auto-aggiornamento del componente.*/
       timerAutoUpdate: undefined,
 
+      /** Classe di stile per il router-link che permette di scegliere
+       * di vedere l'elenco degli administrator. Questo attributo permette
+       * di scegliere tale classe in modo programmatico. */
+      classeRouterLinkAdministrator: "",
+
+      /** Nome della classe di stile per il router-link che permette di scegliere
+       * di vedere l'elenco degli uploader. Questo attributo permette
+       * di scegliere tale classe in modo programmatico. */
+      classeRouterLinkUploader: "",
+
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
@@ -127,7 +139,8 @@ export default {
   },
   created() {
 
-    this.timerAutoUpdate = setInterval(this.caricamentoQuestoComponente, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
+    this.timerAutoUpdate = setInterval(this.caricamentoQuestoComponente,
+                                       process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
   },
   beforeUnmount () {
@@ -141,7 +154,19 @@ export default {
 
       this.layoutCaricato = false;
 
-      this.tipiAttoreCuiQuestoElencoSiRiferisce =  this.qualeTipoAttoriDiCuiMostrareElenco();
+      {
+        // Decide il tipo attore di cui mostrare l'elenco
+        this.tipiAttoreCuiQuestoElencoSiRiferisce = this.qualeTipoAttoriDiCuiMostrareElenco();
+        if( this.isAdministratorAttualmenteAutenticato() ) {
+          if( this.tipiAttoreCuiQuestoElencoSiRiferisce === this.tipoAttore_administrator ) {
+            this.classeRouterLinkAdministrator = '"router-link-exact-active"';
+            this.classeRouterLinkUploader = '""';
+          } else {
+            this.classeRouterLinkAdministrator = '""';
+            this.classeRouterLinkUploader = '"router-link-exact-active"';
+          }
+        }
+      }
 
       const richiestaElencoAttoriAlServer = async () => {
         // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
@@ -233,6 +258,8 @@ export default {
       let tipoAttoreDiCuiMostrareElenco;  // valore restituito da questo metodo
 
       if( this.isAdministratorAttualmenteAutenticato() ) {
+        // SE è un Administrator attualmente autenticato, deve poter scegliere
+        //  se vedere l'elenco degli Uploader o degli Administrator
 
         tipoAttoreDiCuiMostrareElenco = this.tipoAttore_uploader; // valore default
 
@@ -243,6 +270,9 @@ export default {
           if( varComodoPerValutareSeParametroDefinito ) {
             tipoAttoreDiCuiMostrareElenco = varComodoPerValutareSeParametroDefinito;
           }
+        } else {
+          // route undefined, quindi imposta route default
+          this.$router.push({to:"", params:{[this.NOME_PARAM_TIPO_ATTORE]: tipoAttoreDiCuiMostrareElenco}});
         }
 
       } else if ( this.isConsumerAttualmenteAutenticato() ) {
