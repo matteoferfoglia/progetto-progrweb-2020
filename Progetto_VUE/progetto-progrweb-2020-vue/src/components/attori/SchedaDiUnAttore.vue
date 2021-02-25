@@ -398,7 +398,13 @@ name: "SchedaDiUnAttore",
 
     /** Chiude la scheda dell'attore attualmente mostrato.*/
     chiudiSchedaAttore() {
-      this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
+      this.$router.push({
+        name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI,
+        params: {
+          [process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]:
+            this.tipoAttoreCuiQuestaSchedaSiRiferisce
+        }
+      });
     }
 
 
