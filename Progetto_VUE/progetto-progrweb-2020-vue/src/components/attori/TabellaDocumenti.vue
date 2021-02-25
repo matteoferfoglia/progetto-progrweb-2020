@@ -267,7 +267,6 @@ export default {
               // Salva la mappa
               .then(mappa => {
                 this.mappaDocumenti.set(mappa);
-                this.mappaDocumentiDaMostrare.set(mappa);
               })
               .catch(console.error);
 
@@ -294,14 +293,36 @@ export default {
 
 
     caricamentoComponente()
-      .then( () => this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() ) )  // All'inizio mostra tutti gli hashtag
+      .then( () => {
+        // All'inizio mostra tutti gli hashtag
+        this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() );
+        this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true) );
+      })
       .catch( errore => {
         console.error( "Errore durante il caricamento del componente " + this.$options.name + ": " + errore );
-        alert( "Errore durante il caricamento." );
+        alert( "Errore durante il caricamento dei documenti." );
       })
 
     // Gestione dell'auto-aggiornamento della tabella  // TODO: sarebbe meglio che l'autoaggiornamento richiedesse solo i nuovi documenti e non tutti di nuovo
-    this.timerAutoUpdate = setInterval(caricamentoComponente, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
+    this.timerAutoUpdate = setInterval(() => {
+      const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
+
+      caricamentoComponente()
+        .then( () => {
+          // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
+          this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
+          this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true) );
+          // Nascondi i documenti con hashtag da non mostrare
+          const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
+                                               .filter( unHashtag => ! this.listaHashtagDaMostrare.includes(unHashtag) );
+          listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false) );
+        })
+        .catch( errore => {
+          console.error( errore );
+          alert("Errore nel caricamento dei documenti: " + errore);
+        })
+
+    }, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
   },
   beforeUnmount () {
@@ -573,7 +594,7 @@ export default {
       }
     },
 
-    /** Cambia stato se è stato caricato un nuovo documento, quindi
+    /** Cambia stato se è stato caricato (dall'Uploader) un nuovo documento, quindi
      * è necessario aggiornare la vista.*/
     oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere: {
       immediate: true,
