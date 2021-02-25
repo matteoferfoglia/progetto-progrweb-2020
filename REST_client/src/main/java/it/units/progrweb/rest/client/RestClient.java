@@ -28,6 +28,11 @@ public class RestClient {
         this.client.register(MultiPartFeature.class);
     }
 
+    /** Vedere {@link Client#close()}.*/
+    public void close() {
+        this.client.close();
+    }
+
     public Response inviaFileAConsumer(String usernameUploader, String passwordUploader,
                                        String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                                        String nomeFile, String listaHashtag, File file) {
