@@ -18,7 +18,7 @@
             <div class="icona-toggle"/>
           </button>
         </h2>
-        <div class="collapse show" id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
+        <div class="collapse" id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
 
           <p v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
@@ -79,7 +79,7 @@
             <div class="icona-toggle"/>
           </button>
         </h2>
-        <div class="collapse" id="documenti"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
+        <div class="collapse show" id="documenti"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
           <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
                                :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"

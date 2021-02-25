@@ -74,7 +74,9 @@ export default {
     }
   },
   created() {
-    this.$router.push({name: this.nomeRouteCaricamentoDocumenti})
+    // Redirect a route di default se non specificata
+    if( this.$route.name === process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER )
+      this.$router.push({name: this.nomeRouteCaricamentoDocumenti})
   },
   watch: {
 
