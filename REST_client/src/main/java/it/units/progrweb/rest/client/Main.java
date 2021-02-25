@@ -62,17 +62,21 @@ public class Main {
         RestClient restClient = new RestClient(uri_webService);
         try {
 
-            String responseBody =
-                    restClient.inviaFileAConsumer(credenziali_username, credenziali_password,
-                                                  codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
-                                                  nomeFile, listaHashtag, file)
-                              .readEntity(String.class);
-            System.out.println("--- RISPOSTA DAL SERVER ---\n" + responseBody);
+            for(int i=0; i<10; i++) {
+                String responseBody =
+                        restClient.inviaFileAConsumer(credenziali_username, credenziali_password,
+                                codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
+                                nomeFile, listaHashtag, file)
+                                .readEntity(String.class);
+                System.out.println("--- RISPOSTA DAL SERVER ---\n" + responseBody);
+            }
 
         } catch (Exception e) {
             System.err.println("Errore durante l'invio:\n\n" + e.getMessage() + "\n\n\tSTACK TRACE:\n");
             e.printStackTrace(System.err);
         }
+
+        restClient.close();
 
     }
 
