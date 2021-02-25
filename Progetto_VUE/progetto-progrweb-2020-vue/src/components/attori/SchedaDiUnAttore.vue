@@ -12,8 +12,10 @@
 
       <article class="card">
         <h2 class="card-header">
-          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#informazioniAttore">
+          <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#informazioniAttore">
             Informazioni
+            <div class="icona-toggle"/>
           </button>
         </h2>
         <div class="collapse show" id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
@@ -70,9 +72,11 @@
       <article class="card" v-if="!(isAdministratorAttualmenteAutenticato() && !isQuestaSchedaRiferitaAdUnUploader)">
         <!-- Parte principale della pagina, diversa in base all'attore autenticato -->
         <h2 class="card-header">
-          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#documenti">
+          <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
+                  type="button" data-toggle="collapse" data-target="#documenti">
             <span v-if="isAdministratorAttualmenteAutenticato()">Resoconto</span>
             <span v-else>Documenti</span>
+            <div class="icona-toggle"/>
           </button>
         </h2>
         <div class="collapse" id="documenti"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
@@ -99,12 +103,13 @@
 
     </div>
 
-    <button @click="chiudiSchedaAttore"
-            class="x-circle btn btn-dark"
-            v-if="mostrarePulsanteChiusuraQuestaSchedaAttore===true" >
-      Chiudi Scheda
-    </button>
   </section>
+
+  <button @click="chiudiSchedaAttore"
+          class="x-circle btn btn-dark mx-auto d-block"
+          v-if="mostrarePulsanteChiusuraQuestaSchedaAttore===true" >
+    Chiudi Scheda
+  </button>
 
 
 
@@ -247,8 +252,89 @@ name: "SchedaDiUnAttore",
   },
   methods:{
 
+    /** Dato un elemento della classe collapse, restituisce il corrispondente
+     * pulsante toggle che gestisce la sua attivazione.
+     * @param el Elemento html di classe "collapse".
+     * @return null se non ha trovato il toggle corrispondente,
+     *         altrimenti restituisce l'array [collapseShow, toggleElement]
+     *         in cui il primo elemento è un flag (true se il collapsible
+     *         element è attualmente mostrato, false altrimenti) ed il secondo
+     *         è l'elemento toggle di attivazione dell'elemento collapsible
+     *         dato come parametro.*/
+    trovaToggleDiElementoCollapsible(el) {
+
+      if(el===null)
+        return null;
+
+      // Flag: true se el è attualmente mostrato
+      const collapseShow = el.className.includes("show");
+
+      // Trova il card element
+      while( el!==null && !el.className.includes("card") )
+        el = el.parentElement;
+
+      if( el===null )
+        return null; // card element non trovato
+
+      const toggleElement = el.querySelector('*[class|=icona-toggle]');  // trova l'elemento toogle per aprire una card
+
+      if( toggleElement===null )
+        return null;
+
+      return [collapseShow, toggleElement];
+
+    },
+
+    /** Dato un elemento collapsible, imposta lo stile del suo toggle.
+     * @param el Elemento html collapsible
+     * @param invertiStato Flag booleano. Se false, allora questo metodo
+     *        imposta lo stile del toggle in modo coerente con l'attuale
+     *        stile del collapsible, altrimenti in modo opposto (ad esempio
+     *        questa funzione può essere invocata come handler nel caso in
+     *        cui l'utente esegua una qualche azione (esempio: click) ed in
+     *        tal caso bisogna invertire la classe di stile del toggle, ma
+     *        viceversa questa funzione può anche essere invocata per rendere
+     *        la classe di stile del toggle coerente con l'attuale stato del
+     *        collapsible (quindi invertiStato deve essere false).*/
+    impostaClasseStileToggleDiElementoCollapsible(el, invertiStato=false) {
+      const tmp = this.trovaToggleDiElementoCollapsible(el);
+      if( tmp===null )
+        return;
+      let [isShow, toggleEl] = tmp;
+      isShow = invertiStato ? !isShow : isShow;
+      toggleEl.className =
+          toggleEl.className
+              .split(" ")
+              .map( nomeDiUnaClasse => {
+                if( nomeDiUnaClasse.includes("icona-toggle") )
+                  nomeDiUnaClasse = isShow ?
+                      "icona-toggle-show-collapsible" :
+                      "icona-toggle-hide-collapsible";
+                return nomeDiUnaClasse;
+              })
+              .join(" ");
+    },
+
     /** Metodo per i caricamento di questo componente.*/
     caricaQuestoComponente() {
+
+      // Modifica lo stile dei toggle corrispondenti ai collapsible attualmente mostrati "aperti"
+      document.querySelectorAll(".collapse.show")
+              .forEach( this.impostaClasseStileToggleDiElementoCollapsible );
+
+      /** Aggiunge listener per modificare lo stile dei toggle corrispondenti
+       * a card "aperti" o "collassati".
+       * @param el Elemento html padre del toggle.*/
+      const eventListenerHideCollapse = (el) => {
+        el = el.querySelector("*[class|=icona-toggle]");
+        const collapsibleElement = document.querySelector(el.parentElement.getAttribute("data-target"));
+        this.impostaClasseStileToggleDiElementoCollapsible(collapsibleElement, true);
+      };
+      document.querySelectorAll(".card-header")
+              .forEach( el => {
+                el.addEventListener( 'click', () => eventListenerHideCollapse(el));
+              })
+
 
       // Caricamento proprietà da Vue-Router
       this.idAttoreCuiQuestaSchedaSiRiferisce =
@@ -411,23 +497,6 @@ name: "SchedaDiUnAttore",
   },
   watch: {
 
-    /** Aggiorna il contenuto della pagina se cambia la route, ad
-     * es.: si chiedono i dati di un altro Attore
-     * (<a href="https://stackoverflow.com/a/50140702">Fonte</a>)*/
-    /*'$route' : {      // TODO : se cambia id attore, modificare la vista (prova '$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]')
-      immediate: true,
-      deep: true,
-      handler (nuovaRoute) {
-        // Se la nuova route fa riferimento a questo componente,
-        // Allora devo caricare i nuovi dati
-        // Altrimenti non devo fare nulla
-        if ( nuovaRoute.name ===
-              process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE ) {
-          this.caricaQuestoComponente();
-        }
-      }
-    },*/
-
     // necessario wrapper per aggiornare i valori
     NOME_PROP_USERNAME: {
       immediate: true,
@@ -496,5 +565,15 @@ name: "SchedaDiUnAttore",
   button.reset::before {
     /* Fonte icona: https://icons.getbootstrap.com/icons/arrow-counterclockwise/ */
     content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>');
+  }
+  *[class|="icona-toggle"]::after {
+    content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23007bff" class="bi bi-chevron-compact-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.553 6.776a.5.5 0 0 1 .67-.223L8 9.44l5.776-2.888a.5.5 0 1 1 .448.894l-6 3a.5.5 0 0 1-.448 0l-6-3a.5.5 0 0 1-.223-.67z"/></svg>');
+    display: block;
+  }
+  .icona-toggle-hide-collapsible::after {
+    transform: rotate(0deg);
+  }
+  .icona-toggle-show-collapsible::after {
+    transform: rotate(180deg);
   }
 </style>
