@@ -90,7 +90,7 @@
           <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
                                :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"
                                v-if="isAdministratorAttualmenteAutenticato() &&
-                               isQuestaSchedaRiferitaAdUnUploader" />
+                                      isQuestaSchedaRiferitaAdUnUploader" />
 
           <ListaDocumentiPerConsumerVistaDaUploader v-if="isUploaderAttualmenteAutenticato()"
                                                     :idConsumer="idAttoreCuiQuestaSchedaSiRiferisce"
