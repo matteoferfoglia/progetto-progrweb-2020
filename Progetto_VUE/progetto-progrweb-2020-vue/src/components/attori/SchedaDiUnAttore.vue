@@ -15,7 +15,7 @@
           <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
                   type="button" data-toggle="collapse" data-target="#informazioniAttore">
             Informazioni
-            <div class="icona-toggle"/>
+            <span class="icona-toggle"/>
           </button>
         </h2>
         <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() &&
@@ -82,7 +82,7 @@
                   type="button" data-toggle="collapse" data-target="#documenti">
             <span v-if="isAdministratorAttualmenteAutenticato()">Resoconto</span>
             <span v-else>Documenti</span>
-            <div class="icona-toggle"/>
+            <span class="icona-toggle"></span>
           </button>
         </h2>
         <div class="collapse show" id="documenti"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
