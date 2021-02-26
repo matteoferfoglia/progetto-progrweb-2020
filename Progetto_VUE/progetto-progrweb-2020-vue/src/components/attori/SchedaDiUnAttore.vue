@@ -44,11 +44,11 @@
                            @ripristina-valori-prop="ripristinaValoriProperty = false"
                            @dati-form-inviati="formModificaAttoreInviato($event)"
                            @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
-            <label class="mx-auto">
+
+            <label class="mx-auto" v-if="mostrareInputFilePerModificaLogoUploader()">
               Modifica logo
               <input type="file" :name="LOGO_INPUT_FIELD_NAME"
-                     class="form-control-file"
-                     v-if="mostrareInputFilePerModificaLogoUploader()" >
+                     class="form-control-file" >
             </label>
 
             <button @click="modificaAttore()"
