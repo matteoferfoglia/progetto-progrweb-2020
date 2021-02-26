@@ -70,8 +70,8 @@
     </fieldset>
 
     <div class="d-flex justify-content-around flex-row-reverse flex-wrap mt-3">
-      <button type="submit" class="check-icon btn btn-info"> Applica modifiche</button>
-      <button @click="tornaAdAreaRiservata" class="x-circle btn btn-dark mx-auto d-block"> Chiudi</button>
+      <button type="submit" class="check-icon btn btn-info d-block order-0"> Applica modifiche</button>
+      <button @click="tornaAdAreaRiservata" class="x-circle btn btn-dark order-1"> Chiudi</button>
       <button type="reset" class="reset btn btn-secondary"> Reset form</button>
     </div>
 
