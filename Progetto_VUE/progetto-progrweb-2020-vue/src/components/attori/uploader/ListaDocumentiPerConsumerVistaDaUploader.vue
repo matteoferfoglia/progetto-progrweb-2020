@@ -53,6 +53,7 @@ export default {
       nomeRouteCaricamentoDocumenti: process.env.VUE_APP_ROUTER_NOME_CARICAMENTO_DOCUMENTI,
       nomeRouteTabellaDocumenti: process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
       nomeRouteListaDocumentiVistaDaUploader: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
+      nomeRouteSchedaAttore: process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
 
 
       // Copia da variabile d'ambiente
@@ -76,7 +77,8 @@ export default {
   },
   created() {
     // Redirect a route di default se non specificata
-    if( this.$route.name === this.nomeRouteListaDocumentiVistaDaUploader )
+    if( this.$route.name === this.nomeRouteListaDocumentiVistaDaUploader ||
+          this.$route.name === this.nomeRouteSchedaAttore )
       this.$router.push({name: this.nomeRouteCaricamentoDocumenti})
   },
   watch: {
