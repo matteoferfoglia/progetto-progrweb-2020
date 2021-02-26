@@ -18,7 +18,9 @@
             <div class="icona-toggle"/>
           </button>
         </h2>
-        <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() && isQuestaSchedaRiferitaAdUnAdministrator}"
+        <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() &&
+                                                   !isQuestaSchedaRiferitaAdUnConsumer &&
+                                                   !isQuestaSchedaRiferitaAdUnUploader    }"
              id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
 
@@ -203,10 +205,6 @@ name: "SchedaDiUnAttore",
       /** Flag: true se questa scheda si riferisce ad un Uploader.*/
       isQuestaSchedaRiferitaAdUnUploader: undefined,                       // inizializzata in created()
 
-      /** Flag: true se questa scheda si riferisce ad un Administrator.*/
-      isQuestaSchedaRiferitaAdUnAdministrator: !this.isQuestaSchedaRiferitaAdUnUploader &&
-                                                !this.isQuestaSchedaRiferitaAdUnConsumer,
-
       /** Nome del campo di input per caricare il nuovo logo di un Uploader.*/
       LOGO_INPUT_FIELD_NAME: process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME,
 
@@ -326,7 +324,7 @@ name: "SchedaDiUnAttore",
       if( tmp===null )
         return;
       let [isShow, toggleEl] = tmp;
-      isShow = invertiStato ? !isShow : isShow;
+      isShow = invertiStato ? !isShow : isShow; // inversione del flag in base al valore del parametro invertiStato
       toggleEl.className =
           toggleEl.className
               .split(" ")
