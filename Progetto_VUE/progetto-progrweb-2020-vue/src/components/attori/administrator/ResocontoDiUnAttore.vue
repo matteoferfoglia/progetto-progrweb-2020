@@ -1,31 +1,34 @@
 <template>
   <form @submit.prevent="richiediEMostraResocontoNelPeriodo(dataInizio, dataFine)">
     <!-- Token CSRF non usato perché questo form non modifica lo stato nel sistema -->
-    <p>Periodo di riferimento:
-      <label>da
-        <input type="date"
-               :value="dataInizio/*v-bind non funziona correttamente con input[type=date]*/"
-               :id="idDataInizio"
-               @input.prevent="setDataInizio($event.target.value)"
-               required>
-      </label>
-      <label>a
-        <input type="date"
-               :value="dataFine"
-               :min="valoreMinimoDataFineRispettoAData(dataInizio)"
-               :id="idDataFine"
-               @input.prevent="setDataFine($event.target.value)"
-               required>
-      </label>
-    </p>
-    <input type="submit" value="Invia">
+    <fieldset class="fieldset-resoconto">
+      <legend>Periodo di riferimento:</legend>
+      <div class="d-flex justify-content-around align-items-end flex-wrap form-items-container">
+        <label>da
+          <input type="date"
+                 :value="dataInizio/*v-bind non funziona correttamente con input[type=date]*/"
+                 :id="idDataInizio"
+                 class="form-control"
+                 @input.prevent="setDataInizio($event.target.value)"
+                 required>
+        </label>
+        <label>a
+          <input type="date"
+                 :value="dataFine"
+                 :min="valoreMinimoDataFineRispettoAData(dataInizio)"
+                 :id="idDataFine"
+                 class="form-control"
+                 @input.prevent="setDataFine($event.target.value)"
+                 required>
+        </label>
+        <button type="submit" class="btn btn-primary">Invia</button>
+      </div>
+    </fieldset>
   </form>
-  <dl>
+  <dl v-for="(valoreProp, nomeProp) in resoconto" :key="nomeProp">
     <!-- Fonte: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl#wrapping_name-value_groups_in_htmlelementdiv_elements -->
-    <div v-for="(valoreProp, nomeProp) in resoconto" :key="nomeProp">
-      <dt>{{camelcaseToHumanReadable( nomeProp )}}</dt>
-      <dd>{{ valoreProp }}</dd>
-    </div>
+    <dt>{{camelcaseToHumanReadable( nomeProp )}}</dt>
+    <dd>{{ valoreProp }}</dd>
   </dl>
 </template>
 
@@ -201,4 +204,13 @@ const restituisciArrayDaDate_yyyy_mm_dd = data => {
 </script>
 
 <style scoped>
+  .fieldset-resoconto legend {
+    font-size: 1.25rem;
+  }
+  dd {
+    margin-left: 1em;
+  }
+  dl {
+    margin-top: 1em;
+  }
 </style>
