@@ -18,7 +18,8 @@
             <div class="icona-toggle"/>
           </button>
         </h2>
-        <div class="collapse" id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
+        <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() && isQuestaSchedaRiferitaAdUnAdministrator}"
+             id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
 
           <p v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
@@ -201,6 +202,10 @@ name: "SchedaDiUnAttore",
 
       /** Flag: true se questa scheda si riferisce ad un Uploader.*/
       isQuestaSchedaRiferitaAdUnUploader: undefined,                       // inizializzata in created()
+
+      /** Flag: true se questa scheda si riferisce ad un Administrator.*/
+      isQuestaSchedaRiferitaAdUnAdministrator: !this.isQuestaSchedaRiferitaAdUnUploader &&
+                                                !this.isQuestaSchedaRiferitaAdUnConsumer,
 
       /** Nome del campo di input per caricare il nuovo logo di un Uploader.*/
       LOGO_INPUT_FIELD_NAME: process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME,
