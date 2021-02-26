@@ -7,7 +7,7 @@
     <router-link :to="{name: nomeRouteCaricamentoDocumenti}">
       Caricamento documenti
     </router-link>
-    <router-link :to="{name: nomeRouteListaDocumenti}">
+    <router-link :to="{name: nomeRouteTabellaDocumenti}">
       Lista documenti
     </router-link>
   </nav>
@@ -51,7 +51,8 @@ export default {
 
       // Parametri Vue-Router
       nomeRouteCaricamentoDocumenti: process.env.VUE_APP_ROUTER_NOME_CARICAMENTO_DOCUMENTI,
-      nomeRouteListaDocumenti: process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
+      nomeRouteTabellaDocumenti: process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
+      nomeRouteListaDocumentiVistaDaUploader: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
 
 
       // Copia da variabile d'ambiente
@@ -75,7 +76,7 @@ export default {
   },
   created() {
     // Redirect a route di default se non specificata
-    if( this.$route.name === process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER )
+    if( this.$route.name === this.nomeRouteListaDocumentiVistaDaUploader )
       this.$router.push({name: this.nomeRouteCaricamentoDocumenti})
   },
   watch: {
