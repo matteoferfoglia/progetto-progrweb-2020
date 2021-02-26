@@ -150,6 +150,9 @@ export default {
     margin-top: .5em;
     margin-bottom: .5em;
   }
+  button {
+    margin: auto 1%;
+  }
 
   /** Icone dei pulsanti e dei link */
   button.modifica::before {
