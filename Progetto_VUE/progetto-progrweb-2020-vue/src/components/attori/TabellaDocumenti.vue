@@ -444,6 +444,9 @@ export default {
                 this.formattaDate([idDocumento, this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)]);
               })
               .catch(console.error);
+          ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( this.mappaDocumentiDaMostrare,
+                                                                 this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                                                                 this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO )
         }
       }
     },

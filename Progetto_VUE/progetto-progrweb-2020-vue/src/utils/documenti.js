@@ -107,7 +107,7 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
         )
 
         const arrayIdDocumentiNonAncoraVisualizzati = Array.from(   mappaDocumenti.entries() )
-             .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] == null ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
+             .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] === "" ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
              .map(    entryDocumento => entryDocumento[0] )                                      // salva l'id dei documenti risultanti dal filtraggio
                                                                                                  // entryDocumento è nella forma:   [chiaveDoc, {prop1Doc: val1, prop2Doc: val2}]
                                                                                                  // Restituisce array con id dei documenti non ancora visualizzati
