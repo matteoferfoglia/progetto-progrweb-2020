@@ -1,7 +1,7 @@
 <template>
 
   <section class="card" :id="idHtmlQuestoComponente">
-    <header class="card-header">
+    <header class="card-header d-flex align-items-center">
       <img :src="logoBase64_dataUrl"
            alt=""
            v-if="isQuestaSchedaRiferitaAdUnUploader"/>
@@ -551,6 +551,10 @@ name: "SchedaDiUnAttore",
 <style scoped>
   .accordion .card {
     margin: 0;
+  }
+  .card-header * {
+    max-height: 4rem;
+    padding: 0 1%;
   }
   h2.card-header {
     padding: 0;
