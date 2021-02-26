@@ -255,6 +255,26 @@ name: "SchedaDiUnAttore",
     this.caricaQuestoComponente();
 
   },
+  mounted() {
+
+    // Modifica lo stile dei toggle corrispondenti ai collapsible attualmente mostrati "aperti"
+    document.querySelectorAll(".collapse.show")
+        .forEach( this.impostaClasseStileToggleDiElementoCollapsible );
+
+    /** Aggiunge listener per modificare lo stile dei toggle corrispondenti
+     * a card "aperti" o "collassati".
+     * @param el Elemento html padre del toggle.*/
+    const eventListenerHideCollapse = (el) => {
+      el = el.querySelector("*[class|=icona-toggle]");
+      const collapsibleElement = document.querySelector(el.parentElement.getAttribute("data-target"));
+      this.impostaClasseStileToggleDiElementoCollapsible(collapsibleElement, true);
+    };
+    document.querySelectorAll(".card-header")
+        .forEach( el => {
+          el.addEventListener( 'click', () => eventListenerHideCollapse(el));
+        })
+
+  },
   methods:{
 
     /** Dato un elemento della classe collapse, restituisce il corrispondente
@@ -322,24 +342,6 @@ name: "SchedaDiUnAttore",
 
     /** Metodo per i caricamento di questo componente.*/
     caricaQuestoComponente() {
-
-      // Modifica lo stile dei toggle corrispondenti ai collapsible attualmente mostrati "aperti"
-      document.querySelectorAll(".collapse.show")
-              .forEach( this.impostaClasseStileToggleDiElementoCollapsible );
-
-      /** Aggiunge listener per modificare lo stile dei toggle corrispondenti
-       * a card "aperti" o "collassati".
-       * @param el Elemento html padre del toggle.*/
-      const eventListenerHideCollapse = (el) => {
-        el = el.querySelector("*[class|=icona-toggle]");
-        const collapsibleElement = document.querySelector(el.parentElement.getAttribute("data-target"));
-        this.impostaClasseStileToggleDiElementoCollapsible(collapsibleElement, true);
-      };
-      document.querySelectorAll(".card-header")
-              .forEach( el => {
-                el.addEventListener( 'click', () => eventListenerHideCollapse(el));
-              })
-
 
       // Caricamento proprietà da Vue-Router
       this.idAttoreCuiQuestaSchedaSiRiferisce =
