@@ -27,12 +27,18 @@ public class Main {
         String credenziali_password = "5678";
 
         // Parametri per l'invio dei file
-        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
-        String emailConsumer = "pippopluto@example.com";
-        String nomeCognomeConsumer = "Pippo Pluto";
+//        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
+//        String emailConsumer = "pippopluto@example.com";
+//        String nomeCognomeConsumer = "Pippo Pluto";
+//
 //        String codiceFiscaleConsumer = "RSSMRA80A01F205X";
 //        String emailConsumer = "mariorossi@example.com";
 //        String nomeCognomeConsumer = "Mario Rossi";
+
+        String codiceFiscaleConsumer = "NDRNDR80A01A182X";
+        String emailConsumer = "andreaandrei@example.com";
+        String nomeCognomeConsumer = "Andrea Andrei";
+
         String nomeFile = "file prova";
         String listaHashtag = "rest, file, prova, primo file";
         String percorsoFileLocale = "fileProva.txt";
@@ -62,7 +68,7 @@ public class Main {
         RestClient restClient = new RestClient(uri_webService);
         try {
 
-            for(int i=0; i<10; i++) {
+            for(int i=0; i<100; i++) {
                 String responseBody =
                         restClient.inviaFileAConsumer(credenziali_username, credenziali_password,
                                 codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
