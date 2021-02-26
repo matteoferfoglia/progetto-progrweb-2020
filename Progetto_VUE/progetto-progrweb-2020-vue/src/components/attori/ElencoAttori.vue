@@ -35,10 +35,14 @@
     </router-link>
   </nav>
 
-  <ol>
-    <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
-        :key="attore[0]/*Id dell'attore*/">
-      <router-link :to="{
+  <article class="card" id="elencoAttori">
+    <h2>Elenco attori</h2>
+    <ol>
+      <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
+          class="list-group-item list-group-item-action d-flex justify-content-between"
+          :key="attore[0]/*Id dell'attore*/">
+        <router-link
+            :to="{
                           name: NOME_ROUTE_SCHEDA_ATTORE,
                           params: {
                             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
@@ -47,15 +51,17 @@
                               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                           }
                         }">
-        {{ attore[1][NOME_PROP_NOMINATIVO] }}
-      </router-link>
-    </li>
-  </ol>
+          {{ attore[1][NOME_PROP_NOMINATIVO] }}
+        </router-link>
+      </li>
+    </ol>
 
-  <p v-if="isConsumerAttualmenteAutenticato() &&
+    <p v-if="isConsumerAttualmenteAutenticato() &&
           mappa_idAttore_proprietaAttore.size === 0">
-    Nessun <i>Uploader</i> disponibile.
-  </p>
+      Nessun <i>Uploader</i> disponibile.
+    </p>
+  </article>
+
 
 
 </template>
@@ -376,5 +382,21 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 <style scoped>
   p,nav {
     padding: 0 1rem;
+  }
+  h2 {
+    font-size: 1.7rem;
+  }
+  .list-group-item-action {
+    cursor: pointer;
+  }
+  .list-group-item-action::after {
+    /* Fonte icona: https://icons.getbootstrap.com/icons/pen/ */
+    content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/></svg>');
+  }
+  ol {
+    padding: 0
+  }
+  #elencoAttori {
+    border: 0;
   }
 </style>
