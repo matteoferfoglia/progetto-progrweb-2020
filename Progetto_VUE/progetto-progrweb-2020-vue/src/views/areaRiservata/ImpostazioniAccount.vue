@@ -1,75 +1,81 @@
 <template>
-  <h2>Impostazioni account</h2>
+  <h2 class="card-header card-title">Impostazioni account</h2>
 
   <FormConCsrfToken
       :valoreQualsiasiPerAggiornareIComponenteSeModificato="valoreQualsiasiPerAggiornareIlComponenteSeModificato"
       :id="idForm_modificaInformazioniAttore"
+      class="card-body"
       @change="isFormModificato = true"
       @submit="modificaInformazioni"
       @csrf-token-ricevuto="aggiornaCsrfToken($event)"><!-- TODO : è necessario che questo evento venga raccolta dal padre? Dovrebbe andare direttamente in area riservata perché è li il <router-view> -->
 
-    <p>Da questa pagina è possibile modificare le informazioni personali.</p>
-    <small>Riempire solo i campi da aggiornare.</small>
-
     <p>
+      Da questa pagina è possibile modificare le informazioni personali.
+      Riempire solo i campi da aggiornare.
+    </p>
+
+    <fieldset class="informazioni-personali">
+      <legend>Modifica informazioni personali</legend>
       <label>Nuovo nominativo
         <input type="text"
                v-model="nuovoNominativo"
+               class="form-control"
                autocomplete="on"
                maxlength="100">
       </label>
-    </p>
 
-    <p>
       <label>Nuova email
         <input type="text"
                v-model="nuovaEmail"
+               class="form-control"
                autocomplete="on"
                maxlength="100"
                placeholder="xxxxxx@example.com"
                :pattern="REGEX_EMAIL">
       </label>
-    </p>
-
-    <fieldset v-if="!isConsumer()">
-
-      <p>Modifica della password
-        <label>Vecchia password
-          <input type="password"
-                 v-model="vecchiaPassword"
-                 maxlength="100"
-                 autocomplete="current-password">
-        </label>
-        <label>Nuova password
-          <input type="password"
-                 v-model="nuovaPassword"
-                 maxlength="100"
-                 autocomplete="new-password">
-        </label>
-        <label>Conferma nuova password
-          <input type="password"
-                 v-model="confermaNuovaPassword"
-                 maxlength="100"
-                 autocomplete="new-password">
-        </label>
-      </p>
-
     </fieldset>
 
-    <p v-if="isUploader()">Modifica immagine logo
+    <fieldset v-if="!isConsumer()">
+      <legend>Modifica password</legend>
+      <label>Vecchia password
+        <input type="password"
+               v-model="vecchiaPassword"
+               class="form-control"
+               maxlength="100"
+               autocomplete="current-password">
+      </label>
+      <label>Nuova password
+        <input type="password"
+               v-model="nuovaPassword"
+               class="form-control"
+               maxlength="100"
+               autocomplete="new-password">
+      </label>
+      <label>Conferma nuova password
+        <input type="password"
+               v-model="confermaNuovaPassword"
+               class="form-control"
+               maxlength="100"
+               autocomplete="new-password">
+      </label>
+    </fieldset>
+
+    <fieldset class="modifica-logo" v-if="isUploader()">
+      <legend>Modifica immagine logo</legend>
       <label>Nuovo logo
         <input type="file"
                @change="isFileLogoCaricato=true"
-               maxlength="100"><!-- TODO : testare -->
+               class="form-control-file"><!-- TODO : testare -->
       </label>
-    </p>
+    </fieldset>
 
-    <input type="submit" value="Applica modifiche">
-    <input type="reset" value="Reset form">
+    <div class="d-flex justify-content-around flex-row-reverse mt-3">
+      <button type="submit" class="check-icon btn btn-primary"> Applica modifiche</button>
+      <button @click="tornaAdAreaRiservata" class="x-circle btn btn-dark mx-auto d-block"> Chiudi</button>
+      <button type="reset" class="reset btn btn-secondary"> Reset form</button>
+    </div>
 
   </FormConCsrfToken>
-
-  <button @click="tornaAdAreaRiservata">Chiudi</button>
 
 </template>
 
@@ -143,7 +149,7 @@ export default {
     },
 
     aggiornaCsrfToken( nuovoValore ) {
-      this.csrfToken_wrapper = nuovoValore,
+      this.csrfToken_wrapper = nuovoValore;
       this.$emit('csrf-token-ricevuto', nuovoValore);
     },
 
@@ -254,5 +260,19 @@ export default {
 </script>
 
 <style scoped>
+fieldset {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+fieldset label {
+  padding: 0 2%;
+}
+fieldset.informazioni-personali p {
+  min-width: 40%;
+}
+fieldset.modifica-logo legend {
+  margin-bottom: 0;
+}
 
 </style>
