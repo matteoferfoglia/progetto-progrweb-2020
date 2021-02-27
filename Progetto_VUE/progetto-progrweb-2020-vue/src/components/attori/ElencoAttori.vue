@@ -1,4 +1,4 @@
-<template v-if="layoutCaricato">
+<template v-if="isComponenteCaricato">
 
   <!-- Componente per mostrare un elenco di attori -->
 
@@ -96,7 +96,7 @@ export default {
     return {
 
       /** Flag, true quando il layout è caricato.*/
-      layoutCaricato: false,
+      isComponenteCaricato: false,
 
       /** Mappa { idAttore => oggettoConProprietaAttore },
        * ordinata alfabeticamente rispetto al nome dell'Attore.*/
@@ -105,6 +105,8 @@ export default {
       // Parametri Vue-Router
       /** Nome della route che conduce alla scheda di un attore.*/
       NOME_ROUTE_SCHEDA_ATTORE:           process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
+      /** Nome della route che conduce alla tabella dei documenti. */
+      NOME_ROUTE_TABELLA_DOCUMENTI:       process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
       /** Nome del parametro nella route contenente l'identificativo dell'attore
        * di cui si vedrà la scheda a seguito dell'inoltro nella route.*/
       NOME_PARAM_ID_ATTORE_router:        process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE,
@@ -147,6 +149,11 @@ export default {
   },
   created() {
 
+    this.caricamentoQuestoComponente()
+          .then( () => this.isComponenteCaricato = true )
+          .catch( console.error );
+
+    // Timer-auto aggiornamento
     this.timerAutoUpdate = setInterval(this.caricamentoQuestoComponente,
                                        process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
@@ -159,8 +166,6 @@ export default {
     /** Metodo per il caricamento dell'intero componente (incluse le
      * richieste al server per l'elenco degli attori).*/
     async caricamentoQuestoComponente() { // TODO : elenco attori ed elenco dei documenti (in SchedaDiUnAttore) dovrebbero autoaggiornarsi automaticamente dopo un intervallo specificato come parametro
-
-      this.layoutCaricato = false;
 
       {
         // Decide il tipo attore di cui mostrare l'elenco
@@ -212,7 +217,7 @@ export default {
             const entryMappa_unicoAttore = Array.from( this.mappa_idAttore_proprietaAttore.entries() )[0];
 
             this.$router.push({
-              name: this.NOME_ROUTE_SCHEDA_ATTORE,
+              name: this.NOME_ROUTE_TABELLA_DOCUMENTI,
               params: {
                 [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] : false,// vedere componente SchedaAttore
                 [this.NOME_PARAM_ID_ATTORE_router]       : entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
@@ -222,8 +227,6 @@ export default {
             });
 
           }
-
-          this.layoutCaricato = true;
         })
         .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
 

@@ -1,4 +1,4 @@
-<template>
+<template v-if="isComponenteCaricato">
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
   <h4>Lista documenti</h4>
@@ -154,6 +154,9 @@ export default {
 
       // Variabili inizializzate in created() in base ai dati ricevuti dal server
 
+      /** Flag: diventa true dopo aver caricato il componente.*/
+      isComponenteCaricato: false,
+
       /** Mappa in cui ogni chiave è un hashtag ed il corrispettivo
        * valore è un array di identificativi (posting-list) di documenti
        * aventi tale hashtag, tra quelli mostrati in {@link #mappaDocumenti}.*/
@@ -217,18 +220,20 @@ export default {
 
     // TODO : aggiungere un "loader" (flag layoutCaricato)
 
+    const richiestaInfo = async () => {
+      // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
+      await getNomePropertyDataVisualizzazioneDocumenti()
+          .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
+
+          // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
+          .then( getNomePropertyDataCaricamentoDocumenti )
+          .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp);
+    }
+
     const caricamentoComponente = async () => {
 
-              // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
-      await getNomePropertyDataVisualizzazioneDocumenti()
-              .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
-
-              // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
-              .then( getNomePropertyDataCaricamentoDocumenti )
-              .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp)
-
               // Richiede mappa idFile-propFile per questo attore
-              .then( () => richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) )
+      await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore)
 
               // Crea l'indice degli hashtag
               .then(rispostaConMappaFile_id_prop => {
@@ -292,11 +297,13 @@ export default {
     };
 
 
-    caricamentoComponente()
+    richiestaInfo()
+      .then(caricamentoComponente)
       .then( () => {
         // All'inizio mostra tutti gli hashtag
         this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() );
         this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true) );
+        this.isComponenteCaricato = true;
       })
       .catch( errore => {
         console.error( "Errore durante il caricamento del componente " + this.$options.name + ": " + errore );
