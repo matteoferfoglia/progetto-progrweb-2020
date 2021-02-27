@@ -39,10 +39,10 @@
     <h2>Elenco attori</h2>
     <ol>
       <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
-          class="list-group-item list-group-item-action d-flex justify-content-between"
+          class="list-group-item list-group-item-action"
           :key="attore[0]/*Id dell'attore*/">
-        <router-link
-            :to="{
+        <router-link class="w-100"
+                     :to="{
                           name: NOME_ROUTE_SCHEDA_ATTORE,
                           params: {
                             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
@@ -51,7 +51,9 @@
                               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                           }
                         }">
-          {{ attore[1][NOME_PROP_NOMINATIVO] }}
+          <span class="nominativo-attore d-flex justify-content-between">
+            {{ attore[1][NOME_PROP_NOMINATIVO] }}
+          </span>
         </router-link>
       </li>
     </ol>
@@ -386,10 +388,10 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
   h2 {
     font-size: 1.7rem;
   }
-  .list-group-item-action {
+  .list-group-item-action a {
     cursor: pointer;
   }
-  .list-group-item-action::after {
+  .nominativo-attore::after {
     /* Fonte icona: https://icons.getbootstrap.com/icons/pen/ */
     content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/></svg>');
   }
