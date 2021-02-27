@@ -431,31 +431,43 @@ export default {
           a.click();
           URL.revokeObjectURL(downloadUrl);
 
+          if( this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
+            // Se un consumer ha scaricato il documento, si aggiorna la vista per mostrare la data/ora
+            // (richiesta al server per conformità nel formato scelto dal server) a meno che tale
+            // data/ora non sia già scritta (perché il documento era già stato visualizzato)
+
+            if( ! documento[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] ) {
+              richiestaGet(process.env.VUE_APP_URL_GET_DATAORA_VISUALIZZAZIONE_DOCUMENTO + '/' + idDocumento)
+                  .then(dataOraVisualizzazione => {
+                    // TODO : trovare soluzione in MappaDocumenti per evitare questa duplicazione di codice
+                    this.mappaDocumenti.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
+                        dataOraVisualizzazione;
+                    this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
+                        dataOraVisualizzazione;
+                    this.formattaDate([idDocumento, this.mappaDocumenti.getDaChiave(idDocumento)]);
+                    this.formattaDate([idDocumento, this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)]);
+
+                    this.mappaDocumentiDaMostrare.set(
+                        ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( this.mappaDocumentiDaMostrare.get(),   // TODO : rivedere questo metodo
+                            this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                            this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO )
+                    );
+                    this.mappaDocumenti.set(
+                        ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( this.mappaDocumenti.get(),   // TODO : rivedere questo metodo
+                            this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                            this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO )
+                    );
+
+                  })
+                  .catch(console.error);
+
+            }
+          }
+
         })
         .catch( console.error );
 
-      if( this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
-        // Se un consumer ha scaricato il documento, si aggiorna la vista per mostrare la data/ora
-        // (richiesta al server per conformità nel formato scelto dal server) a meno che tale
-        // data/ora non sia già scritta (perché il documento era già stato visualizzato)
 
-        if( ! documento[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] ) {
-          richiestaGet(process.env.VUE_APP_URL_GET_DATAORA_VISUALIZZAZIONE_DOCUMENTO + '/' + idDocumento)
-              .then(dataOraVisualizzazione => {
-                // TODO : trovare soluzione in MappaDocumenti per evitare questa duplicazione di codice
-                this.mappaDocumenti.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
-                    dataOraVisualizzazione;
-                this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
-                    dataOraVisualizzazione;
-                this.formattaDate([idDocumento, this.mappaDocumenti.getDaChiave(idDocumento)]);
-                this.formattaDate([idDocumento, this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)]);
-              })
-              .catch(console.error);
-          ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( this.mappaDocumentiDaMostrare,   // TODO : rivedere questo metodo
-                                                                 this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
-                                                                 this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO )
-        }
-      }
     },
 
     /** Metodo per la cancellazione di un documento (dipende dall'URL).
