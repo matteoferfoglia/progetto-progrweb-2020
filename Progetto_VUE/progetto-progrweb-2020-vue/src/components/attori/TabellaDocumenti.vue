@@ -668,4 +668,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
     max-height: 500px;
     overflow: auto;
   }
+  th, td {
+    text-align: center;
+  }
 </style>
