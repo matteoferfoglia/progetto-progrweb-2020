@@ -1,48 +1,51 @@
-<template v-if="isComponenteCaricato">
-
+<template>
   <!-- Componente per mostrare un elenco di attori -->
 
-  <AggiuntaAttore :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
-                  :csrfToken="csrfToken_wrapper"
-                  @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
-                  @aggiunto-nuovo-attore="aggiungiNuovoAttoreAllElenco($event)"
-                  @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"
-                  v-if="! isConsumerAttualmenteAutenticato()" />
+
+  <div v-if="isComponenteCaricato">
+
+
+    <AggiuntaAttore :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
+                    :csrfToken="csrfToken_wrapper"
+                    @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
+                    @aggiunto-nuovo-attore="aggiungiNuovoAttoreAllElenco($event)"
+                    @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"
+                    v-if="! isConsumerAttualmenteAutenticato()" />
 
 
 
-  <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
-          Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
-          Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
-          gli attori per nome -->
+    <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
+            Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
+            Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
+            gli attori per nome -->
 
-  <nav v-if="isAdministratorAttualmenteAutenticato()" id="sceltaTipoAttoreDiCuiMostrareElenco">
-    Visualizza l'elenco degli
-    <!-- Administrator può scegliere se visualizzare Uploader o altri Administrator -->
-    <router-link :class=classeRouterLinkUploader
-                 :to="{
+    <nav v-if="isAdministratorAttualmenteAutenticato()" id="sceltaTipoAttoreDiCuiMostrareElenco">
+      Visualizza l'elenco degli
+      <!-- Administrator può scegliere se visualizzare Uploader o altri Administrator -->
+      <router-link :class=classeRouterLinkUploader
+                   :to="{
                         name: $route.name,  // questa stessa route (non bisogna cambiare componente, ma solo scegliere che cosa mostrare)
                         params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_uploader}
                       }">
-      Uploader
-    </router-link> |
-    <router-link :class=classeRouterLinkAdministrator
-                 :to="{
+        Uploader
+      </router-link> |
+      <router-link :class=classeRouterLinkAdministrator
+                   :to="{
                         name: $route.name,
                         params:{[NOME_PARAM_TIPO_ATTORE]: tipoAttore_administrator}
                       }">
-      Administrator
-    </router-link>
-  </nav>
+        Administrator
+      </router-link>
+    </nav>
 
-  <article class="card" id="elencoAttori">
-    <h2>Elenco attori</h2>
-    <ol>
-      <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
-          class="list-group-item list-group-item-action"
-          :key="attore[0]/*Id dell'attore*/">
-        <router-link class="w-100"
-                     :to="{
+    <article class="card" id="elencoAttori">
+      <h2>Elenco attori</h2>
+      <ol>
+        <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
+            class="list-group-item list-group-item-action"
+            :key="attore[0]/*Id dell'attore*/">
+          <router-link class="w-100"
+                       :to="{
                           name: NOME_ROUTE_SCHEDA_ATTORE,
                           params: {
                             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
@@ -54,15 +57,22 @@
           <span class="nominativo-attore d-flex justify-content-between">
             {{ attore[1][NOME_PROP_NOMINATIVO] }}
           </span>
-        </router-link>
-      </li>
-    </ol>
+          </router-link>
+        </li>
+      </ol>
 
-    <p v-if="isConsumerAttualmenteAutenticato() &&
+      <p v-if="isConsumerAttualmenteAutenticato() &&
           mappa_idAttore_proprietaAttore.size === 0">
-      Nessun <i>Uploader</i> disponibile.
-    </p>
-  </article>
+        Nessun <i>Uploader</i> disponibile.
+      </p>
+    </article>
+
+
+  </div>
+  <p class="d-flex align-items-center justify-content-center mx-auto" v-else>
+    <span class="spinner-border" role="status" aria-hidden="true"></span>
+    <span class="mx-3">Caricamento</span>
+  </p>
 
 
 
@@ -72,7 +82,6 @@
 import {richiestaGet} from "../../utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
 import {getMappa_idAttore_proprietaAttore} from "../../utils/richiesteInfoSuAttori";
-import {getTipoAttoreAttualmenteAutenticato} from "../../utils/autenticazione";
 
 export default {
   name: "ElencoAttori",
@@ -106,8 +115,6 @@ export default {
       // Parametri Vue-Router
       /** Nome della route che conduce alla scheda di un attore.*/
       NOME_ROUTE_SCHEDA_ATTORE:           process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
-      /** Nome della route che conduce alla tabella dei documenti. */
-      NOME_ROUTE_TABELLA_DOCUMENTI:       process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
       /** Nome del parametro nella route contenente l'identificativo dell'attore
        * di cui si vedrà la scheda a seguito dell'inoltro nella route.*/
       NOME_PARAM_ID_ATTORE_router:        process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE,
@@ -151,7 +158,7 @@ export default {
   created() {
 
     this.caricamentoQuestoComponente()
-          .then( () => this.isComponenteCaricato = true )
+          .then( () =>  this.isComponenteCaricato = true )
           .catch( console.error );
 
     // Timer-auto aggiornamento
@@ -205,7 +212,7 @@ export default {
             .catch( console.error ) ;
       };
 
-      richiestaElencoAttoriAlServer()
+      await richiestaElencoAttoriAlServer()
 
         .then( () => {
 
@@ -217,8 +224,8 @@ export default {
 
             const entryMappa_unicoAttore = Array.from( this.mappa_idAttore_proprietaAttore.entries() )[0];
 
-            this.$router.push({
-              name: this.NOME_ROUTE_TABELLA_DOCUMENTI,
+            return this.$router.push({
+              name: this.NOME_ROUTE_SCHEDA_ATTORE,
               params: {
                 [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] : false,// vedere componente SchedaAttore
                 [this.NOME_PARAM_ID_ATTORE_router]       : entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
@@ -298,19 +305,7 @@ export default {
     },
 
     /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
-    async isConsumerAttualmenteAutenticato() {
-      if( ! this.tipoAttoreAutenticato_wrapper )
-        if( ! this.tipoAttoreAutenticato ) {
-          return await getTipoAttoreAttualmenteAutenticato()
-                        .then( tipoAttore => {
-                          this.tipoAttoreAutenticato_wrapper = tipoAttore;
-                          return this.isConsumerAttualmenteAutenticato();
-                        })
-                        .catch( console.error );
-        } else {
-          this.tipoAttoreAutenticato_wrapper = this.tipoAttoreAutenticato;
-        }
-
+    isConsumerAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato_wrapper ===
           process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },

@@ -1,4 +1,4 @@
-<template>
+<template v-if="isComponenteCaricato">
 
   <section class="card" :id="idHtmlQuestoComponente">
     <header class="card-header titolo-scheda d-flex align-items-center">
@@ -173,7 +173,7 @@ name: "SchedaDiUnAttore",
       /** Flag: true se bisogna mostrare il pulsante per la chiusura della
        * scheda dell'attore mostrata da questo componente. Dipende dai
        * parametri ricevuti da Vue-Router. Inizializzata in created().*/
-      mostrarePulsanteChiusuraQuestaSchedaAttore: true,
+      mostrarePulsanteChiusuraQuestaSchedaAttore: undefined,
 
 
       /** Indica il tipo di attore a cui si riferisce questa scheda.*/
@@ -241,6 +241,9 @@ name: "SchedaDiUnAttore",
       /** email dell'attore a cui si riferisce questa scheda.*/
       email     : "",
 
+      /** Flag: diventa true quando il componente è caricato.*/
+      isComponenteCaricato: false,
+
 
       // Wrapper
       NOME_PROP_USERNAME_wrapper  : this.NOME_PROP_USERNAME,
@@ -253,7 +256,9 @@ name: "SchedaDiUnAttore",
   },
   created() {
 
-    this.caricaQuestoComponente();
+    this.caricaQuestoComponente()
+          .then( () => this.isComponenteCaricato=true )
+          .catch( console.error );
 
   },
   mounted() {
@@ -342,7 +347,7 @@ name: "SchedaDiUnAttore",
     },
 
     /** Metodo per i caricamento di questo componente.*/
-    caricaQuestoComponente() {
+    async caricaQuestoComponente() {
 
       // Caricamento proprietà da Vue-Router
       this.idAttoreCuiQuestaSchedaSiRiferisce =
@@ -400,8 +405,8 @@ name: "SchedaDiUnAttore",
     caricaLogoUploader() {
       if( this.isQuestaSchedaRiferitaAdUnUploader ) {
         richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
-            .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
-            .catch(console.error);
+                .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
+                .catch(console.error);
 
         this.logoBase64_dataUrl =
             this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
