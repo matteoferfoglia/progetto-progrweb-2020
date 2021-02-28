@@ -2,7 +2,7 @@
   <!-- Componente per mostrare un elenco di attori -->
 
 
-  <div v-if="isComponenteCaricato">
+  <Loader :isComponenteCaricato="isComponenteCaricato">
 
 
     <AggiuntaAttore :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
@@ -68,13 +68,7 @@
     </article>
 
 
-  </div>
-  <p class="d-flex align-items-center justify-content-center mx-auto" v-else>
-    <span class="spinner-border" role="status" aria-hidden="true"></span>
-    <span class="mx-3">Caricamento</span>
-  </p>
-
-
+  </Loader>
 
 </template>
 
@@ -82,10 +76,11 @@
 import {richiestaGet} from "../../utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
 import {getMappa_idAttore_proprietaAttore} from "../../utils/richiesteInfoSuAttori";
+import Loader from "../layout/Loader";
 
 export default {
   name: "ElencoAttori",
-  components: {AggiuntaAttore},
+  components: {Loader, AggiuntaAttore},
   inheritAttrs: false,
   emits: [
       /** Evento emesso quando riceve un token CSRF da un componente figlio.*/

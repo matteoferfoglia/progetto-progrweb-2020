@@ -1,124 +1,123 @@
-<template v-if="isComponenteCaricato">
+<template>
 
-  <section class="card" :id="idHtmlQuestoComponente">
-    <header class="card-header titolo-scheda d-flex align-items-center">
-      <img :src="logoBase64_dataUrl"
-           alt=""
-           v-if="isQuestaSchedaRiferitaAdUnUploader"/>
-      <h2>{{ nominativo }}</h2>
-    </header>
+  <Loader :isComponenteCaricato="isComponenteCaricato">
+    <section class="card" :id="idHtmlQuestoComponente">
+      <header class="card-header titolo-scheda d-flex align-items-center">
+        <img :src="logoBase64_dataUrl"
+             alt=""
+             v-if="isQuestaSchedaRiferitaAdUnUploader"/>
+        <h2>{{ nominativo }}</h2>
+      </header>
 
-    <div class="accordion">
+      <div class="accordion">
 
-      <article class="card">
-        <h2 class="card-header">
-          <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
-                  type="button" data-toggle="collapse" data-target="#informazioniAttore">
-            Informazioni
-            <span class="icona-toggle"/>
-          </button>
-        </h2>
-        <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() &&
+        <article class="card">
+          <h2 class="card-header">
+            <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
+                    type="button" data-toggle="collapse" data-target="#informazioniAttore">
+              Informazioni
+              <span class="icona-toggle"/>
+            </button>
+          </h2>
+          <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() &&
                                                    !isQuestaSchedaRiferitaAdUnConsumer &&
                                                    !isQuestaSchedaRiferitaAdUnUploader    }"
-             id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
+               id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
 
-          <p v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
-            Modificare i campi del form per modificare i dati dell'utente nel sistema.
-          </p>
-          <FormCampiAttore :flag_mostrareLabelCampiInput="true"
-                           :urlInvioFormTramitePost="urlModificaInfoAttore"
-                           :flag_inviaDatiForm="flag_inviaDatiForm"
-                           :isQuestoFormRiferitoAConsumer="isQuestaSchedaRiferitaAdUnConsumer"
-                           :username_readOnly="true"
-                           :tuttiICampi_readOnly="isConsumerAttualmenteAutenticato()"
-                           :username="isConsumerAttualmenteAutenticato() ? null : username"
-                           :nominativo="nominativo"
-                           :email="email"
-                           :resetCampiInputDopoInvioForm="false"
-                           :ripristinaValoriProp = "ripristinaValoriProperty"
-                           :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer_onSubmit"
-                           :csrfToken="csrfToken_wrapper"
-                           @submit="flag_inviaDatiForm = true"
-                           @ripristina-valori-prop="ripristinaValoriProperty = false"
-                           @dati-form-inviati="formModificaAttoreInviato($event)"
-                           @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
+            <p v-if="! isConsumerAttualmenteAutenticato()/* Consumer non può modificare nulla */">
+              Modificare i campi del form per modificare i dati dell'utente nel sistema.
+            </p>
+            <FormCampiAttore :flag_mostrareLabelCampiInput="true"
+                             :urlInvioFormTramitePost="urlModificaInfoAttore"
+                             :flag_inviaDatiForm="flag_inviaDatiForm"
+                             :isQuestoFormRiferitoAConsumer="isQuestaSchedaRiferitaAdUnConsumer"
+                             :username_readOnly="true"
+                             :tuttiICampi_readOnly="isConsumerAttualmenteAutenticato()"
+                             :username="isConsumerAttualmenteAutenticato() ? null : username"
+                             :nominativo="nominativo"
+                             :email="email"
+                             :resetCampiInputDopoInvioForm="false"
+                             :ripristinaValoriProp = "ripristinaValoriProperty"
+                             :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer_onSubmit"
+                             :csrfToken="csrfToken_wrapper"
+                             @submit="flag_inviaDatiForm = true"
+                             @ripristina-valori-prop="ripristinaValoriProperty = false"
+                             @dati-form-inviati="formModificaAttoreInviato($event)"
+                             @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
 
-            <label class="mx-auto" v-if="mostrareInputFilePerModificaLogoUploader()">
-              Modifica logo
-              <input type="file" :name="LOGO_INPUT_FIELD_NAME"
-                     class="form-control-file" >
-            </label>
+              <label class="mx-auto" v-if="mostrareInputFilePerModificaLogoUploader()">
+                Modifica logo
+                <input type="file" :name="LOGO_INPUT_FIELD_NAME"
+                       class="form-control-file" >
+              </label>
 
-            <button @click="modificaAttore()"
-                    class="modifica btn btn-info"
-                    v-if="! isConsumerAttualmenteAutenticato()">
-              Modifica utente
+              <button @click="modificaAttore()"
+                      class="modifica btn btn-info"
+                      v-if="! isConsumerAttualmenteAutenticato()">
+                Modifica utente
+              </button>
+
+              <button @click.prevent="ripristinaValoriProperty = true"
+                      class="reset btn btn-secondary"
+                      v-if="! isConsumerAttualmenteAutenticato()">
+                Reset modifiche
+              </button>
+
+              <button @click.prevent="eliminaAttore()"
+                      class="x-circle btn btn-danger"
+                      v-if="! isConsumerAttualmenteAutenticato()">
+                Elimina utente
+              </button>
+
+            </FormCampiAttore>
+
+
+          </div></div>
+        </article>
+
+        <article class="card" v-if="!(isAdministratorAttualmenteAutenticato() && !isQuestaSchedaRiferitaAdUnUploader)">
+          <!-- Parte principale della pagina, diversa in base all'attore autenticato -->
+          <h2 class="card-header">
+            <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
+                    type="button" data-toggle="collapse" data-target="#documenti">
+              <span v-if="isAdministratorAttualmenteAutenticato()">Resoconto</span>
+              <span v-else>Documenti</span>
+              <span class="icona-toggle"></span>
             </button>
+          </h2>
+          <div class="collapse show" id="documenti"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
-            <button @click.prevent="ripristinaValoriProperty = true"
-                    class="reset btn btn-secondary"
-                    v-if="! isConsumerAttualmenteAutenticato()">
-              Reset modifiche
-            </button>
-
-            <button @click.prevent="eliminaAttore()"
-                    class="x-circle btn btn-danger"
-                    v-if="! isConsumerAttualmenteAutenticato()">
-              Elimina utente
-            </button>
-
-          </FormCampiAttore>
-
-
-        </div></div>
-      </article>
-
-      <article class="card" v-if="!(isAdministratorAttualmenteAutenticato() && !isQuestaSchedaRiferitaAdUnUploader)">
-        <!-- Parte principale della pagina, diversa in base all'attore autenticato -->
-        <h2 class="card-header">
-          <button class="btn btn-link btn-block text-left d-flex justify-content-between align-items-center"
-                  type="button" data-toggle="collapse" data-target="#documenti">
-            <span v-if="isAdministratorAttualmenteAutenticato()">Resoconto</span>
-            <span v-else>Documenti</span>
-            <span class="icona-toggle"></span>
-          </button>
-        </h2>
-        <div class="collapse show" id="documenti"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
-
-          <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
-                               :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"
-                               v-if="isAdministratorAttualmenteAutenticato() &&
+            <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
+                                 :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"
+                                 v-if="isAdministratorAttualmenteAutenticato() &&
                                       isQuestaSchedaRiferitaAdUnUploader" />
 
-          <ListaDocumentiPerConsumerVistaDaUploader v-if="isUploaderAttualmenteAutenticato()"
-                                                    :idConsumer="idAttoreCuiQuestaSchedaSiRiferisce"
-                                                    :csrfToken="csrfToken_wrapper"
-                                                    @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
+            <ListaDocumentiPerConsumerVistaDaUploader v-if="isUploaderAttualmenteAutenticato()"
+                                                      :idConsumer="idAttoreCuiQuestaSchedaSiRiferisce"
+                                                      :csrfToken="csrfToken_wrapper"
+                                                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
-          <TabellaDocumenti v-if="isConsumerAttualmenteAutenticato()"
-                            :urlRichiestaElencoDocumentiPerUnAttore=
-                                "urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader"
-                            :urlDownloadDocumento="urlDownloadDocumentoPerConsumer"
-                            :tipoAttoreAutenticato="tipoAttoreAutenticato"
-                            :csrfToken="csrfToken_wrapper"
-                            @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
-        </div></div>
-      </article>
+            <TabellaDocumenti v-if="isConsumerAttualmenteAutenticato()"
+                              :urlRichiestaElencoDocumentiPerUnAttore=
+                                  "urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader"
+                              :urlDownloadDocumento="urlDownloadDocumentoPerConsumer"
+                              :tipoAttoreAutenticato="tipoAttoreAutenticato"
+                              :csrfToken="csrfToken_wrapper"
+                              @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
+          </div></div>
+        </article>
 
-    </div>
+      </div>
 
-  </section>
+    </section>
 
-  <button @click="chiudiSchedaAttore"
-          class="x-circle btn btn-dark mx-auto d-block"
-          v-if="mostrarePulsanteChiusuraQuestaSchedaAttore===true" >
-    Chiudi Scheda
-  </button>
-
-
-
+    <button @click="chiudiSchedaAttore"
+            class="x-circle btn btn-dark mx-auto d-block"
+            v-if="mostrarePulsanteChiusuraQuestaSchedaAttore===true" >
+      Chiudi Scheda
+    </button>
+  </Loader>
 
 
 </template>
@@ -130,9 +129,10 @@ import {richiestaDelete, richiestaGet} from "../../utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
+import Loader from "../layout/Loader";
 export default {
 name: "SchedaDiUnAttore",
-  components: {TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
+  components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
   inheritAttrs: false,
   emits: [
     /** Evento emesso quando riceve un token CSRF da un componente figlio.*/

@@ -2,7 +2,7 @@
 
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
-  <div v-if="isComponenteCaricato">
+  <Loader :isComponenteCaricato="isComponenteCaricato">
 
     <h4>Lista documenti</h4>
 
@@ -91,11 +91,7 @@
 
     <p v-else>Nessun documento disponibile.</p>
 
-  </div>
-  <p class="d-flex align-items-center justify-content-center mx-auto" v-else>
-    <span class="spinner-border" role="status" aria-hidden="true"></span>
-    <span class="mx-3">Caricamento</span>
-  </p>
+  </Loader>
 
 </template>
 
@@ -118,9 +114,10 @@ import {
   ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti
 } from "../../utils/documenti";
 import FormConCsrfToken from "../layout/FormConCsrfToken";
+import Loader from "../layout/Loader";
 export default {
   name: "TabellaDocumenti",
-  components: {FormConCsrfToken},
+  components: {Loader, FormConCsrfToken},
   emits: [
     /**Evento emesso dopo aver aggiunto un nuovo documento, quando
      * richiesto dall'elemento padre.*/
