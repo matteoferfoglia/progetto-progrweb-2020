@@ -72,6 +72,7 @@
 import {richiestaGet} from "../../utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
 import {getMappa_idAttore_proprietaAttore} from "../../utils/richiesteInfoSuAttori";
+import {getTipoAttoreAttualmenteAutenticato} from "../../utils/autenticazione";
 
 export default {
   name: "ElencoAttori",
@@ -297,7 +298,19 @@ export default {
     },
 
     /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
-    isConsumerAttualmenteAutenticato() {
+    async isConsumerAttualmenteAutenticato() {
+      if( ! this.tipoAttoreAutenticato_wrapper )
+        if( ! this.tipoAttoreAutenticato ) {
+          return await getTipoAttoreAttualmenteAutenticato()
+                        .then( tipoAttore => {
+                          this.tipoAttoreAutenticato_wrapper = tipoAttore;
+                          return this.isConsumerAttualmenteAutenticato();
+                        })
+                        .catch( console.error );
+        } else {
+          this.tipoAttoreAutenticato_wrapper = this.tipoAttoreAutenticato;
+        }
+
       return this.tipoAttoreAutenticato_wrapper ===
           process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
