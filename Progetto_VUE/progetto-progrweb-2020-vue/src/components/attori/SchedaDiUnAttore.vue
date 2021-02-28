@@ -368,6 +368,8 @@ name: "SchedaDiUnAttore",
             this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE];
         this.mostrarePulsanteChiusuraQuestaSchedaAttore = this.mostrarePulsanteChiusuraQuestaSchedaAttore === undefined ?
             true : this.mostrarePulsanteChiusuraQuestaSchedaAttore;
+      } else if( this.isConsumerAttualmenteAutenticato() ) {
+        this.mostrarePulsanteChiusuraQuestaSchedaAttore = false;
       } else {
         this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
       }
