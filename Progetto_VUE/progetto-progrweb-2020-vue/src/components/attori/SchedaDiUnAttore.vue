@@ -372,7 +372,7 @@ name: "SchedaDiUnAttore",
         this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
       }
 
-      this.caricaLogoUploader();
+      await this.caricaLogoUploader();
 
       this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
           process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
@@ -407,9 +407,6 @@ name: "SchedaDiUnAttore",
         richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
                 .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
                 .catch(console.error);
-
-        this.logoBase64_dataUrl =
-            this.proprietaAttoreCuiQuestaSchedaSiRiferisce[process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME];
       } else {
         this.logoBase64_dataUrl = "";
       }
