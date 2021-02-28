@@ -195,6 +195,9 @@ const onErrorHandler = async errore => {
     // TODO : verificare che funzioni come da aspettative
 
     console.error( errore );
+
+    if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO )
+        router.go(0);   // ricarica la pagina se è invalido il token CSRF
     
     // Redirection automatica a login
     eliminaTokenAutenticazione();
