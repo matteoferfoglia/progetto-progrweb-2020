@@ -1,92 +1,101 @@
-<template v-if="isComponenteCaricato">
+<template>
+
   <!-- Componente per mostrare una lista di documenti in forma tabellare -->
 
-  <h4>Lista documenti</h4>
+  <div v-if="isComponenteCaricato">
 
-  <form class="filtro-hashtag d-flex flex-wrap align-items-center"
-        v-if="mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
-    <!-- Form per filtraggio documenti rispetto ad hashtag -->
-    <p>Filtra per hashtag: </p>
-    <p>
-      <input type="button"
-             class="btn btn-link"
-             @click="mostraTuttiIDocumenti"
-             value="Mostra tutti">
-    </p>
-    <p>
-      <input type="button"
-             class="btn btn-link"
-             @click="nascondiTuttiIDocumenti"
-             value="Nascondi tutti">
-    </p>
-    <ol>
-      <li class="form-check form-check-inline"
-          v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
-          :key="hashtag">
-        <p>
-          <label class="form-check-label">
-            <input type="checkbox"
-                   class="form-check-input"
-                   @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
+    <h4>Lista documenti</h4>
+
+    <form class="filtro-hashtag d-flex flex-wrap align-items-center"
+          v-if="mappa_hashtag_idDocumenti.size > 0 /*non mostrare se non ci sono hashtag*/ ">
+      <!-- Form per filtraggio documenti rispetto ad hashtag -->
+      <p>Filtra per hashtag: </p>
+      <p>
+        <input type="button"
+               class="btn btn-link"
+               @click="mostraTuttiIDocumenti"
+               value="Mostra tutti">
+      </p>
+      <p>
+        <input type="button"
+               class="btn btn-link"
+               @click="nascondiTuttiIDocumenti"
+               value="Nascondi tutti">
+      </p>
+      <ol>
+        <li class="form-check form-check-inline"
+            v-for="hashtag in Array.from(mappa_hashtag_idDocumenti.keys()).sort()"
+            :key="hashtag">
+          <p>
+            <label class="form-check-label">
+              <input type="checkbox"
+                     class="form-check-input"
+                     @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
                               Se cliccato, mostra documenti con questo hashtag
                               Fonte: https://stackoverflow.com/a/41001483 */"
-                   :checked="listaHashtagDaMostrare.includes(hashtag)"/>
-            {{ hashtag === '' ? 'Senza hashtag' : hashtag }}
-          </label>
-        </p>
-      </li>
-    </ol>
-  </form>
+                     :checked="listaHashtagDaMostrare.includes(hashtag)"/>
+              {{ hashtag === '' ? 'Senza hashtag' : hashtag }}
+            </label>
+          </p>
+        </li>
+      </ol>
+    </form>
 
-  <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
-                    class="form-lista-documenti"
-                    v-if="mappaDocumentiDaMostrare.get().size > 0"          >
-    <!-- Eliminazione di un documento comporta il cambio di stato (serve token CSRF) -->
+    <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
+                      class="form-lista-documenti"
+                      v-if="mappaDocumentiDaMostrare.get().size > 0"          >
+      <!-- Eliminazione di un documento comporta il cambio di stato (serve token CSRF) -->
 
-    <div class="mx-auto table-container">
-      <table class="table table-hover">
-        <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
-        <thead class="thead-dark">
-        <tr>
-          <th>#</th>
-          <th v-for="nomeColonna in nomiPropDocumenti"
-              :key="nomeColonna">
-            {{ camelCaseToHumanReadable(nomeColonna) }}
-          </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(documento, ignored, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
-            :class="{ 'font-weight-bold' : documento[NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO]==='' }"
-            :key="indice"><!-- Ogni riga è un documento -->
-          <td>{{ indice+1 }}</td>
-          <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
+      <div class="mx-auto table-container">
+        <table class="table table-hover">
+          <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
+          <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th v-for="nomeColonna in nomiPropDocumenti"
+                :key="nomeColonna">
+              {{ camelCaseToHumanReadable(nomeColonna) }}
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(documento, ignored, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
+              :class="{ 'font-weight-bold' : documento[NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO]==='' }"
+              :key="indice"><!-- Ogni riga è un documento -->
+            <td>{{ indice+1 }}</td>
+            <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
                                                                                        nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
-              :key="propertyQuestaColonna" >
-            {{ documento[propertyQuestaColonna] }}
-          </td>
-          <td v-if="urlDownloadDocumento">
-            <a :href=documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO]
-               download
-               class="link-download"
-               @click.prevent="scaricaDocumento(documento)">
-            </a>
-          </td>
-          <td v-if="urlEliminazioneDocumento">
-            <a :href="documento[NOME_PROP_LINK_DELETE_DOCUMENTO]"
-               class="link-delete"
-               @click.prevent="eliminaDocumento(documento)">
-            </a>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+                :key="propertyQuestaColonna" >
+              {{ documento[propertyQuestaColonna] }}
+            </td>
+            <td v-if="urlDownloadDocumento">
+              <a :href=documento[NOME_PROP_LINK_DOWNLOAD_DOCUMENTO]
+                 download
+                 class="link-download"
+                 @click.prevent="scaricaDocumento(documento)">
+              </a>
+            </td>
+            <td v-if="urlEliminazioneDocumento">
+              <a :href="documento[NOME_PROP_LINK_DELETE_DOCUMENTO]"
+                 class="link-delete"
+                 @click.prevent="eliminaDocumento(documento)">
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
 
-  </FormConCsrfToken>
+    </FormConCsrfToken>
 
-  <p v-else>Nessun documento disponibile.</p>
+    <p v-else>Nessun documento disponibile.</p>
+
+  </div>
+  <p class="d-flex align-items-center justify-content-center mx-auto" v-else>
+    <span class="spinner-border" role="status" aria-hidden="true"></span>
+    <span class="mx-3">Caricamento</span>
+  </p>
 
 </template>
 
