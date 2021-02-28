@@ -66,13 +66,6 @@ export default {
         .catch( console.error );
 
   },
-  methods: {
-
-    /** Metodo per instradare (Vue-Router) all'elenco attori.*/
-    instradaVersoElencoAttori() {
-      this.$router.push({ name:   process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI });
-    },
-  },
   watch: {
 
     /** Watch per il tipo di attore attualmente autenticato (potrebbe
