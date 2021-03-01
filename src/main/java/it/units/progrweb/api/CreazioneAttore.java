@@ -159,7 +159,7 @@ public class CreazioneAttore {
         } catch (IllegalArgumentException e) {
             // Tipo attore ricevuto non valido
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Valori di input inseriti non validi: \"" + campiFormAggiuntaAttore.getTipoAttore() + "\" non è un tipo valido.") // TODO : risposta molto simile in GestioneConsumer (fare un metodo che restituisce BAD_REQUEST)
+                    .entity("Valori di input inseriti non validi.") // TODO : risposta molto simile in GestioneConsumer (fare un metodo che restituisce BAD_REQUEST)
                     .build();
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(GestioneAttori.class,
