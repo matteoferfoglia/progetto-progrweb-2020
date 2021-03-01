@@ -94,7 +94,7 @@ export const aggiungiDocumentoAdIndiceHashtag =
  * @param mappaDocumenti La mappa dei documenti.
  * @param nomePropDataVisualizzazione In un documento, è il nome della property
  *                                con la data di visualizzazione di quel documento.
- * @param nomePropDataVisualizzazione In un documento, è il nome della property
+ * @param nomePropDataCaricamento In un documento, è il nome della property
  *                                con la data di caricamento di quel documento.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
 export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
     (mappaDocumenti, nomePropDataVisualizzazione, nomePropDataCaricamento) => {
