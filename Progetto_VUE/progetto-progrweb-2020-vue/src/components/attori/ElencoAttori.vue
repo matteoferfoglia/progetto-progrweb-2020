@@ -152,9 +152,7 @@ export default {
   },
   created() {
 
-    this.caricamentoQuestoComponente()
-          .then( () =>  this.isComponenteCaricato = true )
-          .catch( console.error );
+    this.caricaQuestoComponenteSe( this.tipoAttoreAutenticato_wrapper ); // altrimenti sarà fatto dal watch
 
     // Timer-auto aggiornamento
     this.timerAutoUpdate = setInterval(this.caricamentoQuestoComponente,
@@ -165,6 +163,16 @@ export default {
     clearInterval(this.timerAutoUpdate)
   },
   methods: {
+
+    /** Metodo per caricare questo componente a condizione che il
+     * parametro sia truthy. */
+    async caricaQuestoComponenteSe( parametro ) {
+      if( parametro ) { // se non undefined
+        await this.caricamentoQuestoComponente()
+            .then(() => this.isComponenteCaricato = true)
+            .catch(console.error);
+      }
+    },
 
     /** Metodo per il caricamento dell'intero componente (incluse le
      * richieste al server per l'elenco degli attori).*/
@@ -188,8 +196,8 @@ export default {
         // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
 
         // Richiede l'elenco degli Attori associati con questo attualmente autenticato
-        await getElencoAttori( this.tipoAttoreAutenticato_wrapper,
-                               this.tipiAttoreCuiQuestoElencoSiRiferisce )
+        return getElencoAttori( this.tipoAttoreAutenticato_wrapper,
+                                      this.tipiAttoreCuiQuestoElencoSiRiferisce )
 
             // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
             // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
@@ -207,31 +215,30 @@ export default {
             .catch( console.error ) ;
       };
 
-      await richiestaElencoAttoriAlServer()
+      return richiestaElencoAttoriAlServer()
+                    .then( () => {
 
-        .then( () => {
+                      if( this.isConsumerAttualmenteAutenticato() &&
+                          this.mappa_idAttore_proprietaAttore.size === 1 ) {
+                        // Da requisiti:
+                        // Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,mostra direttamente la
+                        // lista dei documenti caricati da questi (in sintesi, non si mostra la schermata di scelta Uploader).
 
-          if( this.isConsumerAttualmenteAutenticato() &&
-              this.mappa_idAttore_proprietaAttore.size === 1 ) {
-            // Da requisiti:
-            // Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,mostra direttamente la
-            // lista dei documenti caricati da questi (in sintesi, non si mostra la schermata di scelta Uploader).
+                        const entryMappa_unicoAttore = Array.from( this.mappa_idAttore_proprietaAttore.entries() )[0];
 
-            const entryMappa_unicoAttore = Array.from( this.mappa_idAttore_proprietaAttore.entries() )[0];
+                        return this.$router.push({
+                          name: this.NOME_ROUTE_SCHEDA_ATTORE,
+                          params: {
+                            [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] : false,// vedere componente SchedaAttore
+                            [this.NOME_PARAM_ID_ATTORE_router]       : entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
+                            [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
+                            // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
+                          }
+                        });
 
-            return this.$router.push({
-              name: this.NOME_ROUTE_SCHEDA_ATTORE,
-              params: {
-                [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] : false,// vedere componente SchedaAttore
-                [this.NOME_PARAM_ID_ATTORE_router]       : entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
-                [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
-                // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
-              }
-            });
-
-          }
-        })
-        .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
+                      }
+                    })
+                    .catch( console.error );  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
 
     },
 
@@ -334,7 +341,7 @@ export default {
       deep: true,
       handler: function(nuovoValore) {
         this.tipoAttoreAutenticato_wrapper = nuovoValore;
-        this.caricamentoQuestoComponente();
+        this.caricaQuestoComponenteSe( nuovoValore );
       }
     },
 
