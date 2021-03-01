@@ -14,11 +14,14 @@ import {eliminaTokenAutenticazione} from "./autenticazione";
 /** Stato della risposta HTTP: credenziali invalide.*/
 export const HTTP_STATUS_UNAUTHORIZED = 401;
 
-/** Stato della risposta HTTP: ok.*/
+/** Stato della risposta HTTP: OK.*/
 export const HTTP_STATUS_OK = 200;
 
 /** Stato della risposta HTTP: CONFLICT.*/
 export const HTTP_STATUS_CONFLICT = 409;
+
+/** Stato della risposta HTTP: NOT_MODIFIED.*/
+export const HTTP_STATUS_NOT_MODIFIED = 304;
 
 /** Stato della risposta HTTP indicante che il CSRF token risulta invalido.*/
 export const HTTP_STATUS_CSRF_INVALIDO = Number(process.env.VUE_APP_HttpStatusCode_CsrfTokenInvalido);
@@ -194,14 +197,14 @@ const onErrorHandler = async errore => {
 
     // TODO : verificare che funzioni come da aspettative
 
-    console.error( errore );
-
     if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO )
         router.go(0);   // ricarica la pagina se è invalido il token CSRF
-    
-    // Redirection automatica a login
-    eliminaTokenAutenticazione();
-    await router.redirectVersoPaginaAutenticazione( router.currentRoute );
+
+    if( 400<=errore.response.status && errore.response.status<=499 ) {
+        // Redirection automatica a login
+        eliminaTokenAutenticazione();
+        await router.redirectVersoPaginaAutenticazione( router.currentRoute );
+    }
 
     return Promise.reject( errore.response );
 }

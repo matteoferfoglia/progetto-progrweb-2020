@@ -105,7 +105,7 @@
 
 
 import {camelCaseToHumanReadable, capitalize} from "../../utils/utilitaGenerale";
-import {richiestaDelete, richiestaGet} from "../../utils/http";
+import {HTTP_STATUS_NOT_MODIFIED, richiestaDelete, richiestaGet} from "../../utils/http";
 import {
   aggiungiDocumentoAdIndiceHashtag,
   creaIndiceDeiFileRispettoAgliHashtagCheContengono,
@@ -318,29 +318,35 @@ export default {
       })
 
     // Gestione dell'auto-aggiornamento della tabella  // TODO: sarebbe meglio che l'autoaggiornamento richiedesse solo i nuovi documenti e non tutti di nuovo
-    this.timerAutoUpdate = setInterval(() => {
+    this.timerAutoUpdate = setInterval(async () => {
       const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
 
-      caricamentoComponente()
-        .then( () => {
-          // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
-          this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
-          this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true) );
-          // Nascondi i documenti con hashtag da non mostrare
-          const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
-                                               .filter( unHashtag => ! this.listaHashtagDaMostrare.includes(unHashtag) );
-          listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false) );
+      // Richiesta al server se l'elenco dei documenti è stato modificato
+      await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
+                         {[process.env.VUE_APP_URL_DOCUMENTI_PER_CONSUMER_QUERYPARAM_NUM_DOC_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
+        .then( risposta => {
+          if(risposta) {  // TODO : vedi precedente TODO ed aggiusta di conseguenza
+            // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
+            this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
+            this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
+            // Nascondi i documenti con hashtag da non mostrare
+            const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
+                .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
+            listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
+          }
         })
         .catch( errore => {
-          console.error( errore );
-          alert("Errore nel caricamento dei documenti: " + errore);
+          if(errore.status!==HTTP_STATUS_NOT_MODIFIED) {
+            console.error( errore );
+            alert("Errore nel caricamento dei documenti: " + errore);
+          }
         })
 
     }, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
   },
   beforeUnmount () {
-    clearInterval(this.timerAutoUpdate)
+    clearInterval(this.timerAutoUpdate);
   },
   methods: {
 

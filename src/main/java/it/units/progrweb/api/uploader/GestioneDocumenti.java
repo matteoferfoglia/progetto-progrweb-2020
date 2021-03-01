@@ -213,17 +213,25 @@ public class GestioneDocumenti {
      * il {@link File} in termini delle sue proprietà. Nella mappa sono presenti
      * tutti i file caricati dall'{@link Uploader} attualmente autenticato e
      * destinati al {@link Consumer} il cui identificativo è specificato come
-     * PathParam.*/
+     * PathParam.
+     * Nel caso in cui venga specificato il PathParam numeroDocumentiAttualmenteNotiAlClient,
+     * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
+     * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
+     * restituisce l'oggetto con tutti i documenti, come sopra descritto.*/
     @Path("/mappa-idFile-propFile/{identificativoConsumer}")
     @GET
     public Response getElencoFile(@Context HttpServletRequest httpServletRequest,
-                                  @PathParam("identificativoConsumer") Long identificativoConsumer) {
+                                  @PathParam("identificativoConsumer") Long identificativoConsumer,
+                                  @QueryParam("numeroDocumentiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
 
         List<File> fileDaRestituire =
                 File.getOccorrenzeFiltrataPerUploaderEConsumer( identificativoUploader, identificativoConsumer );
+
+        if( numeroDocumentiAttualmenteNotiAlClient!=null && numeroDocumentiAttualmenteNotiAlClient.equals(fileDaRestituire.size()))
+            return Response.notModified().build();
 
         return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire, true ) );
 

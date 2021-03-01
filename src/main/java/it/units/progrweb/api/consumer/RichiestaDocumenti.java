@@ -8,10 +8,7 @@ import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,18 +32,29 @@ public class RichiestaDocumenti {
      * ogni property ha per nome l'identificativo del documento e per valore
      * l'oggetto che rappresenta il documento (descritto in base ai suoi
      * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile(boolean)}.
+     * Nel caso in cui venga specificato il PathParam numeroDocumentiAttualmenteNotiAlClient,
+     * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
+     * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
+     * restituisce l'oggetto con tutti i documenti, come sopra descritto.
      * @param httpServletRequest La richiesta HTTP.
-     * @param  identificativoUploader Identificativo dell'Uploader. */
+     * @param identificativoUploader Identificativo dell'Uploader.
+     * @param numeroDocumentiAttualmenteNotiAlClient Se non nullo, specifica il numero di
+     *                                               documenti attualmente noti al client.
+     * */
     @Path("/elencoDocumenti/{identificativoUploader}")     // TODO : variabile d'ambiente
     @GET
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
     public static Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
-                                              @PathParam("identificativoUploader") Long identificativoUploader) {
+                                              @PathParam("identificativoUploader") Long identificativoUploader,
+                                              @QueryParam("numeroDocumentiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
         // TODO : verificare
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);
+
+        if( numeroDocumentiAttualmenteNotiAlClient!=null && numeroDocumentiAttualmenteNotiAlClient.equals(listaFile.size()))
+            return Response.notModified().build();
 
         Map<String, String> mappa_idFile_propFileInJson = File.getMappa_idFile_propFile(listaFile, false);
 
