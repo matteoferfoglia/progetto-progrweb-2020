@@ -34,7 +34,7 @@ public class RichiestaDocumenti {
      * ogni property ha per nome l'identificativo del documento e per valore
      * l'oggetto che rappresenta il documento (descritto in base ai suoi
      * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile(boolean)}.
-     * Nel caso in cui venga specificato il PathParam numeroDocumentiAttualmenteNotiAlClient,
+     * Nel caso in cui venga specificato il QueryParam numeroElementiAttualmenteNotiAlClient,
      * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
      * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
      * redirect a questa stessa api, ma senza query string, così da restituire tutti i documenti.
@@ -48,7 +48,7 @@ public class RichiestaDocumenti {
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
     public static Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
                                               @PathParam("identificativoUploader") Long identificativoUploader,
-                                              @QueryParam("numeroDocumentiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
+                                              @QueryParam("numeroElementiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);

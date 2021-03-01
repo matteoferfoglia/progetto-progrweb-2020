@@ -323,7 +323,7 @@ export default {
 
       // Richiesta al server se l'elenco dei documenti è stato modificato
       await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
-                         {[process.env.VUE_APP_URL_DOCUMENTI_PER_CONSUMER_QUERYPARAM_NUM_DOC_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
+                         {[process.env.VUE_APP_URL_QUERYPARAM_NUM_ELEMENTI_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
         .then( caricamentoComponente )  // Se risposta è NOT_MODIFIED, allora non esegue then e va direttamente a catch
         .then( () => {
           // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati

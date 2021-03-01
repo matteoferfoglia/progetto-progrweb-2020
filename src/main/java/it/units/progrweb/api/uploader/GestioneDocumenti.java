@@ -215,7 +215,7 @@ public class GestioneDocumenti {
      * tutti i file caricati dall'{@link Uploader} attualmente autenticato e
      * destinati al {@link Consumer} il cui identificativo è specificato come
      * PathParam.
-     * Nel caso in cui venga specificato il PathParam numeroDocumentiAttualmenteNotiAlClient,
+     * Nel caso in cui venga specificato il PathParam numeroElementiAttualmenteNotiAlClient,
      * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
      * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
      * restituisce l'oggetto con tutti i documenti, come sopra descritto.*/
@@ -223,7 +223,7 @@ public class GestioneDocumenti {
     @GET
     public Response getElencoFile(@Context HttpServletRequest httpServletRequest,
                                   @PathParam("identificativoConsumer") Long identificativoConsumer,
-                                  @QueryParam("numeroDocumentiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
+                                  @QueryParam("numeroElementiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
