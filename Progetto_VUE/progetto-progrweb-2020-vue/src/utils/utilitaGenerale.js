@@ -49,6 +49,29 @@ export const areMappeEquivalenti = (mappa1, mappa2) => {
 
 }
 
+/** Dati due array, restituisce true se hanno la stessa lunghezza e
+ * contengono gli stessi valori (dello stesso tipo), indipendentemente
+ * dall'ordine, altrimenti false. */
+export const areArrayEquivalenti = (array1, array2) => {
+
+    if( !(isArray(array1) && isArray(array2)) )
+        return false;
+    if( array1.length !== array2.length )
+        return false;
+
+    // Copia locale degli array ordinati, per confrontarne
+    // i valori indipendentemente dall'ordine
+    const array1_ordinato = array1.sort();
+    const array2_ordinato = array2.sort();
+
+    let areArrayEquivalenti = true;
+    for( let i=0; i<array1_ordinato.length; i++ ) {
+        if(array1_ordinato[i]!==array2_ordinato[i])
+            areArrayEquivalenti = false;
+    }
+    return areArrayEquivalenti;
+}
+
 /** Dati due oggetti, ne restituisce uno avente le properties
  di entrambi. Se entrambi gli oggetti hanno la stessa property,
  quella del primo oggetto viene persa.*/
