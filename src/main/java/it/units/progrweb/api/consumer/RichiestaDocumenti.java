@@ -4,6 +4,7 @@ import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
@@ -12,8 +13,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Classe per rispondere alla richiesta di documenti destinati
@@ -35,7 +37,7 @@ public class RichiestaDocumenti {
      * Nel caso in cui venga specificato il PathParam numeroDocumentiAttualmenteNotiAlClient,
      * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
      * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
-     * restituisce l'oggetto con tutti i documenti, come sopra descritto.
+     * redirect a questa stessa api, ma senza query string, così da restituire tutti i documenti.
      * @param httpServletRequest La richiesta HTTP.
      * @param identificativoUploader Identificativo dell'Uploader.
      * @param numeroDocumentiAttualmenteNotiAlClient Se non nullo, specifica il numero di
@@ -48,17 +50,34 @@ public class RichiestaDocumenti {
                                               @PathParam("identificativoUploader") Long identificativoUploader,
                                               @QueryParam("numeroDocumentiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
-        // TODO : verificare
-
         Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
         List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);
 
-        if( numeroDocumentiAttualmenteNotiAlClient!=null && numeroDocumentiAttualmenteNotiAlClient.equals(listaFile.size()))
-            return Response.notModified().build();
+        return creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
+                                           listaFile,
+                                           "consumer/documenti/elencoDocumenti/" + identificativoUploader); // TODO : variabile d'ambiente
 
-        Map<String, String> mappa_idFile_propFileInJson = File.getMappa_idFile_propFile(listaFile, false);
+    }
 
-        return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFileInJson);
+    /** Metodo di comodo per #getElencoDocumenti. */
+    public static Response creaResponseElencoDocumenti(Integer numeroDocumentiAttualmenteNotiAlClient,
+                                                       List<File> listaFile,
+                                                       String URI_redirection) {
+
+        if( numeroDocumentiAttualmenteNotiAlClient !=null ) {
+            if (numeroDocumentiAttualmenteNotiAlClient.equals(listaFile.size())) {
+                return Response.notModified().build();
+            } else {
+                try {
+                    return Response.seeOther(new URI(URI_redirection)).build();    // redirect a questa stessa api
+                } catch (URISyntaxException e) {
+                    Logger.scriviEccezioneNelLog(RichiestaDocumenti.class, e);
+                    return Response.serverError().build();
+                }
+            }
+        }
+
+        return UtilitaGenerale.rispostaJsonConMappa(File.getMappa_idFile_propFile(listaFile, false));
 
     }
 

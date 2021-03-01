@@ -1,5 +1,6 @@
 package it.units.progrweb.api.uploader;
 
+import it.units.progrweb.api.consumer.RichiestaDocumenti;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
@@ -230,11 +231,9 @@ public class GestioneDocumenti {
         List<File> fileDaRestituire =
                 File.getOccorrenzeFiltrataPerUploaderEConsumer( identificativoUploader, identificativoConsumer );
 
-        if( numeroDocumentiAttualmenteNotiAlClient!=null && numeroDocumentiAttualmenteNotiAlClient.equals(fileDaRestituire.size()))
-            return Response.notModified().build();
-
-        return UtilitaGenerale.rispostaJsonConMappa( File.getMappa_idFile_propFile( fileDaRestituire, true ) );
-
+        return RichiestaDocumenti.creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
+                                                              fileDaRestituire,
+                                                              "uploader/documenti/mappa-idFile-propFile/" + identificativoConsumer);    // TODO : variabile d'ambiente
     }
 
 
