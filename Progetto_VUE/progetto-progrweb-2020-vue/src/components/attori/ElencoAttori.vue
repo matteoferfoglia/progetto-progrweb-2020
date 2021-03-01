@@ -77,6 +77,7 @@ import {richiestaGet} from "../../utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
 import {getMappa_idAttore_proprietaAttore} from "../../utils/richiesteInfoSuAttori";
 import Loader from "../layout/Loader";
+import {areArrayEquivalenti} from "../../utils/utilitaGenerale";
 
 export default {
   name: "ElencoAttori",
@@ -195,9 +196,18 @@ export default {
       const richiestaElencoAttoriAlServer = async () => {
         // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
 
+        const msg_NO_MODIFICHE = "Nessuna modifica rilevata";
+
         // Richiede l'elenco degli Attori associati con questo attualmente autenticato
         return getElencoAttori( this.tipoAttoreAutenticato_wrapper,
                                       this.tipiAttoreCuiQuestoElencoSiRiferisce )
+
+            .then( arrayConIdTuttiGliAttoriDaMostrare => {
+              if( areArrayEquivalenti(arrayConIdTuttiGliAttoriDaMostrare, this.mappa_idAttore_proprietaAttore.keys()) )
+                return Promise.reject(msg_NO_MODIFICHE);
+              else
+                return arrayConIdTuttiGliAttoriDaMostrare;
+            })
 
             // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
             // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
@@ -212,7 +222,10 @@ export default {
               this.ordinaElencoAttori();
             })
 
-            .catch( console.error ) ;
+            .catch( reason => {
+              if(reason!==msg_NO_MODIFICHE)
+                console.error(reason)
+            }) ;
       };
 
       return richiestaElencoAttoriAlServer()
