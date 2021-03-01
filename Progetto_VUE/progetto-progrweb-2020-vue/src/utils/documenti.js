@@ -188,6 +188,12 @@ export class MappaDocumenti{
         this.mappaDocumenti.mappa = nuovaMappaDocumenti;
     }
 
+    /** Restituisce il numero di entries della mappa rappresentata
+     * da quest'istanza. */
+    size() {
+      return this.mappaDocumenti.mappa.size;
+    }
+
     /** Restituisce l'array delle entries di questa mappa.*/
     getArrayEntries() {
         return Array.from( this.get().entries() );
