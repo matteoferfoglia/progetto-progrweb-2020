@@ -324,16 +324,16 @@ export default {
       // Richiesta al server se l'elenco dei documenti è stato modificato
       await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
                          {[process.env.VUE_APP_URL_DOCUMENTI_PER_CONSUMER_QUERYPARAM_NUM_DOC_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
-        .then( risposta => {
-          if(risposta) {  // TODO : vedi precedente TODO ed aggiusta di conseguenza
-            // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
-            this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
-            this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
-            // Nascondi i documenti con hashtag da non mostrare
-            const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
-                .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
-            listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
-          }
+        .then( caricamentoComponente )  // Se risposta è NOT_MODIFIED, allora non esegue then e va direttamente a catch
+        .then( () => {
+          // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
+          this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
+          this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
+          // Nascondi i documenti con hashtag da non mostrare
+          const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
+              .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
+          listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
+
         })
         .catch( errore => {
           if(errore.status!==HTTP_STATUS_NOT_MODIFIED) {
