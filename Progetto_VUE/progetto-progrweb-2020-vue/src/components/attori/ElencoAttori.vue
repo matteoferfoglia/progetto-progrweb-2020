@@ -242,6 +242,7 @@ export default {
 
               }
             })
+            .then( () => this.isComponenteCaricato = true )
             .catch(console.error);  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
 
       } else {
