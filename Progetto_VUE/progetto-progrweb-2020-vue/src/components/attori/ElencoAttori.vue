@@ -169,7 +169,7 @@ export default {
      * parametro sia truthy. */
     async caricaQuestoComponenteSe( parametro ) {
       if( parametro ) { // se non undefined
-        await this.caricamentoQuestoComponente()
+        this.caricamentoQuestoComponente()
             .then(() => this.isComponenteCaricato = true)
             .catch(console.error);
       }

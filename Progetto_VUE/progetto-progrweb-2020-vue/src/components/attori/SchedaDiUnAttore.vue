@@ -372,7 +372,7 @@ name: "SchedaDiUnAttore",
         this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
       }
 
-      await this.caricaLogoUploader();
+      this.caricaLogoUploader();
 
       this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
           process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +

@@ -228,8 +228,8 @@ export default {
     // TODO : aggiungere un "loader" (flag layoutCaricato)
 
     const richiestaInfo = async () => {
-      // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
-      await getNomePropertyDataVisualizzazioneDocumenti()
+          // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
+      getNomePropertyDataVisualizzazioneDocumenti()
           .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
 
           // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
@@ -239,67 +239,66 @@ export default {
 
     const caricamentoComponente = async () => {
 
-              // Richiede mappa idFile-propFile per questo attore
+        // Richiede mappa idFile-propFile per questo attore
       await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore)
 
-              // Crea l'indice degli hashtag
-              .then(rispostaConMappaFile_id_prop => {
-                richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
-                    .then(nomePropertyHashtags => {
-                      this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomePropertyHashtags;
-                      this.mappa_hashtag_idDocumenti =
-                          creaIndiceDeiFileRispettoAgliHashtagCheContengono(rispostaConMappaFile_id_prop, nomePropertyHashtags);
-                    });
-                return rispostaConMappaFile_id_prop;
-              })
+        // Crea l'indice degli hashtag
+        .then(rispostaConMappaFile_id_prop => {
+          richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
+              .then(nomePropertyHashtags => {
+                this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomePropertyHashtags;
+                this.mappa_hashtag_idDocumenti =
+                    creaIndiceDeiFileRispettoAgliHashtagCheContengono(rispostaConMappaFile_id_prop, nomePropertyHashtags);
+              });
+          return rispostaConMappaFile_id_prop;
+        })
 
-              // Crea mappa
-              .then(rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)))
-              // Ordina mappa
-              .then( mappa => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( mappa,
-                                              this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
-                                              this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO))
+        // Crea mappa
+        .then(rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)))
+        // Ordina mappa
+        .then( mappa => ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( mappa,
+                                        this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                                        this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO))
 
-              // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
-              .then(mappa =>
-                  new Map(
-                      Array.from(mappa.entries())
-                           .map(unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento))
-                  )
-              )
+        // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
+        .then(mappa =>
+            new Map(
+                Array.from(mappa.entries())
+                     .map(unDocumento => this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(unDocumento))
+            )
+        )
 
-              // In ogni documento, modifica il formato di rappresentazione delle data
-              .then(mappa =>
-                  new Map(
-                      Array.from(mappa.entries())
-                           .map( this.formattaDate )
-                  )
-              )
+        // In ogni documento, modifica il formato di rappresentazione delle data
+        .then(mappa =>
+            new Map(
+                Array.from(mappa.entries())
+                     .map( this.formattaDate )
+            )
+        )
 
-              // Salva la mappa
-              .then(mappa => {
-                this.mappaDocumenti.set(mappa);
-              })
-              .catch(console.error);
+        // Salva la mappa
+        .then(mappa => {
+          this.mappaDocumenti.set(mappa);
+        })
+
+        // Richiede il nome della property di un documento contenente il nome del documento stesso
+        .then( () => richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO) )
+        .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
+
+        // Richiede l'elenco dei nomi delle properties dei documenti
+        .then( () => richiestaGet(process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI) )
+        // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
+        // documento (da creare dinamicamente), poi salva l'array
+        .then(nomiPropDocumenti => {
+          nomiPropDocumenti.push(this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO);
+          if (this.urlEliminazioneDocumento) {
+            nomiPropDocumenti.push(this.NOME_PROP_LINK_DELETE_DOCUMENTO)
+          }
+          this.nomiPropDocumenti = nomiPropDocumenti;
+        })
 
 
-      // Richiede il nome della property di un documento contenente il nome del documento stesso
-      await richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
-              .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
-              .catch(console.error);
-
-      // Richiede l'elenco dei nomi delle properties dei documenti
-      await richiestaGet(process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI)
-              // Aggiunge alle properties dei documenti le colonne con il link di download ed eliminazione
-              // documento (da creare dinamicamente), poi salva l'array
-              .then(nomiPropDocumenti => {
-                nomiPropDocumenti.push(this.NOME_PROP_LINK_DOWNLOAD_DOCUMENTO);
-                if (this.urlEliminazioneDocumento) {
-                  nomiPropDocumenti.push(this.NOME_PROP_LINK_DELETE_DOCUMENTO)
-                }
-                this.nomiPropDocumenti = nomiPropDocumenti;
-              })
-              .catch(console.error);
+        .catch(console.error);
 
     };
 
@@ -322,7 +321,7 @@ export default {
       const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
 
       // Richiesta al server se l'elenco dei documenti è stato modificato
-      await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
+      richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
                          {[process.env.VUE_APP_URL_QUERYPARAM_NUM_ELEMENTI_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
         .then( caricamentoComponente )  // Se risposta è NOT_MODIFIED, allora non esegue then e va direttamente a catch
         .then( () => {

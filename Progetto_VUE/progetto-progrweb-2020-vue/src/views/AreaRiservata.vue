@@ -65,7 +65,7 @@ export default {
 
     async caricaLogoUploader () {
       if(this.isUploaderAttualmenteAutenticato()) {
-        await getIdentificativoAttoreAttualmenteAutenticato()
+        getIdentificativoAttoreAttualmenteAutenticato()
             .then(identificativoAttore => richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore))
             .then(immagineLogo_dataUrl => this.logoUploader_base64 = immagineLogo_dataUrl)
             .catch(console.error);
