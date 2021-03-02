@@ -57,8 +57,7 @@ export const getMappa_idAttore_proprietaAttore = async (arrayIdAttore,
 
         .then( arrayConEntriesDaTutteLePromise => new Map(arrayConEntriesDaTutteLePromise) ) // then() aspetta tutte le promise prima di eseguire
         .catch( rispostaErrore =>
-            console.error("Errore durante il caricamento delle informazioni sugli Attori: " +
-                rispostaErrore ) );
+            console.error("Errore durante il caricamento delle informazioni sugli Attori: " + rispostaErrore ) );
 
 }
 
