@@ -161,13 +161,13 @@ export default {
 
   },
   beforeUnmount () {
-    clearInterval(this.timerAutoUpdate)
+    clearInterval(this.timerAutoUpdate);
   },
   methods: {
 
     /** Metodo per il caricamento dell'intero componente (incluse le
      * richieste al server per l'elenco degli attori).*/
-    async caricamentoQuestoComponente() { // TODO : elenco attori ed elenco dei documenti (in SchedaDiUnAttore) dovrebbero autoaggiornarsi automaticamente dopo un intervallo specificato come parametro
+    async caricamentoQuestoComponente() {
 
       if( this.tipoAttoreAutenticato_wrapper ) {
         {
@@ -330,6 +330,30 @@ export default {
     }
   },
   watch: {
+
+    /**
+     * Osserva nel parametro della route se cambia il tipo degli attori di cui
+     * si vuole vedere l'elenco.
+     */
+    '$route.params': {
+      immediate: true,
+      handler: function() {
+        const nuovoTipoAttoriDiCuiMostrareElenco = this.qualeTipoAttoriDiCuiMostrareElenco();
+        if( nuovoTipoAttoriDiCuiMostrareElenco !== this.tipoAttoriDiCuiMostrareElenco ) {
+          this.tipoAttoriDiCuiMostrareElenco = nuovoTipoAttoriDiCuiMostrareElenco;
+        }
+      }
+    },
+
+    /** Osserva la property ottenuta dal componente padre, attendendo un valore
+     * non undefined. */
+    tipoAttoreAutenticato: {
+      immediate: true,
+      deep: true,
+      handler: function(nuovoValore) {
+        this.tipoAttoreAutenticato_wrapper = nuovoValore;
+      }
+    },
 
     csrfToken : {
       immediate: true,
