@@ -103,8 +103,8 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
 
         mappaDocumenti = new Map(
             [...mappaDocumenti].sort( (a,b) =>
-                        a[1][nomePropDataCaricamento] < b[1][nomePropDataCaricamento] ||            // primo sorting sulla data di caricamento
-                            a[1][nomePropDataVisualizzazione] < b[1][nomePropDataVisualizzazione] ? // a parità di data di caricamento, sorting su quella di visualizzazione
+                        a[1][nomePropDataCaricamento] + a[1][nomePropDataVisualizzazione] <     // '+' per concatenazione
+                            b[1][nomePropDataCaricamento] + b[1][nomePropDataVisualizzazione] ? // primo sorting sulla data di caricamento, a parità di data di caricamento, sorting su quella di visualizzazione
                             1 : -1 )
         )
 
