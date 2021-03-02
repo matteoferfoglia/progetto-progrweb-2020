@@ -461,6 +461,7 @@ public abstract class File {
                                     nomeAttributo_flagFileEliminato, DatabaseHelper.OperatoreQuery.UGUALE, false)
                         .stream()
                         .map(unFile -> ((File)unFile).getIdentificativoMittente())
+                        .distinct()
                         .toArray(Long[]::new);
             else
                 Logger.scriviEccezioneNelLog(File.class,
