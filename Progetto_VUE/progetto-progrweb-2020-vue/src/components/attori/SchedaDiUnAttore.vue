@@ -203,10 +203,10 @@ name: "SchedaDiUnAttore",
 
       /** Flag: true se questa scheda si riferisce ad un Consumer.*/
       isQuestaSchedaRiferitaAdUnConsumer: this.isUploaderAttualmenteAutenticato(), // Se è un Uploader a visualizzare,
-                                                                // allora sta guardando la scheda di un Consumer
+                                                                        // allora sta guardando la scheda di un Consumer
 
       /** Flag: true se questa scheda si riferisce ad un Uploader.*/
-      isQuestaSchedaRiferitaAdUnUploader: undefined,                       // inizializzata in created()
+      isQuestaSchedaRiferitaAdUnUploader: undefined,                    // inizializzata in created()
 
       /** Nome del campo di input per caricare il nuovo logo di un Uploader.*/
       LOGO_INPUT_FIELD_NAME: process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME,
@@ -478,9 +478,12 @@ name: "SchedaDiUnAttore",
       oggetto.promiseRispostaServer
           .then( rispostaServer => {
             // Aggiorna i dati della vista
-            this.username   = rispostaServer[ process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME ];
-            this.nominativo = rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ];
-            this.email      = rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ];
+            // NOTA: aggiungere un carattere in fondo e rimuoverlo con slice() è un trucco per far attivare il watch
+            //       che aggiorna i valori scritti nel form, così se i valori dovessero "sporcarsi", con queste istruzioni
+            //       vengono ripristinati ai valori giusti
+            this.username   = (rispostaServer[ process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+            this.nominativo = (rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+            this.email      = (rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
             alert( "Modifiche effettuate!" );
           })
           .catch( rispostaServer => {
