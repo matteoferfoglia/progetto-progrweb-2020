@@ -142,7 +142,8 @@ public class RichiestaInfo {
         Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
 
         if( Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
-                .equals(Consumer.class.getSimpleName()) ) { // Consumer non vede username dell'Uploader
+                .equals(Consumer.class.getSimpleName()) ) {
+            // Consumer non deve poter vedere username dell'Uploader
 
             try {
                 Field fieldUsername = Attore.class.getDeclaredField("username");
