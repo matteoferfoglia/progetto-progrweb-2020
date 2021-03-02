@@ -219,7 +219,7 @@ export default {
               });
         };
 
-        return await richiestaElencoAttoriAlServer()
+        return richiestaElencoAttoriAlServer()
             .then(() => {
 
               if (this.isConsumerAttualmenteAutenticato() &&
