@@ -14,6 +14,11 @@ import {eliminaTokenAutenticazione} from "./autenticazione";
 /** Stato della risposta HTTP: credenziali invalide.*/
 export const HTTP_STATUS_UNAUTHORIZED = 401;
 
+/** Stato della risposta HTTP: il client non ha il permesso di accedere
+ * alla risorsa. A differenza di {@link HTTP_STATUS_UNAUTHORIZED}, l'identità
+ * del client è nota al server.*/
+export const HTTP_STATUS_FORBIDDEN = 403;
+
 /** Stato della risposta HTTP: OK.*/
 export const HTTP_STATUS_OK = 200;
 
@@ -200,7 +205,8 @@ const onErrorHandler = async errore => {
     if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO )
         router.go(0);   // ricarica la pagina se è invalido il token CSRF
 
-    if( 400<=errore.response.status && errore.response.status<=499 ) {
+    if( errore.response.status===HTTP_STATUS_UNAUTHORIZED ||
+        errore.response.status===HTTP_STATUS_FORBIDDEN ) {
         // Redirection automatica a login
         eliminaTokenAutenticazione();
         await router.redirectVersoPaginaAutenticazione( router.currentRoute );
