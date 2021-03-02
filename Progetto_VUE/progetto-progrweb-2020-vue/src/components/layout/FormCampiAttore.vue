@@ -15,6 +15,7 @@
                :readonly="username_readOnly_wrapper || tuttiICampi_readOnly_wrapper"
                class="form-control"
                :aria-label="usernameCodFisc"
+               :required="tuttiICampi_required ? true : false"
                autocomplete="on">
       </p>
       <p v-if="nominativo!==null">
@@ -27,6 +28,7 @@
                :readonly="tuttiICampi_readOnly_wrapper"
                class="form-control"
                aria-label="Nominativo"
+               :required="tuttiICampi_required ? true : false"
                autocomplete="on">
       </p>
       <p v-if="email!==null">
@@ -41,6 +43,7 @@
                  :readonly="tuttiICampi_readOnly_wrapper"
                  class="form-control"
                  aria-label="Email"
+                 :required="tuttiICampi_required ? true : false"
                  autocomplete="email">
           <a :href="'mailto:' + email_wrapper" v-if="email_wrapper" class="input-group-append btn btn-link"></a>
         </span>
@@ -105,7 +108,6 @@ export default {
      * eventuali campi input[type=file] vengono ignorati.*/
     "isContentType_JSON",
 
-
     /** Flag: true se si vogliono mostrare le label vicino ai
      * campi di input.*/
     "flag_mostrareLabelCampiInput",
@@ -119,6 +121,11 @@ export default {
      * può essere modificato. Se non specificato, si considera
      * che il campo può essere modficato.*/
     "tuttiICampi_readOnly",
+
+    /** Flag: true se tutti i campi di input sono devono avere
+     * l'attributo "required". */
+    "tuttiICampi_required",
+
 
     /** Proprietà che permette al componente padre
      * di specificare a quale url inviare i dati di
