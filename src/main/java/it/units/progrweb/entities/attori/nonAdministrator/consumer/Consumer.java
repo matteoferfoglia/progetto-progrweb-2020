@@ -28,7 +28,7 @@ public abstract class Consumer extends UtenteNonAdministrator {
     }
 
     public Consumer(String username, String nominativo, String email) {
-        super(username, nominativo, email);
+        super(username, nominativo, email, TipoAttore.Consumer);
         if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_CONSUMER, username) ) {   // TODO : metodo da verificare
             throw new IllegalArgumentException("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_CONSUMER + "\"");
         }

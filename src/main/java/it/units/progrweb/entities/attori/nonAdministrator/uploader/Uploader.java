@@ -34,7 +34,7 @@ public abstract class Uploader extends UtenteNonAdministrator {
      */
     public Uploader(String username, String nominativo, String email) {
         // TODO
-        super(username, nominativo, email);
+        super(username, nominativo, email, TipoAttore.Uploader);
 
         if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_UPLOADER, username) ) {   // TODO : metodo da verificare
             throw new FormatoUsernameInvalido("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_UPLOADER + "\"");

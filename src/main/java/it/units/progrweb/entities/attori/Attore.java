@@ -199,11 +199,11 @@ public abstract class Attore implements UserPrincipal, Cloneable {
     }
 
 
-    protected Attore(String username, String nominativo, String email) {
+    protected Attore(String username, String nominativo, String email, TipoAttore tipoAttore) {
         this.username = username;
         this.nominativo = nominativo;
         setEmail(email);
-        // TODO
+        this.tipoAttore = tipoAttore;
     }
 
     protected Attore() {}

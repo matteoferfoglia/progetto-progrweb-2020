@@ -17,7 +17,7 @@ public abstract class Administrator extends Attore {
     }
 
     public Administrator(String username, String nominativo, String email) {
-        super(username, nominativo, email);  // TODO
+        super(username, nominativo, email, TipoAttore.Administrator);  // TODO
         setTipoAttore(Administrator.class.getSimpleName());
     }
 
