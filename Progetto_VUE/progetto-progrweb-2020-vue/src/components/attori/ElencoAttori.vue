@@ -338,9 +338,14 @@ export default {
     '$route.params': {
       immediate: true,
       handler: function() {
-        const nuovoTipoAttoriDiCuiMostrareElenco = this.qualeTipoAttoriDiCuiMostrareElenco();
-        if( nuovoTipoAttoriDiCuiMostrareElenco !== this.tipoAttoriDiCuiMostrareElenco ) {
-          this.tipoAttoriDiCuiMostrareElenco = nuovoTipoAttoriDiCuiMostrareElenco;
+        if ( this.isAdministratorAttualmenteAutenticato() ) {
+          const nuovoTipoAttoriDiCuiMostrareElenco = this.qualeTipoAttoriDiCuiMostrareElenco();
+          if (nuovoTipoAttoriDiCuiMostrareElenco !== this.tipoAttoriDiCuiMostrareElenco) {
+            this.tipoAttoriDiCuiMostrareElenco = nuovoTipoAttoriDiCuiMostrareElenco;
+            if( this.isComponenteCaricato )       // Se questo componente è già stato caricato
+              this.caricamentoQuestoComponente(); // Allora, ricarica il componente quando cambiano gli attori da vedere
+                                                  // Altrimenti ci pensa già la funzione di caricamento a mostrare le cose corrette (e non serve ricaricare)
+          }
         }
       }
     },
