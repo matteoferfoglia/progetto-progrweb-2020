@@ -15,6 +15,7 @@
                      :csrfToken="csrfToken_wrapper"
                      :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer"
                      :isContentType_JSON="true"
+                     :tuttiICampi_required="true"
                      @submit="flag_inviareDatiFormAggiuntaAttore = true"
                      @dati-form-inviati="formAggiuntaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
