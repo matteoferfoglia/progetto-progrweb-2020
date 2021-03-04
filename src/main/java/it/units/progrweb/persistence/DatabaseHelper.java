@@ -197,11 +197,22 @@ public abstract class DatabaseHelper {
                                            OperatoreQuery operatoreCondizione,
                                            Attributo valoreCondizione) {
 
-        // TODO : metodo da testare
-        // TODO : risultato richiede cast?
-
         Query<?> query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
         return query!=null ? query.list() : new ArrayList<>(0);
+
+    }
+
+    /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma restitusce una
+     * lista ordinata in modo decrescente in base al parametro specificato.
+     * @param nomeAttributoOrdinamento Nome dell'attributo su cui eseguire l'ordinamento.*/
+    public static<Attributo> List<?> query(Class<?> classeEntita,
+                                           String nomeAttributoCondizione,
+                                           OperatoreQuery operatoreCondizione,
+                                           Attributo valoreCondizione,
+                                           String nomeAttributoOrdinamento) {
+
+        Query<?> query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        return query!=null ? query.order("-" + nomeAttributoOrdinamento).list() : new ArrayList<>(0);
 
     }
 
@@ -258,8 +269,8 @@ public abstract class DatabaseHelper {
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma permette
      * di filtrare tramite AND la condizione.*/
     public static<Attributo> List<?> queryAnd(Class<?> classeEntita,
-                                   String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
-                                   String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
+                                              String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                              String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
 
         // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
         // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
@@ -270,6 +281,25 @@ public abstract class DatabaseHelper {
 
 
         return query!=null ? query.list() : new ArrayList<>(0);
+
+    }
+
+    /** Come {@link #queryAnd(Class, String, OperatoreQuery, Object, String, OperatoreQuery, Object)},
+     * ma restituisce i risultati ordinati in modo decrescente in base all'attributo fornito.*/
+    public static<Attributo> List<?> queryAnd(Class<?> classeEntita,
+                                              String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
+                                              String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
+                                              String nomeAttributoOrdinamento) {
+
+        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
+        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
+
+        Query<?> query = creaERestituisciQueryAnd(classeEntita,
+                nomeAttributo1, operatoreCondizione1, valoreCondizione1,
+                nomeAttributo2, operatoreCondizione2, valoreCondizione2);
+
+
+        return query!=null ? query.order("-" + nomeAttributoOrdinamento).list() : new ArrayList<>(0);
 
     }
 
