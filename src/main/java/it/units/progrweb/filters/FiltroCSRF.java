@@ -198,11 +198,12 @@ public class FiltroCSRF implements Filter {
 }
 
 
-/** Wrapper per HttpServletRequest, fonte:  https://stackoverflow.com/a/25640232 .
+/** Wrapper per HttpServletRequest, Fonte:  https://stackoverflow.com/a/25640232 .
  * Motivazione di utilizzo di questo wrapper: getReader() può essere invocato una
  * volta sola (e verrà usato dai servizi REST), altrimenti:
  *  java.lang.IllegalStateException: READER . Questo wrapper serve per poter leggere
- *  il body di una request senza generare IllegalStateException .*/
+ *  il body di una request senza generare IllegalStateException .
+ *  Fonte:  https://stackoverflow.com/a/25640232 .*/
 class HttpRequestWrapper extends HttpServletRequestWrapper {
 
     // TODO : classe da rivedere
@@ -224,7 +225,7 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
                 }
             } else {
                 // make an empty string since there is no payload
-                builder.write(Byte.valueOf(""));
+                builder.write(Byte.parseByte(""));
             }
         } catch (IOException ex) {
             Logger.scriviEccezioneNelLog(HttpRequestWrapper.class, "Error reading the request payload", ex);
