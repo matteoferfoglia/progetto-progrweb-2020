@@ -40,7 +40,7 @@ public abstract class DatabaseHelper {
 
 
         private final String operatore;
-        private OperatoreQuery(String operatore) {
+        OperatoreQuery(String operatore) {
             this.operatore = operatore;
         }
         public String operatore() { return operatore; }
@@ -53,6 +53,7 @@ public abstract class DatabaseHelper {
     }
 
     /** Salva più di un'entità nel database. */
+    @SafeVarargs
     public static<Entita> void salvaPiuEntita(Entita ...entita) {
         database.save().entities(entita).now();
     }
@@ -70,7 +71,7 @@ public abstract class DatabaseHelper {
 
     /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
      * {@link NotFoundException} se non trova l'entità.*/
-    public static Object getById(String identificativoEntita, Class classeEntita)
+    public static Object getById(String identificativoEntita, Class<?> classeEntita)
             throws NotFoundException {
 
         try {
@@ -84,7 +85,7 @@ public abstract class DatabaseHelper {
 
     /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
      * {@link NotFoundException} se non trova l'entità.*/
-    public static Object getById(Long identificativoEntita, Class classeEntita)
+    public static Object getById(Long identificativoEntita, Class<?> classeEntita)
             throws NotFoundException {
 
         // TODO : attenzione: molto simile al metodo con lo stesso nome che prende String come parametro ... refactoring?
@@ -114,15 +115,15 @@ public abstract class DatabaseHelper {
     }
 
     /** Restituisce la lista delle chiavi di tutte le entità della classe specificata.
-     * Può essere utile per le cancellazioni per chiave (vedere*/
-    public static<Entita> List<Key<Entita>> getTutteLeChiavi(Class classe) {
-        return (List<Key<Entita>>) database.load().type(classe).keys(); // TODO : testare
+     * Può essere utile per le cancellazioni per chiave.*/
+    public static List<? extends Key<?>> getTutteLeChiavi(Class<?> classe) {
+        return database.load().type(classe).keys().list(); // TODO : testare
     }
 
     /** Restituisce la lista delle chiavi di tutte le entità nel database.
      * Vedere {@link #getTutteLeChiavi(Class)}.*/
     public static List<Key<Object>> getTutteLeChiavi() {
-        return (List<Key<Object>>) database.load().type(Object.class).keys(); // TODO : testare
+        return database.load().type(Object.class).keys().list(); // TODO : testare
     }
 
     /** Elimina tutte le entità corrispondenti alle chiavi date.
@@ -139,30 +140,16 @@ public abstract class DatabaseHelper {
         database.delete().key(chiaveCorrispondenteAdEntitaDaEliminare);
     }
 
-    /** Elimina tutte le entità passate nella lista come parametro.
-     * Il metodo è asincrono, invocare {@link #completaOra()} di
-     * seguito per eseguire subito.*/
-    public static void cancellaEntita(List<?> listaEntitaDaEliminare) {
-        database.delete().entities(listaEntitaDaEliminare);
-    }
-
-    /** Elimina l'entità specificata
-     * Il metodo è asincrono, invocare {@link #completaOra()} di
-     * seguito per eseguire subito.*/
-    public static<Entita> void cancellaEntita(Entita entitaDaEliminare) {
-        database.delete().entity(entitaDaEliminare);
-    }
-
     /** Elimina l'entità corrispondente all'identificativo specificato
      * come parametro. Azione asincrona.*/
-    public static void cancellaEntitaById(Long idEntitaDaEliminare, Class classeEntita) {
+    public static void cancellaEntitaById(Long idEntitaDaEliminare, Class<?> classeEntita) {
         database.delete().type(classeEntita).id(idEntitaDaEliminare);
     }
 
     /** Elimina l'entità corrispondente all'identificativo specificato
      * come parametro. Azione sincrona (attende l'eliminazione e genera
      * un'eccezione se causata dalla computazione richiesta).*/
-    public static void cancellaAdessoEntitaById(Long idEntitaDaEliminare, Class classeEntita)
+    public static void cancellaAdessoEntitaById(Long idEntitaDaEliminare, Class<?> classeEntita)
             throws Exception{
         database.delete().type(classeEntita).id(idEntitaDaEliminare).now();
     }
@@ -173,20 +160,20 @@ public abstract class DatabaseHelper {
     }
 
     /** Restituisce il numero di entità di una data classe.*/
-    public static int contaEntitaNelDatabase(Class classe) {
+    public static int contaEntitaNelDatabase(Class<?> classe) {
         return database.load().type(classe).count();    // TODO : testare
     }
 
     /** Restituisce la lista di entità di una certa classe (specificata nel
      * parametro) salvate nel database.*/
-    public static List<?> listaEntitaNelDatabase(Class classe) {
+    public static List<?> listaEntitaNelDatabase(Class<?> classe) {
         return database.load().type(classe).list();    // TODO : testare
     }
 
     /** Restituisce true se la query cercata produce almeno
      * un risultato.
      */
-    public static boolean esisteNelDatabase(Query query) {
+    public static boolean esisteNelDatabase(Query<?> query) {
         return query.limit(1).list().size() == 1;
     }
 
@@ -205,7 +192,7 @@ public abstract class DatabaseHelper {
      * @param <Attributo> La classe dell'attributo su cui valutare la condizione
      *                      della query
      */
-    public static<Attributo> List<?> query(Class classeEntita,
+    public static<Attributo> List<?> query(Class<?> classeEntita,
                                            String nomeAttributoCondizione,
                                            OperatoreQuery operatoreCondizione,
                                            Attributo valoreCondizione) {
@@ -213,14 +200,14 @@ public abstract class DatabaseHelper {
         // TODO : metodo da testare
         // TODO : risultato richiede cast?
 
-        Query query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        Query<?> query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
         return query!=null ? query.list() : new ArrayList<>(0);
 
     }
 
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma restituisce
      * la lista delle chiavi anziché delle entità.*/
-    public static<Attributo> List<?> queryKey(Class classeEntita,
+    public static<Attributo> List<?> queryKey(Class<?> classeEntita,
                                               String nomeAttributoCondizione,
                                               OperatoreQuery operatoreCondizione,
                                               Attributo valoreCondizione) {
@@ -228,7 +215,7 @@ public abstract class DatabaseHelper {
         // TODO : metodo da testare
         // TODO : risultato richiede cast?
 
-        Query query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        Query<?> query = creaERestituisciQuery(classeEntita, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
         return query!=null ? query.keys().list() : new ArrayList<>(0);
 
     }
@@ -237,10 +224,10 @@ public abstract class DatabaseHelper {
      * @return null se non esite l'attributo su cui si esegue la query,
      *          altrimenti restituisce la {@link Query} risultante
      *          dall'interrogazione al database.*/
-    public static <Attributo, T> Query<T> creaERestituisciQuery(Class classeEntita,
-                                                                 String nomeAttributoCondizione,
-                                                                 OperatoreQuery operatoreCondizione,
-                                                                 Attributo valoreCondizione) {
+    public static <Attributo> Query<?> creaERestituisciQuery(Class<?> classeEntita,
+                                                             String nomeAttributoCondizione,
+                                                             OperatoreQuery operatoreCondizione,
+                                                             Attributo valoreCondizione) {
         // TODO : testare
         String condizioneQuery = nomeAttributoCondizione + operatoreCondizione.operatore ;
         return database.load().type(classeEntita).filter(condizioneQuery, valoreCondizione);
@@ -249,7 +236,7 @@ public abstract class DatabaseHelper {
     }
 
     /** Crea e restituisce una Query, date due condizioni poste in AND.*/   // TODO : da rivedere ed eventuale refactoring
-    public static<Attributo> Query<?> creaERestituisciQueryAnd(Class classeEntita,
+    public static<Attributo> Query<?> creaERestituisciQueryAnd(Class<?> classeEntita,
                                                     String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                                     String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
         return creaERestituisciQuery(classeEntita, nomeAttributo1, operatoreCondizione1, valoreCondizione1)
@@ -257,7 +244,7 @@ public abstract class DatabaseHelper {
     }
 
     /** Crea e restituisce una Query, date due condizioni poste in AND.*/
-    public static<Attributo> Query<?> creaERestituisciQueryAnd(Class classeEntita,
+    public static<Attributo> Query<?> creaERestituisciQueryAnd(Class<?> classeEntita,
                                                                String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                                                String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
                                                                String nomeAttributo3,OperatoreQuery operatoreCondizione3, Attributo valoreCondizione3) {
@@ -270,14 +257,14 @@ public abstract class DatabaseHelper {
 
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma permette
      * di filtrare tramite AND la condizione.*/
-    public static<Attributo> List<?> queryAnd(Class classeEntita,
+    public static<Attributo> List<?> queryAnd(Class<?> classeEntita,
                                    String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                    String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
 
         // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
         // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
 
-        Query query = creaERestituisciQueryAnd(classeEntita,
+        Query<?> query = creaERestituisciQueryAnd(classeEntita,
                 nomeAttributo1, operatoreCondizione1, valoreCondizione1,
                 nomeAttributo2, operatoreCondizione2, valoreCondizione2);
 
@@ -289,14 +276,14 @@ public abstract class DatabaseHelper {
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma permette
      * di filtrare tramite AND la condizione e specifica il massimo numero di
      * entità da restiture.*/
-    public static<Attributo> List<?> queryAnd(Class classeEntita, int maxNumeroEntitaDaRestituire,
+    public static<Attributo> List<?> queryAnd(Class<?> classeEntita, int maxNumeroEntitaDaRestituire,
                                               String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                               String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
 
         // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
         // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
 
-        Query query = creaERestituisciQueryAnd(classeEntita,
+        Query<?> query = creaERestituisciQueryAnd(classeEntita,
                 nomeAttributo1, operatoreCondizione1, valoreCondizione1,
                 nomeAttributo2, operatoreCondizione2, valoreCondizione2).limit(maxNumeroEntitaDaRestituire);
 
@@ -307,7 +294,7 @@ public abstract class DatabaseHelper {
 
     /** Come {@link #queryAnd(Class, String, OperatoreQuery, Object, String, OperatoreQuery, Object)}, ma permette
      * di filtrare tramite fino a tre condizioni.*/
-    public static<Attributo> List<?> queryAnd(Class classeEntita,
+    public static<Attributo> List<?> queryAnd(Class<?> classeEntita,
                                               String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                               String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
                                               String nomeAttributo3,OperatoreQuery operatoreCondizione3, Attributo valoreCondizione3) {
@@ -327,11 +314,11 @@ public abstract class DatabaseHelper {
 
     /** Come {@link #query(Class, String, OperatoreQuery, Object)}, ma senza
      * specificare la classe dell'entità. Il risultato sarà una lista di {@link Object}.*/
-    public static<Attributo> List<Object> query(String nomeAttributoCondizione,
+    public static<Attributo> List<?> query(String nomeAttributoCondizione,
                                            OperatoreQuery operatoreCondizione,
                                            Attributo valoreCondizione) {
         // TODO : metodo da testare
-        return (List<Object>) query(Object.class, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
+        return query(Object.class, nomeAttributoCondizione, operatoreCondizione, valoreCondizione);
     }
 
     /**
@@ -365,7 +352,7 @@ public abstract class DatabaseHelper {
      * restituisce la lista di entità.*/
     public static<Entita> List<Entita> getListaEntitaDaListaReference(List<Ref<Entita>> listaRiferimenti) {
         return listaRiferimenti.stream()
-                               .map(entitaRef -> entitaRef.get())
+                               .map(Ref::get)
                                .collect(Collectors.toList());
     }
 
@@ -375,7 +362,7 @@ public abstract class DatabaseHelper {
      * riferimenti.*/
     public static<Entita> List<Ref<Entita>> setListaRiferimentiEntitaPerListaEntita(List<Entita> listaEntita) {
         return listaEntita.stream()
-                          .map(entita -> Ref.create(entita))
+                          .map(Ref::create)
                           .collect(Collectors.toList());
     }
 
