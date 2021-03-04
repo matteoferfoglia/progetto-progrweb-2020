@@ -355,14 +355,12 @@ public abstract class File {
      * identificativi sono specificati come parametri.
      * Se non viene specificato l'Uploader, allora il filtraggio viene fatto
      * solo sul Consumer.
+     * I risultati restituiti sono ordinati secondo la data-ora di caricamento.
      * @return La lista dei file caricati dall'{@link Uploader} e destinati
      * al {@link Consumer} specificati. */
     public static List<File>
     getOccorrenzeFiltrataPerUploaderEConsumer(Long identificativoUploader,
                                               @NotNull Long identificativoConsumer ) {
-
-        // TODO : verificare che funzioni
-        // TODO : duplicazione di codice con RelazioneUploaderConsumer
 
         // Parametri query
         String nomeAttributo1 = "identificativoMittente";
@@ -371,23 +369,34 @@ public abstract class File {
         if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo1, File.class) ) {
             if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo2, File.class)) {
 
-                List<?> risultatoQuery;
+                String nomeAttributoOrdinamentoDocumenti = "dataEdOraDiCaricamento";
+                if(UtilitaGenerale.esisteAttributoInClasse(nomeAttributoOrdinamentoDocumenti, File.class)) {
 
-                if(identificativoUploader==null)
-                    risultatoQuery =
-                            DatabaseHelper.query(File.class,
-                                    nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer);
-                else
-                    risultatoQuery =
-                            DatabaseHelper.queryAnd(File.class,
-                                    nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
-                                    nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer);
+                    List<?> risultatoQuery;
 
-                return risultatoQuery
-                        .stream()
-                        .map(unFile -> (File)unFile)
-                        .filter(unFile -> !unFile.isEliminato())
-                        .collect(Collectors.toList());
+                    if(identificativoUploader==null)
+                        risultatoQuery =
+                                DatabaseHelper.query(File.class,
+                                        nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
+                                        nomeAttributoOrdinamentoDocumenti);
+                    else
+                        risultatoQuery =
+                                DatabaseHelper.queryAnd(File.class,
+                                        nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
+                                        nomeAttributo2, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
+                                        nomeAttributoOrdinamentoDocumenti);
+
+                    return risultatoQuery
+                            .stream()
+                            .map(unFile -> (File)unFile)
+                            .filter(unFile -> !unFile.isEliminato())
+                            .collect(Collectors.toList());
+
+                } else {
+                    Logger.scriviEccezioneNelLog(File.class,
+                            "Controllare il nome dell'attributo su cui si esegue l'ordinamento",
+                            new NoSuchFieldException());
+                }
 
             } else {
                 Logger.scriviEccezioneNelLog(File.class,
