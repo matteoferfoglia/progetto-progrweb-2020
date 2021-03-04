@@ -83,6 +83,8 @@ public class JsonHelper {
      * Questo metodo funziona solamente con oggetti JSON le cui proprietà
      * sono di tipo primitivo (cioè non possono esserci altri oggetti JSON
      * annidati).
+     * L'ordine delle entries nella mappa è mantenuto nelle proprietà
+     * dell'oggetto JSON risultante.
      * @param <K> è la classe per la chiave della mappa data come argomento.
      * @param <V> è la classe per il valore della mappa data come argomento.
      */
