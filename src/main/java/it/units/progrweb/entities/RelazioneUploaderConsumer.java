@@ -234,7 +234,6 @@ public class RelazioneUploaderConsumer {
             Field consumer_field  = RelazioneUploaderConsumer.class.getDeclaredField("identificativoConsumer");  // eccezione se non esiste questo field
             
             return DatabaseHelper.esisteNelDatabase(
-                    RelazioneUploaderConsumer.class,
                     DatabaseHelper.creaERestituisciQueryAnd( RelazioneUploaderConsumer.class,
                                      uploader_field.getName(),  DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader,
                                      consumer_field.getName(),  DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer

@@ -186,7 +186,7 @@ public abstract class DatabaseHelper {
     /** Restituisce true se la query cercata produce almeno
      * un risultato.
      */
-    public static boolean esisteNelDatabase(Class classe, Query query) {
+    public static boolean esisteNelDatabase(Query query) {
         return query.limit(1).list().size() == 1;
     }
 
