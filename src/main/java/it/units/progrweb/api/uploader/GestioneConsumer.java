@@ -59,7 +59,7 @@ public class GestioneConsumer {
     @Produces( MediaType.APPLICATION_JSON )
     public String[] ricercaConsumerDaInizialiUsername( @PathParam("caratteriInizialiUsername") String caratteriInizialiUsername ) {
 
-        // TODO verificare
+        // TODO verificare, eliminare se non utilizzato
 
         final int MAX_NUMERO_RISULTATI_DA_RESTITUIRE = 10;
 
@@ -163,11 +163,16 @@ public class GestioneConsumer {
             try {
                 consumerDalDB = (Consumer) CreazioneAttore.creaNuovoAttore( campiFormAggiuntaAttore,
                                                                             Attore.TipoAttore.Uploader );
+                if( consumerDalDB==null )
+                    throw new NullPointerException("Non dobrebbe mai essere null.");
             } catch ( NoSuchAlgorithmException | InvalidKeyException |
                       UnsupportedEncodingException | MessagingException e ) {
                 Logger.scriviEccezioneNelLog(GestioneConsumer.class,
                         "Eccezione durante l'aggiunta di un consumer",
                         e);
+                throw e;
+            } catch( NullPointerException e ) {
+                Logger.scriviEccezioneNelLog(GestioneConsumer.class, e);
                 throw e;
             }
         }
