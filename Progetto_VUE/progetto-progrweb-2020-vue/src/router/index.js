@@ -127,12 +127,6 @@ const router = createRouter({
 
 // --------- Gestione del routing ---------
 
-// Permette di gestire il caso "utente richiede risorsa senza autenticazione,
-// lo mando alla pagina di login, poi lo rimando alla pagina che stava visitando"
-const MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE = "NON AUTENTICATO";
-const NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN = "motivoRedirectionVersoLogin";
-
-
 router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
   // TODO : rivedere bene i percorsi di instradamento
@@ -145,8 +139,6 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
       await verificaAutenticazione(routeDestinazione) // TODO: verifica autenticazione dovrebbe basarsi sul token JWT (implementare metodo in autenticazione.js)
         .then( async isUtenteAutenticato => {
-
-          let flag_nextGiaInvocato = false; // per evitare di invocare più volte next()
 
           if(isUtenteAutenticato) {
             // Autenticato
@@ -185,40 +177,15 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                       });
                 }
 
-            }
-
-          } else {
-            // Non autenticato
-            next( router.creaRouteAutenticazioneConInfoRichiesta( routeDestinazione ) );
-            flag_nextGiaInvocato = true;
-          }
-
-          return flag_nextGiaInvocato;
-
-        })
-        .then( flag_nextGiaInvocato => {
-
-          if( ! flag_nextGiaInvocato ) {
-
-            if (routeProvenienza.name === process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN &&  // TODO : TESTARE
-                routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA] && // verifico non nulla ne undefined
-                routeDestinazione.params[NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN] === MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE) {
-              // TODO : questa parte deve essere ricontrollata
-              // Se qui: l'utente aveva chiesto una risorsa senza essere autenticato
-              // ed era stato mandato al login, ora redirect alla pagina che stava usando
-              // con tutti i parametri che aveva prima del redirect
-              let parametriVecchiaRoute = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA];
-              parametriVecchiaRoute = JSON.parse(parametriVecchiaRoute.substring(1, parametriVecchiaRoute.length - 1));  // TODO : testare correttezza
-              // substring() rimuove "" aggiunte all'inizio ed alla fine
-              const routeRichiestaPrima = {
-                fullPath: routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
-                params: parametriVecchiaRoute
-              };
-              next(routeRichiestaPrima);
+                next();
 
             } else {
               next();
             }
+
+          } else {
+            // Non autenticato
+            next(router.creaRouteAutenticazione());
           }
 
         })
@@ -241,42 +208,22 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
 });
 
-/** Crea una route per la pagina di autenticazione dell'utente,
- * salvandosi le informazioni per poter reindirizzare (dopo
- * l'autenticazione) l'utente alla route che aveva chiesto in
- * precedenza.
- * @param routeRichiesta
+/** Crea una route per la pagina di autenticazione dell'utente.
  */
-router.creaRouteAutenticazioneConInfoRichiesta = routeRichiesta => {
-
-  // TODO : verificare che funzioni come da aspettative
-
+router.creaRouteAutenticazione = () => {
   return {
-    name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN, // redirect a login
-    params: {
-
-      [process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO]: "false",  // TODO : migliorare questo sistema che permette al componente App.vue di capire se l'utente è autenticato, per poi informare Header
-
-      // memorizzo la route richiesta e la passo al componente di login così può fare redirect dopo il login a ciò che aveva richiesto
-      [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: routeRichiesta.fullPath,
-      [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(routeRichiesta.params),
-      // JSON perché devono essere stringhe (altrimenti gli oggetti annidati vengono passati come "[Object object]")
-
-      [NOME_PROPERTY_MOTIVO_REDIRECTION_VERSO_LOGIN]: MOTIVO_REDIRECTION_SE_RICHIESTA_SENZA_AUTENTICAZIONE
-    }
+    name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN // redirect a login
   }
 }
 
 /** Si occupa del redirect verso la pagina di autenticazione.
- * Non interviene se si è già nella pagina di autenticazione.
- * @param routeRichiesta per poter proseguire la navigazione
- * dopo l'autenticazione.*/
-router.redirectVersoPaginaAutenticazione = async routeRichiesta => {
+ * Non interviene se si è già nella pagina di autenticazione.*/
+router.redirectVersoPaginaAutenticazione = async () => {
 
   if( router.currentRoute.value.path !== process.env.VUE_APP_ROUTER_PATH_LOGIN          &&
       router.currentRoute.value.path !== process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH    ) {
     console.log( "Redirection a pagina di autenticazione." );
-    await router.push(router.creaRouteAutenticazioneConInfoRichiesta(routeRichiesta)) ;
+    await router.push(router.creaRouteAutenticazione()) ;
   }
 
 }

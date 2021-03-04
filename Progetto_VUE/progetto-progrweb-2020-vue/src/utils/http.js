@@ -209,7 +209,7 @@ const onErrorHandler = async errore => {
         errore.response.status===HTTP_STATUS_FORBIDDEN ) {
         // Redirection automatica a login
         eliminaTokenAutenticazione();
-        await router.redirectVersoPaginaAutenticazione( router.currentRoute );
+        await router.redirectVersoPaginaAutenticazione();
     }
 
     return Promise.reject( errore.response );
