@@ -257,7 +257,6 @@ name: "SchedaDiUnAttore",
   created() {
 
     this.caricaQuestoComponente()
-          .then( () => this.isComponenteCaricato=true )
           .then( () => {
             // Modifica lo stile dei toggle corrispondenti ai collapsible attualmente mostrati "aperti"
             document.querySelectorAll(".collapse.show")
