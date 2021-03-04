@@ -220,7 +220,13 @@ public abstract class File {
         return listaFile.stream()
                  .collect(Collectors.toMap(
                          file -> String.valueOf( file.getIdentificativoFile() ),
-                         file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta(includiMetadati)) // Ogni elemento dello stream contiene la descrizione JSON di un file
+                         file -> JsonHelper.convertiMappaProprietaToStringaJson(file.toMap_nomeProprieta_valoreProprieta(includiMetadati)), // Ogni elemento dello stream contiene la descrizione JSON di un file
+                         (k,v) -> {
+                             IllegalStateException e = new IllegalStateException("Chiave duplicata: " + k);
+                             Logger.scriviEccezioneNelLog(File.class, "Errore in toMap()", e);
+                             throw e;
+                         },
+                         LinkedHashMap::new
                      )
                  );
     }
