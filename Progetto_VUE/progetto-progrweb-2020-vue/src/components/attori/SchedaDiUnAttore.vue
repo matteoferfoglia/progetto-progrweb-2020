@@ -347,59 +347,77 @@ name: "SchedaDiUnAttore",
     /** Metodo per i caricamento di questo componente.*/
     async caricaQuestoComponente() {
 
-      // Caricamento proprietà da Vue-Router
-      this.idAttoreCuiQuestaSchedaSiRiferisce =
-          this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
+      const MSG_ERRORE_SE_COMPONENTE_NON_CARICATO = "Non caricato, attendendo variabili.";
 
-      this.proprietaAttoreCuiQuestaSchedaSiRiferisce =
-          JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
+      await ( async () => {
+        if (this.NOME_PROP_USERNAME_wrapper && this.NOME_PROP_NOMINATIVO_wrapper && this.NOME_PROP_EMAIL_wrapper) {
+          // Procede con le richieste al server solo se i wrapper di tutte le proprietà sono truthy
 
-      this.tipoAttoreCuiQuestaSchedaSiRiferisce =
-          this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
 
-      this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
-                                                  process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
+          // Caricamento proprietà da Vue-Router
+          this.idAttoreCuiQuestaSchedaSiRiferisce =
+              this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE];
 
-      if( this.$route && this.$route.params &&  // controllare che sia definita
-          this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] ) {
-        this.mostrarePulsanteChiusuraQuestaSchedaAttore =
-            this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE];
-        this.mostrarePulsanteChiusuraQuestaSchedaAttore = this.mostrarePulsanteChiusuraQuestaSchedaAttore === undefined ?
-            true : this.mostrarePulsanteChiusuraQuestaSchedaAttore;
-      } else if( this.isConsumerAttualmenteAutenticato() ) {
-        this.mostrarePulsanteChiusuraQuestaSchedaAttore = false;
-      } else {
-        this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
-      }
+          this.proprietaAttoreCuiQuestaSchedaSiRiferisce =
+              JSON.parse(String(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]));
 
-      this.caricaLogoUploader();
+          this.tipoAttoreCuiQuestaSchedaSiRiferisce =
+              this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
 
-      this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
-          process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
-          "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
+          this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
+              process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
 
-      this.datiAggiuntiviDaInviareAlServer_onSubmit = {
-        /** Identificativo dell'attore a cui si riferisce questa scheda.*/
-        [process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD]: this.idAttoreCuiQuestaSchedaSiRiferisce
-      }
+          if (this.$route && this.$route.params &&  // controllare che sia definita
+              this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]) {
+            this.mostrarePulsanteChiusuraQuestaSchedaAttore =
+                this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE];
+            this.mostrarePulsanteChiusuraQuestaSchedaAttore = this.mostrarePulsanteChiusuraQuestaSchedaAttore === undefined ?
+                true : this.mostrarePulsanteChiusuraQuestaSchedaAttore;
+          } else if (this.isConsumerAttualmenteAutenticato()) {
+            this.mostrarePulsanteChiusuraQuestaSchedaAttore = false;
+          } else {
+            this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
+          }
 
-      if( this.proprietaAttoreCuiQuestaSchedaSiRiferisce ) {
-        // Verifica che le proprietà da mostrare siano ben definite
+          this.caricaLogoUploader();
 
-        this.username   = this.NOME_PROP_USERNAME_wrapper   ?
-            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] ?
-                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] : "" ) : "";
+          this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
+              process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
+              "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
 
-        this.nominativo = this.NOME_PROP_NOMINATIVO_wrapper   ?
-            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] ?
-                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] : "" ) : "";
+          this.datiAggiuntiviDaInviareAlServer_onSubmit = {
+            /** Identificativo dell'attore a cui si riferisce questa scheda.*/
+            [process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD]: this.idAttoreCuiQuestaSchedaSiRiferisce
+          }
 
-        this.email      = this.NOME_PROP_EMAIL_wrapper   ?
-            ( this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] ?
-                this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "" ) : "";
-      }
+          if (this.proprietaAttoreCuiQuestaSchedaSiRiferisce) {
+            // Verifica che le proprietà da mostrare siano ben definite
 
+            this.username = this.NOME_PROP_USERNAME_wrapper ?
+                (this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] ?
+                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] : "") : "";
+
+            this.nominativo = this.NOME_PROP_NOMINATIVO_wrapper ?
+                (this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] ?
+                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] : "") : "";
+
+            this.email = this.NOME_PROP_EMAIL_wrapper ?
+                (this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] ?
+                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "") : "";
+          }
+
+        } else {
+          throw new Error(MSG_ERRORE_SE_COMPONENTE_NON_CARICATO);
+        }
+      })()
+      .then( () => this.isComponenteCaricato = true )
+      .catch( errore => {
+        if(errore.message!==MSG_ERRORE_SE_COMPONENTE_NON_CARICATO)
+          console.error(errore);
+      });
     },
+
+
 
     /** Carica il logo di un Uploader, se questa scheda si riferisce ad un Uploader.*/
     caricaLogoUploader() {
