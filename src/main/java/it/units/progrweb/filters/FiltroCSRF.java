@@ -98,24 +98,7 @@ public class FiltroCSRF implements Filter {
 
                     try {
 
-                        // TODO : rivedere questa parte e refactoring (estrarre un metodo che faccia solo il parsing della richiesta JSON) - Attenzione c'è anche il multipart/form-data
-
-                        // TODO : migliorare efficienza (non serve leggere tutto se poi mi serve solo un attributo)
-
-                        ServletInputStream reader = copiaHttpReq.getInputStream();
-
-                        // readLine(): https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
-                        int byteLetti = 0;                                              // integer specifying the character at which this method begins reading
-                        final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
-                        byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
-                        while( (byteLetti = reader.readLine(arrayByteLettura,           // array di lettura "buffer"
-                                                        0,                          // in lettura, occupiamo l'array (primo parametro) dal primo elemento
-                                                            DIMENSIONE_ARRAY_LETTURA)   // massimo spazio disponibile nell'array
-                                ) != -1) {    // TODO : rivedere questa parte
-                            // Lettura di una linea alla volta
-                            String line = new String(arrayByteLettura, StandardCharsets.UTF_8);    // TODO : cercare tutte le occorrenza di UTF-8 e renderla variabile d'ambiente
-                            requestBody.append(line);
-                        }
+                        getRequestBody(copiaHttpReq, requestBody);
 
                         if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
                             Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonToMappaProprieta(requestBody.toString());
@@ -191,6 +174,32 @@ public class FiltroCSRF implements Filter {
             chain.doFilter(req, resp);
         }
 
+    }
+
+
+    /** Dati una {@link HttpServletRequest} ed un {@link StringBuilder},
+     * modifica lo {@link StringBuilder} dato appendendoci linea per linea
+     * il body della request data.
+     * Fonte: https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine
+     * @param httpServletRequest
+     * @param requestBody
+     * @throws IOException - Eventualmente generata dai metodi {@link HttpServletRequest#getInputStream()}
+     *                          oppure {@link ServletInputStream#readLine(byte[], int, int)}
+     */
+    private void getRequestBody(HttpServletRequest httpServletRequest, StringBuilder requestBody) throws IOException {
+        ServletInputStream reader = httpServletRequest.getInputStream();
+
+        // readLine(), Fonte: https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
+        final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
+        byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
+        while( reader.readLine(arrayByteLettura,           // array di lettura "buffer"
+                               0,                      // in lettura, occupiamo l'array (primo parametro) dal primo elemento
+                               DIMENSIONE_ARRAY_LETTURA)   // massimo spazio disponibile nell'array
+                != -1) {
+            // Lettura di una linea alla volta
+            String line = new String(arrayByteLettura, StandardCharsets.UTF_8);    // TODO : cercare tutte le occorrenza di UTF-8 e renderla variabile d'ambiente
+            requestBody.append(line);
+        }
     }
 
     public void init(FilterConfig config) throws ServletException {}
