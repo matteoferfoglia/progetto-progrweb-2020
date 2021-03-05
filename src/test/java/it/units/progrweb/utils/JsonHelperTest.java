@@ -142,7 +142,7 @@ public class JsonHelperTest {
     @ParameterizedTest
     @MethodSource("generaOggettiJsonAdUnSoloLivello")
     void convertiStringaJsonToMappaProprietaTest(String stringaJson, Map<String,Object> mappaProprieta_nome_valore_attesa) {
-        Map<String, Object> mappaProprieta_calcolata = JsonHelper.convertiStringaJsonToMappaProprieta(stringaJson);
+        Map<String, Object> mappaProprieta_calcolata = JsonHelper.convertiStringaJsonInMappaProprieta(stringaJson);
         assertEquals(mappaProprieta_nome_valore_attesa, mappaProprieta_calcolata);
     }
 

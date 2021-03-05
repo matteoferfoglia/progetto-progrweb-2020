@@ -101,7 +101,7 @@ public class FiltroCSRF implements Filter {
                         getRequestBody(copiaHttpReq, requestBody);
 
                         if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ) {
-                            Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonToMappaProprieta(requestBody.toString());
+                            Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonInMappaProprieta(requestBody.toString());
                             csrfToken = (String) mappaProprietaValori.get(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
                         } else if ( contentType.toLowerCase().contains(COTENT_TYPE_MULTIPART_FORM) ) {
                             // Necessario parsing (semplificato, solo per individuare il token) Fonte: https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html

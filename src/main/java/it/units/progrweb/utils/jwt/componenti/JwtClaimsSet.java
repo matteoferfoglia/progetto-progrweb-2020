@@ -141,7 +141,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
 
         JwtClaimsSet claimsSet = new JwtClaimsSet();
 
-        Map<String, Object> mappaProprietaOggettoJSON = JsonHelper.convertiStringaJsonToMappaProprieta(claimSetJSON);
+        Map<String, Object> mappaProprietaOggettoJSON = JsonHelper.convertiStringaJsonInMappaProprieta(claimSetJSON);
         // TODO : il json supporta anche formati non stringa (numero/null/booolean/array...): trovare il modo di salvare il claim con il tipo corretto, non come stringa
 
         mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.aggiungiClaim(new JwtClaim(nomeClaim, valoreClaim)));

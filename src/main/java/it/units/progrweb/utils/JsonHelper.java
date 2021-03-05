@@ -38,7 +38,7 @@ public class JsonHelper {
      * Idea per questo parsing tratta da
      * <a href="https://stackoverflow.com/a/11478699">qui</a>.
      */
-    public static Map<String,Object> convertiStringaJsonToMappaProprieta(String stringaJSON) {
+    public static Map<String,Object> convertiStringaJsonInMappaProprieta(String stringaJSON) {
 
         // TODO : il JSON viene prodotto con tutte le spaziature poi arriva qua tutto attaccato,
         //  perché?? Poi nel token csrf in fondo c'è un eccesso che non centra col token
