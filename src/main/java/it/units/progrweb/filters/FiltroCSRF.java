@@ -104,38 +104,8 @@ public class FiltroCSRF implements Filter {
                             Map<String,?> mappaProprietaValori = JsonHelper.convertiStringaJsonInMappaProprieta(requestBody.toString());
                             csrfToken = (String) mappaProprietaValori.get(NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
                         } else if ( contentType.toLowerCase().contains(COTENT_TYPE_MULTIPART_FORM) ) {
-                            // Necessario parsing (semplificato, solo per individuare il token) Fonte: https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
-
-                            // Estrazione del boundary dal content-type
-                            String boundary_nomeAttributo="boundary=";
-                            String boundary = contentType.substring( contentType.indexOf(boundary_nomeAttributo)+boundary_nomeAttributo.length());
-
-                            // TODO : che succede se manca il csrf ?? Come si comporta?? genera eccezioni??
-                            // TODO : rivedere regex
-
-                            List<String> listaCsrfTokenTorovatiNellaRichiesta =
-                                  Arrays.stream(requestBody.toString().split(boundary))
-                                        .filter( encapsulatedMultipart -> Pattern.compile("(name=\"" + NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST + "\")")
-                                                                                 .matcher(encapsulatedMultipart)
-                                                                                 .find() )
-                                        // dopo filter() restano solo i campi che contengono csrfToken
-                                        .flatMap( encapsulatedMultipart -> {
-                                            Matcher matcher = Pattern.compile("(?:\\r\\n)(.*)")   // prendi tutte le righe
-                                                    .matcher(encapsulatedMultipart);
-
-                                            List<String> valoriCsrfToken = new ArrayList<>();
-                                            while(matcher.find())
-                                                valoriCsrfToken.add(matcher.group(1).trim());  // prendo il gruppo col valore cercato
-
-                                            return valoriCsrfToken.stream();
-                                        })
-                                        .collect( Collectors.toList() );
-
-                            csrfToken = listaCsrfTokenTorovatiNellaRichiesta.stream()
-                                            .filter( csrfTokenTrovato -> CsrfToken.isCsrfTokenValido(csrfTokenTrovato, cookieHeader, indirizzoIPClient) )
-                                            .findAny()
-                                            .orElseGet(() -> "");   // restituisce il primo (non in ordine) token valido trovato, oppure stringa vuota
-
+                            // Necessario parsing (semplificato, solo per individuare il token CSRF)
+                            csrfToken = estraiCsrfTokenDaMultiPart(indirizzoIPClient, cookieHeader, contentType, requestBody, NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST);
                         }
 
 
@@ -174,6 +144,43 @@ public class FiltroCSRF implements Filter {
             chain.doFilter(req, resp);
         }
 
+    }
+
+    /** Dato il body di una request di tipo Multipart, restituisce il valore
+     * del CSRF token trovato, se presente e valido, o stringa vuota altrimenti.
+     * Fonte: https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html */
+    private String estraiCsrfTokenDaMultiPart(String indirizzoIPClient, String cookieHeader, String contentType,
+                                              StringBuilder requestBody, String nomeParametroCsrfTokenNellaRequest) {
+
+        // Estrazione del boundary dal content-type
+        String boundary_nomeAttributo="boundary=";
+        String boundary = contentType.substring( contentType.indexOf(boundary_nomeAttributo)+boundary_nomeAttributo.length());
+
+        // TODO : che succede se manca il csrf ?? Come si comporta?? genera eccezioni??
+        // TODO : rivedere regex
+
+        List<String> listaCsrfTokenTorovatiNellaRichiesta =
+              Arrays.stream(requestBody.toString().split(boundary))
+                    .filter( encapsulatedMultipart -> Pattern.compile("(name=\"" + nomeParametroCsrfTokenNellaRequest + "\")")
+                                                             .matcher(encapsulatedMultipart)
+                                                             .find() )
+                    // dopo filter() restano solo i campi che contengono csrfToken
+                    .flatMap( encapsulatedMultipart -> {
+                        Matcher matcher = Pattern.compile("(?:\\r\\n)(.*)")   // prendi tutte le righe
+                                .matcher(encapsulatedMultipart);
+
+                        List<String> valoriCsrfToken = new ArrayList<>();
+                        while(matcher.find())
+                            valoriCsrfToken.add(matcher.group(1).trim());  // prendo il gruppo col valore cercato
+
+                        return valoriCsrfToken.stream();
+                    })
+                    .collect( Collectors.toList() );
+
+        return listaCsrfTokenTorovatiNellaRichiesta.stream()
+                        .filter( csrfTokenTrovato -> CsrfToken.isCsrfTokenValido(csrfTokenTrovato, cookieHeader, indirizzoIPClient) )
+                        .findAny()
+                        .orElseGet(() -> "");   // restituisce il primo (non in ordine) token valido trovato, oppure stringa vuota
     }
 
 
