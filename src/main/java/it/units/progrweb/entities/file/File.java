@@ -305,6 +305,7 @@ public abstract class File {
      * Prima di restituire il file, si verifica che l'{@link Attore} che lo ha
      * richiesto sia in relazione con quel file (o {@link Consumer} o
      * {@link Uploader}) (non si possono recuperare i file di altri utenti).
+     * Fonte: https://stackoverflow.com/a/12251265
      * @param salvaDataOraVisualizzazione true se si vuole salvare la data/ora
      *                                    in cui il documento è richiesto (ignorato
      *                                    se tale data/ora è già salvata).*/
