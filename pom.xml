@@ -98,6 +98,19 @@
             <artifactId>jersey-hk2</artifactId>
             <version>2.28</version>
         </dependency>
+
+        <!-- Le seguenti dipendenze evitano l'errore SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder"
+             Fonte: https://stackoverflow.com/a/9919375 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
         <!-- fine Jersey! -->
 
         <!-- Objectify -->
