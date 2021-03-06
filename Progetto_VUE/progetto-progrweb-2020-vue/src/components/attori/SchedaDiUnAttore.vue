@@ -125,12 +125,12 @@
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
 import {generaIdUnivoco} from "../../utils/utilitaGenerale";
-import {richiestaDelete} from "../../utils/http";
+import {richiestaDelete, richiestaGet} from "../../utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
 import Loader from "../layout/Loader";
-import {getIdentificativoAttoreAttualmenteAutenticato} from "../../utils/autenticazione";
+import {getIdentificativoAttoreAttualmenteAutenticato, setTokenAutenticazione} from "../../utils/autenticazione";
 export default {
 name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
@@ -513,7 +513,10 @@ name: "SchedaDiUnAttore",
               .then( idAttore => {
                 if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando
                      tmp_vecchioNominativo !== this.nominativo ) {                    //  ed è stato modificato il nominativo
-                  this.$emit('nominativo-attore-modificato', this.nominativo);
+                  richiestaGet(process.env.VUE_APP_URL_RICHIESTA_NUOVO_TOKEN_AUTENTICAZIONE)
+                    .then( setTokenAutenticazione )
+                    .then( () => this.$emit('nominativo-attore-modificato', this.nominativo) )
+                    .catch( console.error );
                 }
               })
               .catch( console.error );

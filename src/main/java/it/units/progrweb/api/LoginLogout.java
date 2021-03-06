@@ -130,6 +130,19 @@ public class LoginLogout {
 
     }
 
+    /** Rilascia un nuovo token di autenticazione per l'attore associato al client che lo richiede. */
+    @Path("/nuovoTokenAutenticazione")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response creaNuovoTokenAutenticazione(@Context HttpServletRequest httpServletRequest){
+        try {
+            return Autenticazione.creaResponseAutenticazionePerAttoreAutenticato(Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest));
+        } catch (NotFoundException notFoundException) {
+            Logger.scriviEccezioneNelLog(LoginLogout.class, "Attore non trovato nel sistema", notFoundException);
+            return Response.serverError().build();
+        }
+    }
+
 }
 
 @SuppressWarnings("unused")

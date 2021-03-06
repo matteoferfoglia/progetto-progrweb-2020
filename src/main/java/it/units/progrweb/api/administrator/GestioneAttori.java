@@ -95,7 +95,7 @@ public class GestioneAttori {
             if( attoreDaModificare_attualmenteSalvatoInDB instanceof Uploader &&
                 nuovoLogo != null && dettagliNuovoLogo != null) {
 
-                try {
+                try {   // TODO : duplicazione del metodo Attore#modificaAttore ?
                     ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
                             .setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
                                              UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
