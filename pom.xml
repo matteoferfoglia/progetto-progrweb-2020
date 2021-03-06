@@ -58,6 +58,13 @@
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
             <version>2.28</version>
+            <exclusions>
+                <exclusion>
+                    <!-- Evita il warn :WARN:oeja.AnnotationParser:qtp1122606666-22: javax.validation.BootstrapConfiguration scanned from multiple locations -->
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
