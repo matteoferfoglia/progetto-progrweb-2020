@@ -19,25 +19,31 @@ public class Main {
 
     public static void main(String[] args) {
 
+        /** Uri base del server a cui eseguire le richieste */
+        final String uri_baseUrl = "http://localhost:8910/api/webService";
+
         // Uri web service
-        String uri_webService = "http://localhost:8910/api/webService/uploadDocumento";
+        final String uri_webService = uri_baseUrl + "/uploadDocumento";
+
+        // Uri web service login
+        final String uri_login = uri_baseUrl + "/login";
 
         // Credenziali uploader
         String credenziali_username = "AB01";
         String credenziali_password = "5678";
 
         // Parametri per l'invio dei file
-//        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
-//        String emailConsumer = "pippopluto@example.com";
-//        String nomeCognomeConsumer = "Pippo Pluto";
+        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
+        String emailConsumer = "pippopluto@example.com";
+        String nomeCognomeConsumer = "Pippo Pluto";
 //
 //        String codiceFiscaleConsumer = "RSSMRA80A01F205X";
 //        String emailConsumer = "mariorossi@example.com";
 //        String nomeCognomeConsumer = "Mario Rossi";
 
-        String codiceFiscaleConsumer = "NDRNDR80A01A182X";
-        String emailConsumer = "andreaandrei@example.com";
-        String nomeCognomeConsumer = "Andrea Andrei";
+//        String codiceFiscaleConsumer = "NDRNDR80A01A182X";
+//        String emailConsumer = "andreaandrei@example.com";
+//        String nomeCognomeConsumer = "Andrea Andrei";
 
         String nomeFile = "file prova";
         String listaHashtag = "rest, file, prova, primo file";
@@ -68,12 +74,15 @@ public class Main {
         RestClient restClient = new RestClient(uri_webService);
         try {
 
-            for(int i=0; i<100; i++) {
+            // Login del client
+            restClient.login(credenziali_username, credenziali_password, uri_login);
+
+            // Upload del file
+            {
                 String responseBody =
-                        restClient.inviaFileAConsumer(credenziali_username, credenziali_password,
-                                codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
-                                nomeFile, listaHashtag, file)
-                                .readEntity(String.class);
+                        restClient.inviaFileAConsumer( codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
+                                                       nomeFile, listaHashtag, file )
+                                  .readEntity(String.class);
                 System.out.println("--- RISPOSTA DAL SERVER ---\n" + responseBody);
             }
 
@@ -82,6 +91,7 @@ public class Main {
             e.printStackTrace(System.err);
         }
 
+        restClient.logout();
         restClient.close();
 
     }

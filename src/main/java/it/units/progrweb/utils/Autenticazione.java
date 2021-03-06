@@ -357,7 +357,7 @@ public class Autenticazione {
 
     /** Data la HttpServletRequest, restituisce il token di autenticazione
      * oppure null se non è presente.*/
-    private static JwtToken getTokenDaHttpServletRequest(HttpServletRequest httpServletRequest) {
+    public static JwtToken getTokenDaHttpServletRequest(HttpServletRequest httpServletRequest) {
         String tokenAutenticazioneBearer = getTokenAutenticazioneBearer(httpServletRequest);
 
         if (tokenAutenticazioneBearer == null)

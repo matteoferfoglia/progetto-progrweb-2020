@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,6 +30,18 @@ import static it.units.progrweb.api.uploader.GestioneConsumer.associaConsumerAdU
 @Path("/webService")
 public class WebService {
 
+    /** Metodo per eseguire l'autenticazione del client.
+     * @return Il token di autenticazione, da presentare nelle
+     *          successive richieste a questo WebService.*/
+    @Path("/login")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String login( CampiFormLogin campiFormLogin ) {
+        return (String) Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword())
+                                      .getEntity();
+    }
+
     /** Questo metodo ha le stesse finalità di
      * {@link GestioneDocumenti#uploadFile(HttpServletRequest, InputStream, FormDataContentDisposition, Long, String, String)},
      * con la differenza che questo metodo riceve come parametro il nomeCognome e codice fiscale di un
@@ -37,8 +50,6 @@ public class WebService {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response uploadFile(@Context HttpServletRequest httpServletRequest,
-                               @FormDataParam("usernameUploader")                   String usernameUploader,
-                               @FormDataParam("passwordUploader")                   String passwordUploader,
                                @FormDataParam("contenutoFile")                      InputStream contenuto,
                                @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile,
                                @FormDataParam("nomeCognomeConsumerDestinatario")    String nomeCognomeConsumerDestinatario,
@@ -47,29 +58,35 @@ public class WebService {
                                @FormDataParam("nomeFile")                           String nomeFile,
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
-    Attore mittente = Autenticazione.getAttoreDaCredenziali(usernameUploader, passwordUploader);
-    if(!(mittente instanceof Uploader)) // check autenticazione uploader mittente
-        return Autenticazione.creaResponseUnauthorized();
+        if (Autenticazione.getTokenDaHttpServletRequest(httpServletRequest).isTokenValido()) {
 
-        try {
+            Attore mittente = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+            if (!(mittente instanceof Uploader)) // check autenticazione uploader mittente
+                return Autenticazione.creaResponseUnauthorized();
 
-            // Non crea nulla se il consumer esiste già
-            CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore
-                    = associaConsumerAdUploader( new CreazioneAttore.CampiFormAggiuntaAttore(
-                                                                   codiceFiscaleConsumerDestinatario,
-                                                                   null,
-                                                                   nomeCognomeConsumerDestinatario,
-                                                                   emailConsumerDestinatario,
-                                                                   Attore.TipoAttore.Consumer.getTipoAttore(),
-                                                                   null),
-                                                 mittente.getIdentificativoAttore() );
-            return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
-                    mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());
+            try {
 
-        } catch ( MessagingException | NoSuchAlgorithmException |
-                  InvalidKeyException | UnsupportedEncodingException e ) {
-            return Response.serverError().entity(e).build();
+                // Non crea nulla se il consumer esiste già
+                CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore
+                        = associaConsumerAdUploader(new CreazioneAttore.CampiFormAggiuntaAttore(
+                                codiceFiscaleConsumerDestinatario,
+                                null,
+                                nomeCognomeConsumerDestinatario,
+                                emailConsumerDestinatario,
+                                Attore.TipoAttore.Consumer.getTipoAttore(),
+                                null),
+                        mittente.getIdentificativoAttore());
+                return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
+                        mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());
+
+            } catch (MessagingException | NoSuchAlgorithmException |
+                    InvalidKeyException | UnsupportedEncodingException e) {
+                return Response.serverError().entity(e).build();
+            }
+        } else {
+            return Autenticazione.creaResponseUnauthorized();
         }
+
     }
 
 }

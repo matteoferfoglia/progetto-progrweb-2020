@@ -30,6 +30,7 @@ public class FiltroAutenticazione implements Filter {
             "/api/login",
             "/api/logout",
             "/api/resetPassword",
+            "/api/webService/login",
             "/api/webService/uploadDocumento",
             // "/api/consumer", "/api/uploader", "/api/administrator",// gestiti da filtri specifici    // TODO : io lascerei scommentato (è un controllo in più)
             "/api/verificaTokenAutenticazione",

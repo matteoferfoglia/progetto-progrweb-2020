@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 
 /**
+ * Classe rappresentante un client REST.
  * @author Matteo Ferfoglia
  */
 public class RestClient {
@@ -22,10 +23,15 @@ public class RestClient {
     /** Istanza del client.*/
     private final Client client;
 
+    /** Token di autenticazione per questo client */
+    private String tokenAutenticazione;
+
+    /** Costruttore. */
     public RestClient(String webServiceUri) {
         this.restWebServiceUri = webServiceUri;
         this.client =  ClientBuilder.newClient();
         this.client.register(MultiPartFeature.class);
+        this.tokenAutenticazione = "";
     }
 
     /** Vedere {@link Client#close()}.*/
@@ -33,67 +39,103 @@ public class RestClient {
         this.client.close();
     }
 
-    public Response inviaFileAConsumer(String usernameUploader, String passwordUploader,
-                                       String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
+    public Response inviaFileAConsumer(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                                        String nomeFile, String listaHashtag, File file) {
 
-        FileDaCaricare fileDaCaricare = new FileDaCaricare(usernameUploader, passwordUploader,
-                                                           codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
+        /** Classe di supporto rappresentante un file da caricare, con tutti
+         * gli attributi richiesti dal web service.*/
+        class FileDaCaricare {
+
+            private final String codiceFiscaleConsumer;
+            private final String emailConsumer;
+            private final String nomeCognomeConsumer;
+            private final String nomeFile;
+            private final String listaHashtag;
+            private final File file;
+
+            public FileDaCaricare(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
+                                  String nomeFile, String listaHashtag, File file) {
+                this.codiceFiscaleConsumer = codiceFiscaleConsumer;
+                this.emailConsumer = emailConsumer;
+                this.nomeCognomeConsumer = nomeCognomeConsumer;
+                this.nomeFile = nomeFile;
+                this.listaHashtag = listaHashtag;
+                this.file = file;
+            }
+
+            /** Restituisce un'istanza della classe {@link FormDataMultiPart} avente
+             * come campi gli attributi dell'istanza di questa classe.
+             * Fonte (ispirato da): https://stackoverflow.com/q/24637038 */
+            FormDataMultiPart getFormDataMultiPart() {
+
+                FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+                FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("contenutoFile", file,
+                        MediaType.APPLICATION_OCTET_STREAM_TYPE);
+
+                formDataMultiPart.field("codiceFiscaleConsumerDestinatario", codiceFiscaleConsumer);
+                formDataMultiPart.field("emailConsumerDestinatario",         emailConsumer);
+                formDataMultiPart.field("nomeCognomeConsumerDestinatario",   nomeCognomeConsumer);
+                formDataMultiPart.field("nomeFile",     nomeFile);
+                formDataMultiPart.field("listaHashtag", listaHashtag);
+                formDataMultiPart.bodyPart(fileDataBodyPart);
+
+                return formDataMultiPart;
+
+            }
+        }
+
+        FileDaCaricare fileDaCaricare = new FileDaCaricare(codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
                                                            nomeFile, listaHashtag, file);
 
         return client.target(restWebServiceUri)
                      .request(MediaType.APPLICATION_JSON)
+                     .header("Authorization", "Bearer " + this.tokenAutenticazione)
                      .post(Entity.entity(fileDaCaricare.getFormDataMultiPart(), fileDaCaricare.getFormDataMultiPart().getMediaType()));
 
     }
 
-}
+    /** Metodo per eseguire il login. */
+    public void login(String credenziali_username, String credenziali_password, String loginUri) {
 
-/** Classe di supporto rappresentante un file da caricare, con tutti
- * gli attributi richiesti dal web service.*/
-class FileDaCaricare {
+        /* Classe di supporto utilizzata per la serializzazione dei dati da inviare al server. */
+        class Login {
+            private String username;
+            private String password;
 
-    private final String usernameUploader;
-    private final String passwordUploader;
-    private final String codiceFiscaleConsumer;
-    private final String emailConsumer;
-    private final String nomeCognomeConsumer;
-    private final String nomeFile;
-    private final String listaHashtag;
-    private final File file;
+            private Login() {}
 
-    public FileDaCaricare(String usernameUploader, String passwordUploader,
-                          String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
-                          String nomeFile, String listaHashtag, File file) {
-        this.usernameUploader = usernameUploader;
-        this.passwordUploader = passwordUploader;
-        this.codiceFiscaleConsumer = codiceFiscaleConsumer;
-        this.emailConsumer = emailConsumer;
-        this.nomeCognomeConsumer = nomeCognomeConsumer;
-        this.nomeFile = nomeFile;
-        this.listaHashtag = listaHashtag;
-        this.file = file;
+            public Login(String username, String password) {
+                this.username = username;
+                this.password = password;
+            }
+
+            public String getUsername() {
+                return username;
+            }
+
+            public void setUsername(String username) {
+                this.username = username;
+            }
+
+            public String getPassword() {
+                return password;
+            }
+
+            public void setPassword(String password) {
+                this.password = password;
+            }
+        }
+
+        this.tokenAutenticazione = client.target( loginUri )
+                                         .request( MediaType.TEXT_PLAIN_TYPE )
+                                         .post( Entity.entity(new Login(credenziali_username, credenziali_password),
+                                                MediaType.APPLICATION_JSON_TYPE) )
+                                         .readEntity( String.class );
+
     }
 
-    /** Restituisce un'istanza della classe {@link FormDataMultiPart} avente
-     * come campi gli attributi dell'istanza di questa classe.
-     * Fonte (ispirato da): https://stackoverflow.com/q/24637038 */
-    FormDataMultiPart getFormDataMultiPart() {
-
-        FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
-        FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("contenutoFile", file,
-                                                        MediaType.APPLICATION_OCTET_STREAM_TYPE);
-
-        formDataMultiPart.field("usernameUploader", usernameUploader);
-        formDataMultiPart.field("passwordUploader", passwordUploader);
-        formDataMultiPart.field("codiceFiscaleConsumerDestinatario", codiceFiscaleConsumer);
-        formDataMultiPart.field("emailConsumerDestinatario",         emailConsumer);
-        formDataMultiPart.field("nomeCognomeConsumerDestinatario",   nomeCognomeConsumer);
-        formDataMultiPart.field("nomeFile",     nomeFile);
-        formDataMultiPart.field("listaHashtag", listaHashtag);
-        formDataMultiPart.bodyPart(fileDataBodyPart);
-
-        return formDataMultiPart;
-
+    /** Metodo per eseguire il logout. */
+    public void logout() {
+        this.tokenAutenticazione = "";
     }
 }
