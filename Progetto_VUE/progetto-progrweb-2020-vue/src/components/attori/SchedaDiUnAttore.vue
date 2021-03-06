@@ -130,11 +130,18 @@ import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiP
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
 import Loader from "../layout/Loader";
+import {getIdentificativoAttoreAttualmenteAutenticato} from "../../utils/autenticazione";
 export default {
 name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
   inheritAttrs: false,
   emits: [
+
+    /** Evento emesso quando viene modificato il nominativo dell'attore
+     * che sta visualizzando la scheda (es. Administrator che visualizza
+     * la sua stessa scheda)*/
+    'nominativo-attore-modificato',
+
     /** Evento emesso quando riceve un token CSRF da un componente figlio.*/
     'csrf-token-ricevuto'
   ],
@@ -491,6 +498,9 @@ name: "SchedaDiUnAttore",
     formModificaAttoreInviato ( oggetto ) {
       oggetto.promiseRispostaServer
           .then( rispostaServer => {
+
+            const tmp_vecchioNominativo = this.nominativo;
+
             // Aggiorna i dati della vista
             // NOTA: aggiungere un carattere in fondo e rimuoverlo con slice() è un trucco per far attivare il watch
             //       che aggiorna i valori scritti nel form, così se i valori dovessero "sporcarsi", con queste istruzioni
@@ -498,6 +508,16 @@ name: "SchedaDiUnAttore",
             this.username   = (rispostaServer[ process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
             this.nominativo = (rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
             this.email      = (rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+
+            getIdentificativoAttoreAttualmenteAutenticato()
+              .then( idAttore => {
+                if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando
+                     tmp_vecchioNominativo !== this.nominativo ) {                    //  ed è stato modificato il nominativo
+                  this.$emit('nominativo-attore-modificato', this.nominativo);
+                }
+              })
+              .catch( console.error );
+
             alert( "Modifiche effettuate!" );
           })
           .catch( rispostaServer => {

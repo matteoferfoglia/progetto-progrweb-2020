@@ -5,6 +5,7 @@
                :NOME_PROP_NOMINATIVO ="NOME_PROP_NOME_ATTORE"
                :NOME_PROP_USERNAME   ="NOME_PROP_USERNAME_ATTORE"
                :NOME_PROP_EMAIL      ="NOME_PROP_EMAIL_ATTORE"
+               @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"
                @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"/>
 
 
