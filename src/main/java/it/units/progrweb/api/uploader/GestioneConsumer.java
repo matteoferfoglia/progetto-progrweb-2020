@@ -6,7 +6,6 @@ import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
-import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
@@ -22,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Classe per la gestione dei {@link Consumer} da parte
@@ -49,47 +47,6 @@ public class GestioneConsumer {
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
         return RelazioneUploaderConsumer.getListaConsumerDiUploader( identificativoUploader );
-
-    }
-
-    /** Restituisce un array di username di Consumer inizianti
-     * con i caratteri dati nel @PathParam.*/
-    @Path("/ricercaConsumer/{caratteriInizialiUsername}")
-    @GET
-    @Produces( MediaType.APPLICATION_JSON )
-    public String[] ricercaConsumerDaInizialiUsername( @PathParam("caratteriInizialiUsername") String caratteriInizialiUsername ) {
-
-        // TODO verificare, eliminare se non utilizzato
-
-        final int MAX_NUMERO_RISULTATI_DA_RESTITUIRE = 10;
-
-        if( caratteriInizialiUsername.length() > 0 ) {
-
-            // Definizione del range di username compatibili con la ricerca
-            final String primoUsernameValido    = caratteriInizialiUsername.toLowerCase();
-
-            // Costruzione primo username non valido
-            char[] caratteri = caratteriInizialiUsername.toCharArray();
-            caratteri[caratteri.length-1] = (char) (caratteri[caratteri.length-1] + 1); // ultimo carattere incrementato
-            final String primoUsernameNONValido = String.copyValueOf( caratteri ).toLowerCase();
-
-            // Ricerca nel database
-            List<String> suggerimenti = DatabaseHelper.queryAnd(
-                            Consumer.class, MAX_NUMERO_RISULTATI_DA_RESTITUIRE,
-                            Consumer.getNomeFieldUsernameAttore(), DatabaseHelper.OperatoreQuery.MAGGIOREOUGUALE, primoUsernameValido,
-                            Consumer.getNomeFieldUsernameAttore(), DatabaseHelper.OperatoreQuery.MINORE, primoUsernameNONValido
-                    )
-                    .stream()
-                    .map( consumer -> ((Consumer)consumer).getUsername() )
-                    .collect(Collectors.toList());
-
-            String[] daRestituire = new String[suggerimenti.size()];
-            return suggerimenti.toArray(daRestituire);
-
-        } else {
-            return new String[]{};
-        }
-
 
     }
 
