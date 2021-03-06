@@ -1,6 +1,7 @@
 package it.units.progrweb.filters;
 
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -21,7 +22,10 @@ import static it.units.progrweb.utils.UtilitaGenerale.*;
 @WebFilter(filterName = "FiltroAutenticazione", asyncSupported = true)
 public class FiltroAutenticazione implements Filter {
 
-    /** Whitelist di uri accessibili senza autenticazione.*/
+    /** Whitelist di percorsi uri accessibili senza autenticazione: se il
+     * percorso richiesto dal client inizia con una delle stringhe presenti
+     * in questo array, allora quella risorsa è considerata ad accesso libero
+     * e non si verifica l'autorizzazione del client.*/
     private static final String[] WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA = {
             "/api/login",
             "/api/logout",
@@ -31,6 +35,7 @@ public class FiltroAutenticazione implements Filter {
             "/api/verificaTokenAutenticazione",
             "/api/registrazioneNuovoConsumer",
             "/api/CSRFToken/generaCSRFToken",
+            "/api/info",
             "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo !!! // TODO : var ambiente solo di sviluppo // TODO : solo per sviluppo
     };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
 
@@ -70,7 +75,7 @@ public class FiltroAutenticazione implements Filter {
      * whitelist}, altrimenti restituisce false.
      * @return true se <strong>non</strong> è richiesta l'autenticazione, false altrimenti.*/
     private static boolean isRisorsaAdAccessoLibero(HttpServletRequest httpReq) {
-        return isPresenteNellArray( getUrlPattern(httpReq),
+        return UtilitaGenerale.isStessoPrefissoNellArray( getUrlPattern(httpReq),
                 WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA);
     }
 
