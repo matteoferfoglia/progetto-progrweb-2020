@@ -105,14 +105,6 @@ public class RichiestaInfo {
         return Attore.getNomeFieldNominativoAttore();
     }
 
-    /** Restituisce il nome della proprietà contenente il logo dell'Uploader.*/
-    @Path("/nomeProprietaLogoUploader")        // TODO : variabile d'ambiente
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNomeFieldLogoUploader() {
-        return Uploader.getNomeFieldLogoUploader();
-    }
-
     /** Restituisce il nome della proprietà contenente lo username di un {@link Attore}.*/
     @Path("/nomeProprietaUsernameAttore")        // TODO : variabile d'ambiente
     @GET

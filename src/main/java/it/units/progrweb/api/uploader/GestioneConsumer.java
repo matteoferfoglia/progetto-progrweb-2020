@@ -267,20 +267,9 @@ public class GestioneConsumer {
         } else {
             return Response
                     .status( Response.Status.BAD_REQUEST )
-                    .entity("Specirficare l'identificativo del Consumer da specificare.")    // TODO : var ambiene con messaggi errore
+                    .entity("Specificare l'identificativo del Consumer da specificare.")    // TODO : var ambiene con messaggi errore
                     .build();
         }
-
-    }
-
-
-    /** Dato l'identificativo del consumer come @PathParam, restituisce il nome.*/
-    @Path("/nomeConsumer/{identificativoConsumer}")
-    @GET
-    @Produces( MediaType.TEXT_PLAIN )
-    public String getNomeUploader( @PathParam("identificativoConsumer") Long identificativoConsumer ) {
-
-        return Consumer.getNominativoDaIdentificativo( identificativoConsumer );
 
     }
 
