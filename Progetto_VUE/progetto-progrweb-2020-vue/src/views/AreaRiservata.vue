@@ -1,10 +1,10 @@
 <template>
 
   <div class="d-flex justify-content-between">
-    <img :src="logoUploader_base64"
+    <img :src="urlLogoUploader"
          alt="Proprio logo"
          class="logo"
-         v-if="isUploaderAttualmenteAutenticato()">
+         v-if="urlLogoUploader && isUploaderAttualmenteAutenticato()"/>
     <h1>Area riservata</h1>
   </div>
 
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import {richiestaGet} from "../utils/http";
+
 import {getIdentificativoAttoreAttualmenteAutenticato} from "../utils/autenticazione";
 
 export default {
@@ -43,9 +43,12 @@ export default {
   data() {
     return {
 
-      /** Se si tratta di un Uploader, questo attributo salva il suo
-       * logo in formato Base64.*/
-      logoUploader_base64: undefined,
+      /** Identificativo dell'attore a cui questa scheda si riferisce.*/
+      idAttoreCuiQuestaSchedaSiRiferisce: undefined,  // caricato in created
+
+      /** Url a cui richiedere il logo dell'attore a cui questa scheda
+       * si riferisce. */
+      urlLogoUploader: undefined,                     // caricato in created
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
@@ -53,7 +56,13 @@ export default {
     }
   },
   created() {
-    this.caricaLogoUploader();
+    // Richiede l'identificativo dell'attore attualmente autenticato ed imposta l'uri a cui richiedere il suo logo
+    getIdentificativoAttoreAttualmenteAutenticato()
+        .then(identificativoAttore => {
+          this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
+          this.urlLogoUploader = process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore;
+        })
+        .catch(console.error);
   },
   methods: {
 
@@ -61,15 +70,6 @@ export default {
     isUploaderAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato_wrapper ===
           process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    },
-
-    async caricaLogoUploader () {
-      if(this.isUploaderAttualmenteAutenticato()) {
-        getIdentificativoAttoreAttualmenteAutenticato()
-            .then(identificativoAttore => richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore))
-            .then(immagineLogo_dataUrl => this.logoUploader_base64 = immagineLogo_dataUrl)
-            .catch(console.error);
-      }
     }
 
   },
@@ -79,8 +79,6 @@ export default {
       deep: true,
       handler( nuovoValore ) {
         this.tipoAttoreAutenticato_wrapper = nuovoValore;
-        this.caricaLogoUploader();  // potrebbe essere che non fosse ancora disponibile
-                                    // l'attributo tipoAttore durante created()
       }
     },
     csrfToken : {

@@ -54,4 +54,7 @@ public class UploaderProxy extends Uploader {
         return null;
     }
 
+    @Override
+    public String getMediatypeImmagineLogo() { return null; }
+
 }

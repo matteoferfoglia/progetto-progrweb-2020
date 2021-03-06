@@ -109,8 +109,13 @@ public abstract class Uploader extends UtenteNonAdministrator {
         }
     }
 
+    /** Restituisce l'array di byte corrispondente all'immagine del logo. */
     abstract public byte[] getImmagineLogo();
+
+    /** Restituisce l'estensione dell'immagine del logo. */
     abstract public String getEstensioneImmagineLogo();
 
+    /** Restituisce il Mediatype dell'immagine del logo. */
+    abstract public String getMediatypeImmagineLogo();
 
 }

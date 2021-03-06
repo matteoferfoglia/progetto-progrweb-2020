@@ -3,9 +3,9 @@
   <Loader :isComponenteCaricato="isComponenteCaricato">
     <section class="card" :id="idHtmlQuestoComponente">
       <header class="card-header titolo-scheda d-flex align-items-center">
-        <img :src="logoBase64_dataUrl"
+        <img :src="urlLogoUploader"
              alt=""
-             v-if="isQuestaSchedaRiferitaAdUnUploader"/>
+             v-if="urlLogoUploader && isQuestaSchedaRiferitaAdUnUploader"/>
         <h2>{{ nominativo }}</h2>
       </header>
 
@@ -125,7 +125,7 @@
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
 import {generaIdUnivoco} from "../../utils/utilitaGenerale";
-import {richiestaDelete, richiestaGet} from "../../utils/http";
+import {richiestaDelete} from "../../utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
@@ -179,10 +179,6 @@ name: "SchedaDiUnAttore",
       /** Indica il tipo di attore a cui si riferisce questa scheda.*/
       tipoAttoreCuiQuestaSchedaSiRiferisce: undefined,                     // inizializzata in created()
 
-      /** Immagine logo (se l'attore rappresentato da questa scheda ne
-       * ha uno) codificato in Base64.*/
-      logoBase64_dataUrl: undefined,                                       // inizializzata in created()
-
       /** URL per la richiesta dell'elenco dei documenti destinati al Consumer
        * attualmente autenticato e caricati dall'Uploader di cui si sta caricando
        * la scheda.*/
@@ -216,6 +212,10 @@ name: "SchedaDiUnAttore",
       urlModificaInfoAttore: this.isUploaderAttualmenteAutenticato() ?  // url e permessi diversi in base a chi chiede la modifica
                              process.env.VUE_APP_URL_MODIFICA_CONSUMER__RICHIESTA_DA_UPLOADER :
                              process.env.VUE_APP_URL_MODIFICA_ATTORE__RICHIESTA_DA_ADMIN,
+
+      /** Url a cui richiedere il logo dell'attore a cui questa scheda
+       * si riferisce. */
+      urlLogoUploader: undefined,                                       // inizializzata in created()
 
       /** Oggetto coi dati aggiuntivi da inviare al server insieme al
        * form quando si clicca submit.*/
@@ -279,6 +279,16 @@ name: "SchedaDiUnAttore",
 
   },
   methods:{
+
+    /** Dato l'identificativo di un attore, restituisce l'url per richiedere
+     * al server il logo di quell'attore. Se il parametro risulta falsy, questo
+     * metodo restituisce undefined. */
+    creaUrlLogo( identificativoAttore ) {
+      if( identificativoAttore )
+        return process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
+      else
+        return undefined;
+    },
 
     /** Dato un elemento della classe collapse, restituisce il corrispondente
      * pulsante toggle che gestisce la sua attivazione.
@@ -378,7 +388,7 @@ name: "SchedaDiUnAttore",
             this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
           }
 
-          this.caricaLogoUploader();
+          this.urlLogoUploader = this.creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
 
           this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
               process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
@@ -414,19 +424,6 @@ name: "SchedaDiUnAttore",
         if(errore.message!==MSG_ERRORE_SE_COMPONENTE_NON_CARICATO)
           console.error(errore);
       });
-    },
-
-
-
-    /** Carica il logo di un Uploader, se questa scheda si riferisce ad un Uploader.*/
-    caricaLogoUploader() {
-      if( this.isQuestaSchedaRiferitaAdUnUploader ) {
-        richiestaGet(process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce)
-                .then(immagineLogo_dataUrl => this.logoBase64_dataUrl = immagineLogo_dataUrl)
-                .catch(console.error);
-      } else {
-        this.logoBase64_dataUrl = "";
-      }
     },
 
     // TODO : i metodi isConsumer() / isUploader() / isAdministrator()  sono presenti in più componenti => refactoring
@@ -559,7 +556,7 @@ name: "SchedaDiUnAttore",
       }
     },
 
-    csrfToken : {
+    csrfToken: {
       immediate: true,
       deep: true,
       handler(nuovoValore) {

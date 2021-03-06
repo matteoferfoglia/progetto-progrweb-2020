@@ -102,6 +102,11 @@ class UploaderStorage extends Uploader {
         return immagineLogoUploader.getEstensioneFileContenenteLogo();
     }
 
+    @Override
+    public String getMediatypeImmagineLogo() {
+        return immagineLogoUploader.getMediaTypeLogo();
+    }
+
     /** Restituisce l'immagine logo in formato Base64.*/
     public String getLogo_base64() {
         return immagineLogoUploader.getLogo_dataUrl();

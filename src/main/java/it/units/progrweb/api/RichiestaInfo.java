@@ -29,6 +29,8 @@ import java.util.function.Function;
  * attesi dai servizi esposti dalle altre classi cosicché
  * tali nomi non vengano "cablati" sul client costituendo
  * una duplicazione di codice.
+ * I servizi esposti da questa classe non hanno vincoli di
+ * autenticazione (chiunque può farne richiesta).
  * @author Matteo Ferfoglia
  */
 @Path("/info")
@@ -162,10 +164,11 @@ public class RichiestaInfo {
     }
 
     /** Dato come @PathParam l'identificativo di un Uploader, restituisce
-     * la rappresentazione codificata come data URL del suo logo.*/
+     * il suo logo.*/
     @Path("/logoUploader/{identificativoUploader}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @GET
-    public Response getLogoUploader_dataUrl(@PathParam("identificativoUploader") Long identificativoUploader) {
+    public Response getLogoUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
 
         // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
 
@@ -174,9 +177,8 @@ public class RichiestaInfo {
 
         Uploader uploader = Uploader.getAttoreDaIdentificativo( identificativoUploader );
         if( uploader != null) {
-            return Response.ok()
-                    .entity( uploader.getImmagineLogoBase64() )
-                    .build();
+            return Response.ok( uploader.getImmagineLogo(), uploader.getMediatypeImmagineLogo() )
+                           .build();
         } else {
             return NotFoundException.creaResponseNotFound("Uploader non trovato.");
         }
