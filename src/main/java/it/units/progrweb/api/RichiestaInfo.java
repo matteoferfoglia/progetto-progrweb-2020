@@ -20,6 +20,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.function.Function;
 
 /**
@@ -169,8 +171,20 @@ public class RichiestaInfo {
 
         Uploader uploader = Uploader.getAttoreDaIdentificativo( identificativoUploader );
         if( uploader != null) {
-            return Response.ok( uploader.getImmagineLogo(), uploader.getMediatypeImmagineLogo() )
-                           .build();
+            byte[] logo = uploader.getImmagineLogo();
+            if( logo!=null && logo.length>0 )
+                return Response.ok( logo, uploader.getMediatypeImmagineLogo() )
+                               .build();
+            else {
+                try {
+                    return Response.seeOther(new URI("/logoDefault.svg")).build();
+                } catch (URISyntaxException e) {
+                    Logger.scriviEccezioneNelLog(this.getClass(),
+                                                 "Errore nella restituzione del logo di default",
+                                                 e);
+                    return Response.serverError().build();
+                }
+            }
         } else {
             return NotFoundException.creaResponseNotFound("Uploader non trovato.");
         }
