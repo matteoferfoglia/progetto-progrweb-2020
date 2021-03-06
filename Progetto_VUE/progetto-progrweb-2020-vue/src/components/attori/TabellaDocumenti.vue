@@ -59,9 +59,10 @@
           </tr>
           </thead>
           <tbody>
+          <!-- Ogni riga è un documento -->
           <tr v-for="(documento, ignored, indice) in mappaDocumentiDaMostrare.getObjetFromEntries()"
               :class="{ 'font-weight-bold' : documento[NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO]==='' }"
-              :key="indice"><!-- Ogni riga è un documento -->
+              :key="indice">
             <td>{{ indice+1 }}</td>
             <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
                                                                                        nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
