@@ -16,9 +16,8 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent" v-if="isAutenticato()">
-        <ul class="navbar-nav mx-auto">
-          <li class="opzioni-utente-header disabled">{{ nomeUtenteAutenticato_wrapper }}</li>
-
+        <p class="opzioni-utente-header mx-auto">{{ nomeUtenteAutenticato_wrapper }}</p>
+        <ul class="navbar-nav ml-auto">
           <li>
             <router-link :to="{path: PERCORSO_AREA_RISERVATA}"
                          class="home">
@@ -149,7 +148,7 @@ export default {
     padding-left: 25px;
     text-indent: -25px;
   }
-  nav li, nav li>*{
+  nav li, nav p, nav li>*{
     margin: auto 0 auto 1rem;
     white-space: nowrap;
     display: inline;
