@@ -19,14 +19,19 @@
         </button>
 
         <ul id="elencoOpzioniUtenteDaHeader" class="dropdown-menu dropdown-menu-right">
-
+          <li>
+            <router-link :to="{path: PERCORSO_AREA_RISERVATA}"
+                         class="home dropdown-item">
+              Home
+            </router-link>
+          </li>
           <li>
             <router-link :to="{path: PERCORSO_IMPOSTAZIONI_ACCOUNT}"
                          class="impostazioni dropdown-item">
               Impostazioni account
             </router-link>
           </li>
-          <li class="dropdown-item">
+          <li class="logout dropdown-item">
             <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
                               :csrfToken_prop="csrfToken_wrapper">
               <a @click.prevent="$emit('logout')">
@@ -70,6 +75,7 @@ export default {
 
       // Percorso vue router
       PERCORSO_IMPOSTAZIONI_ACCOUNT: process.env.VUE_APP_ROUTER_PATH_IMPOSTAZIONI_ACCOUNT,
+      PERCORSO_AREA_RISERVATA      : process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
 
       // CSRF token attualmente valido
       csrfToken_wrapper: undefined
