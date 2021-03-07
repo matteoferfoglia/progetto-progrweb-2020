@@ -1,37 +1,37 @@
 <template>
 
   <header>
-    <nav class="navbar navbar-expand-mr bg-dark">
+
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
       <router-link :to="{name: NOME_ROOT_APPLICAZIONE}" class="navbar-brand">
         <img class="logo d-inline-block align-top" :src="URL_LOGO_APPLICAZIONE" alt=""/>
         <span class="nome-applicazione">{{NOME_APPLICAZIONE}}</span>
       </router-link>
 
-      <div id="containerOpzioniUtente"
-           class="nav-item dropdown"
-           v-if="isAutenticato()">
+      <button v-if="isAutenticato()" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <button id="buttonOpzioniUtente"
-                data-toggle="dropdown"
-                class="opzioni-utente btn btn-light dropdown-toggle mb-0">
-           {{ nomeUtenteAutenticato_wrapper }}
-        </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" v-if="isAutenticato()">
+        <ul class="navbar-nav mx-auto">
+          <li class="opzioni-utente-header disabled">{{ nomeUtenteAutenticato_wrapper }}</li>
 
-        <ul id="elencoOpzioniUtenteDaHeader" class="dropdown-menu dropdown-menu-right">
           <li>
             <router-link :to="{path: PERCORSO_AREA_RISERVATA}"
-                         class="home dropdown-item">
+                         class="home">
               Home
             </router-link>
           </li>
           <li>
             <router-link :to="{path: PERCORSO_IMPOSTAZIONI_ACCOUNT}"
-                         class="impostazioni dropdown-item">
+                         class="impostazioni">
               Impostazioni account
             </router-link>
           </li>
-          <li class="logout dropdown-item">
+          <li class="logout">
             <FormConCsrfToken @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
                               :csrfToken_prop="csrfToken_wrapper">
               <a @click.prevent="$emit('logout')">
@@ -39,10 +39,11 @@
               </a>
             </FormConCsrfToken>
           </li>
-        </ul>
 
+        </ul>
       </div>
     </nav>
+
   </header>
 
 </template>
@@ -132,5 +133,32 @@ export default {
   .nome-applicazione {
     font-size: 1.5em;
     color: ghostwhite;
+    margin-right: 3rem;
+  }
+  header * {
+    color: white;
+  }
+  .opzioni-utente-header {
+    font-size: 1.2rem;
+    margin: auto 3rem auto 0;
+    white-space: inherit;
+    color: lightgrey;
+    font-weight: bold;
+
+    /* Gestione dell'indentazione se va a capo */
+    padding-left: 25px;
+    text-indent: -25px;
+  }
+  nav li, nav li>*{
+    margin: auto 0 auto 1rem;
+    white-space: nowrap;
+    display: inline;
+  }
+  nav li a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  nav li form {
+    padding: 0;
   }
 </style>
