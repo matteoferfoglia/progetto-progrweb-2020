@@ -15,8 +15,9 @@
 // TODO : rivedere ed eventualmente ristrutturare questo script
 
 import {createRouter, createWebHistory} from 'vue-router'
-import {verificaAutenticazione} from "../utils/autenticazione";
+import {eliminaTokenAutenticazione, verificaAutenticazione} from "../utils/autenticazione";
 import {getProprietaAttoreTarget, getTipoAttoreTarget} from "../utils/richiesteInfoSuAttori";
+import {rimuoviAuthorizationHeader} from "../utils/http";
 
 
 const routes = [
@@ -43,6 +44,9 @@ const routes = [
 
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
     component: () => import('../views/PaginaAutenticazione'),
+    meta: {
+      requiresNonAuth: true
+    },
     children: [
       {
         path: process.env.VUE_APP_ROUTER_PATH_LOGIN,
@@ -130,6 +134,12 @@ const router = createRouter({
 router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
   // TODO : rivedere bene i percorsi di instradamento
+
+  if( routeDestinazione.matched.some(route => route.meta.requiresNonAuth) ){
+    // SE route richiede di non essere autenticato, allora rimuove header di autenticazione
+    eliminaTokenAutenticazione();
+    rimuoviAuthorizationHeader();
+  }
 
   (async () => {
     // funzione asincrona
