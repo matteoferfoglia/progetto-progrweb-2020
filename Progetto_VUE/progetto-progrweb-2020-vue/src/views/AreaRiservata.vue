@@ -1,11 +1,11 @@
 <template>
 
   <div class="d-flex justify-content-between">
+    <h1>Area riservata</h1>
     <img :src="urlLogoUploader"
          alt="Proprio logo"
          class="logo"
          v-if="urlLogoUploader && isUploaderAttualmenteAutenticato()"/>
-    <h1>Area riservata</h1>
   </div>
 
   <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
@@ -96,6 +96,7 @@ export default {
 img.logo {
   max-height: 5rem;
   width: auto;
+  margin: 1em;
 }
 h1 {
   padding: 1rem;
