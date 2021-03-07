@@ -40,7 +40,7 @@
 
     <article class="card" id="elencoAttori">
       <h2>Elenco attori</h2>
-      <ol>
+      <ol v-if="mappa_idAttore_proprietaAttore.size>0">
         <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
             class="list-group-item list-group-item-action"
             :key="attore[0]/*Id dell'attore*/">
@@ -61,10 +61,13 @@
         </li>
       </ol>
 
-      <p v-if="isConsumerAttualmenteAutenticato() &&
-          mappa_idAttore_proprietaAttore.size === 0">
-        Nessun <i>Uploader</i> disponibile.
+      <p v-else>Nessun
+        <i v-if="isAdministratorAttualmenteAutenticato()">attore</i>
+        <i v-else-if="isConsumerAttualmenteAutenticato()">Uploader</i>
+        <i v-else>Consumer</i>
+         disponibile.
       </p>
+
     </article>
 
 
