@@ -16,12 +16,8 @@ import javax.ws.rs.core.MediaType;
  * Servizi per richiedere le informazioni sugli Uploader.
  * @author Matteo Ferfoglia
  */
-@Path("/consumer")                          // TODO : variabile d'ambiente
+@Path("/consumer")
 public class RichiestaInfoSuUploader {
-
-
-    // TODO : probabilmente questa classe deve essere cancellata perché (quasi) inutile
-
 
     /** Restituisce un array con gli identificativi di tutti gli {@link Uploader}
      * che hanno caricato dei {@link File} per questo {@link Consumer}.*/

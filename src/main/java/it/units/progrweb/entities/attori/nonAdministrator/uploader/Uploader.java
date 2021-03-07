@@ -92,15 +92,6 @@ public abstract class Uploader extends UtenteNonAdministrator {
         return UploaderProxy.getNomeFieldLogoUploader();
     }
 
-
-    /** Restituisce l'immagine logo dell'Uploader
-     * codificata in Base64.*/  // TODO : refactoring (informazioni sono mal frammentate tra questa classe, la proxy e la storage)
-    public String getImmagineLogoBase64(){
-        if( this instanceof UploaderStorage )
-            return ((UploaderStorage)this).getLogo_base64();
-        return "";
-    }
-
     /** @throws IOException Se le dimensioni del logo sono eccessive. Vedere {@link LogoUploader#setLogo(byte[], String)}. */
     public void setImmagineLogo(byte[] convertiInputStreamInByteArray, String estensioneDaNomeFile)
             throws IOException {

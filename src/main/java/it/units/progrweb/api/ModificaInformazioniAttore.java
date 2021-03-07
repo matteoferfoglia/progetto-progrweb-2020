@@ -50,13 +50,12 @@ public class ModificaInformazioniAttore {
                                          @FormDataParam("email")           String nuovaEmail,
                                          @FormDataParam("vecchiaPassword") String vecchiaPassword,
                                          @FormDataParam("password")        String nuovaPassword,
-                                         @FormDataParam("immagineLogo")    InputStream nuovoLogo,                  // TODO : variabili d'ambiente tutti i campi del form
+                                         @FormDataParam("immagineLogo")    InputStream nuovoLogo,
                                          @FormDataParam("immagineLogo")    FormDataContentDisposition dettagliNuovoLogo) {
 
-        // TODO : verirficare che questo metodo funzioni
         // TODO : duplicazione di codice con GestioneAttori -> modificaAttore
 
-        Attore attoreDaModificare = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);   // TODO: salvare info attore nel token di autenticazione per evitare accesso al db
+        Attore attoreDaModificare = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
 
         if (attoreDaModificare != null) {
 
@@ -103,7 +102,7 @@ public class ModificaInformazioniAttore {
 
         } else {
             // Se qui significa attore non trovato
-            return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
+            return Response.status( Response.Status.BAD_REQUEST )
                            .entity( "Problemi nel recupero delle informazioni dell'autore della richiesta." )
                            .build();
         }
@@ -131,6 +130,8 @@ public class ModificaInformazioniAttore {
      * con quelli forniti nei parametri (solo se validi).*/
     private static void modificaInfoAttore(@NotNull Attore attoreDaModificare,
                                            String nuovoNominativo, String nuovaEmail) {
+
+        // TODO : duplicazione di codice con GestioneAttori#modificaAttore e Attore#modificaAttore
 
         if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovoNominativo) ) {
             attoreDaModificare.setNominativo( nuovoNominativo );

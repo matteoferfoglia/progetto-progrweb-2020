@@ -25,7 +25,7 @@ import java.util.List;
  * {@link it.units.progrweb.filters.attori.FiltroConsumer filtro}.
  * @author Matteo Ferfoglia
  */
-@Path("/consumer/documenti")      // TODO : variabile d'ambiente
+@Path("/consumer/documenti")
 public class RichiestaDocumenti {
 
 
@@ -43,7 +43,7 @@ public class RichiestaDocumenti {
      * @param numeroDocumentiAttualmenteNotiAlClient Se non nullo, specifica il numero di
      *                                               documenti attualmente noti al client.
      * */
-    @Path("/elencoDocumenti/{identificativoUploader}")     // TODO : variabile d'ambiente
+    @Path("/elencoDocumenti/{identificativoUploader}")
     @GET
     // Response costruita senza @Produces per serializzare i dati in modo personalizzato
     public static Response getElencoDocumenti(@Context HttpServletRequest httpServletRequest,
@@ -55,7 +55,7 @@ public class RichiestaDocumenti {
 
         return creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
                                            listaFile,
-                                           "consumer/documenti/elencoDocumenti/" + identificativoUploader); // TODO : variabile d'ambiente
+                                           "consumer/documenti/elencoDocumenti/" + identificativoUploader);
 
     }
 
@@ -95,7 +95,7 @@ public class RichiestaDocumenti {
 
     }
 
-    /** Restituisce la data e l'ora di visualizzazione da parte del // TODO : corretto che restituisca la data ora di visualizzazione? Non di caricamento??
+    /** Restituisce la data e l'ora di visualizzazione da parte del
      * {@link Consumer} che ne fa richiesta del {@link File} il cui
      * identificativo è specificato come @PathParam.
      * Se l'attore che ha fatto richiesta non ha l'autorizzazione ad

@@ -8,12 +8,8 @@ import it.units.progrweb.utils.Logger;
  */
 public class UploaderProxy extends Uploader {
 
-    /** Immagine logo dell'uploader codificato in base 64.*/
-    private final String logoUploaderBase64;
-
     public UploaderProxy(UploaderStorage uploaderStorage) {
         super( uploaderStorage );
-        this.logoUploaderBase64 = uploaderStorage.getImmagineLogoBase64();
     }
 
     /** Restituisce il nome dell'attributo di questa classe con il logo dell'{@link Uploader}.*/
@@ -31,11 +27,6 @@ public class UploaderProxy extends Uploader {
         }
 
         return NOME_FIELD_LOGO;
-    }
-
-    @Override
-    public String getImmagineLogoBase64() {
-        return logoUploaderBase64;
     }
 
     @Override

@@ -68,6 +68,8 @@ public abstract class Attore implements UserPrincipal, Cloneable {
         if( attore_attualmenteSalvatoInDB != null &&
                 attoreDaModificare_conModificheRichiesteDaClient != null) {
 
+            // Creazione dell'attore con le modifiche richieste dal client (Attore è una classe astratta)
+
             Attore copia_attore_attualmenteSalvatoInDB = attore_attualmenteSalvatoInDB.clone();
 
             attore_attualmenteSalvatoInDB.setEmail(attoreDaModificare_conModificheRichiesteDaClient.getUsername());
@@ -97,7 +99,6 @@ public abstract class Attore implements UserPrincipal, Cloneable {
                            .type( MediaType.APPLICATION_JSON )
                            .entity( attoreDaModificare_conModificheRichiesteDaClient )
                            .build();
-            // TODO : riesce a convertire in JSON se è astratto ?
 
         } else {
             return Response.status(Response.Status.NOT_FOUND)

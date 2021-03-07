@@ -31,8 +31,6 @@ public class GestioneAttori {
     public Response eliminaConsumer(@PathParam("identificativoAttoreDaEliminare") Long identificativoAttoreDaEliminare,
                                     @Context HttpServletRequest httpServletRequest) {
 
-        // TODO : questo metodo è molto simile a quello per l'eliminazione dei Consumer da parte di un Uploader (Refactoring??)
-
         // Ricerca dell'attore da eliminare
         boolean attoreEliminato = Attore.eliminaAttoreDaIdentificativo( identificativoAttoreDaEliminare );
 
@@ -40,13 +38,12 @@ public class GestioneAttori {
 
             return Response
                     .status( Response.Status.OK )
-                    .entity("Attore eliminato")    // TODO : var ambiente con messaggi errore
+                    .entity("Attore eliminato")
                     .build();
 
         } else {
             return Response
-                    .status( Response.Status.BAD_REQUEST )  // TODO : fare un metodo che gestisca le BAD_REQUEST con tutte quelle usate nell'intero progetto, che prenda il messaggio d'errore come parametro
-                                                        // TODO : vedere se bisogna modificare dei BAD_REQUEST con dei NOT_FOUND
+                    .status( Response.Status.BAD_REQUEST )
                     .entity( "Impossibile eliminare l'attore " + identificativoAttoreDaEliminare )
                     .build();
         }
@@ -67,7 +64,7 @@ public class GestioneAttori {
     }
 
     /** Modifica di un {@link Attore} di quelli presenti nel sistema. */
-    @Path("/modificaAttore")    // TODO : non si può usare direttamente il metodo in ModficaInformazioniAttore?
+    @Path("/modificaAttore")
     @POST  // TODO : valutare se sostituire con metodo PUT (perché in realtà è idempotente)
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaAttore(@Context HttpServletRequest httpServletRequest,
@@ -75,32 +72,28 @@ public class GestioneAttori {
                                    @FormDataParam("username")             String nuovoUsername,
                                    @FormDataParam("nominativo")           String nuovoNominativo,
                                    @FormDataParam("email")                String nuovaEmail,
-                                   @FormDataParam("immagineLogo")         InputStream nuovoLogo,                  // TODO : vedere dove è usato il componente Form*.vue che si occupa di inviare queste informazioni e cercare di creare un unico servizio sul server che gestisca tutto
+                                   @FormDataParam("immagineLogo")         InputStream nuovoLogo,
                                    @FormDataParam("immagineLogo")         FormDataContentDisposition dettagliNuovoLogo) {
-
-        // TODO : in Vue aggiungere l'input[type=file] per modificare l'immagine logo
 
         Attore attoreDaModificare_attualmenteSalvatoInDB = Attore.getAttoreDaIdentificativo( identificativoAttore );
         if( attoreDaModificare_attualmenteSalvatoInDB != null ) {
 
-            // Creazione dell'attore con le modifiche richieste dal client (Attore è
-            // una classe astratta, Jersey non riesce a deserializzare )
-            // TODO : trovare modo migliore
+            // Crea una nuova istanza di Attore con le modifiche richieste
+            // Poi Attore#modificheAttore confronta le versioni
 
             Attore attore_conModificheRichiesteDalClient = attoreDaModificare_attualmenteSalvatoInDB.clone();
-            attore_conModificheRichiesteDalClient.setUsername( nuovoUsername );
             attore_conModificheRichiesteDalClient.setNominativo( nuovoNominativo );
             attore_conModificheRichiesteDalClient.setEmail( nuovaEmail );
 
             if( attoreDaModificare_attualmenteSalvatoInDB instanceof Uploader &&
                 nuovoLogo != null && dettagliNuovoLogo != null) {
 
-                try {   // TODO : duplicazione del metodo Attore#modificaAttore ?
+                try {
                     ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
                             .setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
                                              UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
                 } catch (IOException e) {
-                    // Dimensione immagine logo eccessiva   // TODO : testare
+                    // Dimensione immagine logo eccessiva
                     return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
                                    .entity( e.getMessage() )
                                    .build();
@@ -126,8 +119,6 @@ public class GestioneAttori {
     @Produces( MediaType.APPLICATION_JSON )
     public long[] getElencoIdentificativiUploader( @PathParam("tipoAttoriDiCuiMostrareElenco") String tipoAttoriDiCuiMostrareElenco) {
 
-        // TODO : refactoring c'è un metodo molto simile in Uploader
-
         List<Long> listaIdentificativiAttoriDaRestituire;
 
         if( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Uploader.getTipoAttore() ) ) {
@@ -139,7 +130,7 @@ public class GestioneAttori {
                     Administrator.getListaIdentificativiTuttiGliAdministratorNelSistema();
 
         } else {
-            return new long[]{};
+            return new long[0];
         }
 
         return listaIdentificativiAttoriDaRestituire.stream().mapToLong(i -> i).toArray();
@@ -148,14 +139,13 @@ public class GestioneAttori {
 
     /** Dato l'identificativo di un {@link Administrator}, restituisce l'oggetto JSON
      * con le properties di quell'{@link Administrator}.*/
-    @Path("/proprietaAdministrator/{identificativoAdministrator}")        // TODO : variabile d'ambiente
+    @Path("/proprietaAdministrator/{identificativoAdministrator}")
     @GET
     @Produces(MediaType.APPLICATION_JSON )
     public Administrator getAdministrator(@PathParam("identificativoAdministrator") Long identificativoAdministrator,
                                 @Context HttpServletRequest httpServletRequest ) {
 
-        Administrator administrator = Administrator.cercaAdministratorDaIdentificativo(identificativoAdministrator);
-        return administrator;
+        return Administrator.cercaAdministratorDaIdentificativo(identificativoAdministrator);
 
     }
 

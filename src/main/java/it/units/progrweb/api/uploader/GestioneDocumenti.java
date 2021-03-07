@@ -29,7 +29,7 @@ import java.util.Map;
  * i documenti inviati ad un {@link Consumer}.
  * @author Matteo Ferfoglia
  */
-@Path("/uploader/documenti")    // TODO : variabile d'ambiente
+@Path("/uploader/documenti")
 public class GestioneDocumenti {
 
     /** Restituisce il documento il cui identificativo è
@@ -57,7 +57,7 @@ public class GestioneDocumenti {
         if( File.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
             return Response
                     .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                    .entity("File " + idFileDaEliminare + " eliminato")    // TODO : var ambiene con messaggi errore
+                    .entity("File " + idFileDaEliminare + " eliminato")
                     .build();
         else return Autenticazione.creaResponseForbidden("Non autorizzato a cancellare il file.");
 
@@ -82,7 +82,7 @@ public class GestioneDocumenti {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response uploadFile(@Context HttpServletRequest httpServletRequest,
-                               @FormDataParam("contenutoFile")                      InputStream contenuto,                  // TODO : variabili d'ambiente tutti i campi del form
+                               @FormDataParam("contenutoFile")                      InputStream contenuto,
                                @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile,
                                @FormDataParam("identificativoConsumerDestinatario") Long identificativoConsumerDestinatario,
                                @FormDataParam("nomeFile")                           String nomeFile,
@@ -131,7 +131,7 @@ public class GestioneDocumenti {
 
             } else {
 
-                return Response.status( Response.Status.BAD_REQUEST )           // TODO : refactoring: creare un metodo che invia BAD_REQUEST
+                return Response.status( Response.Status.BAD_REQUEST )
                         .entity( "Consumer " + identificativoConsumerDestinatario + " non trovato nel sistema." )
                         .build();
 
@@ -159,7 +159,7 @@ public class GestioneDocumenti {
         // TODO : metodo da verificare
 
         String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
-        String linkDownloadFile =  indirizzoServer + "/api/consumer/downloadDocumento/" + fileAggiunto.getIdentificativoFile();      // TODO : variabile d'ambiente (sarebbe meglio che sia un metodo ad hoc ad occuparsi della creazione dell'url)
+        String linkDownloadFile =  indirizzoServer + "/api/consumer/downloadDocumento/" + fileAggiunto.getIdentificativoFile();
 
         String oggettoNotifica   = "Filesharing - Nuovo documento disponibile";  // TODO : variabile d'ambiente il nome della piattaforma
         String emailDestinatario = destinatarioFile.getEmail();
@@ -201,11 +201,11 @@ public class GestioneDocumenti {
 
 
         // TODO : refactoring: creare una classe solo per la gestione dei documenti,
-        // todo   che sia comune a tutti gli attori: metter lì il metodo per il calcolo
-        // todo   dell'url di download (visto che sarà quella classe a gestirlo).
-        // todo   Ricorda che anche sul Client nella tabella mostrata all'Uploader si
-        // todo   crea un url di download/upload. Sarebbe meglio che chiedesse al server
-        // todo   quale sia l'url (del tipo:    GET .../api/documenti/urlDownload/{idDocumento}
+        //        che sia comune a tutti gli attori: metter lì il metodo per il calcolo
+        //        dell'url di download (visto che sarà quella classe a gestirlo).
+        //        Ricorda che anche sul Client nella tabella mostrata all'Uploader si
+        //        crea un url di download/upload. Sarebbe meglio che chiedesse al server
+        //        quale sia l'url (del tipo:    GET .../api/documenti/urlDownload/{idDocumento}
 
     }
 
@@ -233,7 +233,7 @@ public class GestioneDocumenti {
 
         return RichiestaDocumenti.creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
                                                               fileDaRestituire,
-                                                              "uploader/documenti/mappa-idFile-propFile/" + identificativoConsumer);    // TODO : variabile d'ambiente
+                                                              "uploader/documenti/mappa-idFile-propFile/" + identificativoConsumer);
     }
 
 

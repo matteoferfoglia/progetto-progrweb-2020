@@ -154,12 +154,12 @@ public class CreazioneAttore {
             return Autenticazione.creaResponseForbidden("Autorizzazione alla creazione di attori negata.");
         } catch( FormatoUsernameInvalido e ) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage()) // TODO : risposta molto simile in GestioneConsumer (fare un metodo che restituisce BAD_REQUEST)
+                    .entity(e.getMessage())
                     .build();
         } catch (IllegalArgumentException e) {
             // Tipo attore ricevuto non valido
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Valori di input inseriti non validi.") // TODO : risposta molto simile in GestioneConsumer (fare un metodo che restituisce BAD_REQUEST)
+                    .entity("Valori di input inseriti non validi.")
                     .build();
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(GestioneAttori.class,
@@ -179,8 +179,6 @@ public class CreazioneAttore {
     /** Classe di comodo per la deserializzazione dei dati JSON
      * ricevuti dal client per l'aggiunta di un attore..*/
     public static class CampiFormAggiuntaAttore {
-
-        // TODO : rivedere dove è stata utilizzata questa classe e semplificare (refactoring)
 
         private String username;
         private String password;

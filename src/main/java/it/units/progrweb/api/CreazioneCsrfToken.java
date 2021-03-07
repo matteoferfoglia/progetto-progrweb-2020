@@ -25,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
  * secondo cookie viene aggiunto al token JWT e permetterà di verificare
  * che il client che fa uso del token CSRF sia lo stesso che ne ha fatto
  * richiesta.
- * // TODO : verificare che questo meccanismo con due cookie sia sicuro.
  *
  * @author Matteo Ferfoglia
  */
@@ -33,10 +32,10 @@ import java.security.NoSuchAlgorithmException;
 public class CreazioneCsrfToken {
 
     /** Numero di caratteri che formeranno il CSRF token. */
-    public static final short CSRF_TOKEN_LENGTH = 64;      // TODO : creare variabile d'ambiente (parametrizzare)
+    public static final short CSRF_TOKEN_LENGTH = 64;
 
     /** Numero di caratteri che formeranno il token identificativo per il client. */
-    public static final short CLIENT_ID_TOKEN_LENGTH = 64; // TODO : creare variabile d'ambiente (parametrizzare)
+    public static final short CLIENT_ID_TOKEN_LENGTH = 64;
 
 
     /**

@@ -50,7 +50,7 @@ public class RelazioneUploaderConsumer {
             if(relazioneDaEliminare!=null)
                 DatabaseHelper.cancellaEntitaById(relazioneDaEliminare.identificativoRelazione,
                                                   RelazioneUploaderConsumer.class);
-        } catch (RuntimeException ignored) {}
+        } catch (RuntimeException ignored) {}   // non fa nulla se l'occorrenza non è presente nel DB
     }
 
 //    /** Se l'attore il cui identificativo è dato come parametro può accedere
@@ -137,7 +137,7 @@ public class RelazioneUploaderConsumer {
 
                 if( risultatoQuery.size()==1)   // se tutto ok, dovrebbe essere restituita una sola occorrenza
                     return (RelazioneUploaderConsumer) risultatoQuery.get(0);
-                else throw new RuntimeException("Nel database dovrebbe esserci una sola occorrenza," +
+                else throw new RuntimeException("Nel database dovrebbe esserci esattamente un'occorrenza," +
                         "ma ne sono state trovate " + risultatoQuery.size() );
 
             } else {
