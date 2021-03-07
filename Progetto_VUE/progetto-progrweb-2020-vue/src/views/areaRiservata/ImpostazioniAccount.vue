@@ -95,9 +95,13 @@ export default {
     /** Evento generato se viene modificato il nominativo
      * dell'attore attualmente autenticato. Contiene il
      * nuovo nominativo come valore*/
-    'nominativo-attore-modificato'
+    'nominativo-attore-modificato',
 
-  ],
+      /** Evento generato se viene modificato il logo
+       * dell'attore attualmente autenticato*/
+    'logo-attore-modificato'
+
+],
   props: ['tipoAttoreAutenticato','nomeUtenteAutenticato', 'csrfToken'],
   data() {
     return {
@@ -189,31 +193,40 @@ export default {
           formData.append( this.nomeParametro_nuovaPassword, this.nuovaPassword );
           informazioniCheSarannoModificate.push("la password");
         } else if( this.nuovaPassword || this.confermaNuovaPassword ) {
-          alert("Per modificare la password, la nuova password con quella inserita nel campo di conferma.");
+          alert("Per modificare la password, la nuova password deve coincidere con quella inserita nel campo di conferma.");
         }
 
         if( informazioniCheSarannoModificate.length>0 ) {
 
           let stringaInformativaDelleModifiche = "Stanno per essere modificate le seguenti informazioni: " +
               informazioniCheSarannoModificate.join(", ").replace(/,([^,]+)$/,' e$1') + ".";
+                                                          // $1 è il primo parenthesized substring match.
+                                                          // Sostituisce ', ' con ' e '
+
           const confermaModifiche = confirm(stringaInformativaDelleModifiche);
 
           if (confermaModifiche) {
 
-            (() => { // Richiesta di modifica al server
+            (async () => { // Richiesta di modifica al server
 
               // Salvo la variabile nella funzione perché, trattandosi di richieste
               // asincrone, intanto il valore della variabile potrebbe cambiare
               // (questo è il motivo di utilizzo di una funzione: closure)
               const nominativoModificato = this.nuovoNominativo;
+              const isLogoCaricato = this.isFileLogoCaricato;
 
-              richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData)
+              await richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData)
                   .then(nuovoTokenAutenticazione => {  // Nella risposta c'è il nuovo token di autenticazione
                     setTokenAutenticazione(nuovoTokenAutenticazione);
                     this.valoreQualsiasiPerAggiornareIlComponenteSeModificato = 1 - this.valoreQualsiasiPerAggiornareIlComponenteSeModificato;  // serve per aggiornare il componente
                     if (nominativoModificato) {  // truthy se è stato modificato
                       // Avvisa se è stato modificato il nominativo
                       this.$emit('nominativo-attore-modificato', nominativoModificato);
+                    }
+                    if(isLogoCaricato) {
+                      // SE è stato modificato il logo
+                      this.$emit('logo-attore-modificato');
+                      this.isFileLogoCaricato = false;  // ripristina il valore iniziale
                     }
                     alert("Modifiche salvate!");
                   })

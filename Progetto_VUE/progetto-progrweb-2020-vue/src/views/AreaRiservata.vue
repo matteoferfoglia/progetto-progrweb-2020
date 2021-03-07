@@ -2,15 +2,17 @@
 
   <div class="d-flex justify-content-between">
     <h1>Area riservata</h1>
-    <img :src="urlLogoUploader"
+    <img :src="urlLogoUploader_wrapper"
          alt="Proprio logo"
          class="logo"
-         v-if="urlLogoUploader && isUploaderAttualmenteAutenticato()"/>
+         v-if="urlLogoUploader_wrapper && isUploaderAttualmenteAutenticato()"/>
   </div>
 
   <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
                :csrfToken="csrfToken_wrapper"
                @nominativo-attore-modificato="$emit('nominativo-attore-modificato', $event)"
+               @logo-attore-modificato="urlLogoUploader_wrapper = urlLogoUploader + '?' + new Date().getTime()
+                                        /*query string per aggiornare l'immagine allo stesso url*/"
                @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"  />
 
 </template>
@@ -52,6 +54,7 @@ export default {
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
+      urlLogoUploader_wrapper: this.urlLogoUploader,
       csrfToken_wrapper: this.csrfToken
     }
   },
@@ -61,6 +64,7 @@ export default {
         .then(identificativoAttore => {
           this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
           this.urlLogoUploader = process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore;
+          this.urlLogoUploader_wrapper = this.urlLogoUploader;
         })
         .catch(console.error);
   },
