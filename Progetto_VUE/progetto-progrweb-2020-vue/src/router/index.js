@@ -14,7 +14,7 @@
 
 // TODO : rivedere ed eventualmente ristrutturare questo script
 
-import {createRouter, createWebHistory} from 'vue-router'
+import {createRouter, createWebHashHistory} from 'vue-router'
 import {eliminaTokenAutenticazione, verificaAutenticazione} from "../utils/autenticazione";
 import {getProprietaAttoreTarget, getTipoAttoreTarget} from "../utils/richiesteInfoSuAttori";
 import {rimuoviAuthorizationHeader} from "../utils/http";
@@ -124,7 +124,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: routes
 });
 
