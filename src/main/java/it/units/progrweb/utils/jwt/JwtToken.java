@@ -62,8 +62,8 @@ public class JwtToken<TipoValoreClaim> {
 
         String[] componentiDelJwt = jwtToken_stringDaVerificare.split("\\.");
         if(componentiDelJwt.length != NUMERO_COMPONENTI_JWT)
-            throw new IllegalArgumentException("Un token JWT dovrebbe essere costituito da"
-                    + "esattamente tre componenti (header, payload e signature) separate dal punto (.),"
+            throw new IllegalArgumentException("Un token JWT dovrebbe essere costituito da "
+                    + "esattamente tre componenti (header, payload e signature) separate dal punto (.), "
                     + "ma sono state trovate " + componentiDelJwt.length + " componenti.");
 
         JwtHeader jwtHeader = new JwtHeader(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64UrlEncodedToString(componentiDelJwt[0])));
