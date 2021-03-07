@@ -1,6 +1,7 @@
 package it.units.progrweb.entities.attori.administrator;
 
 import com.googlecode.objectify.annotation.Subclass;
+import it.units.progrweb.entities.attori.Attore;
 
 /**
  * Classe rappresentante un'entità {@link Administrator}
@@ -15,7 +16,7 @@ class AdministratorStorage extends Administrator {
         super();
     }
 
-    /** Copy-constructor.*/
+    /** Copy-constructor, usato in {@link Attore#clone()}.*/
     private AdministratorStorage( AdministratorStorage administrator ) {
         this( administrator.username, administrator.nominativo, administrator.email );
     }

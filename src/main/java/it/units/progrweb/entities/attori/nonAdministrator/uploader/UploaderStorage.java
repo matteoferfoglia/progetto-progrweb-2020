@@ -2,9 +2,7 @@ package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
 import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerProxy;
-import it.units.progrweb.entities.file.File;
+import it.units.progrweb.entities.attori.Attore;
 
 import java.io.IOException;
 
@@ -21,7 +19,7 @@ class UploaderStorage extends Uploader {
     private LogoUploader immagineLogoUploader;
 
     private UploaderStorage() {
-        super();    // TODO
+        super();
     }
 
     /** Vedere {@link Uploader}.
@@ -36,7 +34,8 @@ class UploaderStorage extends Uploader {
         setTipoAttore( Uploader.class.getSimpleName() );
     }
 
-    /** Copy-constructor. Vedere {@link #UploaderStorage(String, String, String, byte[], String)}*/
+    /** Copy-constructor, usato in {@link Attore#clone()}.
+     * Vedere {@link #UploaderStorage(String, String, String, byte[], String)}*/
     private UploaderStorage( UploaderStorage uploader )
             throws IOException {
         this( uploader.username, uploader.nominativo, uploader.email, uploader.immagineLogoUploader.getLogo(),
@@ -45,45 +44,6 @@ class UploaderStorage extends Uploader {
 
     public byte[] getImmagineLogoBytes() {
         return immagineLogoUploader.getLogo();
-    }
-
-    /** Restituisce true se la modifica del logo va a buon fine, false altrimenti.*/
-    public boolean modificalogo(File nuovaImmagineLogo) {
-        // TODO
-        return true;    // todo
-    }
-
-    /** Crea un {@link Consumer} con le proprietà specificate nei parametri.*/
-    public Consumer creaConsumer(String username, String nominativo, String email) {
-        return new ConsumerProxy(username, nominativo, email);    // TODO
-    }
-
-    /** Restituisce true se la modifica del {@link Consumer va a buon fine, false altrimenti.*/
-    public boolean modificaConsumer(Consumer consumerModificato) {
-        // TODO
-        return true;    // todo
-    }
-
-    /** Restituisce true se l'eliminazione del {@link Consumer va a buon fine, false altrimenti.*/
-    public boolean eliminaConsumer(Consumer consumerDaEliminare) {
-        // TODO
-        return true;
-    }
-
-
-    /** Crea un file per il consumer specificato.
-     * Restituisce true se la procedura va a buon fine, false altrimenti. */
-    public boolean creaFilePerConsumer(byte[] file, Consumer consumer) {
-        // TODO : creare il file per il consumer
-        return true;   // TODO !!!
-    }
-
-    /** Elimina il file specificato.
-     * Restituisce true se la procedura va a buon fine, false altrimenti. */
-    public boolean eliminaFile(byte[] fileDaEliminare) {
-        // TODO : eliminare il file specificato
-        // TODO : pensare alla strategia di eliminazione: per i consumer che hanno già ricevuto il file? O già visualizzato?
-        return true;   // TODO !!!
     }
 
     /** Modifica l'immagine logo dell'Uploader.*/

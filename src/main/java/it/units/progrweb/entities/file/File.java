@@ -395,6 +395,7 @@ public abstract class File {
 
                     return risultatoQuery
                             .stream()
+                            .filter( Objects::nonNull )
                             .map(unFile -> (File)unFile)
                             .filter(unFile -> !unFile.isEliminato())
                             .collect(Collectors.toList());

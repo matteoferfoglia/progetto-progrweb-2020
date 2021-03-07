@@ -20,10 +20,4 @@ public class ConsumerProxy extends Consumer {
         super();
     }
 
-    /** Copy-constructor.*/
-    private ConsumerProxy( ConsumerProxy consumer ) {
-        this( consumer.username, consumer.nominativo, consumer.email );
-    }
-
-
 }

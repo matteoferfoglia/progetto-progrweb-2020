@@ -16,12 +16,6 @@ public class UploaderProxy extends Uploader {
         this.logoUploaderBase64 = uploaderStorage.getImmagineLogoBase64();
     }
 
-    /** Copy-constructor.*/
-    private UploaderProxy( UploaderProxy uploader ) {
-        super( uploader );
-        this.logoUploaderBase64 = uploader.getImmagineLogoBase64();
-    }
-
     /** Restituisce il nome dell'attributo di questa classe con il logo dell'{@link Uploader}.*/
     public static String getNomeFieldLogoUploader() {
         final String NOME_FIELD_LOGO = "logoUploaderBase64";

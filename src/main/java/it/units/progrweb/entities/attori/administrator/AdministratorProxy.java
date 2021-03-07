@@ -9,11 +9,6 @@ public class AdministratorProxy extends Administrator {
         super(username, nominativo, email);
     }
 
-    /** Copy-constructor.*/
-    public AdministratorProxy( AdministratorProxy administrator ) {
-        this( administrator.username, administrator.nominativo, administrator.email );
-    }
-
     /** Crea un'istanza di questa classe a partire da una di {@link AdministratorStorage}.*/
     public AdministratorProxy(AdministratorStorage administratorStorage) {
         // TODO: serve questo metodo ?
