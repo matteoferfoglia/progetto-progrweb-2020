@@ -3,9 +3,9 @@
   <Loader :isComponenteCaricato="isComponenteCaricato">
     <section class="card" :id="idHtmlQuestoComponente">
       <header class="card-header titolo-scheda d-flex align-items-center">
-        <img :src="urlLogoUploader"
+        <img :src="urlLogoUploader_wrapper"
              alt=""
-             v-if="urlLogoUploader && isQuestaSchedaRiferitaAdUnUploader"/>
+             v-if="urlLogoUploader_wrapper && isQuestaSchedaRiferitaAdUnUploader"/>
         <h2>{{ nominativo }}</h2>
       </header>
 
@@ -58,13 +58,13 @@
                 Modifica utente
               </button>
 
-              <button @click.prevent="ripristinaValoriProperty = true"
+              <button @click="ripristinaValoriProperty = true"
                       class="reset btn btn-secondary"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Reset modifiche
               </button>
 
-              <button @click.prevent="eliminaAttore()"
+              <button @click="eliminaAttore()"
                       class="x-circle btn btn-danger"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Elimina utente
@@ -256,6 +256,7 @@ name: "SchedaDiUnAttore",
       NOME_PROP_USERNAME_wrapper  : this.NOME_PROP_USERNAME,
       NOME_PROP_NOMINATIVO_wrapper: this.NOME_PROP_NOMINATIVO,
       NOME_PROP_EMAIL_wrapper     : this.NOME_PROP_EMAIL,
+      urlLogoUploader_wrapper: this.urlLogoUploader,
 
       csrfToken_wrapper: this.csrfToken
 
@@ -396,6 +397,7 @@ name: "SchedaDiUnAttore",
           }
 
           this.urlLogoUploader = this.creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
+          this.urlLogoUploader_wrapper = this.urlLogoUploader;
 
           this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
               process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
@@ -466,7 +468,7 @@ name: "SchedaDiUnAttore",
     /** Richiede al server la modifica di un attore in base ai valori attualmente
      * inseriti nel form.*/
     modificaAttore() {
-      document.querySelector('#' + this.idHtmlQuestoComponente + ' form').submit();
+      this.flag_inviaDatiForm = true;
     },
 
     /** Richiede al server l'eliminazione di un attore.*/
@@ -508,6 +510,8 @@ name: "SchedaDiUnAttore",
             this.username   = (rispostaServer[ process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
             this.nominativo = (rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
             this.email      = (rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+
+            this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // trucco per forzare l'aggiornamento dell'immagine
 
             getIdentificativoAttoreAttualmenteAutenticato()
               .then( idAttore => {

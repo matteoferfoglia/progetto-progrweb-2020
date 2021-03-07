@@ -100,11 +100,11 @@ export const rimuoviAuthorizationHeader = () => {
 
 
 /** Legge il token impostato per l'header "Authorization" delle richieste HTTP.*/
-export const getAuthorizationHeaderRichiesteHttp = () => tokenAutenticazione.getValoreTokenAutenticazione();
+export const getAuthorizationHeaderRichiesteHttp = () => tokenAutenticazione.getValoreTokenAutenticazione();    // TODO : cancellare se non usato
 
 
 /** Restituisce lo stato della response HTTP.*/
-export const getHttpResponseStatus = (responseHttp) => responseHttp.status;
+export const getHttpResponseStatus = responseHttp => responseHttp.status;
 
 
 /** Effettua una richiesta GET.
@@ -146,13 +146,11 @@ export const richiestaPostConFile = (url, dati) => {
 
     configRichiesteHttp.impostaHeader(HTTP_HEADER_CONTENT_TYPE_NOME, HTTP_HEADER_CONTENT_TYPE_FILE_IN_POST);
 
-    const rimuoviHeaderFile = dati => {
-        configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
-        return dati;
-    }
-
     return richiestaPost(url, dati)
-            .finally( rimuoviHeaderFile )  // rimuove header senza interferire con i dati restituiti
+            .finally( dati => {
+                configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
+                return dati;
+            })  // rimuove header senza interferire con i dati restituiti
 
 }
 
