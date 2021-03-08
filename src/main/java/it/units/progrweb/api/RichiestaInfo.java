@@ -137,20 +137,24 @@ public class RichiestaInfo {
 
         Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
 
-        if( Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
-                .equals(Consumer.class.getSimpleName()) ) {
-            // Consumer non deve poter vedere username dell'Uploader
+        if( uploader == null ) {
+            Logger.scriviEccezioneNelLog(RichiestaInfo.class, "Uploader non trovato", new NullPointerException());
+        } else  {
+            if( Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
+                    .equals(Consumer.class.getSimpleName()) ) {
+                // Consumer non deve poter vedere username dell'Uploader
 
-            try {
-                Field fieldUsername = Attore.class.getDeclaredField("username");
-                fieldUsername.setAccessible(true);
-                fieldUsername.set(uploader, null);
-            } catch (IllegalAccessException | NoSuchFieldException exception) {
-                Logger.scriviEccezioneNelLog(RichiestaInfo.class,
-                        "Potrebbe essere stato modificato, nella classe, l'attributo con lo username di un attore.",
-                        exception);
+                try {
+                    Field fieldUsername = Attore.class.getDeclaredField("username");
+                    fieldUsername.setAccessible(true);
+                    fieldUsername.set(uploader, null);
+                } catch (IllegalAccessException | NoSuchFieldException exception) {
+                    Logger.scriviEccezioneNelLog(RichiestaInfo.class,
+                            "Potrebbe essere stato modificato, nella classe, l'attributo con lo username di un attore.",
+                            exception);
+                }
+
             }
-
         }
 
         return uploader;
