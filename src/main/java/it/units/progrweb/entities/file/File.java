@@ -533,8 +533,6 @@ public abstract class File {
      * Se il file non esiste, restituisce false.*/
     public static boolean eliminaFileDiUploader(Long idFileDaEliminare, Long identificativoUploader) {
 
-        // TODO : spostare questo metodo in File e verificare questo metodo
-
         try {
 
             FileStorage file = (FileStorage) File.getEntitaDaDbById(idFileDaEliminare);

@@ -65,7 +65,6 @@ class FileStorage extends File {
      * @return true se la procedura va a buon fine, false altrimenti.*/
     @Override
     public boolean elimina() {
-        // TODO : da implementare e testare (pensare se meglio usare strategie diverse)
 
         file      = null;
         eliminato = true;
