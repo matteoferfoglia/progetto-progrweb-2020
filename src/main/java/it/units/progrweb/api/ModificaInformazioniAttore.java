@@ -118,6 +118,7 @@ public class ModificaInformazioniAttore {
             throws IOException {
 
         // TODO : perché questo metodo non è utilizzato anche quando è un Administrator a modificare le info di un Uploader?
+        // TODO : dov'è usato questo metodo? Controllare che dettagliNuovoLogo.getFileName() != null
 
         if( dettagliNuovoLogo != null ) {
             uploaderDaModificare.setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray(nuovoLogo),
