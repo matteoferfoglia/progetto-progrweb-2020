@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
@@ -38,12 +39,23 @@ public class RelazioneUploaderConsumer {
     private Long identificativoConsumer;
 
     /** Dissocia il {@link Consumer} il cui identificativo è dato
-     * dall'{link {@link Uploader}} il cui identificativo è dato.*/
+     * dall'{link {@link Uploader}} il cui identificativo è dato.
+     * Tutti i file caricati da quell'{@link Uploader} per quel
+     * {@link Consumer} vengono eliminati (vede
+     * {@link File#elimina()}.*/
     public static void dissociaConsumerDaUploader(Long identificativoConsumerDaDissociare,
                                                   Long identificativoUploader) {
 
         RelazioneUploaderConsumer relazioneDaEliminare;
         try {
+
+            {
+                // Eliminazione dei file caricati dall'Uploader il cui identificativo è specificato
+                //  e destinati al Consumer da dissociare.
+                File.getOccorrenzeFiltrataPerUploaderEConsumer(identificativoUploader,identificativoConsumerDaDissociare)
+                    .forEach(File::elimina);
+            }
+
             relazioneDaEliminare =
                     getOccorrenzaFiltrataPerUploaderEConsumer(identificativoUploader,
                                                               identificativoConsumerDaDissociare);
