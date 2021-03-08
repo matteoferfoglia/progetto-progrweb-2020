@@ -533,6 +533,7 @@ name: "SchedaDiUnAttore",
           })
           .finally( () => {
             this.flag_inviaDatiForm = false;
+            document.querySelector('#' + this.idHtmlQuestoComponente + ' form').reset();  // pulizia dei campi
           });
     },
 
