@@ -171,10 +171,16 @@ public class RichiestaInfo {
 
         Uploader uploader = Uploader.getAttoreDaIdentificativo( identificativoUploader );
         if( uploader != null) {
+
             byte[] logo = uploader.getImmagineLogo();
-            if( logo!=null && logo.length>0 )
-                return Response.ok( logo, uploader.getMediatypeImmagineLogo() )
-                               .build();
+            String mediatypeLogo = uploader.getMediatypeImmagineLogo();
+
+            if( logo!=null && logo.length>0  && !mediatypeLogo.equals("") ) {
+                                                // se mediatype non specificato
+
+                return Response.ok(logo, mediatypeLogo)
+                                   .build();
+            }
             else {
                 try {
                     return Response.seeOther(new URI("/logoDefault.svg")).build();
