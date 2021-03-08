@@ -28,8 +28,8 @@ public class GestioneAttori {
     /** Eliminazione di un {@link Attore} dal sistema. */
     @Path("/eliminaAttore/{identificativoAttoreDaEliminare}")
     @DELETE
-    public Response eliminaConsumer(@PathParam("identificativoAttoreDaEliminare") Long identificativoAttoreDaEliminare,
-                                    @Context HttpServletRequest httpServletRequest) {
+    public Response eliminaAttore(@PathParam("identificativoAttoreDaEliminare") Long identificativoAttoreDaEliminare,
+                                  @Context HttpServletRequest httpServletRequest) {
 
         // Ricerca dell'attore da eliminare
         boolean attoreEliminato = Attore.eliminaAttoreDaIdentificativo( identificativoAttoreDaEliminare );
