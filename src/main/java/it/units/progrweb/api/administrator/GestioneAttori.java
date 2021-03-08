@@ -86,7 +86,8 @@ public class GestioneAttori {
             attore_conModificheRichiesteDalClient.setEmail( nuovaEmail );
 
             if( attoreDaModificare_attualmenteSalvatoInDB instanceof Uploader &&
-                nuovoLogo != null && dettagliNuovoLogo != null) {
+                nuovoLogo != null && dettagliNuovoLogo != null && dettagliNuovoLogo.getFileName()!=null) {
+                // se queste condizioni sono true, allora un nuovo logo è stato caricato
 
                 try {
                     ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
