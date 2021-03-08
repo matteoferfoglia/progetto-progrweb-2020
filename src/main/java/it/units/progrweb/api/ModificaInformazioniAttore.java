@@ -117,8 +117,9 @@ public class ModificaInformazioniAttore {
                                       String nuovoNominativo, String nuovaEmail)
             throws IOException {
 
+        // TODO : perché questo metodo non è utilizzato anche quando è un Administrator a modificare le info di un Uploader?
+
         if( dettagliNuovoLogo != null ) {
-            // TODO : verificare che sia null quando NON c'è il logo e che NON sia null quando c'è il logo
             uploaderDaModificare.setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray(nuovoLogo),
                     UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
         }
@@ -140,7 +141,6 @@ public class ModificaInformazioniAttore {
         if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovaEmail) ) {
             attoreDaModificare.setEmail( nuovaEmail );
         }
-        // TODO controllare che alcune informazioni vengano effettivamnte modificate, evitiamo un accesso in scrittura al DB per non modificare alcunché
 
         DatabaseHelper.salvaEntita( attoreDaModificare );
 
