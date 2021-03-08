@@ -101,18 +101,22 @@ public class LoginLogout {
             {
                 // Invio password temporanea via mail
                 Attore attore = Attore.getAttoreDaUsername(username);
-                MailSender mailSender = new MailSender();
-                try {
-                    mailSender.inviaEmail(attore.getEmail(), attore.getNominativo(),"Reset password",
-                            "E' stato richiesto il reset della password per il Suo account." +
-                                    " La nuova password è: " + passwordTemporanea + ". Si consiglia di modificare" +
-                                    " al primo accesso tale password. Se non è stata richiesta la modifica, ignorare" +
-                                    " questa email.");
-                } catch (MessagingException|UnsupportedEncodingException e) {
-                    Logger.scriviEccezioneNelLog(LoginLogout.class,
-                            "Errore nell'invio della mail per il reset della password",
-                            e);
-                    return "Errore interno, riprovare più tardi.";
+                if ( attore != null ) {
+                    MailSender mailSender = new MailSender();
+                    try {
+                        mailSender.inviaEmail(attore.getEmail(), attore.getNominativo(), "Reset password",
+                                "E' stato richiesto il reset della password per il Suo account." +
+                                        " La nuova password è: " + passwordTemporanea + ". Si consiglia di modificare" +
+                                        " al primo accesso tale password. Se non è stata richiesta la modifica, ignorare" +
+                                        " questa email.");
+                    } catch (MessagingException | UnsupportedEncodingException e) {
+                        Logger.scriviEccezioneNelLog(LoginLogout.class,
+                                "Errore nell'invio della mail per il reset della password",
+                                e);
+                        return "Errore interno, riprovare più tardi.";
+                    }
+                } else {
+                    throw new NotFoundException();
                 }
             }
 
