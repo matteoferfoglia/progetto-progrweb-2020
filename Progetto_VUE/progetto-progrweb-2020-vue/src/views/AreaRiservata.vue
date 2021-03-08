@@ -64,7 +64,7 @@ export default {
         .then(identificativoAttore => {
           this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
           this.urlLogoUploader = process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore;
-          this.urlLogoUploader_wrapper = this.urlLogoUploader;
+          this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // query string per evitare cache
         })
         .catch(console.error);
   },

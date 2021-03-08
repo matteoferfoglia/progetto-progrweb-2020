@@ -397,7 +397,7 @@ name: "SchedaDiUnAttore",
           }
 
           this.urlLogoUploader = this.creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
-          this.urlLogoUploader_wrapper = this.urlLogoUploader;
+          this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // query string per evitare cache
 
           this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
               process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
