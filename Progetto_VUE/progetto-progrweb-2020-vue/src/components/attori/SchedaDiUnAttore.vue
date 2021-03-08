@@ -476,7 +476,7 @@ name: "SchedaDiUnAttore",
       const urlEliminazioneAttore = ( this.isUploaderAttualmenteAutenticato() ?
               process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
               process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) +
-          "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
+                "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
 
       const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
 

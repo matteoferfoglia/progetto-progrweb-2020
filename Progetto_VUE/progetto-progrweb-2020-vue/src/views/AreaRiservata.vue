@@ -3,7 +3,7 @@
   <div class="d-flex justify-content-between">
     <h1>Area riservata</h1>
     <img :src="urlLogoUploader_wrapper"
-         alt="Proprio logo"
+         alt="Logo uploader"
          class="logo"
          v-if="urlLogoUploader_wrapper && isUploaderAttualmenteAutenticato()"/>
   </div>
