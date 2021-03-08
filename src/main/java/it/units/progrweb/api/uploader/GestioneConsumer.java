@@ -188,7 +188,7 @@ public class GestioneConsumer {
                     consumer_attualmenteSalvatoInDB.setUsername(nuovoUsername);
 
                     return Attore.modificaAttore( consumer_conModificheRichiesteDalClient,
-                                                                        consumer_attualmenteSalvatoInDB         );
+                                                  consumer_attualmenteSalvatoInDB );
 
                 } else {
                     Logger.scriviEccezioneNelLog( GestioneConsumer.class,
