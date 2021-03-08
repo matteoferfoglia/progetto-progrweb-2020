@@ -482,7 +482,7 @@ name: "SchedaDiUnAttore",
 
       richiestaDelete( urlEliminazioneAttore, parametriRichiestaDelete )
           .then( () => {
-            alert(this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] + "\" eliminato." );
+            alert(this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] + " eliminato." );
             this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
           })
           .catch( rispostaErrore => {
