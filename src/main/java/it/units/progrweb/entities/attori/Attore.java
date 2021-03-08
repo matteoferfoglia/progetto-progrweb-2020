@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -273,6 +274,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
      * @return true se l'eliminazione viene completata, false se si verificano errori.*/
     public static boolean eliminaAttoreDaIdentificativo(Long identificativoAttore) {
         try {
+            RelazioneUploaderConsumer.eliminaUploader(identificativoAttore);    // se non è un Uploader non fa nulla
             DatabaseHelper.cancellaAdessoEntitaById(identificativoAttore, Attore.class);
             return true;
         } catch (Exception e) {

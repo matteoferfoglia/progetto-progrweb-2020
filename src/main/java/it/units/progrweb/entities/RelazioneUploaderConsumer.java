@@ -38,6 +38,35 @@ public class RelazioneUploaderConsumer {
     @Index
     private Long identificativoConsumer;
 
+    /** Dato l'identificativo di un {@link Uploader}, se presente
+     * nella relazione {@link RelazioneUploaderConsumer} nel database
+     * lo elimina ed elimina (con il metodo {@link File#elimina()})
+     * tutti i file che ha caricato.
+     * @param identificativoUploaderDaEliminare Identificativo dell'{@link Uploader}
+     *                                          Se nullo, questo metodo non fa nulla.
+     * @return true se l'eliminazione va a buon fine, false altrimenti.*/
+    public static void eliminaUploader(Long identificativoUploaderDaEliminare) {
+
+        if( identificativoUploaderDaEliminare==null )
+            return;
+
+        RelazioneUploaderConsumer
+                .getOccorrenzaFiltrataPerUploader(identificativoUploaderDaEliminare)
+                .forEach( unOccorrenza -> {
+
+                    // Elimina tutti i file caricati da questo Uploader, per qualsiasi Consumer
+                    File.getOccorrenzeFiltrataPerUploaderEConsumer(unOccorrenza.getIdentificativoUploader(),
+                                                                   unOccorrenza.getIdentificativoConsumer())
+                        .forEach( File::elimina );
+
+                    // Elimina la relazione
+                    DatabaseHelper.cancellaAdessoEntitaById(unOccorrenza.getIdentificativoRelazione(),
+                                                            RelazioneUploaderConsumer.class);
+
+                });
+
+    }
+
     /** Dissocia il {@link Consumer} il cui identificativo è dato
      * dall'{link {@link Uploader}} il cui identificativo è dato.
      * Tutti i file caricati da quell'{@link Uploader} per quel
@@ -123,7 +152,7 @@ public class RelazioneUploaderConsumer {
     }
 
     /** Interroga il database e restituisce l'occorrenza di questa entità
-     * che relazione l'{@link Uploader} con il {@link Consumer} i cui
+     * che relaziona l'{@link Uploader} con il {@link Consumer} i cui
      * identificativi sono specificati come parametri.
      * @return la relazione voluta oppure null se non trovata.
      * @throws RuntimeException Se viene trovata più di un'occorrenza.
@@ -164,6 +193,38 @@ public class RelazioneUploaderConsumer {
         }
 
         return null;   // nessun risultato dalla query
+
+    }
+
+    /** Interroga il database e restituisce la lista di occorrenze di questa entità
+     * in cui è presente l'{@link Uploader} il cui identificativo è quello specificato
+     * nel parametro.
+     * @param identificativoUploader Identificativo dell'{@link Uploader}.
+     * @return La lista di relazioni.
+     */
+    public static List<RelazioneUploaderConsumer>
+    getOccorrenzaFiltrataPerUploader( Long identificativoUploader )
+            throws RuntimeException {
+
+        // TODO : verificare che funzioni
+
+        // Parametri query
+        String nomeAttributo1 = "identificativoUploader";
+
+        if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo1, RelazioneUploaderConsumer.class) ) {
+            return DatabaseHelper
+                    .query(RelazioneUploaderConsumer.class,
+                            nomeAttributo1, DatabaseHelper.OperatoreQuery.UGUALE, identificativoUploader)
+                    .stream()
+                    .map(unOccorrenza -> (RelazioneUploaderConsumer)unOccorrenza)
+                    .collect(Collectors.toList());
+        } else {
+            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumer.class,
+                    "Field \"" + nomeAttributo1 + "\" non trovato.",
+                    new NoSuchFieldException());
+        }
+
+        return new ArrayList<>(0);
 
     }
 
