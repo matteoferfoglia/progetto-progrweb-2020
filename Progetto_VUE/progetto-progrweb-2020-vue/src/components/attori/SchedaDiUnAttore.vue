@@ -52,19 +52,19 @@
                        class="form-control-file" >
               </label>
 
-              <button @click="modificaAttore()"
+              <button @click.prevent="modificaAttore()"
                       class="modifica btn btn-info"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Modifica utente
               </button>
 
-              <button @click="ripristinaValoriProperty = true"
+              <button @click.prevent="ripristinaValoriProperty = true"
                       class="reset btn btn-secondary"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Reset modifiche
               </button>
 
-              <button @click="eliminaAttore()"
+              <button @click.prevent="eliminaAttore()"
                       class="x-circle btn btn-danger"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Elimina utente
