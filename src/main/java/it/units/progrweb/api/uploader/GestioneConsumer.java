@@ -192,7 +192,7 @@ public class GestioneConsumer {
 
                 } else {
                     Logger.scriviEccezioneNelLog( GestioneConsumer.class,
-                                                 "Consumer [" + identificativoConsumerDaModificare + "] " +
+                                                  "Consumer [" + identificativoConsumerDaModificare + "] " +
                                                      "collegato ad un Uploader ma non trovato nel sistema.",
                                                  new NotFoundException() );
 
