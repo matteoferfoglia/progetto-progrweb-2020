@@ -338,7 +338,7 @@ export default {
         .catch( errore => {
           if(errore.status!==HTTP_STATUS_NOT_MODIFIED) {
             console.error( errore );
-            alert("Errore nel caricamento dei documenti: " + errore);
+            alert("Errore nel caricamento dei documenti");
           }
         })
 
