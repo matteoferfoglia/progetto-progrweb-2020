@@ -31,7 +31,7 @@ public class StarterDatabase implements ServletContextListener {
     /** Array dei nomi delle classi corrispondenti alle entità da
      * registrare nel database. Utilizzare il <i>fully-qualified
      * name</i> delle classi.*/
-    private final static String[] nomiEntitaGestiteDalDatabase = {  // TODO : RENDERLA VARIABILE D'AMBIENTE
+    private final static String[] nomiEntitaGestiteDalDatabase = {
             "it.units.progrweb.entities.attori.Attore",
             "it.units.progrweb.entities.attori.administrator.Administrator",
             "it.units.progrweb.entities.attori.administrator.AdministratorStorage",

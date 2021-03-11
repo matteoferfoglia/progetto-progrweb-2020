@@ -8,7 +8,7 @@ public class ConsumerProxy extends Consumer {
 
 
     public ConsumerProxy(ConsumerStorage consumerStorage) {
-        super(consumerStorage.getUsername(), consumerStorage.getNominativo(), consumerStorage.getEmail());    // TODO
+        super(consumerStorage.getUsername(), consumerStorage.getNominativo(), consumerStorage.getEmail());
     }
 
     public ConsumerProxy(String username, String nominativo, String email) {   // TODO : serve questo metodo ??

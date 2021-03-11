@@ -95,7 +95,10 @@ export default {
               document.getElementById(this.idForm_caricaNuovoDocumento).reset();
 
             })
-            .catch( console.error );
+            .catch( error => {
+              console.error(error);
+              alert(error.data);
+            });
       else
         alert( "Campi del form non validi." );
 

@@ -26,10 +26,6 @@ import java.util.function.Supplier;
 @Entity
 public class AuthenticationDatabaseEntry {
 
-    // TODO : refactoring : spostare tutti (o quasi) i metodi statici nella classe di utilita "Autenticazione"
-
-    // TODO : implementare questa @Entity
-
     private final static int SALT_LENGTH = 15;
     private final static int PASSWORD_TEMPORANEA_LENGTH = 12;
 

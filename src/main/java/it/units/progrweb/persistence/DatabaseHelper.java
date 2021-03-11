@@ -26,6 +26,9 @@ public abstract class DatabaseHelper {
     /** Astrazione del database. */
     private static final Objectify database = ObjectifyService.ofy();
 
+    /** Dimensione massima dei contenuti caricabili in byte. */
+    public static final long MAX_SIZE_ENTITY = 1024*1024*1024;
+
 
     /** Enum delle operazioni possibili nelle query
      * (<a href="https://github.com/objectify/objectify/wiki/Queries#executing-queries">Fonte</a>).

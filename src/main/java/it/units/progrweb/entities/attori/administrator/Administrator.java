@@ -13,25 +13,23 @@ import java.util.List;
 public abstract class Administrator extends Attore {
 
     protected Administrator() {
-        super();    // TODO
+        super();
     }
 
     public Administrator(String username, String nominativo, String email) {
-        super(username, nominativo, email, TipoAttore.Administrator);  // TODO
+        super(username, nominativo, email, TipoAttore.Administrator);
         setTipoAttore(Administrator.class.getSimpleName());
     }
 
     /** Crea un attore di questa classe con le proprietà specificate nei parametri.*/
     public static Administrator creaAttore(String username, String nominativo, String email) {
-        return new AdministratorStorage(username, nominativo, email);    // TODO
+        return new AdministratorStorage(username, nominativo, email);
     }
 
     /** Restituisce la lista degli identificativi di tutti gli {@link Administrator}
      * registrati nel sistema.*/
     public static List<Long> getListaIdentificativiTuttiGliAdministratorNelSistema() {
-
         return Attore.getListaIdentificativiTuttiGliAttoriNelSistema( Administrator.class );
-
     }
 
     /** Restituisce l'entità {@link Administrator Administrator} cercata nel

@@ -8,9 +8,6 @@ import it.units.progrweb.entities.attori.Attore;
  */
 public abstract class UtenteNonAdministrator extends Attore {
 
-    // TODO : implementare questa classe
-
-
     protected UtenteNonAdministrator() {
         super();
     }
@@ -19,11 +16,9 @@ public abstract class UtenteNonAdministrator extends Attore {
         super(username, nominativo, email, tipoAttore);
     }
 
-
-
     /** Restituisce true se il campo email viene correttamente modificato, false altrimenti.*/
     protected boolean modificaEmail(String nuovaEmail) {
         setEmail(nuovaEmail);
-        return true;    // TODO return true se modifica va a buon fine, false altrimenti
+        return true;
     }
 }

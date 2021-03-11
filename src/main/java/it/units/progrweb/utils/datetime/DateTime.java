@@ -16,6 +16,8 @@ import java.util.Date;
  */
 public class DateTime implements Comparable<DateTime> {
 
+    // TODO : rimuovere metodi di conversione stringa (perché fatti sul client)
+
     /** Pattern da utilizzare per la conversione da un'istanza di
      * questa classe in una {@link String} e viceversa.*/
     private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd HH:mm:ss z";

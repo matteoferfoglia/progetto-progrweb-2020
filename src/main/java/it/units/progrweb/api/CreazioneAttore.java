@@ -114,7 +114,7 @@ public class CreazioneAttore {
                     throw new FormatoUsernameInvalido("Formato per il campo username non valido. " + e.getMessage());
                 } catch (IllegalArgumentException e) {
                     // Tipo attore ricevuto non valido
-                    throw new IllegalArgumentException("Valori di input inseriti non validi: \"" + tipoAttoreDaCreare + "\" non è un tipo valido.");
+                    throw new IllegalArgumentException("Valori di input inseriti non validi: " + e.getMessage());
                 }
 
             } else {

@@ -1,6 +1,5 @@
 package it.units.progrweb.api;
 
-import it.units.progrweb.api.consumer.RichiestaDocumenti;
 import it.units.progrweb.api.uploader.GestioneConsumer;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
@@ -56,10 +55,8 @@ public class RichiestaInfo {
     }
 
     /** Restituisce il nome dell'attributo di un {@link File} che
-     * contiene l'array di hashtag riferiti a quel {@link File}.
-     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,Long)
-     * metodo di invio dei file ai client}.*/
-    @Path("/nomePropHashtags")     // TODO : variabile d'ambiente
+     * contiene l'array di hashtag riferiti a quel {@link File}.*/
+    @Path("/nomePropHashtags")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeAttributoContenenteHashtagNeiFile() {
@@ -67,10 +64,8 @@ public class RichiestaInfo {
     }
 
     /** Restituisce il nome dell'attributo di un {@link File} che
-     * contiene la data di caricamento di quel {@link File}.
-     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,Long)
-     * metodo di invio dei file ai client}.*/
-    @Path("/nomePropDataCaricamento")     // TODO : variabile d'ambiente
+     * contiene la data di caricamento di quel {@link File}.*/
+    @Path("/nomePropDataCaricamento")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeAttributoContenenteDataCaricamentoFile() {
@@ -79,10 +74,8 @@ public class RichiestaInfo {
 
     /** Restituisce il nome dell'attributo di un {@link File} che
      * contiene la data di visualizzazione di quel {@link File}
-     * da parte del Consumer.
-     * Vedere anche il {@link RichiestaDocumenti#getElencoDocumenti(HttpServletRequest,Long)
-     * metodo di invio dei file ai client}.*/
-    @Path("/nomePropDataVisualizzazione")     // TODO : variabile d'ambiente
+     * da parte del Consumer.*/
+    @Path("/nomePropDataVisualizzazione")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeAttributoContenenteDataVisualizzazioneFile() {
@@ -91,7 +84,7 @@ public class RichiestaInfo {
 
     /** Restituisce il nome dell'attributo di un {@link File} che
      * ne contiene il nome.*/
-    @Path("/nomeProprietaNomeDocumento")     // TODO : variabile d'ambiente
+    @Path("/nomeProprietaNomeDocumento")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeAttributoContenenteNomeFile() {
@@ -100,7 +93,7 @@ public class RichiestaInfo {
 
 
     /** Restituisce il nome della proprietà contenente il nome di un {@link Attore}.*/
-    @Path("/nomeProprietaNomeAttore")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaNomeAttore")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldNomeAttore() {
@@ -108,7 +101,7 @@ public class RichiestaInfo {
     }
 
     /** Restituisce il nome della proprietà contenente lo username di un {@link Attore}.*/
-    @Path("/nomeProprietaUsernameAttore")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaUsernameAttore")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldUsernameAttore() {
@@ -117,7 +110,7 @@ public class RichiestaInfo {
 
     /** Con riferimento a {@link GestioneConsumer#getConsumer(Long)}, questo metodo restituisce
      * il nome della proprietà contenente lo username del {@link Consumer}.*/
-    @Path("/nomeProprietaEmailAttore")        // TODO : variabile d'ambiente
+    @Path("/nomeProprietaEmailAttore")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getNomeFieldEmailAttore() {
@@ -126,14 +119,11 @@ public class RichiestaInfo {
 
     /** Dato l'identificativo di un Uploader, restituisce l'oggetto JSON
      * con le properties di quell'Uploader.*/
-    @Path("/proprietaUploader/{identificativoUploader}")        // TODO : variabile d'ambiente
+    @Path("/proprietaUploader/{identificativoUploader}")
     @GET
     @Produces(MediaType.APPLICATION_JSON )
     public Uploader getUploader(@PathParam("identificativoUploader") Long identificativoUploader,
                                 @Context HttpServletRequest httpServletRequest ) {
-
-        // TODO : aggiungere Disclaimer che le proprietà di un Uploader sono visibili a tutti gli
-        //        gli utenti autenticati della piattaforma che vengano a conoscenza di questo url
 
         Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
 
@@ -167,11 +157,6 @@ public class RichiestaInfo {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @GET
     public Response getLogoUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
-
-        // TODO : verificare - va bene così senza mediatype ? Il browser che riceve? L'entity nel NOT_FOUND?
-
-        // TODO : aggiungere Disclaimer che le proprietà di un Uploader sono visibili a tutti gli
-        //        gli utenti autenticati della piattaforma che vengano a conoscenza di questo url
 
         Uploader uploader = Uploader.getAttoreDaIdentificativo( identificativoUploader );
         if( uploader != null) {

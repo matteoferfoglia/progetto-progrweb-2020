@@ -9,15 +9,12 @@ import java.io.IOException;
 /**
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroCORS", asyncSupported = true)  // TODO: url pattern da rendere variabile d'ambiente (vedi anche UtilitaGenerale.API_URL_PATTERN)
+@WebFilter(filterName = "FiltroCORS", asyncSupported = true)
 public class FiltroCORS implements Filter {
-
-    // TODO questo filtro è da rivedere / implementare
-
 
     /** Array di stringhe contenente le origini permesse dalla CORS policy (whitelist).*/
     private final static String[] CORS_ALLOWED_ORIGINS = {
-            "http://localhost:8080" // TODO : creare variabile d'ambiente: durante lo sviluppo, questa è l'origine delle pagine originate dal server Vue
+            "http://localhost:8080" // durante lo sviluppo, questa è l'origine delle pagine originate dal server Vue
     };
 
     /** Array di stringhe contente i metodi permessi dalla CORS policy. */
@@ -40,8 +37,7 @@ public class FiltroCORS implements Filter {
 
     /** Array di stringhe contente gli header HTTP che saranno permessi dalla CORS policy.*/
     private final static String[] CORS_ALLOWED_HEADERS = {
-            // TODO : servono tutti questi headers?
-            "Content-Type", // TODO : non servirebbe perché è già in white list cors (vedi specifiche)
+            "Content-Type",
             "Access-Control-Allow-Headers",
             "Authorization",
             "X-Requested-With",

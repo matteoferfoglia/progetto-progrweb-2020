@@ -12,10 +12,6 @@ import java.util.List;
  */
 public class Resoconto {
 
-    // TODO : classe da implementare e testare
-    // TODO : serve una classe proxy ?
-
-
     /** Numero di documenti caricati. */
     private long numeroDiDocumentiCaricati;
 

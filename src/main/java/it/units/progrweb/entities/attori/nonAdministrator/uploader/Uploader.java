@@ -4,11 +4,8 @@ import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.FormatoUsernameInvalido;
 import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
-import it.units.progrweb.entities.file.File;
-import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -33,11 +30,10 @@ public abstract class Uploader extends UtenteNonAdministrator {
      * @throws IllegalArgumentException Se lo username non è valido.
      */
     public Uploader(String username, String nominativo, String email) {
-        // TODO
         super(username, nominativo, email, TipoAttore.Uploader);
 
-        if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_UPLOADER, username) ) {   // TODO : metodo da verificare
-            throw new FormatoUsernameInvalido("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_UPLOADER + "\"");
+        if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_UPLOADER, username) ) {
+            throw new FormatoUsernameInvalido("Lo username deve essere composto da quattro caratteri alfanumerici.");
         }
 
     }
@@ -68,13 +64,6 @@ public abstract class Uploader extends UtenteNonAdministrator {
 
         return Attore.getListaIdentificativiTuttiGliAttoriNelSistema( Uploader.class );
 
-    }
-
-    /** Restituisce la lista dei documenti caricati dall'{@link Uploader}
-     * specificato nel periodo temporale specificato.*/
-    public static List<File> getDocumentiCaricatiNelPeriodoDallUploader(PeriodoTemporale periodoTemporale, Uploader uploader) {
-        // TODO : interroga db è restituisci il numero di documenti caricati da questo uploader nel periodo indicato
-        return new ArrayList<>();   // TODO !!!
     }
 
     /** Restituisce l'entità {@link Uploader Uploader} cercata nel

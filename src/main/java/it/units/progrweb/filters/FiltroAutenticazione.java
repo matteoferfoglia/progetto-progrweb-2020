@@ -32,14 +32,13 @@ public class FiltroAutenticazione implements Filter {
             "/api/resetPassword",
             "/api/webService/login",
             "/api/webService/uploadDocumento",
-            // "/api/consumer", "/api/uploader", "/api/administrator",// gestiti da filtri specifici    // TODO : io lascerei scommentato (è un controllo in più)
             "/api/verificaTokenAutenticazione",
             "/api/registrazioneNuovoConsumer",
             "/api/CSRFToken/generaCSRFToken",
             "/api/info",
             "/api/openapi",
-            "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo !!! // TODO : var ambiente solo di sviluppo // TODO : solo per sviluppo
-    };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
+            "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo
+    };
 
 
     public void destroy() {}

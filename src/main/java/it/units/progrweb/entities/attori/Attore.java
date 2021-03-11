@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 @Entity
 public abstract class Attore implements UserPrincipal, Cloneable {
 
-    // TODO : implementare questa classe
-
     /** Identificativo di un utente.*/
     @Id
     protected Long identificativoAttore;
@@ -136,7 +134,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
         String nomeAttributoPerQuery = "username";
         if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoPerQuery, Attore.class ) ) {
             List<?> risultatoQuery = DatabaseHelper.query( Attore.class,
-                    nomeAttributoPerQuery, DatabaseHelper.OperatoreQuery.UGUALE, username );    // TODO : che succede se non trova nulla ?
+                    nomeAttributoPerQuery, DatabaseHelper.OperatoreQuery.UGUALE, username );
 
             return risultatoQuery.size() == 1;
         } else {

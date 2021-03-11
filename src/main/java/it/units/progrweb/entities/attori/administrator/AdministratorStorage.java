@@ -8,7 +8,6 @@ import it.units.progrweb.entities.attori.Attore;
  * da memorizzare nel database.
  * @author Matteo Ferfoglia
  */
-// TODO : serve proxy pattern?
 @Subclass(index = false)
 class AdministratorStorage extends Administrator {
 

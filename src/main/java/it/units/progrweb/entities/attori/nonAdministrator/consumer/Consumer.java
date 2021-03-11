@@ -17,10 +17,8 @@ import java.util.regex.Pattern;
 @Subclass(index = true)
 public abstract class Consumer extends UtenteNonAdministrator {
 
-    // TODO : implementare questa classe
-
     /** RegEx per validare lo username di un {@link Uploader}.*/
-    private final String REGEX_VALIDITA_USERNAME_CONSUMER = RegexHelper.REGEX_CODICE_FISCALE;
+    private static final String REGEX_VALIDITA_USERNAME_CONSUMER = RegexHelper.REGEX_CODICE_FISCALE;
 
     public Consumer() {
         super();
@@ -29,8 +27,8 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     public Consumer(String username, String nominativo, String email) {
         super(username, nominativo, email, TipoAttore.Consumer);
-        if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_CONSUMER, username) ) {   // TODO : metodo da verificare
-            throw new IllegalArgumentException("Lo username deve rispettare la RegEx: \"" + REGEX_VALIDITA_USERNAME_CONSUMER + "\"");
+        if( ! Pattern.matches(REGEX_VALIDITA_USERNAME_CONSUMER, username) ) {
+            throw new IllegalArgumentException("Lo username deve essere il codice fiscale del Consumer da inserire.");
         }
         setTipoAttore(Consumer.class.getSimpleName());
     }

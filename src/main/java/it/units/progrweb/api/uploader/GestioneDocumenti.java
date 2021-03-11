@@ -1,5 +1,6 @@
 package it.units.progrweb.api.uploader;
 
+import com.google.apphosting.api.ApiProxy;
 import it.units.progrweb.api.consumer.RichiestaDocumenti;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -118,16 +119,25 @@ public class GestioneDocumenti {
 
                 // Se qui, allora destinatario esiste
 
-                File fileAggiunto = File.aggiungiFile( contenuto,nomeFile + "." + estensioneFile, listaHashtag_list,
-                        identificativoUploaderMittente, identificativoConsumerDestinatario );
+                try {
 
-                Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploaderMittente);
-                inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
+                    File fileAggiunto = File.aggiungiFile( contenuto,nomeFile + "." + estensioneFile, listaHashtag_list,
+                            identificativoUploaderMittente, identificativoConsumerDestinatario );
 
-                // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
-                Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
+                    Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploaderMittente);
+                    inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
 
-                return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
+                    // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
+                    Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
+
+                    return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
+
+                } catch( ApiProxy.RequestTooLargeException e) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Il file che si è cercato di caricare è troppo grande. " +
+                                    "Dimensioni massime consentite: " + (int)Math.floor(File.MAX_SIZE_FILE/1024.0) + " KB.")
+                            .build();
+                }
 
             } else {
 

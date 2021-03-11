@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -23,13 +22,6 @@ public class UtilsInTest {
         return Arrays.stream(arrayDiStringhe)
                 .map( stringa -> "'" + stringa + "'")   // un elemento csv è delimitato da ' ' (https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests-sources-CsvSource)
                 .collect(Collectors.joining(", "));
-    }
-
-    /** Restituisce un nuovo array con gli elementi specificati aggiunti in coda. */
-    public static<T> T[] appendiElementi(T[] vecchioArray, T ...elementiDaAggiungereInCoda) {
-        // TODO : verificare che funzioni
-        return (T[]) Stream.concat(Arrays.stream(vecchioArray), Arrays.stream(elementiDaAggiungereInCoda))
-                           .toArray();
     }
 
     /** Scrive nel log per i test. */

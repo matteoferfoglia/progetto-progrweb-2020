@@ -2,6 +2,7 @@ package it.units.progrweb.entities.file;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
@@ -42,14 +43,14 @@ public abstract class File {
 
     /** Nome del file.*/
     @Index
-    protected String nomeDocumento;        // TODO : verificare in objectify che questi campi siano presenti nella subclass "@Entity" che estende questa class
+    protected String nomeDocumento;
 
     /** Data e ora di caricamento del file salvati come Long.*/
     @Index
     private String dataEdOraDiCaricamento;
 
     /** Indirizzo IP del consumer che ha visualizzato il file. */
-    private String indirizzoIpVisualizzatore; // TODO : cambiare tipo??
+    private String indirizzoIpVisualizzatore;
 
     /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
     private String dataEdOraDiVisualizzazione;
@@ -62,6 +63,9 @@ public abstract class File {
     @Index
     private Long identificativoDestinatario;
 
+    /** Dimensione massima per la dimensione di un file, in byte. */
+    @Ignore
+    public static final long MAX_SIZE_FILE = 800*1024*1024;
 
 
     protected File(){}
@@ -237,7 +241,6 @@ public abstract class File {
      * @param includiMetadati true se si vogliono anche i metadati.
      */
     public static String[] anteprimaNomiProprietaFile(boolean includiMetadati) {
-        // TODO : testare questa classe
         return Arrays.stream(getAnteprimaProprietaFile(includiMetadati))
                      .map(Field::getName)
                      .toArray(String[]::new);
@@ -313,14 +316,12 @@ public abstract class File {
                                                HttpServletRequest httpServletRequest,
                                                boolean salvaDataOraVisualizzazione   ) {
 
-        // TODO : verifica che questo metodo funzioni
-
         Long identificativoAttoreDaHttpServletRequest =
                 Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
 
         try {
 
-            File file = File.getEntitaDaDbById(identificativoFile); // TODO : gestire il caso di file eliminato
+            File file = File.getEntitaDaDbById(identificativoFile);
             if(!(file.getIdentificativoDestinatario().equals(identificativoAttoreDaHttpServletRequest) ||
                       file.getIdentificativoMittente().equals(identificativoAttoreDaHttpServletRequest) ))
                 return Autenticazione.creaResponseForbidden("Accesso al file vietato.");
@@ -490,40 +491,6 @@ public abstract class File {
                     new NoSuchFieldException());
         return new Long[0];
     }
-//
-//    // TODO : cancellare questo metodo se inutile
-//    /** Interroga il database e restituisce le occorrenze di questa entità
-//     * che risultano caricate dall'{@link Uploader} il cui identificativo è
-//     * specificato come parametro. */
-//    private static List<File> getOccorrenzeFiltratePerUploader(Long identificativoUploader) {
-//        return queryFiles("identificativoMittente", identificativoUploader);
-//    }
-
-    /** Dati il nome di un attributo di {@link File}
-     * ed il corrispettivo valore, questo metodo interroga il database e
-     * restituisce la lista di tutte le occorrenza in cui l'attributo il
-     * cui nome è specificato nel parametro ha il valore specificato nel
-     * parametro corrispondente. Gli attributi su cui si esegue la query
-     * devono essere indicizzati.*/
-    private static List<File> queryFiles(String nomeAttributo, Long valoreAttributo) {
-        // TODO : metodo probabilmente inutile (CANCELLARE se inutile)
-
-        if (UtilitaGenerale.esisteAttributoInClasse(nomeAttributo, File.class)) {
-
-            return DatabaseHelper.query(File.class,
-                                        nomeAttributo, DatabaseHelper.OperatoreQuery.UGUALE, valoreAttributo )
-                                 .stream()
-                                 .map( unOccorrenza -> (File)unOccorrenza )
-                                 .collect(Collectors.toList());
-
-        } else {
-            Logger.scriviEccezioneNelLog(File.class,
-                                        "Field \"" + nomeAttributo + "\" non trovato.",
-                                         new NoSuchFieldException());
-        }
-
-        return new ArrayList<>();   // nessun risultato dalla query
-    }
 
     /** Se l'{@link Uploader} dato nel parametro è associato al
      * {@link File} di cui si sta chiedendo l'eliminazione, il cui
@@ -540,10 +507,7 @@ public abstract class File {
             if( ! file.getIdentificativoMittente().equals(identificativoUploader) )
                 return false;       // un uploader non può cancellare un file non caricato da lui
 
-            if( file.elimina() )
-                return true;
-            else
-                return false;
+            return file.elimina();
 
         } catch (NotFoundException notFoundException) {
             return false;
@@ -558,13 +522,12 @@ public abstract class File {
     public static File aggiungiFile(InputStream contenutoFile, String nomeFile, List<String> listaHashtag,
                                     Long identificativoUploader, Long identificativoConsumer ) {
 
-        // TODO : spostare nella classe File
-
         if( listaHashtag==null )
             listaHashtag = new ArrayList<>();
 
         listaHashtag = listaHashtag.stream()
                                    .map(EncoderPrevenzioneXSS::encodeForJava)
+                                   .distinct()
                                    .collect( Collectors.toList() );
 
         nomeFile = EncoderPrevenzioneXSS.encodeForJava( nomeFile );

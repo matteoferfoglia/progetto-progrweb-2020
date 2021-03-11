@@ -96,8 +96,7 @@ class FileStorage extends File {
             Logger.scriviEccezioneNelLog(this.getClass(), e);
         }
 
-
-        return mappaNomeValoreProprieta;        // TODO : testare che funzioni (controllare il tipo del valore)
+        return mappaNomeValoreProprieta;
     }
 
     public List<String> getListaHashtag() {

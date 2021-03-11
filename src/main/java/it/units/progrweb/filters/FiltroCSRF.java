@@ -53,11 +53,11 @@ public class FiltroCSRF implements Filter {
             "/api//administrator/aggiungiAttore",
             "/api/administrator/modificaAttore",
             "/api/uploader/modificaConsumer"
-    };   // TODO : creare variabile d'ambiente con whitelist e creare variabile d'ambiente per ogni url pattern delle varie servlet
+    };
 
     /** Nome del parametro che nella richiesta HTTP (proveniente dal client)
      * contiene il token CSRF. */
-    private static final String NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST = "csrfToken";      // TODO : CREARE var d'ambiente comune anche al progetto Vue
+    private static final String NOME_PARAMETRO_CSRF_TOKEN_NELLA_REQUEST = "csrfToken";
 
     // Ricerca dei parametri in una request dipende dal content-type
     private static final String CONTENT_TYPE_JSON = "application/json";
@@ -157,7 +157,6 @@ public class FiltroCSRF implements Filter {
         String boundary = contentType.substring( contentType.indexOf(boundary_nomeAttributo)+boundary_nomeAttributo.length());
 
         // TODO : che succede se manca il csrf ?? Come si comporta?? genera eccezioni??
-        // TODO : rivedere regex
 
         List<String> listaCsrfTokenTorovatiNellaRichiesta =
               Arrays.stream(requestBody.toString().split(boundary))

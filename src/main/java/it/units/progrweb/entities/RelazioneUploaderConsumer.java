@@ -23,9 +23,6 @@ import java.util.stream.Collectors;
 @Entity
 public class RelazioneUploaderConsumer {
 
-    // TODO : DEVE restare un'entità che rappresenti la relazione tra uploader e consumer
-    //          ma la maggior parte del codice in questa classe dovrebbe stare in FileStorage (=> fondere)
-
     /** Identificativo per un'istanza di questa classe.*/
     @Id
     private Long identificativoRelazione;
@@ -94,43 +91,6 @@ public class RelazioneUploaderConsumer {
         } catch (RuntimeException ignored) {}   // non fa nulla se l'occorrenza non è presente nel DB
     }
 
-//    /** Se l'attore il cui identificativo è dato come parametro può accedere
-//     * al file il cui identificativo è dato come parametro, restituisce
-//     * l'occorrenza di {@link RelazioneUploaderConsumer} corrispondente
-//     * al file cercato. Altrimenti restituisce null.
-//     * Se il file non esiste, genera un'eccezione {@link NotFoundException}.*/
-//    public static RelazioneUploaderConsumer attorePuoAccedereAFile(Long identificativoAttore,
-//                                                                   Long identificativoFile)
-//            throws NotFoundException {
-//    // TODO : metodo da eliminare
-//
-//        RelazioneUploaderConsumer relazioneUploaderConsumer = (RelazioneUploaderConsumer)
-//                    DatabaseHelper.getById(identificativoFile, RelazioneUploaderConsumer.class);
-//
-//        if ( relazioneUploaderConsumer.getIdentificativoConsumer().equals( identificativoAttore )
-//                || relazioneUploaderConsumer.getIdentificativoUploader().equals( identificativoAttore ) )
-//            return relazioneUploaderConsumer;
-//
-//        else return null;
-//
-//    }
-
-
-
-//    /** Restituisce l'occorrenza di relazione associata al file il cui identificativo
-//     * è fornito come parametro, oppure null se non viene trovata.*/
-//    public static RelazioneUploaderConsumer getEntitaDaDbByID(Long idFile) {
-//    // TODO : cancellare questo metodo
-//
-//        try {
-//            return (RelazioneUploaderConsumer)
-//                    DatabaseHelper.getById( idFile, RelazioneUploaderConsumer.class );
-//
-//        } catch (NotFoundException notFoundException) {
-//            return null;
-//        }
-//    }
-
     public Long getIdentificativoUploader() {
         return identificativoUploader;
     }
@@ -161,8 +121,6 @@ public class RelazioneUploaderConsumer {
     getOccorrenzaFiltrataPerUploaderEConsumer(Long identificativoUploader,
                                               Long identificativoConsumer )
             throws RuntimeException {
-
-        // TODO : verificare che funzioni
 
         // Parametri query
         String nomeAttributo1 = "identificativoUploader";
@@ -206,8 +164,6 @@ public class RelazioneUploaderConsumer {
     getOccorrenzaFiltrataPerUploader( Long identificativoUploader )
             throws RuntimeException {
 
-        // TODO : verificare che funzioni
-
         // Parametri query
         String nomeAttributo1 = "identificativoUploader";
 
@@ -227,31 +183,6 @@ public class RelazioneUploaderConsumer {
         return new ArrayList<>(0);
 
     }
-
-
-//    public static List<File> getListaFileDaUploaderAConsumer(Long identificativoUploader, Long identificativoConsumer) {
-//        // TODO : questo metodo dovrebbe stare in File
-//        // TODO : refactoring del database (è un po' sprecato andare a cercare per id un'entità che magari nemmeno c'è) visto che fintanto che non viene caricato il primo file da consumer ad uploader il valore è fittizio
-//
-//        List<RelazioneUploaderConsumer> occorrenzeRelazione =
-//                getOccorrenzaFiltrataPerUploaderEConsumer( identificativoUploader, identificativoConsumer );
-//        List<File> listaFile = occorrenzeRelazione.stream()
-//                                                  .map( relazione -> {
-//                                                      try {
-//                                                          File file = File.getEntitaDaDbById( relazione.getIdentificativoRelazione() );
-//                                                          return file != null && file.isEliminato() ?
-//                                                                    null : file; // TODO : deve essere prerogativa della classe File
-//                                                      } catch (NotFoundException notFoundException) {
-//                                                          return null;
-//                                                      }
-//                                                  })
-//                                                  .filter( Objects::nonNull )
-//                                                  .collect(Collectors.toList());
-//
-//        return listaFile;
-//
-//    }
-
 
     /** Interroga il database e restituisce la lista degli identificativi dei
      * {@link Consumer} associati con l'{@link Uploader} il cui identificativo
@@ -279,29 +210,10 @@ public class RelazioneUploaderConsumer {
 
     }
 
-
-//    /** Data una lista in cui ogni elemento è un'istanza di
-//     * {@link RelazioneUploaderConsumer}, restituisce una
-//     * mappa che ha come chiave l'identificativo di un {@link Consumer}
-//     * e come valore corrispondente l'array degli identificativi
-//     * dei {@link File} inviati al {@link Consumer} il cui
-//     * identificativo è specificato nella chiave.
-//     */
-//    public static Map<Long, Long[]> mappa_identificativoConsumer_arrayIdFile(List<RelazioneUploaderConsumer> listaRelazioni) {
-//
-//        // TODO : metodo da spostare nella classe File
-//
-//        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdentificativoConsumer";
-//        return mappa_identificativoAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
-//
-//    }
-
-
-
     /** Restituisce true se il consumer con identificativo dato risulta attualmente
      * servito dall'uploader con identificativo dato, false altrimenti.*/
     public static boolean isConsumerServitoDaUploader( Long identificativoUploader, Long identificativoConsumer ) {
-        // TODO : verificare funzioni
+
         try {
             Field uploader_field  = RelazioneUploaderConsumer.class.getDeclaredField("identificativoUploader");  // eccezione se non esiste questo field
             Field consumer_field  = RelazioneUploaderConsumer.class.getDeclaredField("identificativoConsumer");  // eccezione se non esiste questo field
@@ -324,11 +236,7 @@ public class RelazioneUploaderConsumer {
      * con identificativo dato. Restituisce true se la richiesta va
      * a buon fine, false altrimenti.*/
     public static void aggiungiConsumerAdUploader(Long identificativoConsumer, Long identificativoUploader) {
-
         DatabaseHelper.salvaEntita( new RelazioneUploaderConsumer(identificativoConsumer, identificativoUploader, null) );
-
     }
-
-
 
 }

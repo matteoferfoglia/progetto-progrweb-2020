@@ -1,7 +1,5 @@
 package it.units.progrweb.entities.attori.nonAdministrator.uploader;
 
-import it.units.progrweb.utils.Base64Helper;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -38,14 +36,6 @@ class LogoUploader implements Serializable {
     LogoUploader(byte[] logoInBytes, String estensioneFileContenenteLogo)
             throws IOException {
         this.setLogo( logoInBytes, estensioneFileContenenteLogo );
-    }
-
-    /**
-     * Restituisce la rappresentazione Base64 dell'immagine, come Data URL
-     * (<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs">Fonte</a>).
-     */
-    public String getLogo_dataUrl() {
-        return "data:" + getMediaTypeLogo() + ";base64," + Base64Helper.encodeToBase64_rfc2045_encoder(logo); // TODO : verificare che sia corretto usare la versione url encoded del base64
     }
 
     /**
