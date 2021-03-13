@@ -103,7 +103,7 @@ public class RelazioneUploaderConsumer {
         return identificativoRelazione;
     }
 
-    public RelazioneUploaderConsumer() {}   // TODO : può essere privato?
+    private RelazioneUploaderConsumer() {}
 
     private RelazioneUploaderConsumer(Long identificativoConsumer, Long identificativoUploader, Long identificativoRelazione) {
         this.identificativoConsumer = identificativoConsumer;

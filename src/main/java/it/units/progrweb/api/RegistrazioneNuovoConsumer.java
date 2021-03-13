@@ -22,8 +22,6 @@ public class RegistrazioneNuovoConsumer {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registrazioneNuovoConsumer(CampiFormRegistrazione campiFormRegistrazione) {
 
-        // TODO : usare @FormDataParam
-
         String codiceFiscale = campiFormRegistrazione.getCodiceFiscale();
         String email         = campiFormRegistrazione.getEmail();
         String nominativo    = campiFormRegistrazione.getNominativo();
@@ -52,7 +50,7 @@ public class RegistrazioneNuovoConsumer {
 
         } else {
 
-            return Response.status( Response.Status.BAD_REQUEST )       // todo : REFACTORING per evitare duplicazione
+            return Response.status( Response.Status.BAD_REQUEST )
                            .entity( "Valori di input inseriti non validi." )
                            .build();
 
