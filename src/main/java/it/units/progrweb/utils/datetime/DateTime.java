@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Classe per rappresentare date e ore, utilizzabile
@@ -16,8 +17,6 @@ import java.util.Date;
  */
 public class DateTime implements Comparable<DateTime> {
 
-    // TODO : rimuovere metodi di conversione stringa (perché fatti sul client)
-
     /** Pattern da utilizzare per la conversione da un'istanza di
      * questa classe in una {@link String} e viceversa.*/
     private static final String PATTERN_CONVERSIONE_IN_STRING = "yyyy-MM-dd HH:mm:ss z";
@@ -27,7 +26,7 @@ public class DateTime implements Comparable<DateTime> {
     private static final String PATTERN_HTML_INPUT_DATA = "yyyy-MM-dd";
 
     /** Istante temporale rappresentato da quest'istanza. */
-    private Instant istanteTemporale;
+    private final Instant istanteTemporale;
 
     /** Differenza di fuso orario per UTC. Vedere {@link ZoneOffset#UTC}. */
     public static final ZoneOffset UTC_ZONE_OFFSET = ZoneOffset.UTC;
@@ -62,7 +61,7 @@ public class DateTime implements Comparable<DateTime> {
     /** Crea un'istanza di questa classe in base alla data e l'ora (UTC) specificata.
      * @param giornoDelMese da 1 a 31
      * @param meseDellAnno da 1 a 12
-     * @param anno
+     * @param anno Anno
      * @param oraUTC da 0 a 23
      * @param minutoDellOra da 0 a 59
      * @param secondoDelMinuto da 0 a 59
@@ -71,13 +70,13 @@ public class DateTime implements Comparable<DateTime> {
     public DateTime(int giornoDelMese, int meseDellAnno, int anno, int oraUTC, int minutoDellOra, int secondoDelMinuto)
             throws DateTimeException{
         this(LocalDateTime.of(
-                    anno,
-                    Month.of(meseDellAnno),
-                    giornoDelMese,
-                    oraUTC,
-                    minutoDellOra,
-                    secondoDelMinuto
-                ).toInstant(UTC_ZONE_OFFSET)
+                                anno,
+                                Month.of(meseDellAnno),
+                                giornoDelMese,
+                                oraUTC,
+                                minutoDellOra,
+                                secondoDelMinuto
+                             ).toInstant(UTC_ZONE_OFFSET)
         );
     }
 
@@ -261,9 +260,7 @@ public class DateTime implements Comparable<DateTime> {
     private String getDataOraConFusoOrario(ZoneOffset zoneOffset) {
         String stringa =  convertiInLocalDateTime().atZone(zoneOffset)
                                                    .format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy,  HH:mm:ss '(" + (zoneOffset.equals(UTC_ZONE_OFFSET) ? "UTC" : "'O'") +")'"));
-        String stringaConInizialiMaiuscole = stringa.substring(0,1).toUpperCase()
-                                                + stringa.substring(1);
-        return stringaConInizialiMaiuscole;
+        return stringa.substring(0,1).toUpperCase() + stringa.substring(1);
     }
 
     @Override
@@ -273,7 +270,7 @@ public class DateTime implements Comparable<DateTime> {
 
         DateTime dateTime = (DateTime) o;
 
-        return istanteTemporale != null ? istanteTemporale.equals(dateTime.istanteTemporale) : dateTime.istanteTemporale == null;
+        return Objects.equals(istanteTemporale, dateTime.istanteTemporale);
     }
 
 }
