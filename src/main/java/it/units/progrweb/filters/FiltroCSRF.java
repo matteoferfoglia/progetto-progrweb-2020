@@ -220,17 +220,15 @@ public class FiltroCSRF implements Filter {
  *  Fonte:  https://stackoverflow.com/a/25640232 .*/
 class HttpRequestWrapper extends HttpServletRequestWrapper {
 
-    // TODO : classe da rivedere
-
     private final byte[] payload;
 
     public HttpRequestWrapper(HttpServletRequest request) throws IOException {
+
         super(request);
 
         // read the original payload into the payload variable
         ByteArrayOutputStream builder = new ByteArrayOutputStream();
-        InputStream inputStream = request.getInputStream();
-        try {
+        try (InputStream inputStream = request.getInputStream()) {  // try-with-resources, Fonte: https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
             if (inputStream != null) {
                 byte[] buffer = new byte[128];
                 int bytesRead = -1;
@@ -244,22 +242,16 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
         } catch (IOException ex) {
             Logger.scriviEccezioneNelLog(HttpRequestWrapper.class, "Error reading the request payload", ex);
             throw new IOException("Error reading the request payload", ex);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException iox) {
-                    // ignore
-                }
-            }
         }
+
         payload = builder.toByteArray();
+
     }
 
     @Override
     public ServletInputStream getInputStream () throws IOException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload);
-        ServletInputStream inputStream = new ServletInputStream() {
+        return new ServletInputStream() {
             @Override
             public boolean isFinished() {return false;}
 
@@ -269,12 +261,10 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
             @Override
             public void setReadListener(ReadListener readListener) {}
 
-            public int read ()
-                    throws IOException {
+            public int read () {
                 return byteArrayInputStream.read();
             }
         };
-        return inputStream;
     }
 }
 
@@ -283,8 +273,8 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
 class HttpStatusCode_CsrfTokenInvalido {
 
     /** Codice errore (personalizzato).*/
-    private static int statusCode = 499;
-    private static String reasonPhrase = "CSRF token invalido";
+    private static final int statusCode = 499;
+    private static final String reasonPhrase = "CSRF token invalido";
 
     public static int getStatusCode() {
         return statusCode;
