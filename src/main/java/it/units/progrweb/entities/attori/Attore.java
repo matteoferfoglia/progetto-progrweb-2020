@@ -13,6 +13,7 @@ import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.*;
 
 import javax.security.auth.Subject;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -196,7 +197,10 @@ public abstract class Attore implements UserPrincipal, Cloneable {
     }
 
 
-    protected Attore(String username, String nominativo, String email, TipoAttore tipoAttore) {
+    protected Attore(@NotNull String username, String nominativo, String email, TipoAttore tipoAttore) {
+        if(username==null)
+            throw new NullPointerException("Username non può essere null");
+
         this.username = username;
         this.nominativo = nominativo;
         setEmail(email);
@@ -209,6 +213,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
         return nominativo;
     }
 
+    @NotNull
     public String getUsername() {
         return username;
     }

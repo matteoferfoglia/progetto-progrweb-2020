@@ -16,14 +16,14 @@ import java.util.Properties;
 public class MailSender {
 
     /** Indirizzo email in formato RFC822.*/
-    private static final String INDIRIZZO_MAIL_MITTENTE      = "admin@example.com";       // TODO: variabile d'ambiente
+    private static final String INDIRIZZO_MAIL_MITTENTE      = "admin@example.com";
 
     /** Nome personale utilizzato nelle mail.*/
-    private static final String NOME_PERSONALE_MAIL_MITTENTE = "Servizio di Filesharing"; // TODO: variabile d'ambiente
+    private static final String NOME_PERSONALE_MAIL_MITTENTE = "Servizio di Filesharing";
 
 
     /** Proprietà di configurazione del server SMTP.*/
-    private Properties properties;
+    private final Properties properties;
     
     /** Mail session di questa istanza.*/
     private Session session;

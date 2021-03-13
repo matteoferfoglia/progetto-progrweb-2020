@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanumerico;
 
@@ -28,11 +29,6 @@ import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanume
  * @author Matteo Ferfoglia
  */
 public class Autenticazione {
-
-    /** Rappresentazione di un attore non presente nel database
-     * di autenticazione (es. se credenziali non sono valide),
-     * oppure di un attore non autenticato.*/
-    public static final Attore ATTORE_NON_AUTENTICATO = null;      // TODO : cancellare
 
     /** Tempo in secondi durante il quale ad un attore che si è autenticato
      * non verranno chieste nuovamente le credenziali. */
@@ -62,7 +58,7 @@ public class Autenticazione {
 
 
     /** Restituisce l'attore corrispondente alle credenziali date
-     * come parametri se le credenziali sono valide, {@link #ATTORE_NON_AUTENTICATO} altrimenti.
+     * come parametri se le credenziali sono valide, null altrimenti.
      * Vedere anche {@link #creaResponseAutenticazione(String, String)}.*/
     public static Attore getAttoreDaCredenziali(String username, String password) {
 
@@ -72,14 +68,14 @@ public class Autenticazione {
         if( credenzialiCorrette ) {
             return Attore.getAttoreDaUsername( username );
         } else {
-            return ATTORE_NON_AUTENTICATO;
+            return null;
         }
 
     }
 
     /** Restituisce true se l'attore è autenticato, false altrimenti.*/
     public static boolean isAttoreAutenticato(Attore attore) {
-        return attore != null;    // TODO : verificare corretto funzionamento di questo metodo
+        return attore != null;
     }
 
     /** Date le credenziali, restituisce una {@link javax.ws.rs.core.Response}
@@ -252,7 +248,7 @@ public class Autenticazione {
 
         try {
             String hashPasswordAttore_daAuthDb =
-                    AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(attoreCheStaAutenticandosi.getUsername()); // TODO : Scommentare (questa riga è corretta)
+                    AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(Objects.requireNonNull(attoreCheStaAutenticandosi).getUsername());
 
             String hashValoreCookieId_ricalcolatoCoiValoriNelServer =
                     GestoreSicurezza.hmacSha256(valoreCookieId_dalClient, hashPasswordAttore_daAuthDb);
@@ -269,7 +265,7 @@ public class Autenticazione {
 
     /** Crea un Jwt Token che certifica l'autenticazione dell'attore indicato
      * nel parametro, quindi lo codifica in base64 url-encoded e lo restituisce.
-     * @param attore
+     * @param attore Attore per cui si deve creare il token.
      * @param valoreCookieId è il valore del cookie associato all'attore che si sta autenticando.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}.
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}.
@@ -284,8 +280,8 @@ public class Autenticazione {
         JwtPayload jwtPayload = new JwtPayload();
         jwtPayload.aggiungiClaim(new JwtSubjectClaim(attore.getIdentificativoAttore()));
         jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(TIMEOUT_AUTENTICAZIONE_IN_SECONDI));
-        jwtPayload.aggiungiClaim(new JwtClaim(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
-                                              GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
+        jwtPayload.aggiungiClaim(new JwtClaim<>(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
+                                                GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
 
         // Aggiunge gli attributi dell'attore non sensibili
         jwtPayload.aggiungiClaim( new JwtNomeSubjectClaim(attore.getNominativo()) );
@@ -297,33 +293,27 @@ public class Autenticazione {
 
     /** Ricerca l'attore nel database in base al token di autenticazione
      * della richiesta giunta dal client: se trova l'attore nel database,
-     * lo restituisce, altrimenti restituisce {@link #ATTORE_NON_AUTENTICATO}.*/
+     * lo restituisce, altrimenti restituisce null.*/
     public static Attore getAttoreDaTokenAutenticazione(@NotNull String tokenAutenticazione) {
-
-        // TODO : da testare
 
         JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
         Long idAttore = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
-        Attore attore = Attore.getAttoreDaIdentificativo(idAttore);
 
-        return attore;
+        return Attore.getAttoreDaIdentificativo(idAttore);
+
     }
 
     /** Data una HttpServletRequest, restituisce l'attore autenticato
      * per quella HttpServletRequest. Se la richiesta proviene da un client
      * che non si è autenticato oppure se l'autenticazione non è valida,
-     * allora restituisce {@link #ATTORE_NON_AUTENTICATO}.
+     * allora restituisce null.
      * Questo metodo utilizza {@link #getAttoreDaTokenAutenticazione(String)}*/
     public static Attore getAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
-
-        // TODO : da testare
 
         // TODO : vedere dov'è stato usato questo metodo (getTokenAutenticazioneBearer fa accessi costosi al database)
 
         String tokenAutenticazione = getTokenAutenticazioneBearer(httpServletRequest);
-        Attore attore = getAttoreDaTokenAutenticazione(tokenAutenticazione);
-
-        return attore;
+        return getAttoreDaTokenAutenticazione(tokenAutenticazione);
 
     }
 
