@@ -21,10 +21,13 @@ class ConsumerStorage extends Consumer {
     }
 
     /** Copy-constructor, usato in {@link Attore#clone()}.*/
+    @SuppressWarnings("unused") // accesso tramite reflection da Attore.clone()
     private ConsumerStorage( ConsumerStorage consumer ) {
         this( consumer.username, consumer.nominativo, consumer.email );
     }
 
+    /** No-arg constructor necessario per Objectify. */
+    @SuppressWarnings("unused")
     private ConsumerStorage(){}
 
     /** Scarica dal database tutti i {@link File} caricati dall'{@link Uploader}

@@ -36,7 +36,6 @@ public abstract class Administrator extends Attore {
      * database in base all'identificativo fornito.
      * @return L'{@link Administrator} cercato, oppure null in caso di errore.*/
     public static Administrator cercaAdministratorDaIdentificativo(Long identificativoAdministrator ) {
-        // TODO : metodo molto simile in Uploader => refactor e metterlo in Attore
         Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoAdministrator);
         return attoreTrovatoInDb instanceof AdministratorStorage ?
                 new AdministratorProxy((AdministratorStorage) attoreTrovatoInDb) : null;
