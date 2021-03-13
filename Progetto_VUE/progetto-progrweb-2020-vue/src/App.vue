@@ -92,16 +92,16 @@ export default {
 
       const parametriRichiestaGet = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
       richiestaGet(process.env.VUE_APP_URL_LOGOUT, parametriRichiestaGet)
-          .catch( risposta => console.log("Logout fallito: " + risposta) )
-          .finally( () => { // logout sul client
-            eliminaTokenAutenticazione();
-            this.$router.push({name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN})
-                .then( () => {
-                  this.csrfToken = undefined;
-                  this.tipoAttoreAutenticato = undefined;
-                  this.nomeAttoreAutenticato = undefined;
-                  this.isUtenteAutenticato = false;
-                });
+          .catch( risposta => console.log("Logout fallito: " + risposta) );
+
+      // logout sul client
+      eliminaTokenAutenticazione();
+      this.$router.push({name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN})
+          .then( () => {
+            this.csrfToken = undefined;
+            this.tipoAttoreAutenticato = undefined;
+            this.nomeAttoreAutenticato = undefined;
+            this.isUtenteAutenticato = false;
           });
 
     }
