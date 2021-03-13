@@ -11,13 +11,14 @@ import java.io.IOException;
  * da memorizzare nel database.
  * @author Matteo Ferfoglia
  */
-// TODO : serve Proxy pattern?
 @Subclass(index = false)
 class UploaderStorage extends Uploader {
 
     @Serialize
     private LogoUploader immagineLogoUploader;
 
+    /** no-args constructor utilizzato da Objectify. */
+    @SuppressWarnings("unused")
     private UploaderStorage() {
         super();
     }

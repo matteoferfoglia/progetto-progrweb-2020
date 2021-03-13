@@ -12,7 +12,6 @@ import java.util.List;
  * da memorizzare nel database.
  * @author Matteo Ferfoglia
  */
-// TODO : serve Proxy pattern?
 @Subclass(index = false)
 class ConsumerStorage extends Consumer {
 

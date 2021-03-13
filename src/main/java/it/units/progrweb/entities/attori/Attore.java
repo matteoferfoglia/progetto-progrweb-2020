@@ -306,8 +306,6 @@ public abstract class Attore implements UserPrincipal, Cloneable {
      * classe data nel parametro registrati nel sistema.*/
     public static List<Long> getListaIdentificativiTuttiGliAttoriNelSistema( Class classeAttore ) {
 
-        // TODO : refactoring: metodo molto simile in Uploader (si potrebbe fare un metodo nella classe Attore)
-
         return DatabaseHelper.listaEntitaNelDatabase(classeAttore)
                 .stream()
                 .map( attore -> ((Attore)attore).getIdentificativoAttore() )

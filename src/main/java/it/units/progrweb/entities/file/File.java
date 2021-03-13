@@ -95,7 +95,7 @@ public abstract class File {
     abstract public boolean isEliminato();
 
     public DateTime getDataEdOraDiCaricamento() {
-        return DateTime.convertiDaString( dataEdOraDiCaricamento );     // TODo : vedere in DateTime un metodo di conversione che fornisce un output più carino
+        return DateTime.convertiDaString( dataEdOraDiCaricamento );     // TODO : vedere in DateTime un metodo di conversione che fornisce un output più carino
     }
 
     protected void setNomeDocumento(String nomeDocumento) {
