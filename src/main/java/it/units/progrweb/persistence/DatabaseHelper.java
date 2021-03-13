@@ -52,7 +52,8 @@ public abstract class DatabaseHelper {
 
     /** Salva un'entità (subito) nel database e ne restituisce l'identificativo. */
     public static<Entita> Object salvaEntita(Entita entita) {
-        return database.save().entity(entita).now().getId();
+        Key<?> k = database.save().entity(entita).now();
+        return k.getId()==0 ? k.getName() : k.getId();  // getId() restituisce l'id o 0 se la chiave ha un nome
     }
 
     /** Salva più di un'entità nel database. */
