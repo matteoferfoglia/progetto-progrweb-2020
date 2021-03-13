@@ -248,7 +248,7 @@ public abstract class File {
 
     /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.
      * @param includiMetadati true se si vogliono anche i metadati.*/
-    public static Field[] getAnteprimaProprietaFile( boolean includiMetadati ) {
+    public static Field[] getAnteprimaProprietaFile( boolean includiMetadati ) {    // TODO : usare FileProxy per evitare di dover escludere manualmente degli attributi
         return Arrays.stream(File.class.getDeclaredFields())
                      .filter( field -> {
 
@@ -257,6 +257,7 @@ public abstract class File {
                          {
                              nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoDestinatario");    // TODO : sarebbe meglio spostare questi attributi e relativi metodo in FileStorage, cosicchè non vengano mostrati
                              nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoMittente");
+                             nomeAttributiInQuestaClasseDaNonMostrare.add("MAX_SIZE_FILE");
 
                              if (!includiMetadati) {
                                  nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoFile");
