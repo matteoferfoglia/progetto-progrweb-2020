@@ -156,8 +156,6 @@ public class FiltroCSRF implements Filter {
         String boundary_nomeAttributo="boundary=";
         String boundary = contentType.substring( contentType.indexOf(boundary_nomeAttributo)+boundary_nomeAttributo.length());
 
-        // TODO : che succede se manca il csrf ?? Come si comporta?? genera eccezioni??
-
         List<String> listaCsrfTokenTorovatiNellaRichiesta =
               Arrays.stream(requestBody.toString().split(boundary))
                     .filter( encapsulatedMultipart -> Pattern.compile("(name=\"" + nomeParametroCsrfTokenNellaRequest + "\")")
@@ -179,7 +177,7 @@ public class FiltroCSRF implements Filter {
         return listaCsrfTokenTorovatiNellaRichiesta.stream()
                         .filter( csrfTokenTrovato -> CsrfToken.isCsrfTokenValido(csrfTokenTrovato, cookieHeader, indirizzoIPClient) )
                         .findAny()
-                        .orElseGet(() -> "");   // restituisce il primo (non in ordine) token valido trovato, oppure stringa vuota
+                        .orElse("");   // restituisce il primo (non in ordine) token valido trovato, oppure stringa vuota
     }
 
 
@@ -187,10 +185,11 @@ public class FiltroCSRF implements Filter {
      * modifica lo {@link StringBuilder} dato appendendoci linea per linea
      * il body della request data.
      * Fonte: https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine
-     * @param httpServletRequest
-     * @param requestBody
+     * @param httpServletRequest Istanza della {@link HttpServletRequest}.
+     * @param requestBody Istanza della classe {@link StringBuilder} a cui appendere tutte le
+     *                    linee della {@link HttpServletRequest}.
      * @throws IOException - Eventualmente generata dai metodi {@link HttpServletRequest#getInputStream()}
-     *                          oppure {@link ServletInputStream#readLine(byte[], int, int)}
+     *                          oppure {@link ServletInputStream#readLine(byte[], int, int)}.
      */
     private void getRequestBody(HttpServletRequest httpServletRequest, StringBuilder requestBody) throws IOException {
         ServletInputStream reader = httpServletRequest.getInputStream();
