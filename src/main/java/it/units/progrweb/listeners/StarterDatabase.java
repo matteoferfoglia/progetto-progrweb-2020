@@ -32,6 +32,7 @@ public class StarterDatabase implements ServletContextListener {
      * registrare nel database. Utilizzare il <i>fully-qualified
      * name</i> delle classi.*/
     private final static String[] nomiEntitaGestiteDalDatabase = {
+            // TODO : non basta mettere gli storage?
             "it.units.progrweb.entities.attori.Attore",
             "it.units.progrweb.entities.attori.administrator.Administrator",
             "it.units.progrweb.entities.attori.administrator.AdministratorStorage",
