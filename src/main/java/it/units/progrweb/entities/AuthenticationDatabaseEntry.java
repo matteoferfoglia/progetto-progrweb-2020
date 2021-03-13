@@ -120,18 +120,23 @@ public class AuthenticationDatabaseEntry {
     private static boolean verificaCredenziali(String passwordDaVerificare, AuthenticationDatabaseEntry authenticationEntry)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
+
+        // Verifica password
         if ( calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
                 .equals(authenticationEntry.hashedSaltedPassword) ) {
             // Credenziali (hashedSalted) valide
 
             // Elimina eventuali password temporanee
-            authenticationEntry.passwordTemporanea = null;
-
-            DatabaseHelper.salvaEntita(authenticationEntry);
+            if( authenticationEntry.passwordTemporanea != null ) {
+                authenticationEntry.passwordTemporanea = null;
+                DatabaseHelper.salvaEntita(authenticationEntry);
+            }
 
             return true;
         }
 
+
+        // Verifica password temporanea (se la verifica della password fallisce)
         if(authenticationEntry.passwordTemporanea!=null &&
                 authenticationEntry.passwordTemporanea.equals(passwordDaVerificare)) {
             // Se si sta accedendo con una password temporanea (salvata in chiaro), allora la si rende "hashedSalted"
@@ -143,6 +148,7 @@ public class AuthenticationDatabaseEntry {
 
             return true;    // credenziali valide
         }
+
 
         // Se qui, credenziali invalide
         return false;
@@ -177,8 +183,8 @@ public class AuthenticationDatabaseEntry {
      * (username, password) non era presente nel database).
      * L'aggiornamento del database <strong>non</strong> avviene
      * automaticamente, ma bisogna invocare {@link Optional#get()}
-     * (può essere invocato solo una volta, le successiva non
-     * produce alcun effetto nel database).
+     * sull'oggetto restituito da questo metodo (può essere invocato solo
+     * una volta, le successiva non produce alcun effetto nel database).
      * Motivazione dell'utilizzo di {@link Optional}: il metodo
      * invocante potrebbe richiedere modifiche anche in altre
      * parti del database e prima di confermarle potrebbe dover
@@ -188,16 +194,20 @@ public class AuthenticationDatabaseEntry {
      * un altro database ha generato un'eccezione) potrebbe
      * comportare un ulteriore costo relativo all'ulteriore accesso
      * in scrittura nel database.
-     * @param username
-     * @param vecchiaPassword
-     * @param nuovaPassword
-     * @return {@link Optional} - Vedere descrizione del metodo.
+     * @param username Nuovo username.
+     * @param vecchiaPassword Vecchia password.
+     * @param nuovaPassword Nuova password.
+     * @return {@link Optional} - Se non si verificano problemi, l'oggetto
+     *                            restituito sarà un {@link Optional} contenente
+     *                            un {@link Supplier} che, una volta eseguita con
+     *                            {@link Supplier#get()}, apporterà le modifiche
+     *                            nella base di dati e restituirà l'identificativo
+     *                            dell'occorrenza {@link AuthenticationDatabaseEntry}
+     *                            appena modificata.
      */
-    public static Optional<AuthenticationDatabaseEntry> modificaPassword(String username,
+    public static Optional<?> modificaPassword(String username,
                                                                          String vecchiaPassword,
                                                                          String nuovaPassword   ) {
-
-        // TODO : testare che funzioni come da aspettative
 
         AuthenticationDatabaseEntry authenticationDatabaseEntry;
         try {
@@ -209,19 +219,19 @@ public class AuthenticationDatabaseEntry {
         try {
             if( verificaCredenziali( vecchiaPassword, authenticationDatabaseEntry ) ) {
 
-                authenticationDatabaseEntry.salt = generaSalt();
-                authenticationDatabaseEntry.hashedSaltedPassword =
-                        calcolaHashedSaltedPassword(nuovaPassword, authenticationDatabaseEntry.salt);
+                // variabili inizializzate fuori dalla lambda function per gestire l'eventuale eccezione con try..catch
+                String nuovoSalt = generaSalt();
+                String nuovoHashedSaltedPassword =
+                        calcolaHashedSaltedPassword(nuovaPassword, nuovoSalt);
 
                 // Creazione del Supplier che modificherà il database
-                boolean giaModificatoIlDatabase = false;
-                Supplier<AuthenticationDatabaseEntry> modificaDatabase = () -> {
-                    if( ! giaModificatoIlDatabase ) // stile closure: questo flag non è modificabile dall'esterno del metodo in cui è definito
-                        DatabaseHelper.salvaEntita(authenticationDatabaseEntry);  // importante che le modifiche vengano apportate subito per i cambi di password
-                    return authenticationDatabaseEntry;
+                Supplier<?> modificaDatabase = () -> {
+                    authenticationDatabaseEntry.salt = nuovoSalt;
+                    authenticationDatabaseEntry.hashedSaltedPassword = nuovoHashedSaltedPassword;
+                    return DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
                 };
 
-                return Optional.of(modificaDatabase.get());// TODO: verificare funzionamento e soprattutto che la modifica nel db avvenga solo DOPO aver invoca Optional#get()
+                return Optional.of(modificaDatabase);
 
             } else {
                 return Optional.empty();
@@ -230,7 +240,6 @@ public class AuthenticationDatabaseEntry {
             Logger.scriviEccezioneNelLog(AuthenticationDatabaseEntry.class, e);
             return Optional.empty();
         }
-
 
     }
 

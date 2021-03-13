@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Questa classe espone i servizi per la modifica
@@ -65,7 +66,8 @@ public class ModificaInformazioniAttore {
             // tutti i campi della stessa entità (solo un accesso al database).
             // Minore leggibilità del codice, ma non spreco accessi nel database.
 
-            Optional<?> optionalModificaAuthDb = Optional.of("qualsiasi valore di inizializzazione, così isPresent() restituirà true");
+            Optional<?> optionalModificaAuthDb = Optional.of("qualsiasi valore di inizializzazione," +
+                                                             "così isPresent() restituirà true se non viene modificato");
 
             // Aggiorno prima AuthDb : se ci sono problemi non accedo altre volte (non necessarie) al database
             //  (tutti gli attori sono registrati nell'AuthDB)
@@ -89,11 +91,13 @@ public class ModificaInformazioniAttore {
                     modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
                 }
 
-                optionalModificaAuthDb.get();
+                ((Supplier<?>) optionalModificaAuthDb.get()).get();
 
             }
 
             try {
+                // Necessaria nuova response di autenticazione per il client perché ha modificato le sue informazioni
+                //  (come se avesse appena fatto il login)
                 return Autenticazione.creaResponseAutenticazionePerAttoreAutenticato(attoreDaModificare);
             } catch (NotFoundException notFoundException) {
                 Logger.scriviEccezioneNelLog(ModificaInformazioniAttore.class, notFoundException);
