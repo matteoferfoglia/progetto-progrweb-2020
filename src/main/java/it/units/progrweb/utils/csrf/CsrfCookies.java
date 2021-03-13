@@ -43,7 +43,7 @@ public class CsrfCookies {
     }
 
 
-    public static Cookie creaCookieContenenteJwtToken(JwtToken<?> jwtToken) {
+    public static Cookie creaCookieContenenteJwtToken(JwtToken jwtToken) {
         return new Cookie(NOME_COOKIE_CSRF, jwtToken.generaTokenJsonCodificatoBase64UrlEncoded(),
                 "Cookie contenente il token JWT il cui payload contiene il token CSRF");
     }

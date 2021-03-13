@@ -36,8 +36,10 @@ public class JwtClaim<TipoValoreClaim> {
         return value;
     }
 
-    public void setValue(TipoValoreClaim value) {
-        this.value = value;
+    @SuppressWarnings("unchecked")
+    public void setValue(Object value) {
+        if( this.value.getClass().equals(value.getClass()) )
+            this.value = (TipoValoreClaim) value;
     }
 }
 

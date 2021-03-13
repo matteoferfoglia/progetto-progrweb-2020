@@ -19,16 +19,16 @@ public class JwtHeader extends JwtClaimsSet {
 }
 
 class JwtHeaderClaims {
-    private final JwtClaim algoritmoHash;
-    private final JwtClaim tipoToken;
+    private final JwtClaim<?> algoritmoHash;
+    private final JwtClaim<?> tipoToken;
 
     public JwtHeaderClaims(String algoritmoHash) {
-        this.algoritmoHash = new JwtClaim("alg", algoritmoHash);
-        this.tipoToken = new JwtClaim("typ", "JWT");
+        this.algoritmoHash = new JwtClaim<>("alg", algoritmoHash);
+        this.tipoToken = new JwtClaim<>("typ", "JWT");
     }
 
-    public Collection<JwtClaim> toCollection() {
-        Collection<JwtClaim> collection = new ArrayList<>();
+    public Collection<JwtClaim<?>> toCollection() {
+        Collection<JwtClaim<?>> collection = new ArrayList<>();
         collection.add(algoritmoHash);
         collection.add(tipoToken);
         return collection;

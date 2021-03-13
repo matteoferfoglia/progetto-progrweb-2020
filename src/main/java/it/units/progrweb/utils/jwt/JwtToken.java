@@ -13,10 +13,8 @@ import java.util.NoSuchElementException;
 /**
  * Classe per la gestione dei token JWT
  * (<a href="https://metamug.com/article/security/jwt-java-tutorial-create-verify.html">Fonte</a>).
- * @param <TipoValoreClaim>: i {@link JwtClaim} possono avere valori
- *                         di tipo diverso: qua viene parametrizzato.
  */
-public class JwtToken<TipoValoreClaim> {
+public class JwtToken {
 
     private final JwtHeader header;
     private final JwtPayload payload;
@@ -47,7 +45,7 @@ public class JwtToken<TipoValoreClaim> {
     }
 
     /** Data una stringa che codifica un token, crea un'istanza di questa classe. */
-    public static JwtToken<?> creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare) {
+    public static JwtToken creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare) {
 
         String[] componentiDelJwt = jwtToken_stringDaVerificare.split("\\.");
         if(componentiDelJwt.length != NUMERO_COMPONENTI_JWT)
@@ -59,7 +57,7 @@ public class JwtToken<TipoValoreClaim> {
         JwtPayload jwtPayload = new JwtPayload(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64UrlEncodedToString(componentiDelJwt[1])));
         JwtSignature jwtSignature = new JwtSignature(componentiDelJwt[2]);  // signature da non codificare base64
 
-        return new JwtToken<>(jwtHeader, jwtPayload, jwtSignature);
+        return new JwtToken(jwtHeader, jwtPayload, jwtSignature);
 
     }
 
@@ -68,13 +66,13 @@ public class JwtToken<TipoValoreClaim> {
      * Tale claim viene cercato sia nell'header sia nel payload.
      * @throws NoSuchElementException se non è presente alcun claim con il nome specificato.
      */
-    public TipoValoreClaim getValoreClaimByName(String nomeClaim){
-        TipoValoreClaim valoreClaim;
+    public Object getValoreClaimByName(String nomeClaim){
+        Object valoreClaim;
         try{
-            valoreClaim = (TipoValoreClaim) header.getClaimByName(nomeClaim).getValue();
+            valoreClaim = header.getClaimByName(nomeClaim).getValue();
         } catch (NoSuchElementException ne) {
             try {
-                valoreClaim = (TipoValoreClaim) payload.getClaimByName(nomeClaim).getValue();
+                valoreClaim = payload.getClaimByName(nomeClaim).getValue();
             } catch (NoSuchElementException ne2) {
                 throw new NoSuchElementException("Claim non trovato.");
             }
@@ -152,7 +150,7 @@ public class JwtToken<TipoValoreClaim> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        JwtToken<?> jwtToken = (JwtToken<?>) o;
+        JwtToken jwtToken = (JwtToken) o;
 
         if (header != null ? !header.equals(jwtToken.header) : jwtToken.header != null) return false;
         if (payload != null ? !payload.equals(jwtToken.payload) : jwtToken.payload != null) return false;

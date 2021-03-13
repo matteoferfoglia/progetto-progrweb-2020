@@ -11,14 +11,12 @@ import java.util.stream.Collectors;
 /**
  * Classe per la rappresentazione di un insieme di claim JWT,
  * cioè il JWT header o il JWT payload.
- * @param <TipoValoreClaim>: i {@link JwtClaim} possono avere valori
- *                           di tipo diverso: qua viene parametrizzato.
  * @author Matteo Ferfoglia
  */
-public class JwtClaimsSet<TipoValoreClaim> {
+public class JwtClaimsSet {
 
     /** Lista di claim. */
-    private final Collection<JwtClaim<TipoValoreClaim>> claimsSet = new ArrayList<>();
+    private final Collection<JwtClaim<?>> claimsSet = new ArrayList<>();
 
     /**
      * Memorizza il claims set in formato JSON e codificato in
@@ -33,13 +31,13 @@ public class JwtClaimsSet<TipoValoreClaim> {
     public JwtClaimsSet() {
     }
 
-    public JwtClaimsSet(Collection<JwtClaim<TipoValoreClaim>> jwtClaimSet) {
+    public JwtClaimsSet(Collection<JwtClaim<?>> jwtClaimSet) {
         this();
         claimsSet.addAll(jwtClaimSet);
     }
 
     /** Crea un nuovo JwtClaimsSet a partire da uno dato.*/
-    protected JwtClaimsSet(JwtClaimsSet<TipoValoreClaim> jwtClaimsSet) {
+    protected JwtClaimsSet(JwtClaimsSet jwtClaimsSet) {
         this(jwtClaimsSet.claimsSet);
         this.claimsSetInFormatJsonBase64UrlEncoded = jwtClaimsSet.claimsSetInFormatJsonBase64UrlEncoded;
     }
@@ -47,7 +45,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
     /**
      * Aggiunge un claim.
      */
-    public void aggiungiClaim(JwtClaim<TipoValoreClaim> jwtClaimDaAggiungere) {
+    public void aggiungiClaim(JwtClaim<?> jwtClaimDaAggiungere) {
         claimsSet.add(jwtClaimDaAggiungere);
         if(is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato())
             calcolaClaimsSetInFormatJsonBase64UrlEncoded();
@@ -69,7 +67,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
      * Modifica, se presente, il claim con il nome specificato.
      * Se modificato, restituisce true, altrimenti false.
      */
-    public boolean modificaValoreClaim(String nomeClaimDaModificare, TipoValoreClaim nuovoValore) {
+    public boolean modificaValoreClaim(String nomeClaimDaModificare, Object nuovoValore) {
         try {
             getClaimByName(nomeClaimDaModificare).setValue(nuovoValore);
             return true;
@@ -86,7 +84,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
      * @param claimName - il nome del claim da cercare.
      * @return Il claim corrispondente al nome cercato.
      */
-    public JwtClaim<TipoValoreClaim> getClaimByName(String claimName) {
+    public JwtClaim<?> getClaimByName(String claimName) {
         return claimsSet.stream()
                         .filter(claim -> claim.getName().equals(claimName))
                         .findAny()
@@ -138,17 +136,16 @@ public class JwtClaimsSet<TipoValoreClaim> {
      * Crea un'istanza di questa classe a partire da una stringa
      * che è una rappresentazione JSON di un insieme di claim.
      */
-    @SuppressWarnings("unchecked")
-    public static<TipoValoreClaim> JwtClaimsSet<TipoValoreClaim> convertiJSONToClaimsSet(String claimSetJSON) {
+    public static JwtClaimsSet convertiJSONToClaimsSet(String claimSetJSON) {
 
-        JwtClaimsSet<TipoValoreClaim> claimsSet = new JwtClaimsSet<>();
+        JwtClaimsSet claimsSet = new JwtClaimsSet();
 
         Map<String, ?> mappaProprietaOggettoJSON =
                 JsonHelper.convertiStringaJsonInMappaProprieta(claimSetJSON);
 
         mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> {
             try {
-                claimsSet.aggiungiClaim(new JwtClaim<>(nomeClaim, (TipoValoreClaim) valoreClaim));
+                claimsSet.aggiungiClaim(new JwtClaim<>(nomeClaim, valoreClaim));
             } catch (Exception e) {
                 Logger.scriviEccezioneNelLog(JwtClaimsSet.class, "Errore durante il casting con Generics", e);
             }
@@ -165,7 +162,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        JwtClaimsSet<?> that = (JwtClaimsSet<?>) o;
+        JwtClaimsSet that = (JwtClaimsSet) o;
 
         if(claimsSet.size()==that.claimsSet.size()){
             // Ordina i claims per valore, li riunisce in una stringa e confronta le due stringhe
