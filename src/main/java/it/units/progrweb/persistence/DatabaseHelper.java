@@ -61,17 +61,6 @@ public abstract class DatabaseHelper {
         database.save().entities(entita).now();
     }
 
-    /** Data una query ed i nomi degli attributi su cui eseguire la proiezione,
-     * questo metodo esegue la query e restituisce la proiezione richiesta
-     * del risultato. Comunque viene restituita l'intera entità, ma non vi saranno
-     * duplicati sugli attributi sui quali viene fatta la proiezione.*/ // TODO : indagare meglio sul funzionamento di questo metodo (IMPORTANTE!!)
-    public static List<?> proiezione(Query<?> query, String ...nomiAttributiProiettare ) {
-        if( query!= null && nomiAttributiProiettare.length>0 )
-            return query.project( nomiAttributiProiettare ).distinct(true).list();
-        else
-            return new ArrayList<>(0);
-    }
-
     /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
      * {@link NotFoundException} se non trova l'entità.*/
     public static Object getById(String identificativoEntita, Class<?> classeEntita)

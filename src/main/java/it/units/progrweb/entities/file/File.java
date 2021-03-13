@@ -95,7 +95,7 @@ public abstract class File {
     abstract public boolean isEliminato();
 
     public DateTime getDataEdOraDiCaricamento() {
-        return DateTime.convertiDaString( dataEdOraDiCaricamento );     // TODO : vedere in DateTime un metodo di conversione che fornisce un output più carino
+        return DateTime.convertiDaString( dataEdOraDiCaricamento );
     }
 
     protected void setNomeDocumento(String nomeDocumento) {
@@ -219,7 +219,6 @@ public abstract class File {
      * oggetto JSON.
      * @param includiMetadati true se si vogliono includere i metadati del file.*/
     public static Map<String, String> getMappa_idFile_propFile(List<File> listaFile, boolean includiMetadati) {
-        // TODO : refactoring potrebbe essere meglio avere una classe documenti che risponda alle richieste di documenti, sia di Consumer sia di Uploaders
 
         return listaFile.stream()
                  .collect(Collectors.toMap(
@@ -470,15 +469,6 @@ public abstract class File {
         String nomeAttributo_flagFileEliminato = "eliminato";
         if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo_identificativoConsumer, File.class) )
             if( UtilitaGenerale.esisteAttributoInClasse(nomeAttributo_identificativoUploader, File.class) )
-//                // TODO : perché ofy().load().type(Entity.class).project("field1").distinct(true) non funziona?
-//                return  DatabaseHelper.proiezione(
-//                            DatabaseHelper.creaERestituisciQueryAnd(File.class,
-//                                    nomeAttributo_identificativoConsumer, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
-//                                    nomeAttributo_flagFileEliminato, DatabaseHelper.OperatoreQuery.UGUALE, false),
-//                        nomeAttributo_identificativoUploader
-//                        ).stream()
-//                         .map(unFile -> ((File)unFile).getIdentificativoMittente())
-//                         .toArray(Long[]::new);
                 return DatabaseHelper.queryAnd(File.class,
                                     nomeAttributo_identificativoConsumer, DatabaseHelper.OperatoreQuery.UGUALE, identificativoConsumer,
                                     nomeAttributo_flagFileEliminato, DatabaseHelper.OperatoreQuery.UGUALE, false)
