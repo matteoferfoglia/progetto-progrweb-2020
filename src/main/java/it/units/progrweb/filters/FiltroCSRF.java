@@ -1,5 +1,6 @@
 package it.units.progrweb.filters;
 
+import it.units.progrweb.EnvironmentVariables;
 import it.units.progrweb.utils.Cookie;
 import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
@@ -17,7 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -202,7 +202,7 @@ public class FiltroCSRF implements Filter {
                                DIMENSIONE_ARRAY_LETTURA)   // massimo spazio disponibile nell'array
                 != -1) {
             // Lettura di una linea alla volta
-            String line = new String(arrayByteLettura, StandardCharsets.UTF_8);    // TODO : cercare tutte le occorrenza di UTF-8 e renderla variabile d'ambiente
+            String line = new String(arrayByteLettura, EnvironmentVariables.STANDARD_CHARSET);
             requestBody.append(line);
         }
     }

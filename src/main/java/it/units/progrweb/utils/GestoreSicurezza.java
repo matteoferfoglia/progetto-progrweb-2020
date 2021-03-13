@@ -1,8 +1,9 @@
 package it.units.progrweb.utils;
 
+import it.units.progrweb.EnvironmentVariables;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 /**
@@ -84,13 +85,13 @@ public class GestoreSicurezza {
     public static String hmacSha256(String datiDaFirmare, String hashDaUsarePerFirmare)
             throws NoSuchAlgorithmException, InvalidKeyException {
 
-        byte[] hash = hashDaUsarePerFirmare.getBytes(StandardCharsets.UTF_8);
+        byte[] hash = hashDaUsarePerFirmare.getBytes(EnvironmentVariables.STANDARD_CHARSET);
 
         Mac sha256Hmac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(hash, "HmacSHA256");
         sha256Hmac.init(secretKey);
 
-        byte[] signedBytes = sha256Hmac.doFinal(datiDaFirmare.getBytes(StandardCharsets.UTF_8));
+        byte[] signedBytes = sha256Hmac.doFinal(datiDaFirmare.getBytes(EnvironmentVariables.STANDARD_CHARSET));
 
         return Base64Helper.encodeToBase64UrlEncoded(signedBytes);
 

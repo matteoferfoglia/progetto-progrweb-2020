@@ -1,6 +1,7 @@
 package it.units.progrweb.utils;
 
-import java.nio.charset.StandardCharsets;
+import it.units.progrweb.EnvironmentVariables;
+
 import java.util.Base64;
 
 /**
@@ -16,7 +17,7 @@ public class Base64Helper {
     public static String encodeToBase64UrlEncoded( String stringDaCodificare ) {
         if( stringDaCodificare == null )
             return "";
-        return encodeToBase64UrlEncoded( stringDaCodificare.getBytes( StandardCharsets.UTF_8 ) );
+        return encodeToBase64UrlEncoded( stringDaCodificare.getBytes( EnvironmentVariables.STANDARD_CHARSET ) );
     }
 
     public static String encodeToBase64UrlEncoded( byte[] byteDaCodificare ) {
