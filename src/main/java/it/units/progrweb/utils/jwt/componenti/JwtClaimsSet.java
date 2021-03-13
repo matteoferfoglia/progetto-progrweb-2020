@@ -1,6 +1,7 @@
 package it.units.progrweb.utils.jwt.componenti;
 
 import it.units.progrweb.utils.Base64Helper;
+import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
 import it.units.progrweb.utils.JsonHelper;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 public class JwtClaimsSet<TipoValoreClaim> {
 
     /** Lista di claim. */
-    private final Collection<JwtClaim> claimsSet = new ArrayList<>();
+    private final Collection<JwtClaim<TipoValoreClaim>> claimsSet = new ArrayList<>();
 
     /**
      * Memorizza il claims set in formato JSON e codificato in
@@ -32,13 +33,13 @@ public class JwtClaimsSet<TipoValoreClaim> {
     public JwtClaimsSet() {
     }
 
-    public JwtClaimsSet(Collection<JwtClaim> jwtClaimSet) {
+    public JwtClaimsSet(Collection<JwtClaim<TipoValoreClaim>> jwtClaimSet) {
         this();
         claimsSet.addAll(jwtClaimSet);
     }
 
     /** Crea un nuovo JwtClaimsSet a partire da uno dato.*/
-    protected JwtClaimsSet(JwtClaimsSet jwtClaimsSet) {
+    protected JwtClaimsSet(JwtClaimsSet<TipoValoreClaim> jwtClaimsSet) {
         this(jwtClaimsSet.claimsSet);
         this.claimsSetInFormatJsonBase64UrlEncoded = jwtClaimsSet.claimsSetInFormatJsonBase64UrlEncoded;
     }
@@ -46,7 +47,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
     /**
      * Aggiunge un claim.
      */
-    public void aggiungiClaim(JwtClaim jwtClaimDaAggiungere) {
+    public void aggiungiClaim(JwtClaim<TipoValoreClaim> jwtClaimDaAggiungere) {
         claimsSet.add(jwtClaimDaAggiungere);
         if(is_claimsSetInFormatJsonBase64UrlEncoded_giaInizializzato())
             calcolaClaimsSetInFormatJsonBase64UrlEncoded();
@@ -85,11 +86,11 @@ public class JwtClaimsSet<TipoValoreClaim> {
      * @param claimName - il nome del claim da cercare.
      * @return Il claim corrispondente al nome cercato.
      */
-    public JwtClaim getClaimByName(String claimName) {
+    public JwtClaim<TipoValoreClaim> getClaimByName(String claimName) {
         return claimsSet.stream()
-                .filter(claim -> claim.getName().equals(claimName))
-                .findAny()
-                .orElseThrow(NoSuchElementException::new);
+                        .filter(claim -> claim.getName().equals(claimName))
+                        .findAny()
+                        .orElseThrow(NoSuchElementException::new);
     }
 
 
@@ -105,7 +106,7 @@ public class JwtClaimsSet<TipoValoreClaim> {
 
         Map<String, Object> mappaProprietaOggetto = claimsSet.stream()
                 .collect(Collectors.toMap(
-                        jwtClaim -> jwtClaim.getName(),
+                        JwtClaim::getName,
                         jwtClaim -> jwtClaim.getValue() == null ? "" : jwtClaim.getValue(),
                         (k,v) -> {
                             throw new IllegalStateException("Errore: due claim non possono avere lo stesso nome.");    // il nome del claim è la chiave di questa mappa
@@ -137,14 +138,22 @@ public class JwtClaimsSet<TipoValoreClaim> {
      * Crea un'istanza di questa classe a partire da una stringa
      * che è una rappresentazione JSON di un insieme di claim.
      */
-    public static JwtClaimsSet convertiJSONToClaimsSet(String claimSetJSON) {
+    @SuppressWarnings("unchecked")
+    public static<TipoValoreClaim> JwtClaimsSet<TipoValoreClaim> convertiJSONToClaimsSet(String claimSetJSON) {
 
-        JwtClaimsSet claimsSet = new JwtClaimsSet();
+        JwtClaimsSet<TipoValoreClaim> claimsSet = new JwtClaimsSet<>();
 
-        Map<String, Object> mappaProprietaOggettoJSON = JsonHelper.convertiStringaJsonInMappaProprieta(claimSetJSON);
-        // TODO : il json supporta anche formati non stringa (numero/null/booolean/array...): trovare il modo di salvare il claim con il tipo corretto, non come stringa
+        Map<String, ?> mappaProprietaOggettoJSON =
+                JsonHelper.convertiStringaJsonInMappaProprieta(claimSetJSON);
 
-        mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> claimsSet.aggiungiClaim(new JwtClaim(nomeClaim, valoreClaim)));
+        mappaProprietaOggettoJSON.forEach((nomeClaim, valoreClaim) -> {
+            try {
+                claimsSet.aggiungiClaim(new JwtClaim<>(nomeClaim, (TipoValoreClaim) valoreClaim));
+            } catch (Exception e) {
+                Logger.scriviEccezioneNelLog(JwtClaimsSet.class, "Errore durante il casting con Generics", e);
+            }
+        });
+
         claimsSet.calcolaClaimsSetInFormatJsonBase64UrlEncoded();
 
         return claimsSet;
@@ -153,27 +162,20 @@ public class JwtClaimsSet<TipoValoreClaim> {
     @Override
     public boolean equals(Object o) {
 
-        //TODO : test
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        JwtClaimsSet that = (JwtClaimsSet) o;
+        JwtClaimsSet<?> that = (JwtClaimsSet<?>) o;
 
-        if(claimsSet != null) {
+        if(claimsSet.size()==that.claimsSet.size()){
+            // Ordina i claims per valore, li riunisce in una stringa e confronta le due stringhe
+            String stringaConTuttiIValoriDIUnClaim = ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa();
+            String stringaConTuttiIValoriDellAltroClaim = that.ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa();
 
-            if(claimsSet.size()==that.claimsSet.size()){
-                // Ordina i claims per valore, li riunisce in una stringa e confronta le due stringhe
-                String stringaConTuttiIValoriDIUnClaim = ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa();
-                String stringaConTuttiIValoriDellAltroClaim = that.ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa();
-
-                return stringaConTuttiIValoriDIUnClaim.equals(stringaConTuttiIValoriDellAltroClaim);
-            }
-            return false;
-
-        } else {
-            return that.claimsSet == null;
+            return stringaConTuttiIValoriDIUnClaim.equals(stringaConTuttiIValoriDellAltroClaim);
         }
+        return false;
+
     }
 
     /** Considera tutti i valori dei claim di quest'istanza, quindi

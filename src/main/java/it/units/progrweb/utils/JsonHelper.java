@@ -66,7 +66,7 @@ public class JsonHelper {
             }
             else if( Pattern.compile(RegexHelper.REGEX_BOOLEAN).matcher(valoreProperty).find() )
                 mappa_NomeProprieta_ValoreProprieta.put(nomeProperty,
-                                                        valoreProperty.equals("true") ? new Boolean(true) : new Boolean(false));
+                                                        valoreProperty.equals("true") ? Boolean.TRUE : Boolean.FALSE);
             else if( valoreProperty.equals("null") )
                 mappa_NomeProprieta_ValoreProprieta.put(nomeProperty, null);
             else //altrimenti valore considerato una stringa

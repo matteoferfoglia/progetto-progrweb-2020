@@ -27,7 +27,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 public class DateTimeTest {
 
     /** Da questo parametro dipende il numero di test che verranno esguiti, vedere {@link #generaParametri_Instant()}. */
-    private final static int QUANTI_ISTANTI_GENERARE = 1000;    // valore elevato perché alcuni parametri sono aleatori // TODO : VARIABILE D'AMBIENTE
+    private final static int QUANTI_ISTANTI_GENERARE = 1000;    // valore elevato perché alcuni parametri sono aleatori
 
 
     /** Test per {@link DateTime#adesso()} ()} , {@link DateTime#toString()},
@@ -267,11 +267,10 @@ public class DateTimeTest {
 
 
     /** Genera delle istanze di {@link Instant} da usare come parametri per i test.*/
-    static Stream<Arguments> generaParametri_Instant() {    // TODO : quanti istanti generare potrebbe essere un parametro
-        final int QUANTI_TEST = QUANTI_ISTANTI_GENERARE;    // specifica quanti arguments devono essere generati (un arguments per ogni test)
+    static Stream<Arguments> generaParametri_Instant() {
         // Parametri generati in modo casuale, quindi tenere alto il numero di test.
 
-        return IntStream.range(0,QUANTI_TEST)
+        return IntStream.range(0, QUANTI_ISTANTI_GENERARE)
                         .mapToObj(val -> {
                             // Crea un istante compreso tra "epoch" ed il doppio della data odierna
                             Instant i = Instant.ofEpochMilli(new Double(Math.random()*2*System.currentTimeMillis()).longValue());
@@ -282,8 +281,8 @@ public class DateTimeTest {
     /** Genera delle coppie ( {@link Instant}, int ) da usare come parametri per i test.*/
     static Stream<Arguments> generaParametri_Instant_int() {
 
-        final int MIN = -30;    // valore minimo per l'intero   // TODO : VARIABILE D'AMBIENTE
-        final int MAX = +30;    // valore massimo per l'intero  // TODO : VARIABILE D'AMBIENTE
+        final int MIN = -30;    // valore minimo per l'intero
+        final int MAX = +30;    // valore massimo per l'intero
 
         int[] valoriInteri = IntStream.rangeClosed(MIN,MAX).toArray();
         Stream<Arguments> argumentsStreamInstant = generaParametri_Instant();

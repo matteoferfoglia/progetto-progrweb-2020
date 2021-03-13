@@ -34,19 +34,10 @@ public class JwtToken<TipoValoreClaim> {
     public JwtToken(JwtPayload payload)
             throws NoSuchAlgorithmException, InvalidKeyException {
 
-        // TODO :  la creazione di un token JWT dovrebbe seguire l'iter descritto dalle specifiche (https://tools.ietf.org/html/rfc7519#section-7.2)
-
         this(   new JwtHeader(JwtSignature.getAlgoritmoHash()),
                 payload,
                 new JwtSignature(new JwtHeader(JwtSignature.getAlgoritmoHash()), payload)   );
-    }
 
-    /** Restituisce una nuova istanza di questa classe, copiando tutti gli
-     * attributi dell'istanza passata come parametro.*/
-    private JwtToken(JwtToken jwtTokenDaCopiare) {
-        this(new JwtHeader(jwtTokenDaCopiare.header),
-                new JwtPayload(jwtTokenDaCopiare.payload),
-                new JwtSignature(jwtTokenDaCopiare.signature));
     }
 
     private JwtToken(JwtHeader header, JwtPayload payload, JwtSignature signature) {
@@ -56,9 +47,7 @@ public class JwtToken<TipoValoreClaim> {
     }
 
     /** Data una stringa che codifica un token, crea un'istanza di questa classe. */
-    public static JwtToken creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare) {
-
-        // TODO : test
+    public static JwtToken<?> creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare) {
 
         String[] componentiDelJwt = jwtToken_stringDaVerificare.split("\\.");
         if(componentiDelJwt.length != NUMERO_COMPONENTI_JWT)
@@ -70,7 +59,7 @@ public class JwtToken<TipoValoreClaim> {
         JwtPayload jwtPayload = new JwtPayload(JwtClaimsSet.convertiJSONToClaimsSet(Base64Helper.decodeFromBase64UrlEncodedToString(componentiDelJwt[1])));
         JwtSignature jwtSignature = new JwtSignature(componentiDelJwt[2]);  // signature da non codificare base64
 
-        return new JwtToken(jwtHeader, jwtPayload, jwtSignature);
+        return new JwtToken<>(jwtHeader, jwtPayload, jwtSignature);
 
     }
 
@@ -112,12 +101,11 @@ public class JwtToken<TipoValoreClaim> {
     /** Verifica la validità di questa istanza del token JWT.*/
     public boolean isTokenValido() {
 
-        // TODO :  la validazione di un token JWT dovrebbe seguire l'iter descritto dalle specifiche (https://tools.ietf.org/html/rfc7519#section-7.1)
-
         boolean tokenScaduto = isTokenScaduto();
         boolean signatureValida = isSignatureValida();
 
         return !tokenScaduto && signatureValida;
+
     }
 
     /**
@@ -161,11 +149,10 @@ public class JwtToken<TipoValoreClaim> {
 
     @Override
     public boolean equals(Object o) {
-        // TODO : test
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        JwtToken jwtToken = (JwtToken) o;
+        JwtToken<?> jwtToken = (JwtToken<?>) o;
 
         if (header != null ? !header.equals(jwtToken.header) : jwtToken.header != null) return false;
         if (payload != null ? !payload.equals(jwtToken.payload) : jwtToken.payload != null) return false;
