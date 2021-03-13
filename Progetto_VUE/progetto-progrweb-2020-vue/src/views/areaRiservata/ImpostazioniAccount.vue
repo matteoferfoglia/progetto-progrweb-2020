@@ -243,12 +243,13 @@ export default {
 
         // Reset dei campi input
         document.getElementById(this.idForm_modificaInformazioniAttore).reset();
-        this.nuovoNominativo   = "";
-        this.nuovaEmail        = "";
-        this.vecchiaPassword   = "";
-        this.nuovaPassword     = "";
-        this.isFileLogoCaricato= false;
-        this.isFormModificato  = false
+        this.nuovoNominativo       = "";
+        this.nuovaEmail            = "";
+        this.vecchiaPassword       = "";
+        this.nuovaPassword         = "";
+        this.confermaNuovaPassword = "";
+        this.isFileLogoCaricato    = false;
+        this.isFormModificato      = false
 
       }
 
