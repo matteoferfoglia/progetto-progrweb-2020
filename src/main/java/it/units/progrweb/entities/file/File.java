@@ -330,7 +330,11 @@ public abstract class File {
             if(file.isEliminato())
                 throw new NotFoundException();
 
-            byte[] contenutoFile = File.getContenutoFile(file, httpServletRequest.getRemoteAddr(), salvaDataOraVisualizzazione);
+            byte[] contenutoFile = File.getContenutoFile(file,
+                                                         httpServletRequest.getRemoteAddr()
+                                                                           .replaceAll("\\[","")
+                                                                           .replaceAll("]",""),     // rimuove [] intorno all'indirizzo
+                                                         salvaDataOraVisualizzazione);
             return Response.ok(contenutoFile, MediaType.APPLICATION_OCTET_STREAM)
                            .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
                            .build();
