@@ -55,13 +55,36 @@ public class RichiestaDocumenti {
 
         return creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
                                            listaFile,
+                                           false,
                                            "consumer/documenti/elencoDocumenti/" + identificativoUploader);
 
     }
 
-    /** Metodo di comodo per #getElencoDocumenti. */
+    /** Metodo di comodo per #getElencoDocumenti.
+     * @param numeroDocumentiAttualmenteNotiAlClient Numero di documenti attualmente noti al client:
+     *                                               se il numero di documenti attualmente noti al client coincide
+     *                                               con quelli attualmente memorizzati nel database, si ipotizza
+     *                                               che l'elenco dei documenti sia aggiornato (possibile bug: se
+     *                                               un uploader elimina un documento e ne inserisce uno nuovo e per
+     *                                               completare quest'operazione impiega meno tempo di quanto ne impiega
+     *                                               un client per fare due richieste successive circa l'elenco dei
+     *                                               documenti, allora questo metodo restituirà NOT_MODIFIED; si
+     *                                               consideri però che quest'inconsistenza è solo temporanea (basta
+     *                                               che il client ricarica la pagina o che scade la sua sessione per
+     *                                               ripristinare la situazione corretta) e permette di minimizzare
+     *                                               l'overhead dei dati trasmessi).
+     * @param listaFile Lista dei file memorizzati nel database e destinati al client che li ha richiesti.
+     * @param includiMetadatiFileNellaResponse Flag: true se l'elenco dei file restituiti deve contenere tutti i
+     *                                         metadati.
+     * @param URI_redirection URI dell'api a cui richiedere l'elenco dei documenti nel caso in cui venga rilevata una
+     *                        differenza tra l'elenco dei documenti noti al client e quelli memorizzati nel database.
+     * @return {@link Response}: NOT_MODIFIED se l'elenco dei documenti noti al client appare aggiornato con quelli
+     *                           nel database, SEE_OTHER se non appare aggiornato, oppure l'elenco dei documenti se
+     *                           il parametro numeroDocumentiAttualmenteNotiAlClient è nullo.
+     */
     public static Response creaResponseElencoDocumenti(Integer numeroDocumentiAttualmenteNotiAlClient,
                                                        List<File> listaFile,
+                                                       boolean includiMetadatiFileNellaResponse,
                                                        String URI_redirection) {
 
         if( numeroDocumentiAttualmenteNotiAlClient !=null ) {
@@ -77,7 +100,7 @@ public class RichiestaDocumenti {
             }
         }
 
-        return UtilitaGenerale.rispostaJsonConMappa(File.getMappa_idFile_propFile(listaFile, false));
+        return UtilitaGenerale.rispostaJsonConMappa(File.getMappa_idFile_propFile(listaFile, includiMetadatiFileNellaResponse));
 
     }
 

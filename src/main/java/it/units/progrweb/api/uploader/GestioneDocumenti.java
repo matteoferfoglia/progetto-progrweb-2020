@@ -243,6 +243,7 @@ public class GestioneDocumenti {
 
         return RichiestaDocumenti.creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
                                                               fileDaRestituire,
+                                                              true,
                                                               "uploader/documenti/mappa-idFile-propFile/" + identificativoConsumer);
     }
 
