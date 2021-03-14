@@ -1,10 +1,7 @@
 import {richiestaGet} from "./http";
 
-// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
-
-
 /**
- * Script JavaScript per la gestione del CSRF token.
+ * Script JavaScript per la gestione del token CSRF.
  */
 
 /**
@@ -21,6 +18,5 @@ export const richiediCSRFTokenAlServer = async () => {
         .catch(risposta => {
             console.error("Errore durante il recupero del token CSRF: " + risposta );
             return Promise.reject(risposta);
-            // TODO : gestire l'errore (invio mail ai gestori?)
         });
 }
