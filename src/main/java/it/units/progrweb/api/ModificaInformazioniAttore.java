@@ -91,7 +91,8 @@ public class ModificaInformazioniAttore {
                     modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
                 }
 
-                ((Supplier<?>) optionalModificaAuthDb.get()).get();
+                if( optionalModificaAuthDb.get() instanceof Supplier )
+                    ((Supplier<?>) optionalModificaAuthDb.get()).get();
 
             }
 
