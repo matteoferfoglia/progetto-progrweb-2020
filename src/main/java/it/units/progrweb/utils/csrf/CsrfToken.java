@@ -70,17 +70,21 @@ public class CsrfToken {
         this.valoreIdentificativoClient = generaTokenAlfanumerico(id_client_length);
         this.indirizzoIPClient = indirizzoIPClient;
 
-        {
-            // Creazione del token JWT contenente il token CSRF
-            JwtPayload jwtPayload = new JwtPayload();
-            jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(DURATA_TOKEN_CSRF_IN_SECONDI));
-            jwtPayload.aggiungiClaim(new JwtSubjectClaim(valoreIdentificativoClient));
-            jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.CSRF_TOKEN.nomeClaim(), valoreCsrfToken));
-            jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.IP_CLIENT.nomeClaim(), indirizzoIPClient));
+        this.jwtToken = creaTokenJwt(indirizzoIPClient);
 
-            this.jwtToken = new JwtToken(jwtPayload);
-        }
+    }
 
+    /** Metodo per la creazione del token JWT contenente il token CSRF. */
+    private JwtToken creaTokenJwt(String indirizzoIPClient)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+
+        JwtPayload jwtPayload = new JwtPayload();
+        jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(DURATA_TOKEN_CSRF_IN_SECONDI));
+        jwtPayload.aggiungiClaim(new JwtSubjectClaim(valoreIdentificativoClient));
+        jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.CSRF_TOKEN.nomeClaim(), valoreCsrfToken));
+        jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.IP_CLIENT.nomeClaim(), indirizzoIPClient));
+
+        return new JwtToken(jwtPayload);
     }
 
     public String getValoreCsrfToken() {

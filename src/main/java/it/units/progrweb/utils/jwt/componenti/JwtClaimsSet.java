@@ -36,10 +36,16 @@ public class JwtClaimsSet {
         claimsSet.addAll(jwtClaimSet);
     }
 
-    /** Crea un nuovo JwtClaimsSet a partire da uno dato.*/
+    /** Crea un nuovo JwtClaimsSet a partire da uno dato (gli elementi
+     * della collection vengono copiati).*/
     protected JwtClaimsSet(JwtClaimsSet jwtClaimsSet) {
-        this(jwtClaimsSet.claimsSet);
+        this(jwtClaimsSet.copia());
         this.claimsSetInFormatJsonBase64UrlEncoded = jwtClaimsSet.claimsSetInFormatJsonBase64UrlEncoded;
+    }
+
+    /** Restituisce una copia della collection di claims in quest'istanza. */
+    private Collection<JwtClaim<?>> copia() {
+        return claimsSet.stream().map(JwtClaim::new).collect(Collectors.toList());
     }
 
     /**

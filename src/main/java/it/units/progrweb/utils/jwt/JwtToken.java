@@ -38,10 +38,11 @@ public class JwtToken {
 
     }
 
+    /** Copy constructor. */
     private JwtToken(JwtHeader header, JwtPayload payload, JwtSignature signature) {
-        this.header = header;
-        this.payload = payload;
-        this.signature = signature;
+        this.header = new JwtHeader(header);
+        this.payload = new JwtPayload(payload);
+        this.signature = new JwtSignature(signature);
     }
 
     /** Copy constructor. */

@@ -82,6 +82,11 @@ public class JwtClaim<TipoValoreClaim> {
         this.value = value;
     }
 
+    /** Copy constructor. */
+    public JwtClaim(JwtClaim<TipoValoreClaim> jwtClaim) {
+        this( jwtClaim.name, jwtClaim.value);
+    }
+
     public String getName() {
         return name;
     }

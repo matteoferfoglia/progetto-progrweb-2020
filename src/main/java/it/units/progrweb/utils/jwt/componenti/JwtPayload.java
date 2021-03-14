@@ -9,8 +9,9 @@ public class JwtPayload extends JwtClaimsSet{
         super();
     }
 
+    /** Copy-constructor. */
     public JwtPayload(JwtClaimsSet jwtClaimsSet) {
-        super(jwtClaimsSet);
+        super(new JwtClaimsSet(jwtClaimsSet));
     }
 
 }
