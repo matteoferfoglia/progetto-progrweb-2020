@@ -44,8 +44,10 @@ public class JwtToken {
         this.signature = signature;
     }
 
-    /** Data una stringa che codifica un token, crea un'istanza di questa classe. */
-    public static JwtToken creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare) {
+    /** Data una stringa che codifica un token, crea un'istanza di questa classe.
+     * @throws IllegalArgumentException Se il token di autenticazione è mal formato.*/
+    public static JwtToken creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare)
+            throws IllegalArgumentException {
 
         String[] componentiDelJwt = jwtToken_stringDaVerificare.split("\\.");
         if(componentiDelJwt.length != NUMERO_COMPONENTI_JWT)

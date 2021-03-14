@@ -4,6 +4,7 @@ import it.units.progrweb.api.uploader.GestioneDocumenti;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.jwt.JwtToken;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,10 +36,8 @@ public class WebService {
     @Path("/login")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String login( CampiFormLogin campiFormLogin ) {
-        return (String) Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword())
-                                      .getEntity();
+    public Response login( CampiFormLogin campiFormLogin ) {
+        return Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword());
     }
 
     /** Questo metodo ha le stesse finalità di
@@ -58,7 +56,9 @@ public class WebService {
                                @FormDataParam("nomeFile")                           String nomeFile,
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
-        if (Autenticazione.getTokenDaHttpServletRequest(httpServletRequest).isTokenValido()) {
+        JwtToken tokenAutenticazione = Autenticazione.getTokenDaHttpServletRequest(httpServletRequest);
+
+        if (tokenAutenticazione!=null && tokenAutenticazione.isTokenValido()) {
 
             Attore mittente = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
             if (!(mittente instanceof Uploader)) // check autenticazione uploader mittente

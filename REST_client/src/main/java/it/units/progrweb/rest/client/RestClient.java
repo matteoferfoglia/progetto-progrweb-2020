@@ -42,8 +42,8 @@ public class RestClient {
     public Response inviaFileAConsumer(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                                        String nomeFile, String listaHashtag, File file) {
 
-        /** Classe di supporto rappresentante un file da caricare, con tutti
-         * gli attributi richiesti dal web service.*/
+        /* Classe di supporto rappresentante un file da caricare, con tutti
+          gli attributi richiesti dal web service.*/
         class FileDaCaricare {
 
             private final String codiceFiscaleConsumer;
@@ -94,8 +94,9 @@ public class RestClient {
 
     }
 
-    /** Metodo per eseguire il login. */
-    public void login(String credenziali_username, String credenziali_password, String loginUri) {
+    /** Metodo per eseguire il login.
+     * @return True se il login va a buon fine, false altrimenti. */
+    public boolean login(String credenziali_username, String credenziali_password, String loginUri) {
 
         /* Classe di supporto utilizzata per la serializzazione dei dati da inviare al server. */
         class Login {
@@ -126,11 +127,18 @@ public class RestClient {
             }
         }
 
-        this.tokenAutenticazione = client.target( loginUri )
-                                         .request( MediaType.TEXT_PLAIN_TYPE )
-                                         .post( Entity.entity(new Login(credenziali_username, credenziali_password),
-                                                MediaType.APPLICATION_JSON_TYPE) )
-                                         .readEntity( String.class );
+        Response risposta = client.target( loginUri )
+                                  .request( MediaType.TEXT_PLAIN_TYPE )
+                                  .post( Entity.entity(new Login(credenziali_username, credenziali_password),
+                                         MediaType.APPLICATION_JSON_TYPE) );
+
+        if( 200<=risposta.getStatus() && risposta.getStatus()<300 ) {
+            // Se login ok, attendo il token di autenticazione nella risposta
+            this.tokenAutenticazione = risposta.readEntity( String.class );
+            return true;
+        } else {
+            return false;
+        }
 
     }
 

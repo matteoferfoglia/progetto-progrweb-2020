@@ -1,5 +1,6 @@
 package it.units.progrweb.rest.client;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
@@ -19,7 +20,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        /** Uri base del server a cui eseguire le richieste */
+        // Uri base del server a cui eseguire le richieste
         final String uri_baseUrl = "http://localhost:8910/api/webService";
 
         // Uri web service
@@ -75,15 +76,22 @@ public class Main {
         try {
 
             // Login del client
-            restClient.login(credenziali_username, credenziali_password, uri_login);
+            if( restClient.login(credenziali_username, credenziali_password, uri_login) ) {
 
-            // Upload del file
-            {
-                String responseBody =
-                        restClient.inviaFileAConsumer( codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
-                                                       nomeFile, listaHashtag, file )
-                                  .readEntity(String.class);
-                System.out.println("--- RISPOSTA DAL SERVER ---\n" + responseBody);
+                // Upload del file
+                {
+                    Response risposta =
+                            restClient.inviaFileAConsumer(codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
+                                                          nomeFile, listaHashtag, file);
+                    System.out.println("--- RISPOSTA DAL SERVER: " +
+                                        risposta.getStatus() + " " + risposta.getStatusInfo() + " ---\n" +
+                                        risposta.readEntity(String.class) + "\n");
+                }
+
+                restClient.logout();
+
+            } else {
+                System.out.println("Errore durante il login.");
             }
 
         } catch (Exception e) {
@@ -91,7 +99,6 @@ public class Main {
             e.printStackTrace(System.err);
         }
 
-        restClient.logout();
         restClient.close();
 
     }

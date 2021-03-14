@@ -296,10 +296,15 @@ public class Autenticazione {
      * lo restituisce, altrimenti restituisce null.*/
     public static Attore getAttoreDaTokenAutenticazione(@NotNull String tokenAutenticazione) {
 
-        JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
-        Long idAttore = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
+        try {
+            JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
+            Long idAttore = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
 
-        return Attore.getAttoreDaIdentificativo(idAttore);
+            return Attore.getAttoreDaIdentificativo(idAttore);
+        } catch (IllegalArgumentException e) {
+            // Se il token di autenticazione è mal formato
+            return null;
+        }
 
     }
 
@@ -346,7 +351,7 @@ public class Autenticazione {
     }
 
     /** Data la HttpServletRequest, restituisce il token di autenticazione
-     * oppure null se non è presente.*/
+     * oppure null se non è presente o se è mal formato.*/
     public static JwtToken getTokenDaHttpServletRequest(HttpServletRequest httpServletRequest) {
         String tokenAutenticazioneBearer = getTokenAutenticazioneBearer(httpServletRequest);
 
@@ -355,10 +360,12 @@ public class Autenticazione {
 
         // Calcolo del JWT token ottenuto dall'authorization header
         JwtToken jwtTokenAutenticazione = null;
-        {
+        try {
             boolean isStringaNonNullaNonVuota = ! tokenAutenticazioneBearer.trim().isEmpty();
             if( isStringaNonNullaNonVuota )
                 jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazioneBearer);
+        } catch (IllegalArgumentException ignored) {
+            // jwtTokenAutenticazione resta null se tokenAutenticazioneBearer è mal formato.
         }
 
         return jwtTokenAutenticazione;

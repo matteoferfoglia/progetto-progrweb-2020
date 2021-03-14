@@ -132,8 +132,8 @@ public class CsrfToken {
                         NOME_CLAIM_CSRF_TOKEN,
                         NOME_CLAIM_IP_CLIENT
                     );
-        } catch (NoSuchElementException eccezioneCookieNonTrovati) {
-            // Restituisce false se non trova i cookie cercati
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            // Restituisce false se non trova i cookie cercati o se il token di autenticazione è mal formato
             return false;
         }
 
