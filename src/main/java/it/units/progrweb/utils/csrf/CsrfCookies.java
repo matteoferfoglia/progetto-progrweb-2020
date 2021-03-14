@@ -49,7 +49,7 @@ public class CsrfCookies {
     }
 
     public static Cookie creaCookieContenenteIdentificativoClient(String valoreIdentificativoClient) {
-        return creaCookieContenenteIdentificativoClient(NOME_COOKIE_ID_CLIENT, valoreIdentificativoClient, Cookie.MAX_AGE_DEFAULT);
+        return creaCookieContenenteIdentificativoClient(NOME_COOKIE_ID_CLIENT, valoreIdentificativoClient, Cookie.MAX_AGE_DEFAULT_IN_SECONDI);
     }
 
     public static Cookie creaCookieContenenteIdentificativoClient(String nomeCookie, String valoreIdentificativoClient, int maxAgeDelCookieInSecondi) {

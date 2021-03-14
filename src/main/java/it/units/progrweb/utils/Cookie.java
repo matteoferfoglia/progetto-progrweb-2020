@@ -12,42 +12,45 @@ import java.util.NoSuchElementException;
  */
 public class Cookie extends NewCookie {
 
-    // Parametri comuni e tipici per tutti i cookie creati da questo server (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
+    // Parametri comuni e tipici per tutti i cookie creati da questo server
+    // fONTE: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
 
     /**
-     * Attributo <i>Path</i> usato di default per il
-     *  cookie, quando non specificato. E' il
-     * percorso nell'url richiesto dal client,
-     * per il quale verrà inviato il cookie.
-     * <blockquote cite="">
-     * A path that must exist in the requested URL,
-     * or the browser won't send the Cookie header.
-     * The forward slash (/) character is interpreted
-     * as a directory separator, and subdirectories will
-     * be matched as well: for Path=/docs, /docs, /docs/Web/,
+     * Attributo <i>Path</i> usato di default per il cookie, quando non specificato. E' il
+     * percorso nell'url richiesto dal client per il quale verrà inviato il cookie.
+     * <blockquote cite="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie">
+     * A path that must exist in the requested URL, or the browser won't send the Cookie header.
+     * The forward slash (/) character is interpreted as a directory separator, and
+     * subdirectories will be matched as well: for Path=/docs, /docs, /docs/Web/,
      * and /docs/Web/HTTP will all match.
      * </blockquote>.
      */
-    public final static String PERCORSO_DEFAULT = "/";// TODO : metterlo come variabile d'ambiente
+    public final static String PERCORSO_DEFAULT = "/";
 
     /**
      * Attributo <i>Host</i> usato di default per il cookie,
      * è l'host a cui verrà inviato il cookie.
      * Se omesso, è l'host del documento corrente.
      */
-    public final static String HOST_DOMAIN_DEFAULT = "";// TODO : metterlo come variabile d'ambiente
+    public final static String HOST_DOMAIN_DEFAULT = "";
 
     /** Attributo <i>Max-Age</i> usato di default per il cookie, in secondi.*/
-    public final static int MAX_AGE_DEFAULT = 3600; // in secondi // TODO : metterlo come variabile d'ambiente
+    public final static int MAX_AGE_DEFAULT_IN_SECONDI = 3600;
 
     /**  Flag <i>Secure</i> usato di default per il cookie. */
-    public final static boolean SECURE_DEFAULT = false; // TODO : metterlo come variabile d'ambiente
+    public final static boolean SECURE_DEFAULT = false;
 
     /** Flag <i>HttpOnly</i> usato di default per il cookie.*/
-    public final static boolean HTTP_ONLY_DEFAULT = true;       // TODO : metterlo come variabile d'ambiente
+    public final static boolean HTTP_ONLY_DEFAULT = true;
 
     /** Valore <i>SameSite</i> usato di default per il cookie.*/
-    public final static String SAME_SITE_VALUE = "Lax";       // TODO : metterlo come variabile d'ambiente
+    public final static String SAME_SITE_VALUE = "Lax";
+
+
+    // ------------------------------ FINE PARAMETRI CONFIGURABILI ------------------------------
+
+
+
 
     /** Nelle richieste HTTP (client verso server), è il nome dell' header contenente i cookie.*/
     public static final String NOME_HEADER_COOKIE = "Cookie";
@@ -68,7 +71,7 @@ public class Cookie extends NewCookie {
     public Cookie(String nomeCookie, String valoreCookie, String descrizioneCookie) {
         this(nomeCookie, valoreCookie,
                 PERCORSO_DEFAULT, HOST_DOMAIN_DEFAULT,
-                descrizioneCookie, MAX_AGE_DEFAULT,
+                descrizioneCookie, MAX_AGE_DEFAULT_IN_SECONDI,
                 SECURE_DEFAULT, HTTP_ONLY_DEFAULT);
     }
 
