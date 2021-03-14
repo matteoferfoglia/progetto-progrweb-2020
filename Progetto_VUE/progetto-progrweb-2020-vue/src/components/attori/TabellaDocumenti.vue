@@ -48,7 +48,7 @@
 
       <div class="mx-auto table-container">
         <table class="table table-hover">
-          <!-- Tabella dei documenti --><!-- TODO : aggiungere un altezza massima nello stile della tabella  -->
+          <!-- Tabella dei documenti -->
           <thead class="thead-dark">
           <tr>
             <th>#</th>
@@ -174,7 +174,7 @@ export default {
        * Ogni entry rappresenta un documento nella forma:
        *    [ idDocumento, { oggetto con proprietà del documento } ]
        */
-      mappaDocumenti: new MappaDocumenti(), // TODO : serve una classe MappaDocumenti? Se l'oggetto non viene passato tramite props non basta una Map normale da usare qua?
+      mappaDocumenti: new MappaDocumenti(),
 
       /** Come {@link #mappaDocumenti}, ma contiene solo i documenti da
        * mostrare, a seguito dell'eventuale filtraggio dell'utente.*/
@@ -207,7 +207,7 @@ export default {
 
       /** In un documento, è il nome della property il cui valore
        * è la data di visualizzazione di quel documento.*/
-      NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO: undefined,    // TODO : aggiungerle alle variabili d'ambiente senza richiederle ogni volta, oppure creare un utility da eseguire una volta sola all'accesso nell'applicazione che richieda una volta per tutte tutti i parametri
+      NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO: undefined,
 
       /** In un documento, è il nome della property il cui valore
        * è la data di caricamento di quel documento.*/
@@ -225,8 +225,6 @@ export default {
     }
   },
   created() {
-
-    // TODO : aggiungere un "loader" (flag layoutCaricato)
 
     const richiestaInfo = async () => {
           // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
@@ -317,7 +315,7 @@ export default {
         alert( "Errore durante il caricamento dei documenti." );
       })
 
-    // Gestione dell'auto-aggiornamento della tabella  // TODO: sarebbe meglio che l'autoaggiornamento richiedesse solo i nuovi documenti e non tutti di nuovo
+    // Gestione dell'auto-aggiornamento della tabella
     this.timerAutoUpdate = setInterval(async () => {
       const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
 
@@ -370,8 +368,6 @@ export default {
      * di hashtag da mostrare.*/
     mostraDocumentiConHashtagFiltrato(hashtag, daMostrare) {
 
-      // TODO : da testare
-
       // Aggiorna lista di hashtag da mostrare
       if(daMostrare) {
         this.listaHashtagDaMostrare.push(hashtag);
@@ -395,7 +391,6 @@ export default {
       // Risultato filter: nella mappa restano solo i documenti che hanno id tra quelli filtrati prima
 
       // Osservazione: elencoDocumenti non viene sovrascritto, quindi l'ordine di visualizzazione è mantenuto
-      // TODO : verificare che si mantenga l'ordine di visualizzazione dei documenti
 
     },
 
@@ -407,7 +402,7 @@ export default {
     rimuoviDocumentoDaListaAttualmenteMostrata(idDocumentoEliminato) {
 
       this.mappaDocumenti.delete(idDocumentoEliminato);
-      this.mappaDocumentiDaMostrare.delete(idDocumentoEliminato); // TODO : creare una specie di proxy, in modo che la mappa dei documenti da mostrare sia un sottoinsieme di tutti i documenti, senza fare le stesse operazioni su entrambe le variabili
+      this.mappaDocumentiDaMostrare.delete(idDocumentoEliminato);
 
       // Ricrea indice degli hashtag
       this.mappa_hashtag_idDocumenti =
@@ -452,24 +447,23 @@ export default {
             if( ! documento[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] ) {
               richiestaGet(process.env.VUE_APP_URL_GET_DATAORA_VISUALIZZAZIONE_DOCUMENTO + '/' + idDocumento)
                   .then(dataOraVisualizzazione => {
-                    // TODO : trovare soluzione in MappaDocumenti per evitare questa duplicazione di codice
-                    this.mappaDocumenti.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
-                        dataOraVisualizzazione;
-                    this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
-                        dataOraVisualizzazione;
-                    this.formattaDate([idDocumento, this.mappaDocumenti.getDaChiave(idDocumento)]);
-                    this.formattaDate([idDocumento, this.mappaDocumentiDaMostrare.getDaChiave(idDocumento)]);
 
-                    this.mappaDocumentiDaMostrare.set(
-                        ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( this.mappaDocumentiDaMostrare.get(),   // TODO : rivedere questo metodo
-                            this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
-                            this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO )
-                    );
-                    this.mappaDocumenti.set(
-                        ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti( this.mappaDocumenti.get(),   // TODO : rivedere questo metodo
-                            this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
-                            this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO )
-                    );
+                    [this.mappaDocumenti, this.mappaDocumentiDaMostrare].forEach( mappaDocumenti => {
+                      // Stesse operazioni da effettuare in entrambe le mappe
+
+                      mappaDocumenti.getDaChiave(idDocumento)[this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO] =
+                          dataOraVisualizzazione;
+                      this.formattaDate([idDocumento, mappaDocumenti.getDaChiave(idDocumento)]);
+
+                      mappaDocumenti.set(
+                          ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti(
+                              mappaDocumenti.get(),
+                              this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                              this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO
+                          )
+                      );
+
+                    });
 
                   })
                   .catch(console.error);
@@ -551,9 +545,10 @@ export default {
           ]
       );
 
-      // TODO : rivedere: c'è un metodo più furbo per aggiornare la mappa dei documenti (bisogna aggiornare anche l'elenco degli hashtag per mantenere consistenza) ?
 
-      const oggetto_Id_PropNuovoDocumento = Object.fromEntries( oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere );
+      const oggetto_Id_PropNuovoDocumento = // oggetto avente come nomeProp l'id di un documento e come valore le proprietà di quel documento
+          Object.fromEntries( oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere );
+
       aggiungiDocumentoAdIndiceHashtag( this.mappa_hashtag_idDocumenti,
           oggetto_Id_PropNuovoDocumento,
           this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO );
@@ -657,8 +652,6 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
         console.error("Errore durante la ricezione del nome dell'attributo " +
             "contenente la data di caricamento dei documenti: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
-        // TODO : gestire l'errore (invio mail ai gestori?)
-        // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
       });
 
 }

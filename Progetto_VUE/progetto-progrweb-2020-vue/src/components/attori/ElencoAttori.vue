@@ -12,13 +12,6 @@
                     @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"
                     v-if="! isConsumerAttualmenteAutenticato()" />
 
-
-
-    <!-- TODO : qua ci va l'elenco degli attori, iterando (v-for) su tutti gli attori associati all'attore autenticato
-            Cliccando (<router-link :to="...">) su un attore si apre la sua scheda (SchedaDiUnAttore.vue)>
-            Sarebbe carino implementare anche una piccola searchbox da mettere in testa a questo componente per filtrare
-            gli attori per nome -->
-
     <nav v-if="isAdministratorAttualmenteAutenticato()" id="sceltaTipoAttoreDiCuiMostrareElenco">
       Visualizza l'elenco degli
       <!-- Administrator può scegliere se visualizzare Uploader o altri Administrator -->
@@ -147,7 +140,7 @@ export default {
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
       csrfToken_wrapper: this.csrfToken,
 
-      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template  // TODO : serve ? C'è anche in SchermataPrincipaleAttoreAutenticato
+      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template
       tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
       tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR
@@ -246,7 +239,7 @@ export default {
               }
             })
             .then( () => this.isComponenteCaricato = true )
-            .catch(console.error);  // TODO : aggiungere gestione dell'errore in tutti i componenti che usano questo "pattern" di caricamento contenuti
+            .catch(console.error);
 
       } else {
         // Se il corpo del metodo non è stato eseguito a causa di parametri invalidi

@@ -92,7 +92,7 @@ export default {
       },
 
 
-      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template  // TODO : serve ? C'è anche in ElencoAttori
+      // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template
       tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
       tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR,

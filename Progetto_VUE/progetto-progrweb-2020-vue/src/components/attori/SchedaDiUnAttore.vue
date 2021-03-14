@@ -150,7 +150,7 @@ name: "SchedaDiUnAttore",
     /** Indica il tipo di attore che sta visualizzando questo componente.*/
     "tipoAttoreAutenticato",
 
-    // Nomi delle proprietà di un attore  // TODO : servono ? Non si può semplicemente iterare sulle prop dell'oggetto "attore"?
+    // Nomi delle proprietà di un attore
     /** Nome della proprietà contenente lo username di un attore nell'oggetto
      * che lo rappresenta.*/
     "NOME_PROP_USERNAME",
@@ -435,8 +435,6 @@ name: "SchedaDiUnAttore",
       });
     },
 
-    // TODO : i metodi isConsumer() / isUploader() / isAdministrator()  sono presenti in più componenti => refactoring
-
     /** Restituisce true se è possibile modificare il logo di un uploader.*/
     mostrareInputFilePerModificaLogoUploader() {
       return this.isAdministratorAttualmenteAutenticato() &&
@@ -579,7 +577,7 @@ name: "SchedaDiUnAttore",
       handler(nuovoValore) {
         if(nuovoValore) {
           this.NOME_PROP_EMAIL_wrapper = nuovoValore;
-          this.caricaQuestoComponente();  // TODO : ogni volta che cambia una di queste proprietà ricarica tutto ... spreco (si potrebbe usare una property inizializzata a 3 e decrementata man mano che si ottengono le property non-undefined, quindi metterci un watch che si attiva quando arriva a zero e fa partire il setup dell'applicazione)
+          this.caricaQuestoComponente();
         }
       }
     },
