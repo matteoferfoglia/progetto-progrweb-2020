@@ -69,7 +69,7 @@ export default {
       tipoUtenteAutenticato_wrapper: this.tipoUtenteAutenticato,  // wrapper
 
       // Dati per header
-      NOME_APPLICAZIONE          : process.env.VUE_APP_NOME_APPLICAZIONE, // TODO : chiedere al server queste informazioni?
+      NOME_APPLICAZIONE          : process.env.VUE_APP_NOME_APPLICAZIONE,
       URL_LOGO_APPLICAZIONE      : process.env.VUE_APP_URL_PERCORSO_LOGO,
       NOME_ROOT_APPLICAZIONE     : process.env.VUE_APP_ROUTER_ROOT_NOME,
 

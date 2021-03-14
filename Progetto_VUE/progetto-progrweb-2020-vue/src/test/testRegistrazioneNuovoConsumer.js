@@ -77,7 +77,6 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
         expect(mockSarebberoInviatiIDatiDalForm_varGlobale).toStrictEqual(formRiempitoCorrettamente);
     });
 
-        // TODO test se, dopo che viene fatto submit nel form, al server arrivano i dati corretti (usando jest.mock)
     /** Simula il server. */
     test('Verifica dei dati ricevuti dal server.',  async () => {
 

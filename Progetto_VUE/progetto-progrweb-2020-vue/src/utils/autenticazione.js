@@ -1,10 +1,8 @@
 /**
- * Codice JavaScript con funzioni di utilità, richiamate da
+ * Codice JavaScript con funzioni di autenticazione, richiamate da
  * componenti diversi e definite qua per evitare duplicazione
  * di codice.
  */
-
-// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
 
 import {
     impostaAuthorizationHeaderInRichiesteHttp,
@@ -37,8 +35,6 @@ export const verificaAutenticazione = async $route => {
  * @param $route la property $route (this.$route) del componente che invoca questo metodo.
  */
 const impostaTokenDiAutenticazioneSeEsiste = $route => {
-
-    // TODO : rivedere questo metodo
 
     // Cerco token autenticazione nei parametri di Vue Router
     if($route) {    // controllo che $route (parametro di questo metodo) sia definita
@@ -84,15 +80,33 @@ export const setTokenAutenticazione = nuovoValoreTokenAutenticazione => {
 /** Restituisce il tipo dell'attore attualmente autenticato.*/
 export const getTipoAttoreAttualmenteAutenticato = async () => {
 
-    // TODO: potrebbe essere ottenuto dal token JWT senza "sprecare" una richiesta al server
+    let necessariaRichiestaAlServer = false;    // diventerà true se sarà necessario richiedere al server
 
-    return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO)
-        .catch( rispostaErrore => {
-            console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
-            return Promise.reject(rispostaErrore);
-            // TODO : gestire l'errore (invio mail ai gestori?)
-            // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
-        });
+    const tokenAutenticazione = getTokenAutenticazione();
+
+    if( tokenAutenticazione && typeof tokenAutenticazione === "string" ) {
+        const [, payloadJwt, ] = tokenAutenticazione.split('.');    // un-packing del JWT ignorando header e signature
+        if( payloadJwt ) {  // bisogna verificare che sia definito
+            const payloadJwt_decodificatoDaBase64_comeStringa = atob(payloadJwt);   // Fonte: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/atob
+            const payloadJwt_decodificatoDaBase64_comeOggettoJS = JSON.parse(payloadJwt_decodificatoDaBase64_comeStringa);
+            const tipoAttoreAttualmenteAutenticato = payloadJwt_decodificatoDaBase64_comeOggettoJS[process.env.VUE_APP_NOME_CLAIM_JWT_TIPO_ATTORE];
+            if( tipoAttoreAttualmenteAutenticato )
+                return tipoAttoreAttualmenteAutenticato;
+            else necessariaRichiestaAlServer = true;
+        } else {
+            necessariaRichiestaAlServer = true;
+        }
+    }
+
+    if ( necessariaRichiestaAlServer ) {
+        return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO)
+            .catch( rispostaErrore => {
+                console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore );
+                return Promise.reject(rispostaErrore);
+            });
+    }
+
+
 
 }
 

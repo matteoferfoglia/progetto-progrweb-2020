@@ -25,7 +25,6 @@ const routes = [
   // Route default (se non trovate altre)
   {
     // Route non trovata (url invalido) (Fonte: https://router.vuejs.org/guide/essentials/redirect-and-alias.html#redirect)
-    // todo : si potrebbe mostrare un alert prima di effettuare redirect
     path: '/:pathMatch(.*)*',
     props: true,
     redirect: { name: process.env.VUE_APP_ROUTER_ROOT_NOME }
@@ -95,7 +94,6 @@ const routes = [
             path: process.env.VUE_APP_ROUTER_PATH_SCHEDA_UN_ATTORE + '/:' +
                     process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE,
             name: process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
-            // TODO : aggiungere controllo: prima di instradare verificare che ci siano le property e se non ci sono richiederle al server
             component: () => import('../components/attori/SchedaDiUnAttore'),
             props: true,
             meta: {
@@ -147,7 +145,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
     if( routeDestinazione.matched.some(route => route.meta.requiresAuth) ) {
       // Gestione instradamento per route che richiede autenticazione
 
-      await verificaAutenticazione(routeDestinazione) // TODO: verifica autenticazione dovrebbe basarsi sul token JWT (implementare metodo in autenticazione.js)
+      await verificaAutenticazione(routeDestinazione)
         .then( async isUtenteAutenticato => {
 
           if(isUtenteAutenticato) {
