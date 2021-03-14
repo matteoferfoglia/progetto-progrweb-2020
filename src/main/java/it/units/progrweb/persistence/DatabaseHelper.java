@@ -1,5 +1,6 @@
 package it.units.progrweb.persistence;
 
+import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
@@ -65,24 +66,6 @@ public abstract class DatabaseHelper {
      * {@link NotFoundException} se non trova l'entità.*/
     public static Object getById(Long identificativoEntita, Class<?> classeEntita)
             throws NotFoundException {
-
-        // TODO : attenzione: molto simile al metodo con lo stesso nome che prende String come parametro ... refactoring?
-
-        // TODO : attenzione a quante volte viene invocato questo metodo (accedere al db costa), di seguito stacktrafce invocazioni
-        //        ma riprovare mettendo qua il breakpoint e vedere quante volte viene chiamato in una request
-        /* Invocato 4 volte da Filtro Autenticazione sulla stessa richiesta, serve?
-            getById:94, DatabaseHelper (it.units.progrweb.persistence)
-            getAttoreDaIdentificativo:151, Attore (it.units.progrweb.entities.attori)
-            isStessoHashCookieIdNelToken:278, Autenticazione (it.units.progrweb.utils)
-            isClientAutenticato:236, Autenticazione (it.units.progrweb.utils)
-            isClientAttualmenteAutenticato:52, LoginLogout (it.units.progrweb.api)
-            FiltroAutenticazione
-
-            getById:94, DatabaseHelper (it.units.progrweb.persistence)
-            getNominativoDaIdentificativo:56, Consumer (it.units.progrweb.entities.attori.nonAdministrator.consumer)
-            getNomeUploader:219, GestioneConsumer (it.units.progrweb.api.uploader)
-            doFilter:34, FiltroUploader (it.units.progrweb.filters.attori)
-       */
 
         try {
             return database.load().type(classeEntita).id(identificativoEntita).now();
@@ -181,7 +164,7 @@ public abstract class DatabaseHelper {
 
     }
 
-    /** Crea e restituisce una Query, date due condizioni poste in AND.*/   // TODO : da rivedere ed eventuale refactoring
+    /** Crea e restituisce una Query, date due condizioni poste in AND.*/
     public static<Attributo> Query<?> creaERestituisciQueryAnd(Class<?> classeEntita,
                                                     String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                                     String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
@@ -207,9 +190,6 @@ public abstract class DatabaseHelper {
                                               String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                               String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2) {
 
-        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
-        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
-
         Query<?> query = creaERestituisciQueryAnd(classeEntita,
                 nomeAttributo1, operatoreCondizione1, valoreCondizione1,
                 nomeAttributo2, operatoreCondizione2, valoreCondizione2);
@@ -226,9 +206,6 @@ public abstract class DatabaseHelper {
                                               String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
                                               String nomeAttributoOrdinamento) {
 
-        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
-        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
-
         Query<?> query = creaERestituisciQueryAnd(classeEntita,
                 nomeAttributo1, operatoreCondizione1, valoreCondizione1,
                 nomeAttributo2, operatoreCondizione2, valoreCondizione2);
@@ -244,9 +221,6 @@ public abstract class DatabaseHelper {
                                               String nomeAttributo1,OperatoreQuery operatoreCondizione1, Attributo valoreCondizione1,
                                               String nomeAttributo2,OperatoreQuery operatoreCondizione2, Attributo valoreCondizione2,
                                               String nomeAttributo3,OperatoreQuery operatoreCondizione3, Attributo valoreCondizione3) {
-
-        // TODO : rifare questo metodo ed interfacciarlo meglio con gli altri. Vedi : com.googlecode.objectify.cmd.Loader
-        // TODO                                                                Ad un Loader (ottenibile con .type(Class) può essere filtrato con .filter(...) )
 
         Query<?> query = creaERestituisciQueryAnd(classeEntita,
                 nomeAttributo1, operatoreCondizione1, valoreCondizione1,
@@ -265,23 +239,29 @@ public abstract class DatabaseHelper {
      * di questo metodo lo fa subito (in modo sincrono).
      *
      * @return true se l'esecuzione va a buon fine.*/
-    public static boolean completaOra() {     // TODO : indagare meglio su questo metodo
-
-        final long MILLISECONDI_RITARDO_FORZATO = 50;   // TODO : verificare tempi di accesso richiesti dal Datastore reale
+    public static boolean completaOra() {
 
         AsyncCacheFilter.complete();    // Fonte: https://groups.google.com/g/objectify-appengine/c/a4CaFbZdqh0/m/Ih_vEaoBRCEJ
-        try {
+        if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
+            // Local development server
+
             // Pur seguendo la documentazione di Objectify, dai test si è visto che
             // circa il 10% delle volte la modifica non si propagava in modo sincrono
-            // sul database, quindi si aggiunge un breve ritardo (~ millisecondi)
+            // sul database locale, quindi si aggiunge un breve ritardo (~ millisecondi)
             // tale che al termine di questo metodo la modifica sia propagata nel
             // database.
-            TimeUnit.MILLISECONDS.sleep(MILLISECONDI_RITARDO_FORZATO);
-        } catch (InterruptedException e) {
-            Logger.scriviEccezioneNelLog(DatabaseHelper.class,
-                    "Eccezione nel completamento immediato di un'operazione" +
-                                    " nel database, eccezione generata dal ritardo imposto nel codice", e);
+
+            final long MILLISECONDI_RITARDO_FORZATO = 50;
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(MILLISECONDI_RITARDO_FORZATO);
+            } catch (InterruptedException e) {
+                Logger.scriviEccezioneNelLog(DatabaseHelper.class,
+                        "Eccezione nel completamento immediato di un'operazione" +
+                                " nel database, eccezione generata dal ritardo imposto nel codice", e);
+            }
         }
+
         return true;
     }
 
