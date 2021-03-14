@@ -79,7 +79,7 @@ public class Main {
             if( restClient.login(credenziali_username, credenziali_password, uri_login) ) {
 
                 // Upload del file
-                for (int i=0; i<5000; i++) {
+                {
                     Response risposta =
                             restClient.inviaFileAConsumer(codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
                                                           nomeFile, listaHashtag, file);
