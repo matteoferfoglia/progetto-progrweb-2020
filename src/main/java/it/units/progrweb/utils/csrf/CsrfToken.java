@@ -37,13 +37,6 @@ import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodifica
  */
 public class CsrfToken {
 
-    /** Nome del claims JWT il cui valore è il CSRF-token. */
-    public static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";
-
-    /** Nome del claims JWT il cui valore è l'indirizzo IP
-     * del client a cui è stato rilasciato il token CSRF.*/
-    public static final String NOME_CLAIM_IP_CLIENT = "IP-CLIENT";
-
     /** Durata in secondi del token JWT. */
     private static final int DURATA_TOKEN_CSRF_IN_SECONDI = 30*60;
 
@@ -82,8 +75,8 @@ public class CsrfToken {
             JwtPayload jwtPayload = new JwtPayload();
             jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(DURATA_TOKEN_CSRF_IN_SECONDI));
             jwtPayload.aggiungiClaim(new JwtSubjectClaim(valoreIdentificativoClient));
-            jwtPayload.aggiungiClaim(new JwtClaim<>(NOME_CLAIM_CSRF_TOKEN, valoreCsrfToken));
-            jwtPayload.aggiungiClaim(new JwtClaim<>(NOME_CLAIM_IP_CLIENT, indirizzoIPClient));
+            jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.CSRF_TOKEN.nomeClaim(), valoreCsrfToken));
+            jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.IP_CLIENT.nomeClaim(), indirizzoIPClient));
 
             this.jwtToken = new JwtToken(jwtPayload);
         }
@@ -109,7 +102,6 @@ public class CsrfToken {
     /**
      * Verifica la validità del token CSRF, il quale è gestito tramite
      * cookie, quindi è la classe {@link CsrfCookies} ad occuparsene.
-     * Vedere{@link #isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
      * @param valoreTokenCsrf Valore del token CSRF da verificare
      * @param cookieHeader Headere della richiesta HTTP che necessita delle validazione CSRF.
      * @param indirizzoIPClient Indirizzo IP del client da cui proviene la richiesta.
@@ -129,8 +121,8 @@ public class CsrfToken {
                         jwtTokenOttenutoDaCookie,
                         identificativoClientOttenutoDaCookie,
                         indirizzoIPClient,
-                        NOME_CLAIM_CSRF_TOKEN,
-                        NOME_CLAIM_IP_CLIENT
+                        JwtClaim.NomeClaim.CSRF_TOKEN,
+                        JwtClaim.NomeClaim.IP_CLIENT
                     );
         } catch (NoSuchElementException | IllegalArgumentException e) {
             // Restituisce false se non trova i cookie cercati o se il token di autenticazione è mal formato
@@ -159,14 +151,14 @@ public class CsrfToken {
                                              JwtToken jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient,
                                              String valoreIdentificativoClientRicevuto,
                                              String valoreIndirizzoIPClientRicevuto,
-                                             String nomeClaimCsrfTokenInJwtPayload,
-                                             String nomeClaimIPClientInJwtPayload ) {
+                                             JwtClaim.NomeClaim nomeClaimCsrfTokenInJwtPayload,
+                                             JwtClaim.NomeClaim nomeClaimIPClientInJwtPayload ) {
 
         String valoreCsrfTokenDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
 
         String valoreIdentificativoClientDaJwt = String.valueOf( jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
-                .getValoreSubjectClaim() );
+                .getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE) );
 
         String valoreIndirizzoIPClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
                 .getValoreClaimByName(nomeClaimIPClientInJwtPayload);

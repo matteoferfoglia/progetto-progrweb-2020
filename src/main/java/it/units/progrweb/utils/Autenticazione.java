@@ -39,12 +39,8 @@ public class Autenticazione {
 
     /** Nome del cookie contenente un token per il client. L'hash di questo valore
      * è presente nel token di autenticazione del client, nel claims con nome specificato
-     * in {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE}.*/
+     * in {@link JwtClaim#JWT_HASH_TOKEN_AUTENTICAZIONE_IN_COOKIE_CLAIM_NAME}.*/
     private static final String NOME_COOKIE_CLIENT_TOKEN = "TOKEN-ID-CLIENT-AUTENTICAZIONE";
-
-    /** Nome del claims contenente l'hash del token associato al client nel JWT di autenticazione.
-     * Vedere anche {@link #creaJwtTokenAutenticazionePerAttore(Attore, String)}.*/
-    private static final String NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE = "hash-" + NOME_COOKIE_CLIENT_TOKEN;
 
     /** Nelle richieste HTTP, è il nome dell' header contenente il token di autenticazione.*/
     private static final String NOME_HEADER_AUTHORIZATION = "Authorization";
@@ -189,7 +185,7 @@ public class Autenticazione {
      * presente nell'header <i>Authorization</i> della request.
      * Inoltre, la request deve contenere il cookie il cui hash del valore corrisponde
      * a quello indicato nel claims di nome specificato in
-     * {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE} contenuto nel payload
+     * {@link JwtClaim#JWT_HASH_TOKEN_AUTENTICAZIONE_IN_COOKIE_CLAIM_NAME} contenuto nel payload
      * del token appena verificato.
      * @return true se il client è autenticato, false altrimenti.*/
     public static boolean isClientAutenticato(HttpServletRequest httpServletRequest) {
@@ -234,8 +230,8 @@ public class Autenticazione {
     private static boolean isStessoHashCookieIdNelToken(@NotNull JwtToken jwtTokenAutenticazione,
                                                         Cookie[] cookies) {
 
-        Long identificativoAttoreDaToken = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
-        String valoreHash_nelTokenAutenticazione_dalClient = (String) jwtTokenAutenticazione.getValoreClaimByName(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE);
+        Long identificativoAttoreDaToken = (Long)jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE);
+        String valoreHash_nelTokenAutenticazione_dalClient = (String) jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.HASH_TOKEN_AUTENTICAZIONE);
         String valoreCookieId_dalClient;
         try {
             valoreCookieId_dalClient = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
@@ -280,7 +276,7 @@ public class Autenticazione {
         JwtPayload jwtPayload = new JwtPayload();
         jwtPayload.aggiungiClaim(new JwtSubjectClaim(attore.getIdentificativoAttore()));
         jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(TIMEOUT_AUTENTICAZIONE_IN_SECONDI));
-        jwtPayload.aggiungiClaim(new JwtClaim<>(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
+        jwtPayload.aggiungiClaim(new JwtClaim<>(JwtClaim.NomeClaim.HASH_TOKEN_AUTENTICAZIONE.nomeClaim(),
                                                 GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
 
         // Aggiunge gli attributi dell'attore
@@ -299,7 +295,7 @@ public class Autenticazione {
 
         try {
             JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
-            Long idAttore = (Long)jwtTokenAutenticazione.getValoreSubjectClaim();
+            Long idAttore = (Long)jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE);
 
             return Attore.getAttoreDaIdentificativo(idAttore);
         } catch (IllegalArgumentException e) {
@@ -331,24 +327,33 @@ public class Autenticazione {
     }
 
     /** Restituisce il tipo di {@link Attore} in base alle informazioni contenute
-     * nel token JWT. */
+     * nel token JWT o null se l'informazione non è presente. */
     public static String getTipoAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
-        return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_TIPO_ATTORE_CLAIM_NAME );
+        if (jwtTokenAutenticazione != null) {
+            return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.TIPO_ATTORE );
+        }
+        return null;
     }
 
     /** Restituisce il nome dell'{@link Attore} in base alle informazioni contenute
-     * nel token JWT. */
+     * nel token JWT o null se l'informazione non è presente. */
     public static String getNomeAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
-        return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_NOME_SUBJECT_CLAIM_NAME );
+        if (jwtTokenAutenticazione != null) {
+            return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.NOME_ATTORE );
+        }
+        return null;
     }
 
     /** Restituisce l'identificativo dell'{@link Attore} in base alle informazioni contenute
-     * nel token JWT. */
+     * nel token JWT o null se l'informazione non è presente. */
     public static Long getIdentificativoAttoreDaTokenAutenticazione(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
-        return (Long)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.JWT_SUBJECT_CLAIM_NAME );
+        if (jwtTokenAutenticazione != null) {
+            return (Long)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.ID_ATTORE );
+        }
+        return null;
     }
 
     /** Data la HttpServletRequest, restituisce il token di autenticazione

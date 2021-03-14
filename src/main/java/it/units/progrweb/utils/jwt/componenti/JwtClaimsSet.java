@@ -52,22 +52,10 @@ public class JwtClaimsSet {
     }
 
     /**
-     * Rimuove, se presente, il claims con il nome specificato.
-     * Se rimosso, restituisce true, altrimenti false.
-     */
-    public boolean rimuoviClaim(String nomeClaimDaRimuovere) {
-        try {
-            return claimsSet.remove(getClaimByName(nomeClaimDaRimuovere));
-        } catch(NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    /**
      * Modifica, se presente, il claims con il nome specificato.
      * Se modificato, restituisce true, altrimenti false.
      */
-    public boolean modificaValoreClaim(String nomeClaimDaModificare, Object nuovoValore) {
+    public boolean modificaValoreClaim(JwtClaim.NomeClaim nomeClaimDaModificare, Object nuovoValore) {
         try {
             getClaimByName(nomeClaimDaModificare).setValue(nuovoValore);
             return true;
@@ -84,9 +72,9 @@ public class JwtClaimsSet {
      * @param claimName - il nome del claims da cercare.
      * @return Il claims corrispondente al nome cercato.
      */
-    public JwtClaim<?> getClaimByName(String claimName) {
+    public JwtClaim<?> getClaimByName(JwtClaim.NomeClaim claimName) {
         return claimsSet.stream()
-                        .filter(claim -> claim.getName().equals(claimName))
+                        .filter(claim -> claim.getName().equals(claimName.nomeClaim()))
                         .findAny()
                         .orElseThrow(NoSuchElementException::new);
     }

@@ -81,9 +81,9 @@ public class CsrfCookiesTest {
                     Field jwtPayloadDelClientField = JwtToken.class.getDeclaredField("payload");
                     jwtPayloadDelClientField.setAccessible(true);
                     JwtPayload jwtPayloadDelClient = (JwtPayload) jwtPayloadDelClientField.get(jwtTokenDelClient);
-                    JwtClaim expirationTimeClaimClient = jwtPayloadDelClient.getClaimByName(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME);
+                    JwtClaim<?> expirationTimeClaimClient = jwtPayloadDelClient.getClaimByName(JwtClaim.NomeClaim.EXP);
 
-                    jwtPayloadRicreato.modificaValoreClaim(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME, expirationTimeClaimClient.getValue());
+                    jwtPayloadRicreato.modificaValoreClaim(JwtClaim.NomeClaim.EXP, expirationTimeClaimClient.getValue());
                 }
 
                 jwtTokenRicreatoNelServer = new JwtToken(jwtPayloadRicreato);
@@ -100,7 +100,7 @@ public class CsrfCookiesTest {
     }
 
 
-    /** Test per {@link it.units.progrweb.utils.csrf.CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
+    /** Test per {@link it.units.progrweb.utils.csrf.CsrfToken#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
      * @param valoreCsrfTokenDaVerificare è il token CSRF da verificare (ottenuto dal
      *                                    form in cui è stato usato)
      * @param cookieHeader è il cookie header (testuale) ricevuto dalla richiesta HTTP.
@@ -121,14 +121,14 @@ public class CsrfCookiesTest {
 
             boolean risultatoOttenuto = (boolean) metodoProtettoDaTestare.invoke(null,
                     valoreCsrfTokenDaVerificare, cookieHeader, indirizzoIPClient,
-                    CsrfToken.NOME_CLAIM_CSRF_TOKEN, CsrfToken.NOME_CLAIM_IP_CLIENT );
+                    JwtClaim.NomeClaim.CSRF_TOKEN.nomeClaim(), JwtClaim.NomeClaim.IP_CLIENT.nomeClaim() );
 
             if(risultatoOttenuto!=isCsrfCookieValido_expected) {
                 UtilsInTest.scriviNelLogDeiTest( "----- TEST FALLITO -----\n"
                         + "VALORE CSRF TOKEN DA VERIFICARE:\t" + valoreCsrfTokenDaVerificare + "\n"
                         + "COOKIE HEADER:\t" + cookieHeader + "\n"
-                        + "NOME CLAIM CSRF TOKEN:\t" + CsrfToken.NOME_CLAIM_CSRF_TOKEN + "\n"
-                        + "NOME CLAIM IP CLIENT:\t" + CsrfToken.NOME_CLAIM_IP_CLIENT + "\n"
+                        + "NOME CLAIM CSRF TOKEN:\t" + JwtClaim.NomeClaim.CSRF_TOKEN.nomeClaim() + "\n"
+                        + "NOME CLAIM IP CLIENT:\t" + JwtClaim.NomeClaim.IP_CLIENT.nomeClaim() + "\n"
                         + "** RISULTATO ATTESO:\t" + isCsrfCookieValido_expected + "\n"
                         + "## RISULTATO OTTENUTO:\t" + risultatoOttenuto + "\n\n");
             }

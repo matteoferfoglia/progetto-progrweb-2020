@@ -68,7 +68,7 @@ public class JwtToken {
      * Tale claims viene cercato sia nell'header sia nel payload.
      * @throws NoSuchElementException se non è presente alcun claims con il nome specificato.
      */
-    public Object getValoreClaimByName(String nomeClaim){
+    public Object getValoreClaimByName(JwtClaim.NomeClaim nomeClaim){
         Object valoreClaim;
         try{
             valoreClaim = header.getClaimByName(nomeClaim).getValue();
@@ -80,15 +80,6 @@ public class JwtToken {
             }
         }
         return valoreClaim;
-    }
-
-    /**
-     * Restituisce il claims "Subject" se presente.
-     * @throws NoSuchElementException Se il claims cercato non è presente.
-     * @return Il claims corrispondente al nome cercato.
-     */
-    public Object getValoreSubjectClaim() {
-        return getValoreClaimByName(JwtClaim.JWT_SUBJECT_CLAIM_NAME);
     }
 
     /** Genera il token JWT, già firmato e nella codifica corretta (Base64 separato da punti).*/
@@ -119,7 +110,7 @@ public class JwtToken {
 
         boolean isTokenScaduto = true;  // valore default di inizializzazione
         try{
-            isTokenScaduto = new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME))
+            isTokenScaduto = new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.NomeClaim.EXP))
                                     .isScaduto();
         } catch(NoSuchElementException e) {
             // Se qui, non c'è Expiration Time nel token, quindi non è scaduto
