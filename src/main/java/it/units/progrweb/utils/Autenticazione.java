@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 import static it.units.progrweb.utils.GeneratoreTokenCasuali.generaTokenAlfanumerico;
 
@@ -230,7 +229,6 @@ public class Autenticazione {
     private static boolean isStessoHashCookieIdNelToken(@NotNull JwtToken jwtTokenAutenticazione,
                                                         Cookie[] cookies) {
 
-        Long identificativoAttoreDaToken = (Long)jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE);
         String valoreHash_nelTokenAutenticazione_dalClient = (String) jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.HASH_TOKEN_AUTENTICAZIONE);
         String valoreCookieId_dalClient;
         try {
@@ -240,20 +238,23 @@ public class Autenticazione {
             // Cookie non trovato
             return false;
         }
-        Attore attoreCheStaAutenticandosi = Attore.getAttoreDaIdentificativo(identificativoAttoreDaToken);
 
         try {
+
+            String usernameAttoreCheStaAutenticandosi = (String) jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.USERNAME_ATTORE);
+
             String hashPasswordAttore_daAuthDb =
-                    AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(Objects.requireNonNull(attoreCheStaAutenticandosi).getUsername());
+                    AuthenticationDatabaseEntry.getHashedSaltedPasswordDellAttore(usernameAttoreCheStaAutenticandosi);
 
             String hashValoreCookieId_ricalcolatoCoiValoriNelServer =
                     GestoreSicurezza.hmacSha256(valoreCookieId_dalClient, hashPasswordAttore_daAuthDb);
 
             return valoreHash_nelTokenAutenticazione_dalClient.equals(hashValoreCookieId_ricalcolatoCoiValoriNelServer);
+
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(Autenticazione.class, e);
             return false;
-        } catch (NotFoundException notFoundException) {
+        } catch (NoSuchElementException|NotFoundException ignored) {
             return false;
         }
 
