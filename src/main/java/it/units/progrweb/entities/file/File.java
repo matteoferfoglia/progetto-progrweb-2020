@@ -317,7 +317,7 @@ public abstract class File {
                                                boolean salvaDataOraVisualizzazione   ) {
 
         Long identificativoAttoreDaHttpServletRequest =
-                Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+                Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
         try {
 

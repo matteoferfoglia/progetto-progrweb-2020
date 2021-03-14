@@ -60,7 +60,7 @@ public class WebService {
 
         if (tokenAutenticazione!=null && tokenAutenticazione.isTokenValido()) {
 
-            Attore mittente = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+            Attore mittente = Autenticazione.getAttoreDaDatabase(httpServletRequest);
             if (!(mittente instanceof Uploader)) // check autenticazione uploader mittente
                 return Autenticazione.creaResponseUnauthorized();
 

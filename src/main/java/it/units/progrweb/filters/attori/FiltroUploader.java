@@ -33,7 +33,7 @@ public class FiltroUploader implements Filter {
         if(tipoAttore.equals(Uploader.class.getSimpleName()))
             chain.doFilter(req, resp);
         else
-            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+            Autenticazione.creaResponseUnauthorized((HttpServletResponse) resp);
 
     }
 

@@ -116,11 +116,18 @@ public class Autenticazione {
         return creaResponseUnauthorized();
     }
 
-    public static Response creaResponseUnauthorized() { // TODO : c'è anche il metodo rispondiNonAutorizzato() ... servono entrambi?
+    public static Response creaResponseUnauthorized() {
         return Response.status(Response.Status.UNAUTHORIZED)
                        .header(NOME_HEADER_AUTHENTICATE, TIPO_AUTENTICAZIONE_RICHIESTA)   // invita il client ad autenticarsi
                        .entity("Credenziali invalide")                                    // body della response
                        .build();
+    }
+
+    /** Invia una risposta al client indicando che non è autorizzato.*/
+    public static void creaResponseUnauthorized(HttpServletResponse response)
+            throws IOException {
+        response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getReasonPhrase() );
     }
 
     public static Response creaResponseForbidden(String messaggio) {
@@ -311,20 +318,11 @@ public class Autenticazione {
      * che non si è autenticato oppure se l'autenticazione non è valida,
      * allora restituisce null.
      * Questo metodo utilizza {@link #getAttoreDaTokenAutenticazione(String)}*/
-    public static Attore getAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
-
-        // TODO : vedere dov'è stato usato questo metodo (getTokenAutenticazioneBearer fa accessi costosi al database)
+    public static Attore getAttoreDaDatabase(HttpServletRequest httpServletRequest) {
 
         String tokenAutenticazione = getTokenAutenticazioneBearer(httpServletRequest);
         return getAttoreDaTokenAutenticazione(tokenAutenticazione);
 
-    }
-
-    /** Invia una risposta al client indicando che non è autorizzato.*/
-    public static void rispondiNonAutorizzato(HttpServletResponse response)
-            throws IOException {
-        response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
-                            Response.Status.UNAUTHORIZED.getReasonPhrase() );
     }
 
     /** Restituisce il tipo di {@link Attore} in base alle informazioni contenute
@@ -349,7 +347,7 @@ public class Autenticazione {
 
     /** Restituisce l'identificativo dell'{@link Attore} in base alle informazioni contenute
      * nel token JWT o null se l'informazione non è presente. */
-    public static Long getIdentificativoAttoreDaTokenAutenticazione(HttpServletRequest httpServletRequest) {
+    public static Long getIdentificativoAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
         if (jwtTokenAutenticazione != null) {
             return (Long)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.ID_ATTORE );

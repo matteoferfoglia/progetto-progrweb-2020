@@ -33,7 +33,7 @@ public class FiltroConsumer implements Filter {
         if(tipoAttore.equals(Consumer.class.getSimpleName()))
             chain.doFilter(req, resp);
         else
-            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+            Autenticazione.creaResponseUnauthorized((HttpServletResponse) resp);
 
     }
 

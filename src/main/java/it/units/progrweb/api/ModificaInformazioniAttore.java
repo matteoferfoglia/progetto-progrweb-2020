@@ -56,7 +56,7 @@ public class ModificaInformazioniAttore {
 
         // TODO : duplicazione di codice con GestioneAttori -> modificaAttore
 
-        Attore attoreDaModificare = Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+        Attore attoreDaModificare = Autenticazione.getAttoreDaDatabase(httpServletRequest);
 
         if (attoreDaModificare != null) {
 

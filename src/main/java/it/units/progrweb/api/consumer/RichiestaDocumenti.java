@@ -50,7 +50,7 @@ public class RichiestaDocumenti {
                                               @PathParam("identificativoUploader") Long identificativoUploader,
                                               @QueryParam("numeroElementiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
-        Consumer consumer = (Consumer) Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest);
+        Consumer consumer = (Consumer) Autenticazione.getAttoreDaDatabase(httpServletRequest);
         List<File> listaFile = consumer.getAnteprimaFiles(identificativoUploader);
 
         return creaResponseElencoDocumenti(numeroDocumentiAttualmenteNotiAlClient,
@@ -132,7 +132,7 @@ public class RichiestaDocumenti {
     public String getDataOraVisualizzazioneFile( @PathParam("identificativoFile") Long identificativoFile,
                                                  @Context HttpServletRequest httpServletRequest             ) {
 
-        Long identificatoreRichiedente = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificatoreRichiedente = Autenticazione.getIdentificativoAttoreDaHttpServletRequest( httpServletRequest );
         try {
 
             File file = File.getEntitaDaDbById(identificativoFile);

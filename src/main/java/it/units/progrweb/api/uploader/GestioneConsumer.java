@@ -40,7 +40,7 @@ public class GestioneConsumer {
     @Produces( MediaType.APPLICATION_JSON )
     public List<Long> getElencoConsumerDiUploader(@Context HttpServletRequest httpServletRequest) {
 
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
         return RelazioneUploaderConsumer.getListaConsumerDiUploader( identificativoUploader );
 
     }
@@ -69,7 +69,7 @@ public class GestioneConsumer {
     public Response associaConsumerAdUploader( CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore ,
                                               @Context HttpServletRequest httpServletRequest) {
 
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest( httpServletRequest );
 
         try {
             CreazioneAttore.CampiFormAggiuntaAttore consumerAppenaAggiunto
@@ -142,7 +142,7 @@ public class GestioneConsumer {
     public Response eliminaConsumer(@PathParam("identificativoConsumerDaEliminare") Long identificativoConsumerDaEliminare,
                                     @Context HttpServletRequest httpServletRequest) {
 
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
         RelazioneUploaderConsumer.dissociaConsumerDaUploader(identificativoConsumerDaEliminare, identificativoUploader);
 
         return Response
@@ -171,7 +171,7 @@ public class GestioneConsumer {
                                      @Context HttpServletRequest  httpServletRequest) {
 
         if( identificativoConsumerDaModificare != null ) {
-            Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+            Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
             if( RelazioneUploaderConsumer.
                     isConsumerServitoDaUploader(identificativoUploader,

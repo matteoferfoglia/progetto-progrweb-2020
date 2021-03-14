@@ -68,7 +68,7 @@ public class LoginLogout {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Long identificativoDiQuestoAttoreAutenticato(@Context HttpServletRequest httpServletRequest) {
-        return Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+        return Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
     }
 
     /** Restituisce il tipo di utente autenticato. */
@@ -133,7 +133,7 @@ public class LoginLogout {
     @Produces(MediaType.TEXT_PLAIN)
     public Response creaNuovoTokenAutenticazione(@Context HttpServletRequest httpServletRequest){
         try {
-            return Autenticazione.creaResponseAutenticazionePerAttoreAutenticato(Autenticazione.getAttoreDaHttpServletRequest(httpServletRequest));
+            return Autenticazione.creaResponseAutenticazionePerAttoreAutenticato(Autenticazione.getAttoreDaDatabase(httpServletRequest));
         } catch (NotFoundException notFoundException) {
             Logger.scriviEccezioneNelLog(LoginLogout.class, "Attore non trovato nel sistema", notFoundException);
             return Response.serverError().build();

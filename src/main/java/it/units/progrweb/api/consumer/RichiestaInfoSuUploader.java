@@ -27,7 +27,7 @@ public class RichiestaInfoSuUploader {
     public Long[] getElencoIdentificativiUploaderCheHannoCaricatoFilePerQuestoConsumer(@Context HttpServletRequest httpServletRequest) {
 
         Long identificativoQuestoConsumer =
-                Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+                Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
         return File.getElencoUploaderServentiConsumer(identificativoQuestoConsumer);
 

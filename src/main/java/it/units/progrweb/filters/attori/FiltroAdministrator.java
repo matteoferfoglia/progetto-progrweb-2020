@@ -33,7 +33,7 @@ public class FiltroAdministrator implements Filter {
         if(tipoAttore.equals(Administrator.class.getSimpleName()))
             chain.doFilter(req, resp);
         else
-            Autenticazione.rispondiNonAutorizzato((HttpServletResponse) resp);
+            Autenticazione.creaResponseUnauthorized((HttpServletResponse) resp);
 
     }
 

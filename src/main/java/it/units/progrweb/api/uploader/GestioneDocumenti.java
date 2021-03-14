@@ -53,7 +53,7 @@ public class GestioneDocumenti {
     public Response eliminaFile(@PathParam("idFileDaEliminare") Long idFileDaEliminare,
                                 @Context HttpServletRequest httpServletRequest) {
 
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
         if( File.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
             return Response
@@ -90,7 +90,7 @@ public class GestioneDocumenti {
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
 
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest( httpServletRequest );
 
         return uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
                    identificativoUploader, identificativoConsumerDestinatario);
@@ -236,7 +236,7 @@ public class GestioneDocumenti {
                                   @QueryParam("numeroElementiAttualmenteNotiAlClient") Integer numeroDocumentiAttualmenteNotiAlClient) {
 
 
-        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione( httpServletRequest );
+        Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest( httpServletRequest );
 
         List<File> fileDaRestituire =
                 File.getOccorrenzeFiltrataPerUploaderEConsumer( identificativoUploader, identificativoConsumer );

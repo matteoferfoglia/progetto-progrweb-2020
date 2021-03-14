@@ -238,7 +238,7 @@ public class RichiestaInfo {
             return creazioneRisposta.apply(idAttoreTarget);
         } else {
             // uploader e consumer devono essere in relazione per vedere uno le info dell'altro
-            Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaTokenAutenticazione(httpServletRequest);
+            Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
             Long idConsumer, idUploader;
             if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Consumer.getTipoAttore()) ) {
                 idConsumer = idAttoreAutenticato;
