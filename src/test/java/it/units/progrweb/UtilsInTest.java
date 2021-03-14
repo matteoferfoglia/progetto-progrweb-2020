@@ -26,7 +26,7 @@ public class UtilsInTest {
 
     /** Scrive nel log per i test. */
     public static void scriviNelLogDeiTest(String daStampare) {
-        PrintStream outputTest = System.out;    // TODO : creare un file di log per i test
+        PrintStream outputTest = System.out;
         outputTest.println(daStampare);
     }
 

@@ -23,7 +23,7 @@ public class GestoreSicurezza {
 
     /** Chiave segreta di questo server usata in {@link #hmacSha256(String)},
      * generata con algoritmo RSA a 1024 bit, vedere
-     * {@link #generaChiave(String, int)}*/  // TODO : creare variabile d'ambiente con la chiave
+     * {@link #generaChiave(String, int)}*/
     private final static String CHIAVE_SEGRETA_SERVER_HS256 = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAKwvp_-oaEHmBnpT4eHB-vV10CbeP0rKh4AVSoPWJvJ3_fUxNslHDBeV_G_9rS5SFn57w4TCyvIU6e2-CgcARq-nEL3bN9Oq5cA2tsXzD2YbRUfpK4_KDVexiC2NLp9SFETx_zkubOthkF5Ao3xzN7yI1FklS76q77ZRZ0ScFQrbAgMBAAECgYEApAM5CYOG286aOQeR0BOQUyOHxJ5Kt5k3fL_LHM1uh-PYWigowY0VbZoGvT5sKgUzPAPz94_89J8LPNSahJS0vqerxqIC_Yj1TAT_qFq_ncTkSqkVbz-SHy6DuUKUNTex5QLfIPCD4_VD2M-lEFfgPMTbWWcSFqjTwDBgllaeR6ECQQDfX-mO8bLqqo2RTDGab6n46iKSvMqrX25g23lmu-1KmimNzzzfwTSUv9ni-1R-R84VFDJkb42O5_xbzqZmq9OJAkEAxVXH5dglFOTjIR2ohU6X31K9rcOdhqvh6iIUTkkyEyCGZ3WYIhEC7opu4SOVa9GTA9Z3mI0BY2AL5NhXpPW-QwJBALhVy0UmWpLjam5kZW7gBXGfriZP3CRuXYVauSW5ogn1jKM1STQRmdXDOQjihYissvmcMDXIBRbQhOYydAm4dJkCQQCcc3kLwkUL_rgQjkoIfposJZZaiKeAmQ-AqEo_EwsPXQ8SQYo_IAuaAckM2EBj_gE33rZtDQYXupNTeS5ri6WvAkBfWGvoArqyepLBuWh_jGBuRDUIBJo7x4aRNIVkufRFaBDlBjWNE9eZIfaX9CCgLck5w6oNCkQmLiI092Qucryx";
 
 
@@ -34,7 +34,7 @@ public class GestoreSicurezza {
     private PublicKey publicKey;
     private PrivateKey privateKey;
 
-    private final static GestoreSicurezza gestoreSicurezza = new GestoreSicurezza();   // TODO: da creare durante bootstrap del server
+    private final static GestoreSicurezza gestoreSicurezza = new GestoreSicurezza();
 
     private GestoreSicurezza() {
         this(CIPHERING_ALGORITHM, KEY_NUMBER_OF_BITS);

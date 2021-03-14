@@ -154,6 +154,4 @@ public class Cookie extends NewCookie {
                 .orElseThrow(NoSuchElementException::new);
     }
 
-    // TODO : usare questa classe per la creazione dei cookie (anziché NewCookie() e Cookie() sparso nel codice, usare questo helper)
-
 }

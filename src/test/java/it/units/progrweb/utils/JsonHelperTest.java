@@ -23,8 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class JsonHelperTest {
 
-    private final static int QUANTI_TEST = 1000;    // todo : variabile d'ambiente
-
+    private final static int QUANTI_TEST = 1000;
     /** Tipi primitivi negli oggetti JSON.*/
     private enum TipiPrimitiviInJson {
         STRING, NUMBER, BOOLEAN, NULL
@@ -39,7 +38,7 @@ public class JsonHelperTest {
 
         // todo : refactoring di questo metodo
 
-        final int NUMERO_MASSIMO_PROPERTIES_UN_OGGETTO_JSON = 200;  // todo : variabile d'ambiente
+        final int NUMERO_MASSIMO_PROPERTIES_UN_OGGETTO_JSON = 200;
 
         return  IntStream.range(0,QUANTI_TEST)
                          .mapToObj(contatoreTest -> {
@@ -52,8 +51,8 @@ public class JsonHelperTest {
                                          .mapToObj(contatoreProperties -> {
                                              // creazione di una property
 
-                                             final int LUNGHEZZA_MASSIMA_NOME_PROPERTY   = 200; // todo : variabile d'ambiente
-                                             final int LUNGHEZZA_MASSIMA_VALORE_PROPERTY = 1000; // todo : variabile d'ambiente
+                                             final int LUNGHEZZA_MASSIMA_NOME_PROPERTY   = 200;
+                                             final int LUNGHEZZA_MASSIMA_VALORE_PROPERTY = 1000;
                                              final int lunghezzaNomeProperty   = (int)(Math.random()*LUNGHEZZA_MASSIMA_NOME_PROPERTY)+1;    // lunghezza minima 1 per il nome della property
                                              final int lunghezzaValoreProperty = (int)(Math.random()*LUNGHEZZA_MASSIMA_VALORE_PROPERTY+1);  // lunghezza minima 0 per il valore della property
 
@@ -70,7 +69,7 @@ public class JsonHelperTest {
                                                      boolean ilNumeroSaraIntero = Math.round(Math.random()) != 0;
                                                      Double numeroCasuale = Math.random()*((double) (10 ^ lunghezzaValoreProperty));
                                                      if(ilNumeroSaraIntero){
-                                                         valoreProperty = String.valueOf(numeroCasuale.longValue()); // todo: rivedere come si comporta quest'istruzione
+                                                         valoreProperty = String.valueOf(numeroCasuale.longValue());
                                                          rappresentazione_stringa_entryMappaCorrispondente[1] = new AbstractMap.SimpleEntry<>(nomeProperty, numeroCasuale.longValue());
                                                      }
                                                      else {

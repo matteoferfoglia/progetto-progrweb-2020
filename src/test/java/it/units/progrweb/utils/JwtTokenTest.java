@@ -9,10 +9,8 @@ import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
 import it.units.progrweb.utils.jwt.componenti.claims.JwtExpirationTimeClaim;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
@@ -33,32 +31,25 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  * @author Matteo Ferfoglia
  */
 public class JwtTokenTest {
-    // TODO
-
 
     /** Numero di iterazioni di ogni test di questa classe.
      * I test hanno dei parametri aleatori, quindi, probabilmente,
      * iterazioni successive corrispondono a diversi parametri per i test.*/
-    private final static int QUANTI_TEST_PER_OGNI_TIPO_IN_QUESTA_CLASSE = 1000;   // todo : variabile d'ambiente
+    private final static int QUANTI_TEST_PER_OGNI_TIPO_IN_QUESTA_CLASSE = 1000;
 
     /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#generaTokenJsonCodificatoBase64UrlEncoded()}.*/
     @ParameterizedTest
     @MethodSource("generaTokenECorrispondenteRappresentazioneComeStringaDelToken")
     void generaTokenJsonTest(JwtToken token, String corrispondenteJsonCodificatoBase64UrlEncoded){
-         // todo : rivedere questo test ed il metodo di generazione dei parametri
 
         assertEquals(corrispondenteJsonCodificatoBase64UrlEncoded, token.generaTokenJsonCodificatoBase64UrlEncoded());
 
     }
 
-    /** Genera i parametri per {@link #generaTokenJsonTest(JwtToken)}.*/
+    /** Genera i parametri per {@link #generaToken()}.*/
     private static Stream<Arguments> generaTokenECorrispondenteRappresentazioneComeStringaDelToken() {
 
-        // TODO : rivedere questo metodo di generazione parametri per il test
-
-        final int QUANTI_TOKEN = QUANTI_TEST_PER_OGNI_TIPO_IN_QUESTA_CLASSE; // è il numero di elementi nello stream
-
-        return IntStream .range(0, QUANTI_TOKEN)
+        return IntStream .range(0, QUANTI_TEST_PER_OGNI_TIPO_IN_QUESTA_CLASSE)
                          .mapToObj(contatore -> {
 
                              JwtClaimsSet jwtClaimsSet;
@@ -66,9 +57,9 @@ public class JwtTokenTest {
                              {
                                  // Creazione del JwtClaimsSet per il payload per un JwtToken
 
-                                 final short NUMERO_MASSIMO_CLAIM_PAYLOAD = 10;    // todo :  variabile d'ambiente
-                                 final short LUNGHEZZA_MASSIMA_NOME_CLAIM = 1000;   // todo :  variabile d'ambiente
-                                 final short LUNGHEZZA_MASSIMA_VALORE_CLAIM = 1000; // todo :  variabile d'ambiente
+                                 final short NUMERO_MASSIMO_CLAIM_PAYLOAD = 10;
+                                 final short LUNGHEZZA_MASSIMA_NOME_CLAIM = 1000;
+                                 final short LUNGHEZZA_MASSIMA_VALORE_CLAIM = 1000;
 
                                  Random random = new Random();
 
@@ -83,15 +74,13 @@ public class JwtTokenTest {
 
                                                      String claimJson = " \"" + NOME_CLAIM_GENERATO + "\":\"" + VALORE_CLAIM_GENERATO + "\" ";
 
-                                                     Object[] claims_e_json = {new JwtClaim(NOME_CLAIM_GENERATO, VALORE_CLAIM_GENERATO), claimJson};
-                                                     return claims_e_json;
-                                                 }).toArray(); // todo : collect in list, poi prendi una lista coi soli primi elementi di questa crea la lista token, e coi secondi crei la lista cliam json da collezionare separati da virgolab
+                                                     return new Object[]{new JwtClaim<>(NOME_CLAIM_GENERATO, VALORE_CLAIM_GENERATO), claimJson};
+                                                 }).toArray();
 
                                  jwtClaimsSet = new JwtClaimsSet(Arrays.stream(stream_claims_json)
                                                                      .map(claim_json -> {
                                                                          Object[] object_token_json = (Object[])claim_json;
-                                                                         JwtClaim jwtClaim = (JwtClaim) object_token_json[0];
-                                                                         return jwtClaim;
+                                                                         return (JwtClaim<?>) object_token_json[0];
                                                                      }).collect(Collectors.toList()) );
                                  payloadJson += Arrays.stream(stream_claims_json)
                                          .map(claim_json -> {
@@ -132,36 +121,22 @@ public class JwtTokenTest {
                          });
     }
 
-    /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#JwtToken(it.units.progrweb.utils.jwt.componenti.JwtPayload)}.
-     * Dati in claims del payload in formato JSON, si costruisce il token JWT,
-     * si prende la sua rappresentazione come stringa codificata in base64
-     * url-encoded e si verifica che sia uguale alla stringa attesa.*/
-    @ParameterizedTest
-    @CsvSource({
-            "'{\"sub\": \"1234567890\", \"name\": \"John Doe\",\"admin\": true}', ''"   // todo
-    })
-    void JwtTokenTest(String claimsPayloadInJson) {
-        // TODO : creare il token col costruttore, prendere la sua rappresentazione come stringa che sia uguale a correttaRappresentazioneJsonDelJwtToken
-    // todo test da fare
-    }
-
     /** Test per {@link JwtToken#equals(Object)}.*/
     @ParameterizedTest
     @MethodSource("generaToken")
     void equalsTest(JwtToken jwtToken){
         try {
-            boolean equalsFunzionaConLoStessoToken = jwtToken.equals(jwtToken);
+            @SuppressWarnings("EqualsWithItself") boolean equalsFunzionaConLoStessoToken = jwtToken.equals(jwtToken);
 
-            boolean equalsFunzionaConLaCopiaDelloStessoToken = creaNuovoTokenUgualeAQuelloDato(jwtToken).equals(jwtToken);
-
-            boolean equalsRiconosceTokenNulli = ! jwtToken.equals(null);
+            boolean equalsFunzionaConLaCopiaDelloStessoToken = new JwtToken(jwtToken).equals(jwtToken);
 
             JwtToken jwtTokenDiverso;   // per verificare che .equals() riesca a riconoscere oggetti diversi
-            jwtTokenDiverso = creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(jwtToken, new JwtClaim("Claim aggiunto che renderà il token diverso", "qualsiasi valore"));
+            jwtTokenDiverso = creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(jwtToken, new JwtClaim<>("Claim aggiunto che renderà il token diverso", "qualsiasi valore"));
             boolean equalsRiconosceTokenDiversi = ! jwtTokenDiverso.equals(jwtToken);
 
-            assertTrue(equalsFunzionaConLoStessoToken && equalsFunzionaConLaCopiaDelloStessoToken
-                        && equalsRiconosceTokenNulli && equalsRiconosceTokenDiversi);
+            assertTrue(equalsFunzionaConLoStessoToken &&
+                        equalsFunzionaConLaCopiaDelloStessoToken &&
+                        equalsRiconosceTokenDiversi);
 
 
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
@@ -177,11 +152,11 @@ public class JwtTokenTest {
      * il token così ottenuto.
      * NB.: non viene ricalcolata la signature del token, quindi il token
      * prodotto da questo metodo risulterà invalido.*/
-    private static JwtToken creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(JwtToken jwtToken, JwtClaim claimDaAggiungere)
+    private static JwtToken creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(JwtToken jwtToken, JwtClaim<?> claimDaAggiungere)
             throws NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
          
         // Crea un nuovo token identico a quello iniziale, poi lo modifica
-        JwtToken jwtTokenDiverso = creaNuovoTokenUgualeAQuelloDato(jwtToken);
+        JwtToken jwtTokenDiverso = new JwtToken(jwtToken);
         JwtPayload jwtPayloadModificato = getPayload(jwtTokenDiverso);
         jwtPayloadModificato.aggiungiClaim(claimDaAggiungere);
         
@@ -196,13 +171,6 @@ public class JwtTokenTest {
         jwtPayload_Field.setAccessible(true);
         return (JwtPayload) jwtPayload_Field.get(jwtToken);
 
-    }
-
-    private static JwtToken creaNuovoTokenUgualeAQuelloDato(JwtToken jwtToken)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Constructor<JwtToken> costruttoreCopia = JwtToken.class.getDeclaredConstructor(JwtToken.class);
-        costruttoreCopia.setAccessible(true);
-        return costruttoreCopia.newInstance(jwtToken);
     }
 
     private static Stream<Arguments> generaToken() {
@@ -259,14 +227,6 @@ public class JwtTokenTest {
 
         });
 
-    }
-
-
-    /** Test per {@link JwtToken#creaJwtTokenDaStringaCodificata(String)}.*/
-    // @Test // todo : fare questo test
-    void creaJwtTokenDaStringaCodificata(String stringaCodificata) {
-        // TODO : creare il token col costruttore, prendere la sua rappresentazione come stringa ed invocare il metodo per la costruzione del Jwt, poi confrontarlo con uno costruito manualmente
-        // todo
     }
 
     /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#isSignatureValida()}.

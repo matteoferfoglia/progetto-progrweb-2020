@@ -30,10 +30,10 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  */
 public class CsrfCookiesTest {
 
-    private static final int QUANTI_TEST_PER_OGNI_TIPO = 1000;  // numero di "iterazioni" di ogni test (con parametri diversi) // TODO : VARIABILE D'AMBIENTE
+    private static final int QUANTI_TEST_PER_OGNI_TIPO = 1000;  // numero di "iterazioni" di ogni test (con parametri diversi)
         // mantenere elevato il numero di test perché ci sono parametri aleatori (generati casualmente)
 
-    /** Test per {@link CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
+    /** Test per {@link CsrfToken#isCsrfTokenValido(String, JwtToken, String, String, JwtClaim.NomeClaim, JwtClaim.NomeClaim)}.
      * Viene generato il token CSRF e l'identificativo del client (allo stesso
      * modo di quando un client ne fa richiesta), poi viene creato il token
      * JWT (allo stesso modo di come verrebbe creato per il client), infine
@@ -41,12 +41,10 @@ public class CsrfCookiesTest {
      * e si verifica che i due token (quello creato per il client e quello
      * ricreato nel server) siano uguali ({@link JwtToken#equals(Object)}).
      * Questo test è necessario perché la verifica di un token JWT avviene
-     * in modo simile (vedere {@link CsrfCookies#isCsrfTokenValido(String, JwtToken, String, String, String, String)}
+     * in modo simile (vedere {@link CsrfToken#isCsrfTokenValido(String, JwtToken, String, String, JwtClaim.NomeClaim, JwtClaim.NomeClaim)}
      * {@link JwtToken#isTokenValido()}, {@link JwtToken#isSignatureValida()})*/
     @RepeatedTest(QUANTI_TEST_PER_OGNI_TIPO) // questo test fa uso di valori casuali, quindi ripeterlo potrebbe portare a risultati diversi
     void test_verificaValiditaTokenCsrf() {
-
-        // TODO : rivedere questo metodo (la descrizione è coerente con ciò che fa? Serve?)
 
         try {
 
@@ -100,7 +98,7 @@ public class CsrfCookiesTest {
     }
 
 
-    /** Test per {@link it.units.progrweb.utils.csrf.CsrfToken#isCsrfTokenValido(String, JwtToken, String, String, String, String)}.
+    /** Test per {@link it.units.progrweb.utils.csrf.CsrfToken#isCsrfTokenValido(String, JwtToken, String, String, JwtClaim.NomeClaim, JwtClaim.NomeClaim)}.
      * @param valoreCsrfTokenDaVerificare è il token CSRF da verificare (ottenuto dal
      *                                    form in cui è stato usato)
      * @param cookieHeader è il cookie header (testuale) ricevuto dalla richiesta HTTP.

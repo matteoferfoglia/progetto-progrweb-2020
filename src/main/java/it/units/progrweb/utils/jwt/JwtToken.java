@@ -44,6 +44,11 @@ public class JwtToken {
         this.signature = signature;
     }
 
+    /** Copy constructor. */
+    public JwtToken(JwtToken jwtToken) {
+        this(jwtToken.header, jwtToken.payload, jwtToken.signature);
+    }
+
     /** Data una stringa che codifica un token, crea un'istanza di questa classe.
      * @throws IllegalArgumentException Se il token di autenticazione è mal formato.*/
     public static JwtToken creaJwtTokenDaStringaCodificata(String jwtToken_stringDaVerificare)

@@ -18,8 +18,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  */
 public class GestoreSicurezzaTest {
 
-    // TODO : aggiungere test
-
     /** Verifica la ripetibilità del calcolo di una stringa da firmare.
      * Questo test, date una stringa da firmare e l'hash calcolato in
      * prececedenza con {@link GestoreSicurezza#hmacSha256(String)} su
