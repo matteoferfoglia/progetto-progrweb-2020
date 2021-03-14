@@ -283,8 +283,9 @@ public class Autenticazione {
         jwtPayload.aggiungiClaim(new JwtClaim<>(NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE,
                                                 GestoreSicurezza.hmacSha256(valoreCookieId, hashPasswordAttore)) );
 
-        // Aggiunge gli attributi dell'attore non sensibili
+        // Aggiunge gli attributi dell'attore
         jwtPayload.aggiungiClaim( new JwtNomeSubjectClaim(attore.getNominativo()) );
+        jwtPayload.aggiungiClaim( new JwtUsernameSubjectClaim(attore.getUsername()) );
         jwtPayload.aggiungiClaim( new JwtTipoAttoreClaim( attore.getTipoAttore() ) );
 
         return new JwtToken(jwtPayload).generaTokenJsonCodificatoBase64UrlEncoded();

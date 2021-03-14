@@ -16,6 +16,9 @@ public class JwtClaim<TipoValoreClaim> {
     /** Nome del claims corrispondente al nome del subject.*/
     public static final String JWT_NOME_SUBJECT_CLAIM_NAME = "Subject name";
 
+    /** Nome del claims corrispondente allo username del subject.*/
+    public static final String JWT_USERNAME_SUBJECT_CLAIM_NAME = "Subject username";
+
     /** Nome del claims corrispondente al tipo dell'{@link Attore}
      * con cui il possessore del token si sta qualificando.*/
     public static final String JWT_TIPO_ATTORE_CLAIM_NAME = "Tipo attore";

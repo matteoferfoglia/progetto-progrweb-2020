@@ -7,11 +7,11 @@ import it.units.progrweb.entities.attori.Attore;
  * Contiene il nome dell'{@link Attore} che
  * possiede il token.
  */
-public class JwtNomeSubjectClaim extends JwtClaim {
+public class JwtNomeSubjectClaim extends JwtClaim<String> {
 
     /**
-     * Crea un username claims.
-     * @param nomeSubject Lo username del subject.
+     * Crea un claim per il nome del Subject.
+     * @param nomeSubject Il nome del subject.
      */
     public JwtNomeSubjectClaim(String nomeSubject) {
         super(JwtClaim.JWT_NOME_SUBJECT_CLAIM_NAME, nomeSubject);
