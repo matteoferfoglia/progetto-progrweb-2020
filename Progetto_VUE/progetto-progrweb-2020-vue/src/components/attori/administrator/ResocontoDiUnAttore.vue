@@ -15,7 +15,7 @@
         <label>a
           <input type="date"
                  :value="dataFine"
-                 :min="valoreMinimoDataFineRispettoAData(dataInizio)"
+                 :min="dataGiornoSuccessivoRispettoAData(dataInizio)"
                  :id="idDataFine"
                  class="form-control"
                  @input.prevent="setDataFine($event.target.value)"
@@ -102,14 +102,14 @@ export default {
         // In realtà non dovrebbe mai succedere che venga impostata una data sbagliata
         // perché è stato impostato l'attributo "min" del campo di input (ma non si sa mai)
         alert("La data iniziale non può essere posteriore alla data finale.");
-        this.dataFine = this.valoreMinimoDataFineRispettoAData( this.dataInizio );
+        this.dataFine = this.dataGiornoSuccessivoRispettoAData( this.dataInizio );
       } else {
         this.dataFine = nuovoValoreDataFinale;
       }
 
       const inputDataFine = document.getElementById( this.idDataFine );
       inputDataFine.value = this.dataFine;
-      inputDataFine.setAttribute( "min", this.valoreMinimoDataFineRispettoAData( this.dataInizio ) );
+      inputDataFine.setAttribute( "min", this.dataGiornoSuccessivoRispettoAData( this.dataInizio ) );
 
     },
 
@@ -123,7 +123,7 @@ export default {
 
       if(  Number( nuovoValoreDataIniziale.replaceAll("-","")) >
            Number( this.dataFine.replaceAll("-","") )  ) {
-        this.setDataFine( this.valoreMinimoDataFineRispettoAData( this.dataInizio ) );
+        this.setDataFine( this.dataGiornoSuccessivoRispettoAData( this.dataInizio ) );
       }
 
       document.getElementById( this.idDataInizio ).value = this.dataInizio;
@@ -134,7 +134,7 @@ export default {
      * @param dataIniziale Stringa rappresentante la data iniziale (formato: yyyy-mm-dd).
      * @return il giorno successivo alla data rappresentata dal parametro, restituito
      *         come stringa (formato: yyyy-mm-dd)*/
-    valoreMinimoDataFineRispettoAData( dataIniziale ) {  // TODO : verificare come si comporta con input errati (es.: "0")
+    dataGiornoSuccessivoRispettoAData( dataIniziale ) {
       // Prima converto in Date() poi riporto in stringa (lascio che sia Date
       // a gestire la somma di giorni, per ottenere il giorno successivo)
 
@@ -147,7 +147,7 @@ export default {
       const giorno = Number( dataComeArray_yyyy_mm_dd[2] );
 
       const data_giornoSuccessivo = new Date();
-      data_giornoSuccessivo.setFullYear(anno, mese, giorno+1 ); // giorno successivo // TODO : verificare output corretto
+      data_giornoSuccessivo.setFullYear(anno, mese, giorno+1 ); // giorno successivo
 
       return restituisciArrayDaDate_yyyy_mm_dd(data_giornoSuccessivo).join("-");
     },

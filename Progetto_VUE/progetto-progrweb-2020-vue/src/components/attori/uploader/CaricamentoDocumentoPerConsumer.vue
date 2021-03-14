@@ -46,12 +46,6 @@ export default {
       nomeDocumento: "",
       listaHashtag: "",
 
-      // NOMI DEI PARAMETRI ATTESI DAL SERVER // TODO : variabili d'ambiente sia per client sia per server
-      nomeParametro_nomeDocumento:             "nomeFile",
-      nomeParametro_contenutoDocumento:        "contenutoFile",
-      nomeParametro_idConsumerDestinatario:    "identificativoConsumerDestinatario",
-      nomeParametro_listaHashtag:              "listaHashtag",
-
       // Wrapper
       csrfToken_wrapper: this.csrfToken
     }
@@ -69,10 +63,10 @@ export default {
       // Costruzione dei parametri da inviare
       const formData = new FormData();
       formData.append( process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME, this.csrfToken_wrapper );
-      formData.append( this.nomeParametro_nomeDocumento, this.nomeDocumento );
-      formData.append( this.nomeParametro_idConsumerDestinatario, this.idConsumer );
-      formData.append( this.nomeParametro_listaHashtag, this.listaHashtag.trim().toLowerCase() );
-      formData.append( this.nomeParametro_contenutoDocumento, documento );
+      formData.append( process.env.VUE_APP_FORM_CARICA_DOCUMENTO_NOME_DOCUMENTO_INPUT_FIELD_NAME, this.nomeDocumento );
+      formData.append( process.env.VUE_APP_FORM_CARICA_DOCUMENTO_ID_CONSUMER_DESTINATARIO_INPUT_FIELD_NAME, this.idConsumer );
+      formData.append( process.env.VUE_APP_FORM_CARICA_DOCUMENTO_LISTA_HASHTAG_INPUT_FIELD_NAME, this.listaHashtag.trim().toLowerCase() );
+      formData.append( process.env.VUE_APP_FORM_CARICA_DOCUMENTO_CONTENUTO_DOCUMENTO_INPUT_FIELD_NAME, documento );
 
       // Controllo validità campi del form
       const formValido = documento && this.nomeDocumento;  // che siano truthy
