@@ -4,9 +4,9 @@ import it.units.progrweb.utils.Cookie;
 import it.units.progrweb.utils.GestoreSicurezza;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtSubjectClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtExpirationTimeClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtSubjectClaim;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -19,16 +19,16 @@ import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodifica
 /**
  * Questa classe rappresenta un token CSRF.
  * Tale token viene inviato tramite token JWT (il token CSRF sarà
- * un claim nel payload del token JWT) ed il token JWT a sua volta
+ * un claims nel payload del token JWT) ed il token JWT a sua volta
  * sarà inviato al client tramite cookie (vedere
  * {@link CsrfCookies}).
  * Inoltre, per verificare che il client che richiede il token CSRF
  * sia lo stesso ad usarlo, questa classe genera un identificativo per
  * il client e crea un apposito cookie (vedere {@link CsrfCookies}).
  * Quest'ultimo valore identificativo del client viene aggiunto anche
- * come claim del JWT token di cui sopra (così è possibile effettuare
+ * come claims del JWT token di cui sopra (così è possibile effettuare
  * una "verifica incrociata" sull'identità del client).
- * All'interno del token JWT vi è anche un claim contenente l'indirizzo
+ * All'interno del token JWT vi è anche un claims contenente l'indirizzo
  * IP del client che ha richiesto il token CSRF: al momento della verifica
  * del token CSRF, si verifica che venga utilizzato dal client con lo
  * stesso indirizzo IP (è una misura di sicurezza aggiuntiva).
@@ -37,10 +37,10 @@ import static it.units.progrweb.utils.jwt.JwtToken.creaJwtTokenDaStringaCodifica
  */
 public class CsrfToken {
 
-    /** Nome del claim JWT il cui valore è il CSRF-token. */
+    /** Nome del claims JWT il cui valore è il CSRF-token. */
     public static final String NOME_CLAIM_CSRF_TOKEN = "CSRF-TOKEN";
 
-    /** Nome del claim JWT il cui valore è l'indirizzo IP
+    /** Nome del claims JWT il cui valore è l'indirizzo IP
      * del client a cui è stato rilasciato il token CSRF.*/
     public static final String NOME_CLAIM_IP_CLIENT = "IP-CLIENT";
 
@@ -148,9 +148,9 @@ public class CsrfToken {
      * @param valoreCsrfTokenDaVerificare Token CSRF da verificare.
      * @param jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient Token JWT contenente nel payload il CSRF token e l'identificativo del client.
      * @param valoreIdentificativoClientRicevuto Identificativo del client.
-     * @param nomeClaimCsrfTokenInJwtPayload Nome del claim contenente il Csrf Token all'interno del token JWT.
+     * @param nomeClaimCsrfTokenInJwtPayload Nome del claims contenente il Csrf Token all'interno del token JWT.
      * @param valoreIndirizzoIPClientRicevuto Indirizzo IP del client che sta presentando il token CSRF da verificare.
-     * @param nomeClaimIPClientInJwtPayload Nome del claim contenente l'indirizzo IP del client a cui era stato
+     * @param nomeClaimIPClientInJwtPayload Nome del claims contenente l'indirizzo IP del client a cui era stato
      *                                      rilasciato il token CSRF all'interno del token JWT.
      * @return true se il token specificato nel primo parametro è verificato
      * e valido, false altrimenti.

@@ -2,20 +2,20 @@ package it.units.progrweb.utils.jwt.componenti;
 
 import it.units.progrweb.utils.Base64Helper;
 import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
 import it.units.progrweb.utils.JsonHelper;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Classe per la rappresentazione di un insieme di claim JWT,
+ * Classe per la rappresentazione di un insieme di claims JWT,
  * cioè il JWT header o il JWT payload.
  * @author Matteo Ferfoglia
  */
 public class JwtClaimsSet {
 
-    /** Lista di claim. */
+    /** Lista di claims. */
     private final Collection<JwtClaim<?>> claimsSet = new ArrayList<>();
 
     /**
@@ -43,7 +43,7 @@ public class JwtClaimsSet {
     }
 
     /**
-     * Aggiunge un claim.
+     * Aggiunge un claims.
      */
     public void aggiungiClaim(JwtClaim<?> jwtClaimDaAggiungere) {
         claimsSet.add(jwtClaimDaAggiungere);
@@ -52,7 +52,7 @@ public class JwtClaimsSet {
     }
 
     /**
-     * Rimuove, se presente, il claim con il nome specificato.
+     * Rimuove, se presente, il claims con il nome specificato.
      * Se rimosso, restituisce true, altrimenti false.
      */
     public boolean rimuoviClaim(String nomeClaimDaRimuovere) {
@@ -64,7 +64,7 @@ public class JwtClaimsSet {
     }
 
     /**
-     * Modifica, se presente, il claim con il nome specificato.
+     * Modifica, se presente, il claims con il nome specificato.
      * Se modificato, restituisce true, altrimenti false.
      */
     public boolean modificaValoreClaim(String nomeClaimDaModificare, Object nuovoValore) {
@@ -77,12 +77,12 @@ public class JwtClaimsSet {
     }
 
     /**
-     * Recupera un particolare claim in base al nome dal claim set.
-     * Se non c'è un claim con quel nome, restituisce l'eccezione
+     * Recupera un particolare claims in base al nome dal claims set.
+     * Se non c'è un claims con quel nome, restituisce l'eccezione
      * "NoSuchElementException".
-     * @throws NoSuchElementException Se il claim cercato non è presente.
-     * @param claimName - il nome del claim da cercare.
-     * @return Il claim corrispondente al nome cercato.
+     * @throws NoSuchElementException Se il claims cercato non è presente.
+     * @param claimName - il nome del claims da cercare.
+     * @return Il claims corrispondente al nome cercato.
      */
     public JwtClaim<?> getClaimByName(String claimName) {
         return claimsSet.stream()
@@ -97,7 +97,7 @@ public class JwtClaimsSet {
      * Url-Encoded del claims set, quindi la memorizza
      * nell'apposito attributo di questa classe
      * ({@link #claimsSetInFormatJsonBase64UrlEncoded claimsSetInFormatJsonBase64UrlEncoded}).
-     * @throws IllegalStateException se due claim hanno lo stesso nome.
+     * @throws IllegalStateException se due claims hanno lo stesso nome.
      */
     private void calcolaClaimsSetInFormatJsonBase64UrlEncoded()
             throws IllegalStateException{
@@ -107,9 +107,9 @@ public class JwtClaimsSet {
                         JwtClaim::getName,
                         jwtClaim -> jwtClaim.getValue() == null ? "" : jwtClaim.getValue(),
                         (k,v) -> {
-                            throw new IllegalStateException("Errore: due claim non possono avere lo stesso nome.");    // il nome del claim è la chiave di questa mappa
+                            throw new IllegalStateException("Errore: due claims non possono avere lo stesso nome.");    // il nome del claims è la chiave di questa mappa
                         },
-                        LinkedHashMap::new));  // mantiene l'ordine dei claim come in claimsSet (Fonte: https://stackoverflow.com/a/29090335)*/
+                        LinkedHashMap::new));  // mantiene l'ordine dei claims come in claimsSet (Fonte: https://stackoverflow.com/a/29090335)*/
 
         claimsSetInFormatJsonBase64UrlEncoded = Base64Helper.encodeToBase64UrlEncoded(JsonHelper.convertiMappaProprietaToStringaJson(mappaProprietaOggetto));
 
@@ -134,7 +134,7 @@ public class JwtClaimsSet {
 
     /**
      * Crea un'istanza di questa classe a partire da una stringa
-     * che è una rappresentazione JSON di un insieme di claim.
+     * che è una rappresentazione JSON di un insieme di claims.
      */
     public static JwtClaimsSet convertiJSONToClaimsSet(String claimSetJSON) {
 
@@ -175,7 +175,7 @@ public class JwtClaimsSet {
 
     }
 
-    /** Considera tutti i valori dei claim di quest'istanza, quindi
+    /** Considera tutti i valori dei claims di quest'istanza, quindi
      * li ordina alfabeticamente e li riunisce in una stringa, che restituisce.*/
     private String ordinaERiunisciTuttiIValoriDeiClaimInUnaStringa() {
         return claimsSet.stream()

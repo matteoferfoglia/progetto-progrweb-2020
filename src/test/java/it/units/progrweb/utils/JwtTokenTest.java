@@ -5,8 +5,8 @@ import it.units.progrweb.utils.jwt.componenti.JwtClaimsSet;
 import it.units.progrweb.utils.jwt.componenti.JwtHeader;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
 import it.units.progrweb.utils.jwt.componenti.JwtSignature;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtExpirationTimeClaim;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -110,7 +110,7 @@ public class JwtTokenTest {
                                  try {
                                      jwtToken = new JwtToken(jwtPayload);
                                  } catch (IllegalStateException e) {
-                                     // Eccezione se ci sono due claim con lo stesso nome nel payload
+                                     // Eccezione se ci sono due claims con lo stesso nome nel payload
                                      jwtPayload = new JwtPayload();
                                      jwtToken = new JwtToken(jwtPayload); // token con payload vuoto
                                      payloadJson = "{}";
@@ -173,7 +173,7 @@ public class JwtTokenTest {
     }
 
     /** Crea un nuovo JwtToken identico a quello dato nel primo parametro,
-     * poi aggiunge il claim dato nel secondo parametro e restituisce
+     * poi aggiunge il claims dato nel secondo parametro e restituisce
      * il token così ottenuto.
      * NB.: non viene ricalcolata la signature del token, quindi il token
      * prodotto da questo metodo risulterà invalido.*/
@@ -246,7 +246,7 @@ public class JwtTokenTest {
 
                 jwtPayload.aggiungiClaim(new JwtExpirationTimeClaim(differenzaInSecondiTraTempoAttualeEScadenzaDiQuestoToken));
 
-                // Ricalcolo della firma sul token JWT (a seguito dell'aggiunta di un claim, il token è cambiato e la firma non è più valida).
+                // Ricalcolo della firma sul token JWT (a seguito dell'aggiunta di un claims, il token è cambiato e la firma non è più valida).
                 try {
                     jwtToken = new JwtToken(jwtPayload);
                 } catch (NoSuchAlgorithmException|InvalidKeyException e) {

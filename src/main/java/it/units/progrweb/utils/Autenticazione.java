@@ -6,7 +6,7 @@ import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
-import it.units.progrweb.utils.jwt.componenti.claim.*;
+import it.units.progrweb.utils.jwt.componenti.claims.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,11 +38,11 @@ public class Autenticazione {
     private static final int LUNGHEZZA_TOKEN_AUTENTICAZIONE = 128;
 
     /** Nome del cookie contenente un token per il client. L'hash di questo valore
-     * è presente nel token di autenticazione del client, nel claim con nome specificato
+     * è presente nel token di autenticazione del client, nel claims con nome specificato
      * in {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE}.*/
     private static final String NOME_COOKIE_CLIENT_TOKEN = "TOKEN-ID-CLIENT-AUTENTICAZIONE";
 
-    /** Nome del claim contenente l'hash del token associato al client nel JWT di autenticazione.
+    /** Nome del claims contenente l'hash del token associato al client nel JWT di autenticazione.
      * Vedere anche {@link #creaJwtTokenAutenticazionePerAttore(Attore, String)}.*/
     private static final String NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE = "hash-" + NOME_COOKIE_CLIENT_TOKEN;
 
@@ -95,7 +95,7 @@ public class Autenticazione {
      *     </li>
      *     <li>
      *         Generare un token JWT (di autenticazione) con le informazioni del
-     *         client ed aggiungervi il claim contenente l'hash del token CSRF
+     *         client ed aggiungervi il claims contenente l'hash del token CSRF
      *         calcolato al punto precedente.
      *     </li>
      *     <li>
@@ -188,7 +188,7 @@ public class Autenticazione {
      * La verifica dell'autenticazione è basata sul Bearer Token che dovrebbe essere
      * presente nell'header <i>Authorization</i> della request.
      * Inoltre, la request deve contenere il cookie il cui hash del valore corrisponde
-     * a quello indicato nel claim di nome specificato in
+     * a quello indicato nel claims di nome specificato in
      * {@link #NOME_CLAIM_JWT_CON_HASH_COOKIE_AUTENTICAZIONE} contenuto nel payload
      * del token appena verificato.
      * @return true se il client è autenticato, false altrimenti.*/
@@ -239,7 +239,7 @@ public class Autenticazione {
         String valoreCookieId_dalClient;
         try {
             valoreCookieId_dalClient = Cookie.cercaCookiePerNomeERestituiscilo(NOME_COOKIE_CLIENT_TOKEN, cookies)
-                                    .getValue();
+                                             .getValue();
         } catch ( NoSuchElementException e) {
             // Cookie non trovato
             return false;

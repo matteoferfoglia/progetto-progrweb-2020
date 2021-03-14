@@ -5,7 +5,7 @@ import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.csrf.CsrfToken;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

@@ -50,7 +50,7 @@ public class JsonHelper {
         Matcher matcherPropertiesJson = Pattern.compile(RegexHelper.REGEX_COPPIA_NOME_VALORE)
                                                .matcher(stringaJSON);   // nomeProperty in Group1, valore property in group3 (vedere definizione della regex)
         Map<String, Object> mappa_NomeProprieta_ValoreProprieta = new LinkedHashMap<>();    // LinkedHashedMap per mantenere l'ordine delle properties
-        // TODO : per confrontare due token JWT si va a confrontare la firma. Se cambia l'ordine dei claim, allora cambia la firma del token. Ma questo non va bene, perché le property nel JSON non dovrebbero dipendere dall'ordine.
+        // TODO : per confrontare due token JWT si va a confrontare la firma. Se cambia l'ordine dei claims, allora cambia la firma del token. Ma questo non va bene, perché le property nel JSON non dovrebbero dipendere dall'ordine.
         while(matcherPropertiesJson.find()) {
             String nomeProperty = matcherPropertiesJson.group(RegexHelper.NUMERO_GRUPPO_CORRISPONDENTE_A_NOME_PROPRIETA_IN_REGEX_COPPIA_NOME_VALORE);
             String valoreProperty = matcherPropertiesJson.group(RegexHelper.NUMERO_GRUPPO_CORRISPONDENTE_A_VALORE_PROPRIETA_IN_REGEX_COPPIA_NOME_VALORE);

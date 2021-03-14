@@ -2,8 +2,8 @@ package it.units.progrweb.utils.jwt;
 
 import it.units.progrweb.utils.GestoreSicurezza;
 import it.units.progrweb.utils.jwt.componenti.*;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtClaim;
-import it.units.progrweb.utils.jwt.componenti.claim.JwtExpirationTimeClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
+import it.units.progrweb.utils.jwt.componenti.claims.JwtExpirationTimeClaim;
 import it.units.progrweb.utils.Base64Helper;
 
 import java.security.InvalidKeyException;
@@ -64,9 +64,9 @@ public class JwtToken {
     }
 
     /**
-     * Restituisce il valore di un claim nel token a partire dal nome del claim (parametro).
-     * Tale claim viene cercato sia nell'header sia nel payload.
-     * @throws NoSuchElementException se non è presente alcun claim con il nome specificato.
+     * Restituisce il valore di un claims nel token a partire dal nome del claims (parametro).
+     * Tale claims viene cercato sia nell'header sia nel payload.
+     * @throws NoSuchElementException se non è presente alcun claims con il nome specificato.
      */
     public Object getValoreClaimByName(String nomeClaim){
         Object valoreClaim;
@@ -83,9 +83,9 @@ public class JwtToken {
     }
 
     /**
-     * Restituisce il claim "Subject" se presente.
-     * @throws NoSuchElementException Se il claim cercato non è presente.
-     * @return Il claim corrispondente al nome cercato.
+     * Restituisce il claims "Subject" se presente.
+     * @throws NoSuchElementException Se il claims cercato non è presente.
+     * @return Il claims corrispondente al nome cercato.
      */
     public Object getValoreSubjectClaim() {
         return getValoreClaimByName(JwtClaim.JWT_SUBJECT_CLAIM_NAME);
@@ -110,17 +110,17 @@ public class JwtToken {
 
     /**
      * Verifica che questa istanza di token non sia scaduta.
-     * Se NON è presente il claim "Expiration Time", allora restituisce false.
-     * Se è presenta il claim "Expiration Time" e la data/ora da
+     * Se NON è presente il claims "Expiration Time", allora restituisce false.
+     * Se è presenta il claims "Expiration Time" e la data/ora da
      * esso rappresentato è strettamente inferiore ai quella corrente
      * allora restituisce true.
      */
     public boolean isTokenScaduto() {
 
-        boolean isTokenScaduto;
+        boolean isTokenScaduto = true;  // valore default di inizializzazione
         try{
             isTokenScaduto = new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME))
-                                            .isScaduto();
+                                    .isScaduto();
         } catch(NoSuchElementException e) {
             // Se qui, non c'è Expiration Time nel token, quindi non è scaduto
             isTokenScaduto = false;
