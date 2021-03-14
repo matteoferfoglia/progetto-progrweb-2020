@@ -17,11 +17,7 @@
                :urlDownloadDocumento="urlDownloadDocumento"
                :urlEliminazioneDocumento="urlEliminazioneDocumento"
                :tipoAttoreAutenticato="tipoAttore_uploader"
-               :oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere=
-                   "oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato"
-               @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
-               @nuovo-documento-mostrato=
-                   "oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato=undefined"/>
+               @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
 </template>
 
@@ -58,17 +54,6 @@ export default {
 
       // Copia da variabile d'ambiente
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
-
-      /** Oggetto con solo una property, che contiene un documento, nella forma
-       *    { idDocumento : {proprieta del documento} }
-       * Questo oggetto è definito solamente dopo che l'utente ha richiesto
-       * tramite l'apposito form il caricamento del soprascritto documento,
-       * dal momento in cui il server ha risposto confermandone l'aggiunta
-       * fino al momento in cui il componente deputato alla rappresentazione
-       * della lista dei documenti non lo mostra (questo componente viene
-       * avvertito tramite un evento generato dal componente che mostra
-       * i documenti).*/
-      oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato: undefined,
 
       // Wrapper
       csrfToken_wrapper: this.csrfToken

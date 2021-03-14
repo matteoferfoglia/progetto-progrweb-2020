@@ -108,7 +108,6 @@
 import {camelCaseToHumanReadable, capitalize} from "../../utils/utilitaGenerale";
 import {HTTP_STATUS_NOT_MODIFIED, richiestaDelete, richiestaGet} from "../../utils/http";
 import {
-  aggiungiDocumentoAdIndiceHashtag,
   creaIndiceDeiFileRispettoAgliHashtagCheContengono,
   getNomePropertyDataVisualizzazioneDocumenti,
   MappaDocumenti,
@@ -141,12 +140,6 @@ export default {
      * Se questa prop non è specificata, si assume che l'utente
      * <strong>non</strong> possa eliminare documenti.*/
     "urlEliminazioneDocumento",
-
-    /** Nuovo documento da aggiungere alla lista. Vedere descrizione
-     * nel componente padre. Quando cambia stato ed è definito, il
-     * documento che questa property rappresenta viene aggiunto alla
-     * lista attualmente mostrata.*/
-    "oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere",
 
     /** Nome del Consumer a cui questi documenti si riferiscono.*/
     "nomeConsumer",
@@ -527,61 +520,6 @@ export default {
 
     },
 
-    /** Metodo per aggiungere un nuovo documento alla lista di quelli mostrati.
-     * Questo metodo <strong>non</strong> interroga il server, ma si aspetta come
-     * parametro il nuovo documento nella forma di un oggetto come segue:
-     *    { idDocumento : {proprieta del documento} }
-     *
-     * @param oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere
-     */
-    aggiungiNuovoDocumentoAllaListaMostrata( oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere ) {
-
-      // Aggiungi url nelle properties
-      oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere = new Map(
-          [
-              this.formattaDate(this.aggiungiUrlDownloadEliminazioneDocumentoERestituisciEntryDocumento(
-                Object.entries(oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere)[0])
-            )
-          ]
-      );
-
-      const oggetto_Id_PropNuovoDocumento = // oggetto avente come nomeProp l'id di un documento e come valore le proprietà di quel documento
-          Object.fromEntries( oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere );
-
-      aggiungiDocumentoAdIndiceHashtag( this.mappa_hashtag_idDocumenti,
-          oggetto_Id_PropNuovoDocumento,
-          this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO );
-
-      // nel valore della prima property dell'oggetto ci sono le properties del documento
-      const oggettoConPropNuovoDocumento = Object.values( oggetto_Id_PropNuovoDocumento )[0] ;
-
-      const listaHashtagNuovoDocumento   = oggettoConPropNuovoDocumento[this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO];
-
-      // Aggiungi gli hashtag di questo documento a quelli da mostrare
-      this.listaHashtagDaMostrare =
-          [...new Set([ ...this.listaHashtagDaMostrare, ...listaHashtagNuovoDocumento])].sort();
-      // Set() evita eventuali duplicati negli hashtag,
-      // ma non dispone di sort() quindi necessario prima riconvertire in Array
-
-
-      // Aggiungi il documento all'elenco di quelli noti a questo componente
-      this.mappaDocumenti.set(
-        new Map([
-          ...oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere,  // merge della nuova entry in cima alla mappa
-          ... this.mappaDocumenti.get()
-        ])
-      );
-
-      // Aggiungi il documento a quelli da mostrare
-      this.mappaDocumentiDaMostrare.set(
-          new Map([
-            ...oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere,
-            ... this.mappaDocumentiDaMostrare.get()
-          ])
-      );
-
-    },
-
     /** Data un'entry rappresentante un documento, ne formatta le date presenti.
      * @param entry Array avente come primo elemento l'identificativo di un
      *              documento come secondo elemento gli attributi di quel documento.
@@ -621,20 +559,8 @@ export default {
       handler(nuovoValore) {
         this.csrfToken_wrapper = nuovoValore;
       }
-    },
-
-    /** Cambia stato se è stato caricato (dall'Uploader) un nuovo documento, quindi
-     * è necessario aggiornare la vista.*/
-    oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere: {
-      immediate: true,
-      deep: true,
-      handler( nuovoDocumento ) {
-        if( nuovoDocumento ) {  // che non sia falsy
-          this.aggiungiNuovoDocumentoAllaListaMostrata( nuovoDocumento );
-          this.$emit( 'nuovo-documento-mostrato' );
-        }
-      }
     }
+
   }
 }
 
