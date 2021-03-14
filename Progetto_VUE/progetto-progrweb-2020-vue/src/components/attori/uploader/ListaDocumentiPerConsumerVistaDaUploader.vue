@@ -4,10 +4,10 @@
        visualizzata da un Uploader -->
 
   <nav class="d-flex justify-content-center">
-    <router-link :to="{name: nomeRouteCaricamentoDocumenti}">
+    <router-link :to="{name: nomeRouteCaricamentoDocumenti, params: $route.params}">
       Caricamento documenti
     </router-link>
-    <router-link :to="{name: nomeRouteTabellaDocumenti}">
+    <router-link :to="{name: nomeRouteTabellaDocumenti, params: $route.params}">
       Lista documenti
     </router-link>
   </nav>
@@ -79,7 +79,10 @@ export default {
     // Redirect a route di default se non specificata
     if( this.$route.name === this.nomeRouteListaDocumentiVistaDaUploader ||
           this.$route.name === this.nomeRouteSchedaAttore )
-      this.$router.push({name: this.nomeRouteCaricamentoDocumenti})
+      this.$router.push({
+        name: this.nomeRouteCaricamentoDocumenti,
+        params: this.$route.params
+      });
   },
   watch: {
 
