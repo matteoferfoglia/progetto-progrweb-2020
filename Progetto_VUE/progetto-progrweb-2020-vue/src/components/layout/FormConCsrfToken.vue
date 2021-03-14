@@ -58,7 +58,7 @@ export default {
       }).catch( errore => {
         // Errore durante la ricezione del token csrf
         console.error("Errore in " +
-            this.$options.name /*Nome componente: */ + ": " + errore);  // TODO : gestire questo errore
+            this.$options.name /*Nome componente: */ + ": " + errore);
       });
     }
 

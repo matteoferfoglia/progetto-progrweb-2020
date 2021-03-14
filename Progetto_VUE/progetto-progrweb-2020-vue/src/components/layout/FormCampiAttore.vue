@@ -200,8 +200,6 @@ export default {
   },
   watch: {
 
-    // TODO : fare una funzione per i watcher (queste sono tutti uguali => c'è duplicazione di codice)
-
     /** Watcher per gestire l'invio dei dati dal form al server.
      * I dati vengono inviati quando il flag osservato diventa true.
      * Restituisce un oggetto con due property: "datiInviati" contiene

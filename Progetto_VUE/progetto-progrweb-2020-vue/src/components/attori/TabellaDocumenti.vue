@@ -545,7 +545,6 @@ export default {
           ]
       );
 
-
       const oggetto_Id_PropNuovoDocumento = // oggetto avente come nomeProp l'id di un documento e come valore le proprietà di quel documento
           Object.fromEntries( oggetto_idDocumentoDaAggiungere_proprietaDocumentoDaAggiungere );
 
