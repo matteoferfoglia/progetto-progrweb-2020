@@ -88,8 +88,6 @@ export default {
   methods: {
     validaEdInviaForm() {
 
-      // TODO : questo metodo è presente anche nel form di autenticazione: refactoring per evitare duplicazione!
-
       const isFormValido = () => {
         return this.nominativo.length>0 &&
             RegExp(this.REGEX_EMAIL).test(this.email) &&
@@ -109,7 +107,7 @@ export default {
         console.error( "Errore durante la registrazione: " + JSON.stringify(ris) );
 
         if( getHttpResponseStatus( ris ) === HTTP_STATUS_CONFLICT ) {
-          alert( ris.data )
+          alert( ris.data );
         } else {
           alert("Si è verificato un errore durante la registrazione. Riprovare in seguito.");
         }

@@ -7,7 +7,7 @@
       class="card-body"
       @change="isFormModificato = true"
       @submit="modificaInformazioni"
-      @csrf-token-ricevuto="aggiornaCsrfToken($event)"><!-- TODO : è necessario che questo evento venga raccolta dal padre? Dovrebbe andare direttamente in area riservata perché è li il <router-view> -->
+      @csrf-token-ricevuto="aggiornaCsrfToken($event)">
 
     <p>
       Da questa pagina è possibile modificare le informazioni personali.
@@ -65,7 +65,7 @@
       <label>Nuovo logo
         <input type="file"
                @change="isFileLogoCaricato=true"
-               class="form-control-file"><!-- TODO : testare -->
+               class="form-control-file">
       </label>
     </fieldset>
 

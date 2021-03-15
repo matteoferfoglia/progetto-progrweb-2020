@@ -113,13 +113,10 @@ export default {
         }
 
         console.error("Errore durante l'autenticazione (" + risposta.status + " [" + risposta.statusText + "])");
-        // TODO : refactoring : questo metodo c'è anche in RegistrazioneNuovoConsumer
 
       }
 
       const inviaForm = () => {
-
-        // TODO: refactoring: questo stesso metodo c'è anche nel form di registrazione nuovo consumer: potrebbe essere astratto per evitare duplicazione di codice, creando un metodo che riceve l' oggetto campiFormDaInviareAlServer e l' indirizzo del server, quindi provvede all' invio.
 
         const campiFormDaInviareAlServer = {
           [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME] : this.username,
