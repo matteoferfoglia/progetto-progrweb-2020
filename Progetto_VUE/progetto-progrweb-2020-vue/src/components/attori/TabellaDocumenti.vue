@@ -311,6 +311,7 @@ export default {
     // Gestione dell'auto-aggiornamento della tabella
     this.timerAutoUpdate = setInterval(async () => {
       const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
+      const numeroDocumentiDisponibiliPreAggiornamento = this.mappaDocumenti.size();
 
       // Richiesta al server se l'elenco dei documenti è stato modificato
       richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
@@ -324,6 +325,10 @@ export default {
           const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
               .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
           listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
+
+          if( this.mappaDocumenti.size() > numeroDocumentiDisponibiliPreAggiornamento ) {
+            alert("Sono disponibili dei nuovi documenti");
+          }
 
         })
         .catch( errore => {
