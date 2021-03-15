@@ -1,6 +1,5 @@
 /** Script con funzioni di utilità generale.*/
 
-// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
 
 /** Restituisce true se l'oggetto passato come parametro
  è un array, false altrimenti.*/

@@ -4,12 +4,6 @@ import axios from "axios";
 import router from "../router";
 import {eliminaTokenAutenticazione} from "./autenticazione";
 
-// TODO : ristrutturare meglio questo script
-
-// TODO : non funziona: quando si aggiorna la pagina, i dati sono persi ! Pssare il token di autenticazione in cookie, così viene inviato automaticamente
-
-// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
-
 
 /** Stato della risposta HTTP: credenziali invalide.*/
 export const HTTP_STATUS_UNAUTHORIZED = 401;
@@ -66,7 +60,7 @@ const tokenAutenticazione = ( () => {
 
 /** Oggetto di configurazione per le richieste HTTP (ad es. contenente
  * degli header particolari, come "Authorization"), realizzato con closure.*/
-let configRichiesteHttp = ( () => {     // TODO : testare
+const configRichiesteHttp = ( () => {
 
     let oggettoConfig = {headers : {}}; // è l'oggetto di configurazione vero e proprio
 
@@ -75,6 +69,7 @@ let configRichiesteHttp = ( () => {     // TODO : testare
         "rimuoviHeader" : nomeHeaderDaRimuovere      => delete oggettoConfig.headers[nomeHeaderDaRimuovere],
         "getConfig"     : ()                         => oggettoConfig
     }
+
 }) ();
 
 
@@ -97,10 +92,6 @@ export const impostaAuthorizationHeaderInRichiesteHttp = token => {
 export const rimuoviAuthorizationHeader = () => {
     configRichiesteHttp.rimuoviHeader(HTTP_HEADER_AUTHORIZATION_NOME);
 }
-
-
-/** Legge il token impostato per l'header "Authorization" delle richieste HTTP.*/
-export const getAuthorizationHeaderRichiesteHttp = () => tokenAutenticazione.getValoreTokenAutenticazione();    // TODO : cancellare se non usato
 
 
 /** Restituisce lo stato della response HTTP.*/
@@ -150,7 +141,7 @@ export const richiestaPostConFile = (url, dati) => {
             .finally( dati => {
                 configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
                 return dati;
-            })  // rimuove header senza interferire con i dati restituiti
+            });  // rimuove header senza interferire con i dati restituiti
 
 }
 
@@ -197,8 +188,6 @@ const aggiungiParametriAllaRequest = oggettoConParametri => {
  * {@link HTTP_STATUS_UNAUTHORIZED}, allora redirect a
  * pagina di autenticazione.*/
 const onErrorHandler = async errore => {
-
-    // TODO : verificare che funzioni come da aspettative
 
     if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO )
         router.go(0);   // ricarica la pagina se è invalido il token CSRF

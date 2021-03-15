@@ -2,8 +2,6 @@
  * che prescindono dal particolare componente in cui vengono
  * utilizzati.*/
 
-// TODO : rivedere ed eventualmente ristrutturare questo script - serve??
-
 
 import {isArray} from "./utilitaGenerale";
 import {richiestaGet} from "./http";
@@ -15,7 +13,8 @@ import {richiestaGet} from "./http";
  * in cui ogni chiave è un hashtag ed il corrispondente valore è un
  * array contenente gli identificativi di tutti i documenti che
  * contengono quel particolare hashtag.
- * Gli hashtag vengono indicizzati in modo case-insensitive.
+ * Gli hashtag vengono indicizzati in modo case-insensitive ed
+ * ignorando gli spazi (applicando la funzione trim()).
  * @param elencoDocumenti Oggetto in cui ogni property ha come nome
  *                        l'identificativo di un documento e come
  *                        valore quel documento.
@@ -25,11 +24,11 @@ import {richiestaGet} from "./http";
  *                        hashtag di quel documento: questo parametro
  *                        corrisponde al nome di tale property.
  * @return indice dei documenti, indicizzati rispetto agli hashtag
- *         che contengono, implementato tramite Map.    // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
+ *         che contengono, implementato tramite Map.
  */
 export const creaIndiceDeiFileRispettoAgliHashtagCheContengono = (elencoDocumenti, nomePropertyHashtagDocumenti) => {
 
-    const indice_Hashtag_ListaDocumenti = new Map();    // TODO : rivedere se servono tutte queste conversioni Map -> Object -> Entries -> ... ??? (Già dal metodo invocante... non si può fare tutto come Map o tutto come oggetto?)
+    const indice_Hashtag_ListaDocumenti = new Map();
 
     // Iterazione sulle properties dell'oggetto,
     //  fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
@@ -95,7 +94,7 @@ export const aggiungiDocumentoAdIndiceHashtag =
  * @param nomePropDataVisualizzazione In un documento, è il nome della property
  *                                con la data di visualizzazione di quel documento.
  * @param nomePropDataCaricamento In un documento, è il nome della property
- *                                con la data di caricamento di quel documento.*/ // TODO : SPOSTARE QUESTO METODO NELLA CLASSE MAPPA DOCUMENTI
+ *                                con la data di caricamento di quel documento.*/
 export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
     (mappaDocumenti, nomePropDataVisualizzazione, nomePropDataCaricamento) => {
 
@@ -109,7 +108,7 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
         )
 
         const arrayIdDocumentiNonAncoraVisualizzati = Array.from(   mappaDocumenti.entries() )
-             .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] === "" ) // filtra documenti non ancora letti // TODO : verifica corretto funzionamento
+             .filter( entryDocumento => entryDocumento[1][nomePropDataVisualizzazione] === "" ) // filtra documenti non ancora letti
              .map(    entryDocumento => entryDocumento[0] )                                      // salva l'id dei documenti risultanti dal filtraggio
                                                                                                  // entryDocumento è nella forma:   [chiaveDoc, {prop1Doc: val1, prop2Doc: val2}]
                                                                                                  // Restituisce array con id dei documenti non ancora visualizzati
@@ -143,8 +142,6 @@ export const getNomePropertyDataVisualizzazioneDocumenti = async () => {
             console.error("Errore durante la ricezione del nome dell'attributo " +
                 "contenente la data di caricamento dei documenti: " + rispostaErrore );
             return Promise.reject(rispostaErrore);
-            // TODO : gestire l'errore (invio mail ai gestori?)
-            // TODO : cercare tutti i catch nel progetto e fare un gestore di eccezioni unico
         });
 
 }
@@ -222,6 +219,5 @@ export class MappaDocumenti{
     getDaChiave(chiave ) {
         return this.get().get(chiave);
     }
-
 
 }

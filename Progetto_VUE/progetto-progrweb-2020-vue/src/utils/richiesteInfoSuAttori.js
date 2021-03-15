@@ -46,12 +46,8 @@ export const getInfoAttore = async (idAttoreDiCuiRichiedereInfo,
 export const getMappa_idAttore_proprietaAttore = async (arrayIdAttore,
                                                         tipoAttoreAttualmenteAutenticato,
                                                         tipoAttoriDiCuiRichiedereInfo) => {
-
-    // TODO : verificare correttezza
-
     // Richiede al server info su ogni Attore nell'array
 
-    // TODO : si può evitare duplicazione di codice ? Stesso pattern usato anche in Consumer
     return Promise.all( arrayIdAttore.map( idAttore => getInfoAttore( idAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo ) ))
         //  una Promise per ogni Attore, quindi Promise.all per poi aspettarle tutte (Fonte: https://stackoverflow.com/a/31414472)
 
