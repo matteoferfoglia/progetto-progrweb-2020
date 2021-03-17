@@ -152,7 +152,7 @@ public class UtilitaGenerale {
      * @param mappa
      * @return {@link Response} costruita.
      */
-    public static Response rispostaJsonConMappa(Map<?,?> mappa) {
+    public static Response rispostaJsonConMappa(Map<String,?> mappa) {
         // Costruzione della response
         return Response.ok()
                        .type(MediaType.APPLICATION_JSON)

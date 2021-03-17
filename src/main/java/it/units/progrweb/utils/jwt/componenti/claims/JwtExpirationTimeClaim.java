@@ -29,14 +29,20 @@ public class JwtExpirationTimeClaim extends JwtClaim<Long> {
     }
 
     /** Dato un {@link JwtClaim}, questo costruttore prova a creare un'istanza di
-     * questa classe se il claim fornito è compatibile. */
+     * questa classe se il claim fornito è compatibile.
+     * Il valore del claim può essere di tipo {@link Number}, poi convertito a
+     * {@link Long} (da questo metodo) usando {@link Number#longValue()},
+     * assumendo che in alcune applicazioni non si faccia distinzione tra i tipi
+     * numerici.*/
     public JwtExpirationTimeClaim(JwtClaim<?> jwtClaim) {
         super(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME,
-              jwtClaim.getValue() instanceof Long ? (Long)jwtClaim.getValue() : 0);
-        if(! ( jwtClaim.getName().equals(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME) &&
-               jwtClaim.getValue() instanceof Long ) )
+              jwtClaim.getValue() instanceof Number ?
+                      ((Number) jwtClaim.getValue()).longValue() :
+                      0);
+        if( ! ( jwtClaim.getName().equals(JwtClaim.JWT_EXPIRATION_TIME_CLAIM_NAME) &&
+                jwtClaim.getValue() instanceof Number ) )
             throw new IllegalArgumentException("Impossibile creare un " + JwtExpirationTimeClaim.class.getName()
-                    + ", perché è stato fornito un claims con nome " + jwtClaim.getName());
+                    + ", perché è stato fornito un claims con nome " + jwtClaim.getName() + " di tipo invalido.");
     }
 
     /**

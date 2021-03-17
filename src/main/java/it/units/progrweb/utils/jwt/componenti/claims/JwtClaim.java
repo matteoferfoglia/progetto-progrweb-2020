@@ -5,7 +5,7 @@ import it.units.progrweb.entities.attori.Attore;
 /**
  * Rappresentazione di un claims nel payload di un token JWT.
  */
-public class JwtClaim<TipoValoreClaim> {
+public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
 
     /** Nome del claims corrispondente all' "Expiration Time".*/
     public static final String JWT_EXPIRATION_TIME_CLAIM_NAME = "exp";
@@ -36,6 +36,10 @@ public class JwtClaim<TipoValoreClaim> {
      * nella classe {@link it.units.progrweb.utils.Autenticazione}.*/
     public static final String JWT_HASH_TOKEN_AUTENTICAZIONE_IN_COOKIE_CLAIM_NAME = "hash-token-autenticazione";
 
+    @Override
+    public int compareTo(JwtClaim<?> jwtClaim) {
+        return this.getName().compareTo(jwtClaim.getName());
+    }
 
     /** Enum contenente i possibili nomi dei claim. */
     public enum NomeClaim {
@@ -95,7 +99,6 @@ public class JwtClaim<TipoValoreClaim> {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
     public void setValue(Object value) {
         if( this.value.getClass().equals(value.getClass()) )
             this.value = (TipoValoreClaim) value;

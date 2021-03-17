@@ -28,6 +28,19 @@ public class JwtSignature {
     }
 
     /**
+     * Crea la signature per il token JWT a partire dai suoi header e payload
+     * forniti come stringhe in formato Base64UrlEncoded.
+     * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     *  @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     */
+    public JwtSignature(String jwtHeaderBase64, String jwtPayloadBase64)
+            throws InvalidKeyException, NoSuchAlgorithmException {
+
+        this.signature = GestoreSicurezza.hmacSha256(jwtHeaderBase64 + "." + jwtPayloadBase64 );
+
+    }
+
+    /**
      * Crea un'istanza di questa classe a partire da una firma
      * fornita come stringa.
      */
@@ -40,6 +53,7 @@ public class JwtSignature {
         this.signature = signatureDaCopiare.signature;
     }
 
+    /** Getter per la signature calcolata. */
     public String getSignature() {
         return signature;
     }

@@ -141,6 +141,28 @@ public class JwtToken {
         return signature.equals(signatureCalcolata);
     }
 
+    /** Data la rappresentazione Base64UrlEncoded di un token,
+     * restituisce true se la firma risulta valida, false altrimenti.*/
+    public static boolean isSignatureValida(String jwtTokenBase64) {
+
+        if( jwtTokenBase64==null )
+            return false;
+
+        String[] partiToken = jwtTokenBase64.split(".");
+        if( partiToken.length!=3 )  // un token JWT è composto da tre parti
+            return false;
+
+        String headerBase64    = partiToken[0];
+        String payloadBase64   = partiToken[1];
+        String signatureBase64 = partiToken[2];
+
+        try {
+            return signatureBase64.equals( new JwtSignature(headerBase64, payloadBase64).getSignature() );
+        } catch (InvalidKeyException|NoSuchAlgorithmException e) {
+            return false;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
