@@ -48,7 +48,7 @@ public abstract class File {
     private String dataEdOraDiCaricamento;
 
     /** Indirizzo IP del consumer che ha visualizzato il file. */
-    @SuppressWarnings("unused") // attributo necessario affinché venga salvato da Objectify
+    @SuppressWarnings({"unused", "FieldCanBeLocal"}) // attributo necessario affinché venga salvato da Objectify
     private String indirizzoIpVisualizzatore;
 
     /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/

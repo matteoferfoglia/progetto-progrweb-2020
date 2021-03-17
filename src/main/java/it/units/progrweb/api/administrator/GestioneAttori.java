@@ -122,11 +122,11 @@ public class GestioneAttori {
 
         List<Long> listaIdentificativiAttoriDaRestituire;
 
-        if( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Uploader.getTipoAttore() ) ) {
+        if( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Uploader.name() ) ) {
             listaIdentificativiAttoriDaRestituire =
                     Uploader.getListaIdentificativiTuttiGliUploaderNelSistema();
 
-        } else if ( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Administrator.getTipoAttore() ) ) {
+        } else if ( tipoAttoriDiCuiMostrareElenco.equals( Attore.TipoAttore.Administrator.name() ) ) {
             listaIdentificativiAttoriDaRestituire =
                     Administrator.getListaIdentificativiTuttiGliAdministratorNelSistema();
 

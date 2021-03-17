@@ -96,7 +96,7 @@ public class DatabaseTest {
             nomiEntitaGestiteDalDatabase_field.setAccessible(true);
             String[] nomiClassiGestiteDalDatabase = (String[]) nomiEntitaGestiteDalDatabase_field.get(null); // null perché la classe è statica
 
-            Class[] classiGestiteDalDatabase = Arrays.stream(nomiClassiGestiteDalDatabase)
+            Class<?>[] classiGestiteDalDatabase = Arrays.stream(nomiClassiGestiteDalDatabase)
                                                                .map(nomeClasse -> {
                                                                    try { return Class.forName(nomeClasse); }
                                                                    catch (ClassNotFoundException e) {
@@ -112,7 +112,7 @@ public class DatabaseTest {
                          .map(classeEntita -> {
                              try {
 
-                                 Constructor costruttore = classeEntita.getDeclaredConstructor();
+                                 Constructor<?> costruttore = classeEntita.getDeclaredConstructor();
                                  costruttore.setAccessible(true);
                                  Object nuovaEntita = costruttore.newInstance();
 
@@ -141,7 +141,8 @@ public class DatabaseTest {
                          });
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            return (Stream<Arguments>) fallisciTestACausaDiEccezioneNonAttesa(e);
+            fallisciTestACausaDiEccezioneNonAttesa(e);
+            return null;
         }
 
     }
@@ -149,7 +150,7 @@ public class DatabaseTest {
     /** Test per {@link DatabaseHelper#salvaEntita(java.lang.Object)}.*/
     @ParameterizedTest
     @MethodSource("generaEntitaDaSalvareNelDatabase")
-    void testSalvataggioEntita(Class classeEntita, Object entita){
+    void testSalvataggioEntita(Class<?> classeEntita, Object entita){
 
         if(! classeEntita.equals(Object.class)) {   // il @MethodSource genera Object in caso di classi astratte, ma non sono entità (evitate con questo if)
 

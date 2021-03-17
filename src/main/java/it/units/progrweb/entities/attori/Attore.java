@@ -5,12 +5,13 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
-import it.units.progrweb.entities.attori.administrator.Administrator;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
-import it.units.progrweb.utils.*;
+import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.RegexHelper;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.security.auth.Subject;
 import javax.validation.constraints.NotNull;
@@ -110,18 +111,9 @@ public abstract class Attore implements UserPrincipal, Cloneable {
 
     /** Tipi di attori permessi nel sistema.*/
     public enum TipoAttore {
-        Consumer(Consumer.class.getSimpleName()),
-        Uploader(Uploader.class.getSimpleName()),
-        Administrator(Administrator.class.getSimpleName());
-
-        private final String nomeTipoAttore;
-        TipoAttore( String nomeTipoAttore ) {
-            this.nomeTipoAttore = nomeTipoAttore;
-        }
-
-        public String getTipoAttore() {
-            return nomeTipoAttore;
-        }
+        Consumer,
+        Uploader,
+        Administrator
     }
 
     /**
@@ -152,7 +144,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
 
     /** Restituisce il tipo di un attore.*/
     public String getTipoAttore() {
-        return tipoAttore == null ? "" : tipoAttore.getTipoAttore();
+        return tipoAttore == null ? "" : tipoAttore.name();
     }
 
     /** Restituisce il nome del field contenente lo username

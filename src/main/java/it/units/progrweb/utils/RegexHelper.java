@@ -8,7 +8,7 @@ public class RegexHelper {
 
     /** RegEx per email (<a href="https://html.spec.whatwg.org/multipage/input.html">Fonte</a>). */
     // TODO : verificare regex
-    public final static String REGEX_EMAIL = "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
+    public final static String REGEX_EMAIL = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
 
     /** Regex per il codice fiscale
      * (<a href="https://regexlib.com/(A(CAg_Bth78XI7Ry2C7vo_2HR3yuG9GuP1YeCHLd1AH53pIpI-z7JHENTvKnhDjJJhOkjyka4kah-CTZaupEY3MAVWa6qYC256houEBaNXoG01))/UserPatterns.aspx?authorId=10d43491-1297-481f-ae66-db9f2263575c&AspxAutoDetectCookieSupport=1">Fonte</a>).*/

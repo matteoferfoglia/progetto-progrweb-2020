@@ -34,13 +34,13 @@ public class Main {
         String credenziali_password = "5678";
 
         // Parametri per l'invio dei file
-        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
-        String emailConsumer = "pippopluto@example.com";
-        String nomeCognomeConsumer = "Pippo Pluto";
-//
-//        String codiceFiscaleConsumer = "RSSMRA80A01F205X";
-//        String emailConsumer = "mariorossi@example.com";
-//        String nomeCognomeConsumer = "Mario Rossi";
+//        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
+//        String emailConsumer = "pippopluto@example.com";
+//        String nomeCognomeConsumer = "Pippo Pluto";
+
+        String codiceFiscaleConsumer = "RSSMRA80A01F205X";
+        String emailConsumer = "mariorossi@example.com";
+        String nomeCognomeConsumer = "Mario Rossi";
 
 //        String codiceFiscaleConsumer = "NDRNDR80A01A182X";
 //        String emailConsumer = "andreaandrei@example.com";

@@ -79,7 +79,7 @@ public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
     }
 
     private final String name;
-    private TipoValoreClaim value;
+    private final TipoValoreClaim value;
 
     public JwtClaim(String name, TipoValoreClaim value) {
         this.name = name;

@@ -19,6 +19,7 @@ class FileStorage extends File {
 
     /** Lista di hashtag associati a questo file. */
     @Index
+    @SuppressWarnings("FieldCanBeLocal") // attributo necessario affinché venga salvato da Objectify
     private List<String> listaHashtag;
 
     /** Il file. */

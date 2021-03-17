@@ -45,21 +45,25 @@ public class CreazioneAttore {
      * @throws IllegalArgumentException Se i valori di input forniti non sono validi.
      * @throws NoSuchAlgorithmException Errore durante la scrittura in AuthDB.
      * @throws InvalidKeyException Errore durante la scrittura in AuthDB.
-     * @throws UnsupportedEncodingException Errore durante l'invio della mail
+     * @throws UnsupportedEncodingException Errore durante l'invio della mail.
+     * @throws NullPointerException Se si verificano errori durante la creazione dell'attore e
+     *                              l'attore appena creato dovessere risultare null a causa di
+     *                              errori interni.
      */
     public static Attore creaNuovoAttore(CampiFormAggiuntaAttore campiFormAggiuntaAttore,
                                          Attore.TipoAttore tipoAttoreRichiedenteCreazione)
             throws NotAuthorizedException, IllegalArgumentException,
                    NoSuchAlgorithmException, InvalidKeyException,
+                   NullPointerException,
                    UnsupportedEncodingException, MessagingException {
 
         String username   = campiFormAggiuntaAttore.getUsername();
         String password   = campiFormAggiuntaAttore.getPassword();
         String nominativo = campiFormAggiuntaAttore.getNominativo();
         String email      = campiFormAggiuntaAttore.getEmail();
-        String tipoAttoreDaCreare = campiFormAggiuntaAttore.getTipoAttore();
+        Attore.TipoAttore tipoAttoreDaCreare = Attore.TipoAttore.valueOf(campiFormAggiuntaAttore.getTipoAttore());
 
-        boolean parametriInputValidi = Arrays.stream(new String[]{username, nominativo, email, tipoAttoreDaCreare})
+        boolean parametriInputValidi = Arrays.stream(new Object[]{username, nominativo, email, tipoAttoreDaCreare})
                 .noneMatch( Objects::isNull );
 
         if( parametriInputValidi ) {
@@ -74,7 +78,7 @@ public class CreazioneAttore {
 
                     if( tipoAttoreRichiedenteCreazione.equals(Attore.TipoAttore.Administrator) ) {
 
-                        switch (Attore.TipoAttore.valueOf(tipoAttoreDaCreare)) {
+                        switch ( tipoAttoreDaCreare ) {
                             case Uploader:
                                 attoreDaCreare = Uploader.creaAttore(username, nominativo, email);
                                 break;
@@ -87,13 +91,16 @@ public class CreazioneAttore {
                                 throw new IllegalArgumentException("Questo non dovrebbe mai succedere");
                         }
                     } else if ( tipoAttoreRichiedenteCreazione.equals(Attore.TipoAttore.Uploader) &&
-                            tipoAttoreDaCreare.equals(Attore.TipoAttore.Consumer.getTipoAttore()) ) {
+                            tipoAttoreDaCreare.equals(Attore.TipoAttore.Consumer) ) {
 
                         attoreDaCreare = Consumer.creaConsumer(username, nominativo, email);
 
                     } else {
                         throw new NotAuthorizedException("Autorizzazione alla creazione di attori negata.");
                     }
+
+                    if( attoreDaCreare == null )
+                        throw new NullPointerException("L'attore da creare non dovrebbe mai essere null. Questo non dovrebbe mai succedere.");
 
                     Long identificativoNuovoAttore = (Long) DatabaseHelper.salvaEntita(attoreDaCreare);
                     attoreDaCreare.setIdentificativoAttore(identificativoNuovoAttore);
@@ -171,6 +178,9 @@ public class CreazioneAttore {
                     "Errore durante l'invio della mail'",
                     e);
             return Response.serverError().build();
+        } catch (NullPointerException e) {
+            Logger.scriviEccezioneNelLog(GestioneAttori.class, e);
+            return Response.serverError().build();
         }
 
     }
@@ -185,8 +195,11 @@ public class CreazioneAttore {
         private String password;
         private String nominativo;
         private String email;
-        private String tipoAttore;  // Consumer, Uploader, Administrator
+        private Attore.TipoAttore tipoAttore;  // Consumer, Uploader, Administrator
         private Long identificativoAttore;
+
+        /** Zero argument constructor necessario per JAX-RS.*/
+        private CampiFormAggiuntaAttore() {}
 
         /** Crea un'istanza di questa classe a partire da un'istanza di {@link Attore}.*/
         public CampiFormAggiuntaAttore(Attore attore) {
@@ -201,7 +214,8 @@ public class CreazioneAttore {
         /** Crea un'istanza di questa classe coi parametri dati.*/
         public CampiFormAggiuntaAttore(@NotNull String username, @NotNull String password,
                                        @NotNull String nominativo, @NotNull String email,
-                                       @NotNull String tipoAttore, Long identificativoAttore) {
+                                       @NotNull Attore.TipoAttore tipoAttore,
+                                       Long identificativoAttore) {
             this.username = username;
             this.password = password;
             this.nominativo = nominativo;
@@ -250,11 +264,12 @@ public class CreazioneAttore {
         }
 
         public String getTipoAttore() {
-            return tipoAttore;
+            return tipoAttore.name();
         }
 
-        public void setTipoAttore(String tipoAttore) {
-            this.tipoAttore = EncoderPrevenzioneXSS.encodeForJava(tipoAttore);
+        /** @throws IllegalArgumentException Se il parametro non corrisponde ad un valido valore di {@link Attore.TipoAttore}. */
+        public void setTipoAttore(String tipoAttoreStringa) throws IllegalArgumentException {
+            this.tipoAttore = Attore.TipoAttore.valueOf(EncoderPrevenzioneXSS.encodeForJava(tipoAttoreStringa));
         }
 
         public Long getIdentificativoAttore() {

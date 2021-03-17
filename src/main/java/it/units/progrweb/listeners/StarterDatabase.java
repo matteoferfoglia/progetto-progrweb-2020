@@ -89,7 +89,7 @@ public class StarterDatabase implements ServletContextListener {
 
                     {
                         // Creazione consumer
-                        Class consumerStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage");
+                        Class<?> consumerStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage");
                         Constructor<?> constructorConsumerStorage = consumerStorage.getDeclaredConstructor(String.class, String.class, String.class);
                         constructorConsumerStorage.setAccessible(true);
                         consumerTest = constructorConsumerStorage.newInstance("PPPPLT80A01A952G", "Pippo Pluto", "pippopluto@example.com");
@@ -98,7 +98,7 @@ public class StarterDatabase implements ServletContextListener {
 
                     {
                         // Creazione Uploader
-                        Class uploaderStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage");
+                        Class<?> uploaderStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage");
                         Constructor<?> constructorUploaderStorage = uploaderStorage.getDeclaredConstructor(String.class, String.class, String.class, byte[].class, String.class);
                         constructorUploaderStorage.setAccessible(true);
                         uploaderTest = constructorUploaderStorage.newInstance("AB01", "Banca Prova", "bancaprova@example.com",
@@ -108,7 +108,7 @@ public class StarterDatabase implements ServletContextListener {
 
                     {
                         // Creazione Administrator
-                        Class administratorStorage = Class.forName("it.units.progrweb.entities.attori.administrator.AdministratorStorage");
+                        Class<?> administratorStorage = Class.forName("it.units.progrweb.entities.attori.administrator.AdministratorStorage");
                         Constructor<?> constructorAdministratorStorage = administratorStorage.getDeclaredConstructor(String.class, String.class, String.class);
                         constructorAdministratorStorage.setAccessible(true);
                         administratorTest = constructorAdministratorStorage.newInstance("AdminTest", "Mario l'Amministratore", "marioadmin@example.com");

@@ -7,14 +7,14 @@ import it.units.progrweb.entities.attori.Attore;
  * Contiene il tipo di {@link Attore} con cui il
  * possessore del token si sta qualificando.
  */
-public class JwtTipoAttoreClaim extends JwtClaim {
+public class JwtTipoAttoreClaim extends JwtClaim<Attore.TipoAttore> {
 
     /**
      * Crea un "tipo attore" claims.
-     * @param tipoAttore Il tipo di {@link Attore} che
+     * @param tipoAttore Il {@link Attore.TipoAttore} di {@link Attore} che
      *                   possiede il token.
      */
-    public JwtTipoAttoreClaim(String tipoAttore) {
+    public JwtTipoAttoreClaim(Attore.TipoAttore tipoAttore) {
         super(JwtClaim.JWT_TIPO_ATTORE_CLAIM_NAME, tipoAttore);
     }
 

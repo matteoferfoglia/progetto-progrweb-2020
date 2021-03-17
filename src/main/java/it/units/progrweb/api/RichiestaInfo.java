@@ -234,13 +234,13 @@ public class RichiestaInfo {
                                                            HttpServletRequest httpServletRequest,
                                                            Function<Long, Response> creazioneRisposta) {
         String tipoAttoreAutenticato = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
-        if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Administrator.getTipoAttore()) ) {
+        if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Administrator.name()) ) {
             return creazioneRisposta.apply(idAttoreTarget);
         } else {
             // uploader e consumer devono essere in relazione per vedere uno le info dell'altro
             Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
             Long idConsumer, idUploader;
-            if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Consumer.getTipoAttore()) ) {
+            if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Consumer.name()) ) {
                 idConsumer = idAttoreAutenticato;
                 idUploader = idAttoreTarget;
             } else {

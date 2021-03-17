@@ -36,8 +36,6 @@ public class JsonHelperTest {
      * @see TipiPrimitiviInJson TipiPrimitiviInJson.*/
     private static Stream<Arguments> generaOggettiJsonAdUnSoloLivello() {
 
-        // todo : refactoring di questo metodo
-
         final int NUMERO_MASSIMO_PROPERTIES_UN_OGGETTO_JSON = 200;
 
         return  IntStream.range(0,QUANTI_TEST)
@@ -104,15 +102,15 @@ public class JsonHelperTest {
                                              return rappresentazione_stringa_entryMappaCorrispondente;  // array (Object[]) con proprietà ("nome":valore) nel primo elemento e l'entry (key-value) nel secondo elemento
                                          }).collect(Collectors.toList());
 
-                                 Supplier<Stream> streamSupplier = () -> streamPropertyJson.stream();   // Fonte: https://stackoverflow.com/a/30922045
+                                 Supplier<Stream<?>> streamSupplier = streamPropertyJson::stream;   // Fonte: https://stackoverflow.com/a/30922045
 
 
                                  // Creazione dello stream di arguments da resituire: primo argomento è la stringa JSON dell'oggetto
                                  String rappresentazioneJson = "{\n\t"
                                          +   streamSupplier.get().map(rappresentazione_stringa_entryMappaCorrispondente -> {
-                                     Object[] rappresentazione_stringa_entryMappaCorrispondente_array = (Object[]) rappresentazione_stringa_entryMappaCorrispondente;
-                                     return rappresentazione_stringa_entryMappaCorrispondente_array[0];
-                                 }).collect(Collectors.joining(", \n\t"))
+                                                 Object[] rappresentazione_stringa_entryMappaCorrispondente_array = (Object[]) rappresentazione_stringa_entryMappaCorrispondente;
+                                                 return String.valueOf(rappresentazione_stringa_entryMappaCorrispondente_array[0]);
+                                             }).collect(Collectors.joining(", \n\t"))
                                          + "\n}";  // oggetto JSON (String) con tutte le properties
 
                                  // Creazione dello stream di arguments da resituire: secondo argomento è la mappa chiave-valore con le properties dell'oggetto
@@ -121,8 +119,8 @@ public class JsonHelperTest {
                                      Object[] rappresentazione_stringa_entryMappaCorrispondente_array = (Object[]) rappresentazione_stringa_entryMappaCorrispondente;
                                      return  rappresentazione_stringa_entryMappaCorrispondente_array[1];
                                  }).forEach(entry -> {
-                                     Map.Entry entryCast = (Map.Entry)entry;
-                                     if(rappresentazioneMappa_nomeProp_valoreProp.containsKey(entryCast.getKey()))
+                                     Map.Entry<?,?> entryCast = (Map.Entry<?,?>)entry;
+                                     if(rappresentazioneMappa_nomeProp_valoreProp.containsKey(String.valueOf(entryCast.getKey())))
                                          throw new IllegalStateException("Chiave già presente nella mappa.");
                                      rappresentazioneMappa_nomeProp_valoreProp.put((String) entryCast.getKey(), entryCast.getValue());
                                  });
@@ -153,9 +151,9 @@ public class JsonHelperTest {
 
         // Nei test non siamo interessati agli spazi
 
-        Function rimuoviSpaziTranneQuelliTraVirgolette = stringaInput -> {
+        Function<String,String> rimuoviSpaziTranneQuelliTraVirgolette = stringaInput -> {
             final String[] caratteriRegexDaRimuovere = {"\t","\n", " "};
-            String stringaOutput = (String)stringaInput;
+            String stringaOutput = stringaInput;
             for (String carattereRegexDaRimuovere : caratteriRegexDaRimuovere) {
                 stringaOutput = stringaOutput.replaceAll(carattereRegexDaRimuovere, "");
             }

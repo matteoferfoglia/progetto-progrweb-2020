@@ -73,7 +73,7 @@ public class WebService {
                                 null,
                                 nomeCognomeConsumerDestinatario,
                                 emailConsumerDestinatario,
-                                Attore.TipoAttore.Consumer.getTipoAttore(),
+                                Attore.TipoAttore.Consumer,
                                 null),
                         mittente.getIdentificativoAttore());
                 return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
