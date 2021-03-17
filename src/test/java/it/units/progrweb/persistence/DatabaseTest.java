@@ -169,7 +169,7 @@ public class DatabaseTest {
     /** Test per {@link DatabaseHelper#salvaEntita(Object)}.*/
     @ParameterizedTest
     @MethodSource("generaEntitaDaSalvareNelDatabase")
-    void testSalvataggioImmediatoEntita(Class classeEntita, Object entita){
+    void testSalvataggioImmediatoEntita(Class<?> classeEntita, Object entita){
 
         if(! classeEntita.equals(Object.class)) {   // il @MethodSource genera Object in caso di classi astratte, ma non sono entità (evitate con questo if)
 

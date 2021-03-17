@@ -198,7 +198,7 @@ public class FiltroCSRF implements Filter {
         // readLine(), Fonte: https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
         final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
         byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
-        int numeroByteLetti = 0;
+        int numeroByteLetti;
         while( (numeroByteLetti = reader.readLine(arrayByteLettura,            // array di lettura "buffer"
                                                   0,                       // in lettura, occupiamo l'array (primo parametro) dal primo elemento
                                                   DIMENSIONE_ARRAY_LETTURA))   // massimo spazio disponibile nell'array
@@ -233,7 +233,7 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
         try (InputStream inputStream = request.getInputStream()) {  // try-with-resources, Fonte: https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
             if (inputStream != null) {
                 byte[] buffer = new byte[128];
-                int bytesRead = -1;
+                int bytesRead;
                 while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) > 0) {
                     builder.write(buffer, 0, bytesRead);
                 }

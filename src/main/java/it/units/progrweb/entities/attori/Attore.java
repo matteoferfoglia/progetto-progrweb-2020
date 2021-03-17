@@ -289,7 +289,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
 
     /** Restituisce la lista degli identificativi di tutti gli Attori della
      * classe data nel parametro registrati nel sistema.*/
-    public static List<Long> getListaIdentificativiTuttiGliAttoriNelSistema( Class classeAttore ) {
+    public static List<Long> getListaIdentificativiTuttiGliAttoriNelSistema( Class<?> classeAttore ) {
 
         return DatabaseHelper.listaEntitaNelDatabase(classeAttore)
                 .stream()
@@ -354,6 +354,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
      * @return Il clone dell'istanza data, oppure null se si verificano
      *         dei problemi durante lo'operazione.
      */
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
     public Attore clone() {
 

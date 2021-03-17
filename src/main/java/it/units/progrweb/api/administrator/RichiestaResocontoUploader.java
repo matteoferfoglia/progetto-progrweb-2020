@@ -28,11 +28,11 @@ public class RichiestaResocontoUploader {
     /** Restituisce il {@link Resoconto} dei documenti caricati dall'
      * {@link Uploader} specificato nel parametro durante il periodo
      * temporale specificato nei parametri.
-     * @param identificativoUploader
-     * @param dataInizio
-     * @param dataFine
+     * @param identificativoUploader L'identificativo dell'{@link Uploader}.
+     * @param dataInizio Data di inizio (inclusa) del periodo di interesse.
+     * @param dataFine Data di fine (inclusa) del periodo di interesse.
+     * @return L'istanza di {@link Resoconto} richiesta.
      * @throws IOException A causa di {@link HttpServletResponse#sendError(int)}.
-     * @return
      */
     @GET
     @Path("/{identificativoUploader}")

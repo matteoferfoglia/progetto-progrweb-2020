@@ -105,37 +105,33 @@ public abstract class File {
 
     /** Restituisce il nome dell'attributo che contiene il nome di un file.*/
     public static String getNomeAttributoContenenteNomeFile() {
-
         final String NOME_ATTRIBUTO_NOME_FILE = "nomeDocumento";
-        return getFieldDaNome(NOME_ATTRIBUTO_NOME_FILE).getName();
-
+        Field field = getFieldDaNome(NOME_ATTRIBUTO_NOME_FILE);
+        return field != null ? field.getName() : "";
     }
 
     /** Restituisce il nome dell'attributo che contiene la lista
      * degli hashtag di un file.*/
     public static String getNomeAttributoContenenteHashtagNeiFile() {
-
         final String NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE = "listaHashtag";
-        return getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE).getName();
-
+        Field field = getFieldDaNome(NOME_ATTRIBUTO_LISTA_HASHTAG_IN_FILE);
+        return field != null ? field.getName() : "";
     }
 
     /** Restituisce il nome dell'attributo che contiene la data di
      * caricamento di un file.*/
     public static String getNomeAttributoContenenteDataCaricamentoFile() {
-
         final String NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE = "dataEdOraDiCaricamento";
-        return getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE).getName();
-
+        Field field = getFieldDaNome(NOME_ATTRIBUTO_DATA_CARICAMENTO_FILE);
+        return field != null ? field.getName() : "";
     }
 
     /** Restituisce il nome dell'attributo che contiene data di
      * visualizzazione di un file.*/
     public static String getNomeAttributoContenenteDataVisualizzazioneFile() {
-
         final String NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE = "dataEdOraDiVisualizzazione";
-        return getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE).getName();
-
+        Field field = getFieldDaNome(NOME_ATTRIBUTO_DATA_VISUALIZZAZIONE_FILE);
+        return field != null ? field.getName() : "";
     }
 
     /** Controlla che dato un nome esista un attributo con quel nome

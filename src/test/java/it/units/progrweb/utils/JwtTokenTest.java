@@ -132,6 +132,7 @@ public class JwtTokenTest {
             jwtTokenDiverso = creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(jwtToken, new JwtClaim<>("Claim aggiunto che renderà il token diverso", "qualsiasi valore"));
             boolean equalsRiconosceTokenDiversi = ! jwtTokenDiverso.equals(jwtToken);
 
+            //noinspection ConstantConditions   // test fatto apposta per verificare correttezza
             assertTrue(equalsFunzionaConLoStessoToken &&
                         equalsFunzionaConLaCopiaDelloStessoToken &&
                         equalsRiconosceTokenDiversi);

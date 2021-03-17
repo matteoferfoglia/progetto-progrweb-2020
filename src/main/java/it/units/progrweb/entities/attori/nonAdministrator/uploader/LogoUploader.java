@@ -29,8 +29,11 @@ class LogoUploader implements Serializable {
 
     /**
      * Costruttore.
-     * @param logoInBytes
-     * @param estensioneFileContenenteLogo
+     * @param logoInBytes Array di byte rappresentante il logo.
+     * @param estensioneFileContenenteLogo Estensione del logo: poiché verrà
+     *                                     salvato un array di byte, è necessario
+     *                                     salvare anche l'estensione del file per
+     *                                     sapere come interpretare quei byte.
      * @throws IOException Vedere {@link #setLogo(byte[], String)}.
      */
     LogoUploader(byte[] logoInBytes, String estensioneFileContenenteLogo)

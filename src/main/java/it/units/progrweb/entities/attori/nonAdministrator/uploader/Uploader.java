@@ -24,9 +24,6 @@ public abstract class Uploader extends UtenteNonAdministrator {
     }
 
     /** Costruttore.
-     * @param username
-     * @param nominativo
-     * @param email
      * @throws IllegalArgumentException Se lo username non è valido.
      */
     public Uploader(String username, String nominativo, String email) {
@@ -53,6 +50,9 @@ public abstract class Uploader extends UtenteNonAdministrator {
         }
     }
 
+    /** Restituisce l'entità {@link Uploader} cercata nel database
+     * in base all'identificativo fornito.
+     * @return L'{@link Uploader} cercato, oppure null in caso di errore.*/
     public static Uploader getAttoreDaIdentificativo(Long identificativoAttore) {
         Attore a = Attore.getAttoreDaIdentificativo(identificativoAttore);
         return a instanceof Uploader ? (Uploader) a : null;

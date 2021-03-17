@@ -95,7 +95,7 @@ public class UtilitaGenerale {
         return Arrays.stream(campiDaMostrareNellaMappa)
                 .collect(
                         Collectors.toMap(
-                                nomeField -> nomeField.getName(),
+                                Field::getName,
                                 field -> {
                                     try {
                                         field.setAccessible(true);
@@ -116,7 +116,7 @@ public class UtilitaGenerale {
      * nella classe data.
      * @return true se l'attributo esiste, false altrimenti.
      */
-    public static boolean esisteAttributoInClasse(String nomeAttributo, Class classe) {
+    public static boolean esisteAttributoInClasse(String nomeAttributo, Class<?> classe) {
 
         try {
             classe.getDeclaredField(nomeAttributo);
@@ -132,7 +132,7 @@ public class UtilitaGenerale {
      * @return Il nome stesso se il field esiste, stringa vuota altrimenti.
      */
     public static String ricercaFieldPerNomeInQuestaClasse( String nomeField,
-                                                            Class classeInCuiCercareField ) {
+                                                            Class<?> classeInCuiCercareField ) {
 
         if ( esisteAttributoInClasse(nomeField, classeInCuiCercareField) ) {
             return nomeField;

@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -125,10 +126,17 @@ public class GestioneDocumenti {
                             identificativoUploaderMittente, identificativoConsumerDestinatario );
 
                     Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploaderMittente);
+
+                    if( mittente==null )
+                        return Response.status( Response.Status.BAD_REQUEST )
+                                .entity( "Uploader " + identificativoUploaderMittente + " non trovato nel sistema." )
+                                .build();
+
                     inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
 
                     // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
-                    Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
+                    Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Collections.singletonList(fileAggiunto), true);
+                        // Collections.singletonList(fileAggiunto) anziché Collections.singletonList(fileAggiunto) suggerito dall'IDE per performance
 
                     return UtilitaGenerale.rispostaJsonConMappaConValoriJSON(mappa_idFile_propFile);
 

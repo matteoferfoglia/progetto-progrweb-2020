@@ -35,7 +35,7 @@ public abstract class Consumer extends UtenteNonAdministrator {
 
     /** Restituisce l'entità {@link Consumer} cercata nel database
      * in base all'identificativo fornito.
-     * @return Il consumer cercato, oppure null in caso di errore.*/
+     * @return Il {@link Consumer} cercato, oppure null in caso di errore.*/
     public static Consumer getAttoreDaIdentificativo(Long identificativoConsumer ) {
 
         Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoConsumer);

@@ -56,7 +56,7 @@ public class StarterDatabase implements ServletContextListener {
         Arrays.stream(nomiEntitaGestiteDalDatabase)
               .forEach(nomeClasse -> {  //mappatura da nome della classe alla classe
                   try {
-                      Class classeDaRegistrare = Class.forName(nomeClasse);
+                      Class<?> classeDaRegistrare = Class.forName(nomeClasse);
                       ObjectifyService.register(classeDaRegistrare);
                   } catch (ClassNotFoundException e) {
                       Logger.scriviEccezioneNelLog(StarterDatabase.class,
@@ -126,7 +126,7 @@ public class StarterDatabase implements ServletContextListener {
 
                         try {
                             // Creazione relazione consumer-uploader
-                            Constructor<RelazioneUploaderConsumer> costruttoreRelazione = null;
+                            Constructor<RelazioneUploaderConsumer> costruttoreRelazione;
                             costruttoreRelazione = RelazioneUploaderConsumer.class
                                     .getDeclaredConstructor(Long.class, Long.class, Long.class);
                             costruttoreRelazione.setAccessible(true);
@@ -150,10 +150,10 @@ public class StarterDatabase implements ServletContextListener {
                 Logger.scriviEccezioneNelLog(StarterDatabase.class, e);
             }
 
-        } else {
+        } /* else {
             // Production
             // which is: SystemProperty.Environment.Value.Production
-        }
+        } */
     }
 
     public void contextDestroyed(ServletContextEvent sce) {}

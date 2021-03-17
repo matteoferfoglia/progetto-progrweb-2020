@@ -40,8 +40,7 @@ public class RelazioneUploaderConsumer {
      * lo elimina ed elimina (con il metodo {@link File#elimina()})
      * tutti i file che ha caricato.
      * @param identificativoUploaderDaEliminare Identificativo dell'{@link Uploader}
-     *                                          Se nullo, questo metodo non fa nulla.
-     * @return true se l'eliminazione va a buon fine, false altrimenti.*/
+     *                                          Se nullo, questo metodo non fa nulla.*/
     public static void eliminaUploader(Long identificativoUploaderDaEliminare) {
 
         if( identificativoUploaderDaEliminare==null )
