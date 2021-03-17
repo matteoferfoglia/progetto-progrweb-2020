@@ -344,7 +344,7 @@ public class Autenticazione {
      * @throws NoSuchElementException Se l'identificativo non viene trovato nel token.*/
     public static Long getIdentificativoAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
         JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(getTokenAutenticazioneBearer(httpServletRequest));
-        return (Long)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.ID_ATTORE );
+        return ((Number)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.ID_ATTORE )).longValue();
     }
 
 }
