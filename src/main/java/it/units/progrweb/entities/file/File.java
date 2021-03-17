@@ -4,7 +4,6 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
-import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -20,8 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,10 +43,12 @@ public abstract class File {
     protected String nomeDocumento;
 
     /** Data e ora di caricamento del file salvati come Long.*/
+    @SuppressWarnings("unused") // attributo necessario affinché venga salvato da Objectify
     @Index
     private String dataEdOraDiCaricamento;
 
     /** Indirizzo IP del consumer che ha visualizzato il file. */
+    @SuppressWarnings("unused") // attributo necessario affinché venga salvato da Objectify
     private String indirizzoIpVisualizzatore;
 
     /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
@@ -508,56 +507,4 @@ public abstract class File {
                                    identificativoUploader, identificativoConsumer);
 
     }
-
-    /** A partire da una lista di occorrenze di questa classe data come parametro,
-     * questo metodo crea una mappa in cui ogni entry ha come valore un array
-     * di identificativi di {@link File} associati all'{@link Attore} il cui identificativo
-     * è specificato nella chiave dell'entry: in questo modo, la lista di occorrenze date
-     * viene raggruppata in base all'{@link Attore} specificato dal soprascritto metodo getter.*/
-    private static Map<Long, Long[]>
-    mappa_identificativoAttore_arrayIdFiles(List<File> listaFile,
-                                            String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze) {
-
-        try {
-
-            Method getter_metodoRaggruppamentoOccorrenze =
-                    File.class.getDeclaredMethod(nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
-
-            return listaFile
-                    .stream()
-                    .collect(Collectors.groupingBy(relazione -> {
-                        try {
-                            return getter_metodoRaggruppamentoOccorrenze.invoke(relazione);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumer.class, e);
-                            return null;
-                        }
-                    }))   // raggruppa in base all'attore ( quale attore dipende dal metodo usato )
-
-                    // Ora che è raggruppato, crea mappa { attore => arrayFilesAssociatiAdAttore }
-                    .entrySet()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .map(entry -> {
-                        Long chiave = (Long) entry.getKey();
-                        Long[] arrayIdFiles = entry.getValue()
-                                .stream()
-                                .map(File::getIdentificativoFile)
-                                .filter( Objects::nonNull ) // evita le occorrenze in cui il file è null
-                                .toArray(Long[]::new);
-                        return new AbstractMap.SimpleEntry<Long,Long[]>(chiave, arrayIdFiles);
-                    })
-                    .collect(Collectors.toMap(
-                            AbstractMap.SimpleEntry::getKey,
-                            AbstractMap.SimpleEntry::getValue)
-                    );
-        } catch (NoSuchMethodException e) {
-            Logger.scriviEccezioneNelLog(RelazioneUploaderConsumer.class,
-                            "Metodo \"" + nomeMetodoGetterDaUsarePerRaggruppareOccorrenze + "\" non trovato.",
-                                            e );
-            return new HashMap<>(); // mappa vuota
-        }
-    }
-
-
 }

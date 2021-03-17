@@ -105,6 +105,7 @@ public class RelazioneUploaderConsumer {
 
     private RelazioneUploaderConsumer() {}
 
+    @SuppressWarnings("SameParameterValue")
     private RelazioneUploaderConsumer(Long identificativoConsumer, Long identificativoUploader, Long identificativoRelazione) {
         this.identificativoConsumer = identificativoConsumer;
         this.identificativoUploader = identificativoUploader;

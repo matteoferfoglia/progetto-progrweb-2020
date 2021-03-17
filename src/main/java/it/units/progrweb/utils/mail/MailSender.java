@@ -41,6 +41,7 @@ public class MailSender {
      * SMTP esterno.
      * @param smtpHost Es.: "smtp.example.com"
      * @param smtpPort Es.: "25".*/
+    @SuppressWarnings("unused") // metodo mantenuto per completezza della classe.
     public MailSender( String smtpHost, String smtpPort ) {
 
         this();

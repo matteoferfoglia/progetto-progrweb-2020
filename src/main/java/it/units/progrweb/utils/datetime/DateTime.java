@@ -257,7 +257,7 @@ public class DateTime implements Comparable<DateTime> {
     }
 
     /** Restituisce data e ora, col fuso orario specificato.*/
-    private String getDataOraConFusoOrario(ZoneOffset zoneOffset) {
+    private String getDataOraConFusoOrario(@SuppressWarnings("SameParameterValue") ZoneOffset zoneOffset) {
         String stringa =  convertiInLocalDateTime().atZone(zoneOffset)
                                                    .format(DateTimeFormatter.ofPattern("cccc, d LLLL yyyy,  HH:mm:ss '(" + (zoneOffset.equals(UTC_ZONE_OFFSET) ? "UTC" : "'O'") +")'"));
         return stringa.substring(0,1).toUpperCase() + stringa.substring(1);

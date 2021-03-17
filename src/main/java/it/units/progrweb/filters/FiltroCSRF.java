@@ -149,6 +149,7 @@ public class FiltroCSRF implements Filter {
     /** Dato il body di una request di tipo Multipart, restituisce il valore
      * del CSRF token trovato, se presente e valido, o stringa vuota altrimenti.
      * Fonte: https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html */
+    @SuppressWarnings("SameParameterValue")
     private String estraiCsrfTokenDaMultiPart(String indirizzoIPClient, String cookieHeader, String contentType,
                                               StringBuilder requestBody, String nomeParametroCsrfTokenNellaRequest) {
 

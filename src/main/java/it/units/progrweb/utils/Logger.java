@@ -22,7 +22,7 @@ public abstract class Logger {
      * @param messaggio Messaggio da scrivere nel log.
      * @param throwable Oggetto Throwable da riportare nel log.
      */
-    private static void scriviNelLog(Class<?> classe, Level livelloLogging, String messaggio, Throwable throwable) {
+    private static void scriviNelLog(Class<?> classe, @SuppressWarnings("SameParameterValue") Level livelloLogging, String messaggio, Throwable throwable) {
         getLogger(classe).log(livelloLogging, messaggio, throwable);
     }
 
