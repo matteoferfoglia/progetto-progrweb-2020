@@ -1,5 +1,7 @@
 package it.units.progrweb.utils;
 
+import it.units.progrweb.EnvironmentVariables;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
@@ -19,14 +21,11 @@ import java.util.stream.Collectors;
  */
 public class UtilitaGenerale {
 
-    /** Inizio dell'URI delle richieste "api".*/
-    private static final String API_URL_PATTERN = "/api";       // TODO : variabile d'ambiente (questa variabile NON dovrebbe essere in questa classe!!!)
-
     /** Restituisce true se l'array dato contiene l'oggetto
      * da cercare, false altrimenti. La classe dell'oggetto
      * cercato deve implementare il metodo <code>equals</code>.*/
     public static<T> boolean isPresenteNellArray(T oggettoDaCercare, T[] array) {
-        return Arrays.stream(array).anyMatch(oggettoDaCercare::equals);
+        return Arrays.asList(array).contains(oggettoDaCercare);
     }
 
     /** Restituisce true se l'array di stringhe dato contiene un
@@ -38,7 +37,7 @@ public class UtilitaGenerale {
 
     /** Restituisce true se la richiesta è di tipo "api" (Ajax), false altrimenti.*/
     public static boolean isRichiestaApi(HttpServletRequest httpReq) {
-        return getUrlPattern(httpReq).startsWith(API_URL_PATTERN);
+        return getUrlPattern(httpReq).startsWith(EnvironmentVariables.API_URL_PATTERN);
     }
 
     /** Restituisce una stringa con l'intero stacktrace di un'eccezione. */
