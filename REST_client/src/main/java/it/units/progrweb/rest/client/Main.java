@@ -105,6 +105,7 @@ public class Main {
 
 
     /** Metodo per stampare il contenuto di un file dato.*/
+    @SuppressWarnings("unused") // metodo mantenuto per comodità
     private static void stampaFile(File file) {
 
         Scanner scannerFile;

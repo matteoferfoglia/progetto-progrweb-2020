@@ -99,6 +99,7 @@ public class RestClient {
     public boolean login(String credenziali_username, String credenziali_password, String loginUri) {
 
         /* Classe di supporto utilizzata per la serializzazione dei dati da inviare al server. */
+        @SuppressWarnings("unused")  // Alcuni metodi "unused" in realtà sono utilizzati per le operazioni di de/serializzazione
         class Login {
             private String username;
             private String password;
