@@ -3,24 +3,15 @@ package it.units.progrweb.entities.file;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.persistence.DatabaseHelper;
-import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Matteo Ferfoglia
  */
 @Subclass(index = true)
 class FileStorage extends File {
-
-    /** Lista di hashtag associati a questo file. */
-    @Index
-    @SuppressWarnings("FieldCanBeLocal") // attributo necessario affinché venga salvato da Objectify
-    private List<String> listaHashtag;
 
     /** Il file. */
     private byte[] file;   // byte[] automaticamente convertito in Blob nel datastore
@@ -35,9 +26,8 @@ class FileStorage extends File {
     /** Crea un nuovo file, con nome ed hashtags specificati. */
     public FileStorage(String nomeDocumento, byte[] contenuto, List<String> hashtags,
                        Long identificativoMittente, Long identificativoDestinatario) {
-        super(nomeDocumento, DateTime.adesso(), identificativoMittente, identificativoDestinatario);
+        super(nomeDocumento, DateTime.adesso(), identificativoMittente, identificativoDestinatario, hashtags);
         this.file         = contenuto;
-        this.listaHashtag = hashtags;
         this.eliminato    = false;
     }
 
@@ -79,25 +69,6 @@ class FileStorage extends File {
     @Override
     public boolean isEliminato() {
         return eliminato;
-    }
-
-    @Override
-    public Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati) {
-        Map<String, Object> mappaNomeValoreProprieta;
-
-        mappaNomeValoreProprieta = UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(includiMetadati), this);
-
-        // Aggiunge attributi rilevanti da questa classe
-        // Accesso con reflection, così se campo non presente (es. se cambia nome) è subito individuato da un'eccezione
-        try {
-            Field listaHashtag = this.getClass().getDeclaredField("listaHashtag");
-            listaHashtag.setAccessible(true);
-            mappaNomeValoreProprieta.put(listaHashtag.getName(), listaHashtag.get(this));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            Logger.scriviEccezioneNelLog(this.getClass(), e);
-        }
-
-        return mappaNomeValoreProprieta;
     }
 
 }

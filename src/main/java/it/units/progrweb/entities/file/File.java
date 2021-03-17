@@ -47,12 +47,12 @@ public abstract class File {
     @Index
     private String dataEdOraDiCaricamento;
 
+    /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
+    private String dataEdOraDiVisualizzazione;
+
     /** Indirizzo IP del consumer che ha visualizzato il file. */
     @SuppressWarnings({"unused", "FieldCanBeLocal"}) // attributo necessario affinché venga salvato da Objectify
     private String indirizzoIpVisualizzatore;
-
-    /** Data e ora di (eventuale) visualizzazione del file salvati come Long.*/
-    private String dataEdOraDiVisualizzazione;
 
     /** Mittente del file.*/
     @Index
@@ -62,18 +62,51 @@ public abstract class File {
     @Index
     private Long identificativoDestinatario;
 
+    /** Lista di hashtag associati a questo file. */
+    @Index
+    @SuppressWarnings({"unused", "FieldCanBeLocal"}) // attributo necessario affinché venga salvato da Objectify
+    private List<String> listaHashtag;
+
     /** Dimensione massima per la dimensione di un file, in byte. */
     @Ignore
     public static final long MAX_SIZE_FILE = 800*1024*1024;
 
 
+    //   ---   PARAMETRI:  grazie ai successivi attributi della classe è possibile specificare quali attributi restituire ai client   ---
+
+    /** Array coi nomi degli attributi di questa classe da inviare ai
+     * client che richiedono un'istanza di questa classe.*/
+    @Ignore
+    private static final String[] elencoAttributiDaMostrareAiClient = {
+            getNomeAttributoContenenteNomeFile(),
+            getNomeAttributoContenenteDataCaricamentoFile(),
+            getNomeAttributoContenenteDataVisualizzazioneFile(),
+            getNomeAttributoContenenteHashtagNeiFile()
+    };
+
+    /** Array coi nomi dei meta-attributi di questa classe.*/
+    @Ignore
+    private static final String[] elencoMetaAttributi = {
+            getNomeAttributoContenenteIdFile(),
+            getNomeAttributoContenenteIpVisualizzatore()
+    };
+
+    //   ---   FINE PARAMETRI   ---
+
+
+
+
+
     protected File(){}
 
-    protected File(String nomeDocumento, DateTime dataEdOraDiCaricamento, Long identificativoMittente, Long identificativoDestinatario) {
+    protected File(String nomeDocumento, DateTime dataEdOraDiCaricamento,
+                   Long identificativoMittente, Long identificativoDestinatario,
+                   List<String> listaHashtag) {
         this.nomeDocumento = nomeDocumento;
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
         this.identificativoMittente = identificativoMittente;
         this.identificativoDestinatario = identificativoDestinatario;
+        this.listaHashtag = listaHashtag;
     }
 
     /** Restituisce true se il file è stato eliminato, false altrimenti.*/
@@ -134,6 +167,21 @@ public abstract class File {
         return field != null ? field.getName() : "";
     }
 
+    /** Restituisce il nome dell'attributo che contiene l'identificativo di
+     * un'istanza di questa classe.*/
+    private static String getNomeAttributoContenenteIdFile() {
+        final String NOME_ATTRIBUTO_NOME_FILE = "identificativoFile";
+        Field field = getFieldDaNome(NOME_ATTRIBUTO_NOME_FILE);
+        return field != null ? field.getName() : "";
+    }
+
+    /** Restituisce il nome dell'attributo che contiene l'indirizzo IP del visualizzatore.*/
+    private static String getNomeAttributoContenenteIpVisualizzatore() {
+        final String NOME_ATTRIBUTO_NOME_FILE = "indirizzoIpVisualizzatore";
+        Field field = getFieldDaNome(NOME_ATTRIBUTO_NOME_FILE);
+        return field != null ? field.getName() : "";
+    }
+
     /** Controlla che dato un nome esista un attributo con quel nome
      * in {@link File questa classe} oppure nella classe {@link FileStorage}.
      * Se non trova tale attributo, viene riportata un'eccezione, in questo
@@ -173,8 +221,8 @@ public abstract class File {
      *                                    in cui il documento è richiesto (ignorato
      *                                    se tale data/ora è già salvata).*/
     public static byte[] getContenutoFile(File file,
-                                               String indirizzoIpVisualizzazione,
-                                               boolean salvaDataOraVisualizzazione) {
+                                          String indirizzoIpVisualizzazione,
+                                          boolean salvaDataOraVisualizzazione) {
         if( file instanceof FileStorage)
             return FileStorage.getContenutoFile((FileStorage) file,
                                                 indirizzoIpVisualizzazione,
@@ -211,42 +259,43 @@ public abstract class File {
     public static String[] anteprimaNomiProprietaFile(boolean includiMetadati) {
         return Arrays.stream(getAnteprimaProprietaFile(includiMetadati))
                      .map(Field::getName)
+                     .filter(fieldName -> ! fieldName.equals(getNomeAttributoContenenteHashtagNeiFile()))   // lista degli hashtag deve essere nota al client per indicizzare i documenti, ma non mostrata tra le proprietà "in anteprima"
                      .toArray(String[]::new);
     }
 
     /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.
      * @param includiMetadati true se si vogliono anche i metadati.*/
     public static Field[] getAnteprimaProprietaFile( boolean includiMetadati ) {    // TODO : usare FileProxy per evitare di dover escludere manualmente degli attributi
+
+        List<String> nomeAttributiInQuestaClasseDaMostrare;
+                
+        {
+            // Creazione dela lista coi nomi degli attributi di questa classe
+            nomeAttributiInQuestaClasseDaMostrare = new ArrayList<>(Arrays.asList(elencoAttributiDaMostrareAiClient));
+            
+            if (includiMetadati)
+                nomeAttributiInQuestaClasseDaMostrare.addAll(Arrays.asList(elencoMetaAttributi));
+
+            nomeAttributiInQuestaClasseDaMostrare
+                .forEach(nomeUnAttributo -> {
+                    if (!UtilitaGenerale.esisteAttributoInClasse(nomeUnAttributo, File.class)) {
+                        // Informa se il field non si trova
+                        Logger.scriviEccezioneNelLog(File.class,
+                                "L'attributo \"" + nomeUnAttributo + "\"" +
+                                        " non si trova nella classe " + File.class.getName() +
+                                        ": forse è stato rinominato",
+                                new NoSuchFieldException());
+
+                        // e rimuovilo da quelli da mostrare (altrimenti si generà un'eccezione)
+                        nomeAttributiInQuestaClasseDaMostrare.remove(nomeUnAttributo);
+                    }
+                });
+        }
+        
         return Arrays.stream(File.class.getDeclaredFields())
-                     .filter( field -> {
-
-                         // Escludi i campi i cui nomi sono presenti in questo array
-                         List<String> nomeAttributiInQuestaClasseDaNonMostrare = new ArrayList<>();
-                         {
-                             nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoDestinatario");    // TODO : sarebbe meglio spostare questi attributi e relativi metodo in FileStorage, cosicchè non vengano mostrati
-                             nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoMittente");
-                             nomeAttributiInQuestaClasseDaNonMostrare.add("MAX_SIZE_FILE");
-
-                             if (!includiMetadati) {
-                                 nomeAttributiInQuestaClasseDaNonMostrare.add("identificativoFile");
-                                 nomeAttributiInQuestaClasseDaNonMostrare.add("indirizzoIpVisualizzatore");
-                             }
-                             nomeAttributiInQuestaClasseDaNonMostrare
-                                     .forEach(nomeUnAttributo -> {
-                                         if (!UtilitaGenerale.esisteAttributoInClasse(nomeUnAttributo, File.class)) {
-                                             // Informa se il field non si trova
-                                             Logger.scriviEccezioneNelLog(File.class,
-                                                     "L'attributo \"" + nomeUnAttributo + "\"" +
-                                                             " non si trova nella classe " + File.class.getName() +
-                                                             ": forse è stato rinominato",
-                                                     new NoSuchFieldException());
-                                         }
-                                     });
-                         }
-
-                         return ! UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaNonMostrare.toArray() );
-
-                     }).toArray(Field[]::new);
+                     .filter( field -> UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaMostrare.toArray() ) )
+                     .toArray(Field[]::new);
+        // L'ordine con cui vengono restituiti i field nell'array è quello con cui gli attributi sono dichiarati nella classe
     }
 
     /** Restituisce l'identificativo del file.*/
@@ -262,7 +311,9 @@ public abstract class File {
      * ritenuti rilevanti dalla classe concreta che implementa questo
      * metodo.
      * @param includiMetadati true se si vogliono anche i metadati.*/
-    public abstract Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati);
+    public Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati) {
+        return UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(includiMetadati), this);
+    }
 
     public String getNomeDocumento() {
         return nomeDocumento;
