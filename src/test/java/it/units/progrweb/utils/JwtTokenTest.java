@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -85,8 +84,7 @@ public class JwtTokenTest {
                                  payloadJson += Arrays.stream(stream_claims_json)
                                          .map(claim_json -> {
                                              Object[] object_token_json = (Object[])claim_json;
-                                             String jwtClaimInFormatoJson = (String) object_token_json[1];
-                                             return jwtClaimInFormatoJson;
+                                             return (String) object_token_json[1];
                                          }).collect(Collectors.joining(","));
 
                              }
@@ -139,8 +137,7 @@ public class JwtTokenTest {
                         equalsRiconosceTokenDiversi);
 
 
-        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException
-                | InvocationTargetException | NoSuchFieldException e) {
+        } catch ( IllegalAccessException | NoSuchFieldException e) {
             fallisciTestACausaDiEccezioneNonAttesa(e);
         }
 
@@ -153,7 +150,7 @@ public class JwtTokenTest {
      * NB.: non viene ricalcolata la signature del token, quindi il token
      * prodotto da questo metodo risulterà invalido.*/
     private static JwtToken creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(JwtToken jwtToken, JwtClaim<?> claimDaAggiungere)
-            throws NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+            throws NoSuchFieldException, IllegalAccessException {
          
         // Crea un nuovo token identico a quello iniziale, poi lo modifica
         JwtToken jwtTokenDiverso = new JwtToken(jwtToken);

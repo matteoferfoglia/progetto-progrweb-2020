@@ -208,7 +208,7 @@ public class FiltroCSRF implements Filter {
         }
     }
 
-    public void init(FilterConfig config) throws ServletException {}
+    public void init(FilterConfig config) /*throws ServletException*/ {}
 
 }
 
@@ -250,7 +250,7 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public ServletInputStream getInputStream () throws IOException {
+    public ServletInputStream getInputStream () {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload);
         return new ServletInputStream() {
             @Override

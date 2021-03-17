@@ -202,11 +202,7 @@ public class UtilitaGenerale {
 
     /** Verifica che una stringa non sia nè nulla nè vuota.*/
     public static boolean isStringaNonNullaNonVuota(String stringa) {
-
         if( stringa == null ) return false;
-        if( stringa.trim().isEmpty() ) return false;
-
-        return true;
-
+        return !stringa.trim().isEmpty();
     }
 }

@@ -77,30 +77,8 @@ public abstract class File {
         this.identificativoDestinatario = identificativoDestinatario;
     }
 
-    /** Dato l'identificativo di un'istanza di questa classe, restituisce la data
-     * e l'ora di visualizzazione.
-     * @throws NotFoundException Se il {@link File} non si trova.*/
-    public static String getDataOraVisualizzazione(Long identificativoFile)
-            throws NotFoundException{
-
-        return DateTime.convertiInString(
-                    File.getEntitaDaDbById( identificativoFile )
-                        .getDataEdOraDiVisualizzazione()
-                );
-
-
-    }
-
     /** Restituisce true se il file è stato eliminato, false altrimenti.*/
     abstract public boolean isEliminato();
-
-    public DateTime getDataEdOraDiCaricamento() {
-        return DateTime.convertiDaString( dataEdOraDiCaricamento );
-    }
-
-    protected void setNomeDocumento(String nomeDocumento) {
-        this.nomeDocumento = nomeDocumento;
-    }
 
     protected void setDataEdOraDiCaricamento(DateTime dataEdOraDiCaricamento) {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
@@ -124,10 +102,6 @@ public abstract class File {
 
     protected void setIndirizzoIpVisualizzazione(String indirizzoIpVisualizzazione) {
         this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
-    }
-
-    protected String getIndirizzoIpVisualizzatore() {
-        return indirizzoIpVisualizzatore;
     }
 
     /** Restituisce il nome dell'attributo che contiene il nome di un file.*/
@@ -360,6 +334,7 @@ public abstract class File {
     }
 
     /** Rimuove il contenuto di un file.*/
+    @SuppressWarnings("SameReturnValue")    // nel caso in cui tutte le implementazioni del metodo restituiscono lo stesso valore
     public abstract boolean elimina();
 
     /** Interroga il database e restituisce l'occorrenza di questa entità
@@ -531,26 +506,6 @@ public abstract class File {
         byte[] contenuto = UtilitaGenerale.convertiInputStreamInByteArray( contenutoFile );
         return File.salvaFileInDb( nomeFile, contenuto, listaHashtag,
                                    identificativoUploader, identificativoConsumer);
-
-    }
-
-    /** Interroga il database e restituisce le occorrenze di questa entità
-     * che risultano destinate al {@link Consumer} il cui identificativo è
-     * specificato come parametro. */
-    public static List<File> getOccorrenzeFiltratePerConsumer(Long identificativoConsumer) {
-        return getOccorrenzeFiltrataPerUploaderEConsumer(null, identificativoConsumer);
-    }
-
-    /** Data una lista in cui ogni elemento è un'istanza di
-     * questa classe, restituisce una mappa che ha come chiave
-     * l'identificativo di un {@link Uploader} e come valore
-     * corrispondente l'array degli identificativi dei {@link File}
-     * inviati da quell'{@link Uploader} il cui identificativo è
-     * specificato nella chiave. */
-    public static Map<Long, Long[]> mappa_identificativoUploader_arrayIdFile(List<File> listaRelazioni) {
-
-        String nomeMetodoGetterDaUsarePerRaggruppareOccorrenze = "getIdentificativoMittente";
-        return mappa_identificativoAttore_arrayIdFiles(listaRelazioni, nomeMetodoGetterDaUsarePerRaggruppareOccorrenze);
 
     }
 

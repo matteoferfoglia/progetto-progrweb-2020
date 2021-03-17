@@ -99,8 +99,4 @@ class FileStorage extends File {
         return mappaNomeValoreProprieta;
     }
 
-    public List<String> getListaHashtag() {
-        return listaHashtag;
-    }
-
 }

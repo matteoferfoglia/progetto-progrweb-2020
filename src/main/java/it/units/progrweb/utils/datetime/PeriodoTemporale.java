@@ -68,10 +68,6 @@ public class PeriodoTemporale {
         return dataFinale;
     }
 
-    public long getNumeroGiorni() {
-        return numeroGiorni;
-    }
-
     @Override
     public String toString() {
         return "PeriodoTemporale{" +

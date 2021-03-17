@@ -47,9 +47,6 @@ public class CsrfToken {
     /** Valore identificativo per il client a cui questo CSRF token è stato rilasciato.*/
     private final String valoreIdentificativoClient;
 
-    /** Valore indirizzo IP del client a cui questo CSRF token è stato rilasciato.*/
-    private final String indirizzoIPClient;
-
     /** JWT token contenente il valore di questa istanza di CSRF token
      * e dell'identificativo del client che lo ha richiesto. */
     private final JwtToken jwtToken;
@@ -68,7 +65,6 @@ public class CsrfToken {
 
         this.valoreCsrfToken = generaTokenAlfanumerico(csrf_token_length);
         this.valoreIdentificativoClient = generaTokenAlfanumerico(id_client_length);
-        this.indirizzoIPClient = indirizzoIPClient;
 
         this.jwtToken = creaTokenJwt(indirizzoIPClient);
 
@@ -89,18 +85,6 @@ public class CsrfToken {
 
     public String getValoreCsrfToken() {
         return valoreCsrfToken;
-    }
-
-    public String getValoreIPClient() {
-        return indirizzoIPClient;
-    }
-
-    public JwtToken getJwtToken() {
-        return jwtToken;
-    }
-
-    public String getValoreIdentificativoClient() {
-        return valoreIdentificativoClient;
     }
 
     /**

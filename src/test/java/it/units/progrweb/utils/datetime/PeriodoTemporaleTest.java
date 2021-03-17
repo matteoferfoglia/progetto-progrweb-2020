@@ -29,6 +29,7 @@ public class PeriodoTemporaleTest {
         boolean atteso = istanteInizio.isBefore(istanteFine);
         boolean ottenuto;
         try {
+            //noinspection unused   // anche se non usato, istruzione usata per verificare corretto funzionamento del costruttore
             PeriodoTemporale periodoTemporale = new PeriodoTemporale(dataInizio, dataFine);
             ottenuto = true;
         } catch (IllegalArgumentException e) {

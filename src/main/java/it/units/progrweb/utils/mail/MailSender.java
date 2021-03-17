@@ -51,27 +51,6 @@ public class MailSender {
 
     }
 
-    /** Come {@link #MailSender(String, String)}, permette di specificare
-     * le proprietà di autenticazione.
-     * Nota: in Appengine <strong>non</strong> è possibile usare un server
-     * SMTP esterno.*/
-    public MailSender( String smtpHost, String smtpPort,
-                       String usernameAuth, String passwordAuth ) {
-
-        this(smtpHost, smtpPort);
-
-        properties.put("mail.smtp.auth", "true");
-        Authenticator authenticator = new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(usernameAuth, passwordAuth);
-            }
-        };
-
-        this.session = Session.getDefaultInstance(properties, authenticator);
-
-    }
-
-
     /** Metodo per l'invio di email con solo contenuto testuale.
      * @throws MessagingException Problemi con l'invio dell'email,
      *  in particolare {@link AddressException} se l'indirizzo

@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Matteo Ferfoglia
  */
+@SuppressWarnings("UnusedReturnValue")
 public abstract class DatabaseHelper {
 
     /** Astrazione del database. */
@@ -26,6 +27,7 @@ public abstract class DatabaseHelper {
     /** Enum delle operazioni possibili nelle query
      * (<a href="https://github.com/objectify/objectify/wiki/Queries#executing-queries">Fonte</a>).
      */
+    @SuppressWarnings("unused") // operatori possibili, mantenuti anche se non usati
     public enum OperatoreQuery {
         MAGGIORE        (" >")  ,
         MAGGIOREOUGUALE (" >=") ,
@@ -94,6 +96,7 @@ public abstract class DatabaseHelper {
     }
 
     /** Restituisce il numero di entità di una data classe.*/
+    @SuppressWarnings("unused") // anche se metodo non usato, tenuto per completezza di questa classe
     public static int contaEntitaNelDatabase(Class<?> classe) {
         return database.load().type(classe).count();
     }
@@ -236,10 +239,8 @@ public abstract class DatabaseHelper {
      * Porta a termine <em>adesso</em> tutte le operazioni differite nel database.
      * Nota: in ogni caso il sistema garantisce di portare a termine le
      * transazioni in corso, anche senza usare questo metodo, ma l'invocazione
-     * di questo metodo lo fa subito (in modo sincrono).
-     *
-     * @return true se l'esecuzione va a buon fine.*/
-    public static boolean completaOra() {
+     * di questo metodo lo fa subito (in modo sincrono).*/
+    public static void completaOra() {
 
         AsyncCacheFilter.complete();    // Fonte: https://groups.google.com/g/objectify-appengine/c/a4CaFbZdqh0/m/Ih_vEaoBRCEJ
         if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
@@ -262,7 +263,6 @@ public abstract class DatabaseHelper {
             }
         }
 
-        return true;
     }
 
 }

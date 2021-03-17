@@ -59,14 +59,13 @@ public class RegistrazioneNuovoConsumer {
 }
 
 
+@SuppressWarnings("unused") // getter e setter usati durante la deserializzazione da JAX-RS
 class CampiFormRegistrazione {
 
     private String codiceFiscale = "";
     private String nominativo = "";
     private String email = "";
     private String password = "";
-
-    public CampiFormRegistrazione() {}
 
     public String getCodiceFiscale() {
         return codiceFiscale;

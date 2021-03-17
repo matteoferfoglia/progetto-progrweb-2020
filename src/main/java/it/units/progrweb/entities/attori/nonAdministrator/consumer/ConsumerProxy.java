@@ -12,6 +12,7 @@ public class ConsumerProxy extends Consumer {
     }
 
     /** "zero argument constructor" per accesso da JAX-RS.*/
+    @SuppressWarnings("unused") // usato da JAX-RS
     public ConsumerProxy() {
         super();
     }

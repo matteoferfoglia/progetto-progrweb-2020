@@ -26,6 +26,7 @@ public class Base64Helper {
         return BASE64_URLENCODER.withoutPadding().encodeToString( byteDaCodificare );
     }
 
+    @SuppressWarnings("unused") // metodo aggiunto per completezza
     public static String encodeToBase64_rfc2045_encoder( byte[] byteDaCodificare ) {
         if( byteDaCodificare == null )
             return "";
@@ -38,6 +39,7 @@ public class Base64Helper {
         return new String( BASE64_URLDECODER.decode( stringDaDecodificare ) );
     }
 
+    @SuppressWarnings("unused") // metodo aggiunto per completezza
     public static String decodeFromBase64_rfc2045_decoder( String stringDaDecodificare ) {
         if( stringDaDecodificare == null )
             return "";

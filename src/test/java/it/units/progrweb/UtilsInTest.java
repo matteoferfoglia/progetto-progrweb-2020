@@ -5,7 +5,6 @@ import it.units.progrweb.utils.UtilitaGenerale;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -30,22 +29,12 @@ public class UtilsInTest {
         outputTest.println(daStampare);
     }
 
-    /** Genera casualmente un indirizzo IPv4. */
-    public static String generaIndirizzoIP() {
-
-        final int NUMERO_BYTES_IPV4 = 4;
-        final int VALORE_MASSIMO_UN_BYTE = 255 ;
-        return IntStream.range(0,NUMERO_BYTES_IPV4)
-                        .mapToObj(contatoreByteIndirizzo -> String.valueOf((int)(Math.random()*VALORE_MASSIMO_UN_BYTE)))
-                        .collect(Collectors.joining("."));
-
-    }
-
     /** Metodo un utilizzabile nei test che devono gestire eccezioni non attese.
      * Se invocato, questo metodo fa fallire il test.
      * @param e L'eccezione non attesa.
      * @return null.
      */
+    @SuppressWarnings("SameReturnValue")
     public static Object fallisciTestACausaDiEccezioneNonAttesa(Exception e) {
         UtilsInTest.scriviNelLogDeiTest(UtilitaGenerale.stringaConStackTrace(e));
         fail("Eccezione non attesa: " + UtilitaGenerale.stringaConStackTrace(e));

@@ -11,6 +11,7 @@ import java.io.IOException;
  * da memorizzare nel database.
  * @author Matteo Ferfoglia
  */
+@SuppressWarnings("DefaultAnnotationParam")
 @Subclass(index = false)
 class UploaderStorage extends Uploader {
 

@@ -12,6 +12,7 @@ import java.util.List;
  * da memorizzare nel database.
  * @author Matteo Ferfoglia
  */
+@SuppressWarnings("DefaultAnnotationParam")
 @Subclass(index = false)
 class ConsumerStorage extends Consumer {
 

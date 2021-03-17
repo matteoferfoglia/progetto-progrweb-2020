@@ -58,19 +58,6 @@ public class JwtClaimsSet {
     }
 
     /**
-     * Modifica, se presente, il claims con il nome specificato.
-     * Se modificato, restituisce true, altrimenti false.
-     */
-    public boolean modificaValoreClaim(JwtClaim.NomeClaim nomeClaimDaModificare, Object nuovoValore) {
-        try {
-            getClaimByName(nomeClaimDaModificare).setValue(nuovoValore);
-            return true;
-        } catch(NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    /**
      * Recupera un particolare claims in base al nome dal claims set.
      * Se non c'è un claims con quel nome, restituisce l'eccezione
      * "NoSuchElementException".

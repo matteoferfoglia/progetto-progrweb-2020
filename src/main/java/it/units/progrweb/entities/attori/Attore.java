@@ -251,18 +251,6 @@ public abstract class Attore implements UserPrincipal, Cloneable {
         this.tipoAttore = TipoAttore.valueOf(tipoAttore);
     }
 
-
-    /** Ricerca nel database l {@link Attore} corrispondente
-     * all'identificativo fornito e restituisce il suo nominativo
-     * se presente, altrimenti restituisce null.*/
-    public static String getNominativoDaIdentificativo(Long identificativoAttore) {
-        try {
-            return ((Attore)DatabaseHelper.getById( identificativoAttore, Consumer.class )).getNominativo();
-        } catch (NotFoundException notFoundException) {
-            return null;
-        }
-    }
-
     /** Restituisce l'attore corrispondente all'identificativo dato nel parametro,
      * oppure null se non trovato.*/
     public static Attore getAttoreDaIdentificativo(Long identificativoAttore) {

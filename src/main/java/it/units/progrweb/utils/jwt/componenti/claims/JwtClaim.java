@@ -99,8 +99,11 @@ public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
         return value;
     }
 
+    /** Setter: il parametro passato deve essere del tipo corretto,
+     * altrimenti non viene eseguita alcuna modifica. */
+    @SuppressWarnings("unchecked")  // tipo verificato prima del casting tramite if
     public void setValue(Object value) {
-        if( this.value.getClass().equals(value.getClass()) )
+        if (this.value.getClass().equals(value.getClass()))
             this.value = (TipoValoreClaim) value;
     }
 }

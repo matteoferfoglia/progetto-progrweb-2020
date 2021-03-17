@@ -177,7 +177,8 @@ public class CreazioneAttore {
 
 
     /** Classe di comodo per la deserializzazione dei dati JSON
-     * ricevuti dal client per l'aggiunta di un attore..*/
+     * ricevuti dal client per l'aggiunta di un attore.*/
+    @SuppressWarnings("unused") // metodi usati per la deserializzazione da JAX-RS
     public static class CampiFormAggiuntaAttore {
 
         private String username;
@@ -186,9 +187,6 @@ public class CreazioneAttore {
         private String email;
         private String tipoAttore;  // Consumer, Uploader, Administrator
         private Long identificativoAttore;
-
-        /** Costruttore di default.*/
-        public CampiFormAggiuntaAttore(){}
 
         /** Crea un'istanza di questa classe a partire da un'istanza di {@link Attore}.*/
         public CampiFormAggiuntaAttore(Attore attore) {

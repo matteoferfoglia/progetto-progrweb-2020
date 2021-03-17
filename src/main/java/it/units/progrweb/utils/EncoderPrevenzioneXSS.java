@@ -8,6 +8,7 @@ import org.owasp.encoder.Encode;
  *
  * @author Matteo Ferfoglia
  */
+@SuppressWarnings("unused") // alcuni metodi non usati, ma mantenuti per completezza della classe
 public class EncoderPrevenzioneXSS {
 
     /** @see org.owasp.encoder.Encode#forJava(String)   */

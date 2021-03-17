@@ -16,9 +16,4 @@ public abstract class UtenteNonAdministrator extends Attore {
         super(username, nominativo, email, tipoAttore);
     }
 
-    /** Restituisce true se il campo email viene correttamente modificato, false altrimenti.*/
-    protected boolean modificaEmail(String nuovaEmail) {
-        setEmail(nuovaEmail);
-        return true;
-    }
 }

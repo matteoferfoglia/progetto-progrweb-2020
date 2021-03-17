@@ -54,8 +54,7 @@ public class RichiestaResocontoUploader {
 
         if( uploaderPerCuiSiRichiedeResoconto != null ) {
 
-            Resoconto resoconto = new Resoconto( identificativoUploader, periodoTemporale);
-            return resoconto;
+            return new Resoconto( identificativoUploader, periodoTemporale);
 
         } else {
             // Utilizzo httpServletResponse per rispondere con errore (Fonte: https://stackoverflow.com/a/22869076 )
