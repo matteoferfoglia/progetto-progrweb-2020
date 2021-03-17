@@ -203,8 +203,19 @@ public class FiltroCSRF implements Filter {
                                                   0,                       // in lettura, occupiamo l'array (primo parametro) dal primo elemento
                                                   DIMENSIONE_ARRAY_LETTURA))   // massimo spazio disponibile nell'array
                 != -1) {
+
             // Lettura di una linea alla volta
-            String line = new String(arrayByteLettura, EnvironmentVariables.STANDARD_CHARSET).substring(0, numeroByteLetti);
+            String line;
+            if( numeroByteLetti>0 ) {
+                // Array dei byte effettivamente letti
+                byte[] arrayByteLetti = new byte[numeroByteLetti];
+                System.arraycopy(arrayByteLettura, 0, arrayByteLetti, 0, numeroByteLetti);
+
+                line = new String(arrayByteLetti, EnvironmentVariables.STANDARD_CHARSET);
+            }
+            else {
+                line = "";
+            }
             requestBody.append(line);
         }
     }
@@ -234,7 +245,7 @@ class HttpRequestWrapper extends HttpServletRequestWrapper {
             if (inputStream != null) {
                 byte[] buffer = new byte[128];
                 int bytesRead;
-                while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) > 0) {
+                while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
                     builder.write(buffer, 0, bytesRead);
                 }
             } else {
