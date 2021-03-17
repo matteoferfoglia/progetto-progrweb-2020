@@ -197,12 +197,13 @@ public class FiltroCSRF implements Filter {
         // readLine(), Fonte: https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
         final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
         byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
-        while( reader.readLine(arrayByteLettura,           // array di lettura "buffer"
-                               0,                      // in lettura, occupiamo l'array (primo parametro) dal primo elemento
-                               DIMENSIONE_ARRAY_LETTURA)   // massimo spazio disponibile nell'array
+        int numeroByteLetti = 0;
+        while( (numeroByteLetti = reader.readLine(arrayByteLettura,            // array di lettura "buffer"
+                                                  0,                       // in lettura, occupiamo l'array (primo parametro) dal primo elemento
+                                                  DIMENSIONE_ARRAY_LETTURA))   // massimo spazio disponibile nell'array
                 != -1) {
             // Lettura di una linea alla volta
-            String line = new String(arrayByteLettura, EnvironmentVariables.STANDARD_CHARSET);
+            String line = new String(arrayByteLettura, EnvironmentVariables.STANDARD_CHARSET).substring(0, numeroByteLetti);
             requestBody.append(line);
         }
     }
