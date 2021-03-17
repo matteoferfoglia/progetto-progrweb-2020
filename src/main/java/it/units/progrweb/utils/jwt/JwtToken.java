@@ -114,16 +114,13 @@ public class JwtToken {
      */
     public boolean isTokenScaduto() {
 
-        boolean isTokenScaduto = true;  // valore default di inizializzazione
         try{
-            isTokenScaduto = new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.NomeClaim.EXP))
+            return new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.NomeClaim.EXP))
                                     .isScaduto();
         } catch(NoSuchElementException e) {
             // Se qui, non c'è Expiration Time nel token, quindi non è scaduto
-            isTokenScaduto = false;
+            return false;
         }
-
-        return isTokenScaduto;
 
     }
 
