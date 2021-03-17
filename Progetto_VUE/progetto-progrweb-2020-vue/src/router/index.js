@@ -121,6 +121,7 @@ const routes = [
 
 ]
 
+// noinspection JSCheckFunctionSignatures // corretto
 const router = createRouter({
   history: createWebHashHistory(),
   routes: routes
@@ -133,7 +134,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
   // TODO : rivedere bene i percorsi di instradamento
 
-  if( routeDestinazione.matched.some(route => route.meta.requiresNonAuth) ){
+  if( routeDestinazione.matched.some(route => route.meta["requiresNonAuth"]) ){
     // SE route richiede di non essere autenticato, allora rimuove header di autenticazione
     eliminaTokenAutenticazione();
     rimuoviAuthorizationHeader();
@@ -142,7 +143,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
   (async () => {
     // funzione asincrona
 
-    if( routeDestinazione.matched.some(route => route.meta.requiresAuth) ) {
+    if( routeDestinazione.matched.some(route => route.meta["requiresAuth"]) ) {
       // Gestione instradamento per route che richiede autenticazione
 
       await verificaAutenticazione(routeDestinazione)
@@ -152,7 +153,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
             // Autenticato
             routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";
 
-            if (routeDestinazione.matched.some(route => route.meta.requiresInfoAttore)) {
+            if (routeDestinazione.matched.some(route => route.meta["requiresInfoAttore"])) {
 
                 if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
                   // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni

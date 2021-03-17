@@ -354,7 +354,7 @@ public abstract class Attore implements UserPrincipal, Cloneable {
      * @return Il clone dell'istanza data, oppure null se si verificano
      *         dei problemi durante lo'operazione.
      */
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    @SuppressWarnings("MethodDoesntCallSuperMethod")    // metodo gestito interamente qui senza chiamata a super
     @Override
     public Attore clone() {
 

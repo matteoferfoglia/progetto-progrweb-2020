@@ -15,7 +15,7 @@
                :readonly="username_readOnly_wrapper || tuttiICampi_readOnly_wrapper"
                class="form-control"
                :aria-label="usernameCodFisc"
-               :required="tuttiICampi_required ? true : false"
+               :required="!!tuttiICampi_required"
                autocomplete="on">
       </p>
       <p v-if="nominativo!==null">
@@ -28,7 +28,7 @@
                :readonly="tuttiICampi_readOnly_wrapper"
                class="form-control"
                aria-label="Nominativo"
-               :required="tuttiICampi_required ? true : false"
+               :required="!!tuttiICampi_required"
                autocomplete="on">
       </p>
       <p v-if="email!==null">
@@ -43,7 +43,7 @@
                  :readonly="tuttiICampi_readOnly_wrapper"
                  class="form-control"
                  aria-label="Email"
-                 :required="tuttiICampi_required ? true : false"
+                 :required="!!tuttiICampi_required"
                  autocomplete="email">
           <a :href="'mailto:' + email_wrapper" v-if="email_wrapper" class="input-group-append btn btn-link"></a>
         </span>

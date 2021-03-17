@@ -73,15 +73,8 @@ export default {
 
       if( formValido )
         richiestaPostConFile( process.env.VUE_APP_URL_POST_CARICA_DOCUMENTO__RICHIESTA_DA_UPLOADER, formData)
-            .then( oggetto_idDocumento_proprietaDocumento_documentoAppenaCaricato => {
-              // Server restituisce una mappa avente per chiave l'id del file aggiunto
-              //  e per valore l'oggetto con le properties del file: l'unica entry è
-              //  il file appena aggiunto
-
+            .then( () => {
               alert("Documento caricato");
-
-              this.oggetto_idDocumento_proprietaDocumento_nuovoDocumentoCaricato =
-                  oggetto_idDocumento_proprietaDocumento_documentoAppenaCaricato;
 
               // Pulisci i campi
               this.nomeDocumento = "";

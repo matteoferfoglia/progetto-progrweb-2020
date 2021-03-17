@@ -13,8 +13,7 @@ export const HTTP_STATUS_UNAUTHORIZED = 401;
  * del client è nota al server.*/
 export const HTTP_STATUS_FORBIDDEN = 403;
 
-/** Stato della risposta HTTP: OK.*/
-export const HTTP_STATUS_OK = 200;
+
 
 /** Stato della risposta HTTP: CONFLICT.*/
 export const HTTP_STATUS_CONFLICT = 409;

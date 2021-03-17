@@ -88,8 +88,7 @@ export const aggiungiDocumentoAdIndiceHashtag =
  * La mappa dei documenti deve avere come chiave l'identificativo del
  * documento nell'entry di quella chiave e come valore l'oggetto che
  * rappresenta il documento stesso.
- * Restituisce la mappa risultante come valore di una Promise risolta,
- * ammesso che la procedura vada a buon fine.
+ * Restituisce la mappa risultante.
  * @param mappaDocumenti La mappa dei documenti.
  * @param nomePropDataVisualizzazione In un documento, è il nome della property
  *                                con la data di visualizzazione di quel documento.
