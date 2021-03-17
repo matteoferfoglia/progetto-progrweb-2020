@@ -100,7 +100,7 @@ public class RichiestaDocumenti {
             }
         }
 
-        return UtilitaGenerale.rispostaJsonConMappa(File.getMappa_idFile_propFile(listaFile, includiMetadatiFileNellaResponse));
+        return UtilitaGenerale.rispostaJsonConMappaConValoriJSON(File.getMappa_idFile_propFile(listaFile, includiMetadatiFileNellaResponse));
 
     }
 

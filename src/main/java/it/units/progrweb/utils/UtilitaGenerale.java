@@ -145,17 +145,28 @@ public class UtilitaGenerale {
 
     }
 
-    /** Data una mappa, crea la stringa JSON corrispondente e la
-     * inserisce nella entity di una {@link Response} di tipo "ok",
-     * che restituisce dopo aver costruito.
-     * @param mappa
+    /** Data una mappa in cui il valore di ogni entry è un oggetto JSON,
+     * crea la stringa JSON corrispondente a tale mappa, in cui ogni
+     * entry della mappa è una property dell'oggetto.
+     * La rappresentazione JSON corrispondente viene inserita nella
+     * entity di una {@link Response} di tipo "ok", che viene restituita
+     * da questo metodo.
+     * @param mappa i cui valori sono oggetti JSON.
      * @return {@link Response} costruita.
      */
-    public static Response rispostaJsonConMappa(Map<String,?> mappa) {
+    public static Response rispostaJsonConMappaConValoriJSON(Map<String,String> mappa) {
+
+        String rappresentazioneJson = "{"   +
+                mappa.entrySet()
+                    .stream()
+                    .map( entry -> '"' + entry.getKey() +"\": " + entry.getValue() )
+                    .collect(Collectors.joining(", "))  +
+                "}";
+
         // Costruzione della response
         return Response.ok()
                        .type(MediaType.APPLICATION_JSON)
-                       .entity(JsonHelper.convertiMappaProprietaToStringaJson(mappa))
+                       .entity(rappresentazioneJson)
                        .build();
     }
 

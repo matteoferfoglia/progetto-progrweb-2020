@@ -130,7 +130,7 @@ public class GestioneDocumenti {
                     // Restituisce il file nella sua rappresentazione { chiave => {proprietà del file} }
                     Map<String, String> mappa_idFile_propFile = File.getMappa_idFile_propFile(Arrays.asList(fileAggiunto), true);
 
-                    return UtilitaGenerale.rispostaJsonConMappa(mappa_idFile_propFile);
+                    return UtilitaGenerale.rispostaJsonConMappaConValoriJSON(mappa_idFile_propFile);
 
                 } catch( ApiProxy.RequestTooLargeException e) {
                     return Response.status(Response.Status.BAD_REQUEST)
