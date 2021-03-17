@@ -196,7 +196,7 @@ public class JwtTokenTest {
         return tokensJwt.map(tokenJwtArgument -> {
 
             // Generazione casuale del flag di validità (true se token valido)
-            boolean isValido = Math.round(Math.random()) == 1 ? true : false ;
+            boolean isValido = Math.round(Math.random()) == 1;
 
             JwtToken jwtToken = (JwtToken)tokenJwtArgument.get()[0];
             {
@@ -229,38 +229,6 @@ public class JwtTokenTest {
 
     }
 
-    /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#isSignatureValida()}.
-     * In particolare se si altera il payload, la verifica della signature deve
-     * dare esito negativo.*/
-    @ParameterizedTest
-    @MethodSource("generaToken")
-    void isSignatureValidaTest(JwtToken jwtTokenDiCuiVerificareLaFirma){
-
-        try {
-
-            boolean firmaDovrebbeEssereValida = jwtTokenDiCuiVerificareLaFirma.isSignatureValida();
-
-            JwtToken jwtTokenModificato = modificaTokenERestituisciNuovoTokenConFirmaNONValida(jwtTokenDiCuiVerificareLaFirma);
-            boolean firmaDovrebbeEssereNONValida = jwtTokenModificato.isSignatureValida();
-
-            assertTrue(firmaDovrebbeEssereValida && !firmaDovrebbeEssereNONValida);
-
-        } catch (NoSuchFieldException|InstantiationException|IllegalAccessException
-                |InvocationTargetException|NoSuchMethodException e) {
-            fallisciTestACausaDiEccezioneNonAttesa(e);
-        }
-
-    }
-
-    /** Copia il token dato in una nuova istanza, poi modifica
-     * la copia, che quindi risulterà avere una firma invalida.
-     * Infine restituisce il token con la firma invalida.
-     * Il token passato come parametro non viene modificato.*/
-    private static JwtToken modificaTokenERestituisciNuovoTokenConFirmaNONValida(JwtToken jwtToken)
-            throws InvocationTargetException, NoSuchMethodException,
-            InstantiationException,IllegalAccessException, NoSuchFieldException {
-        return creaNuovoTokenUgualeAQuelloDatoEdAggiungiUnClaim(jwtToken, new JwtClaim("", ""));
-    }
 
     /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#isTokenScaduto()} .*/
     @ParameterizedTest
@@ -268,31 +236,6 @@ public class JwtTokenTest {
     void isTokenScadutoTest(JwtToken tokenDiCuiVerificareScadenza, boolean isValido_valoreAtteso){
         boolean isValido_valoreCalcolato = ! tokenDiCuiVerificareScadenza.isTokenScaduto();
         assertEquals(isValido_valoreAtteso, isValido_valoreCalcolato);
-    }
-
-
-    /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#isTokenValido()} */
-    @ParameterizedTest
-    @MethodSource("generaTokenConScadenza")
-    void isTokenValidoTest(JwtToken jwtToken, boolean isNONScaduto_valoreAtteso){
-
-        try {
-            // Decisione aleatoria se in questo token si falsificherà la firma
-            boolean isSignatureValida_valoreAtteso = Math.round(Math.random()) == 1 ? true : false;  // se true, firma sarà valida
-
-            if(!isSignatureValida_valoreAtteso)
-                jwtToken = modificaTokenERestituisciNuovoTokenConFirmaNONValida(jwtToken);
-
-            boolean isTokenValido_valoreAtteso = isNONScaduto_valoreAtteso && isSignatureValida_valoreAtteso;
-            boolean isTokenValido_valoreCalcolato = jwtToken.isTokenValido();
-
-            assertEquals(isTokenValido_valoreAtteso, isTokenValido_valoreCalcolato);
-
-        } catch (InvocationTargetException|NoSuchMethodException|InstantiationException
-                |IllegalAccessException|NoSuchFieldException e) {
-            fallisciTestACausaDiEccezioneNonAttesa(e);
-        }
-
     }
 
 }

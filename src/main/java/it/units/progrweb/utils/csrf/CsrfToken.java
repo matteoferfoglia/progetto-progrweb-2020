@@ -117,60 +117,32 @@ public class CsrfToken {
         try {
             Cookie[] cookies = Cookie.trovaCookiesDaHeader(cookieHeader);
             Cookie cookieConJwtConCsrf = Cookie.cercaCookiePerNomeERestituiscilo(CsrfCookies.NOME_COOKIE_CSRF, cookies);
-            JwtToken jwtTokenOttenutoDaCookie = creaJwtTokenDaStringaCodificata( cookieConJwtConCsrf.getValue() );
             String identificativoClientOttenutoDaCookie = Cookie.cercaCookiePerNomeERestituiscilo(CsrfCookies.NOME_COOKIE_ID_CLIENT, cookies).getValue();
 
-            return isCsrfTokenValido(
-                        valoreTokenCsrf,
-                        jwtTokenOttenutoDaCookie,
-                        identificativoClientOttenutoDaCookie,
-                        indirizzoIPClient,
-                        JwtClaim.NomeClaim.CSRF_TOKEN,
-                        JwtClaim.NomeClaim.IP_CLIENT
-                    );
+            String jwtTokenBase64UrlEncoded = cookieConJwtConCsrf.getValue();
+
+            JwtToken jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient =
+                    creaJwtTokenDaStringaCodificata( jwtTokenBase64UrlEncoded );
+
+            String valoreCsrfTokenDaJwt = String.valueOf( jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+                    .getValoreClaimByName(JwtClaim.NomeClaim.CSRF_TOKEN) );
+
+            String valoreIdentificativoClientDaJwt = String.valueOf( jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+                    .getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE) );
+
+            String valoreIndirizzoIPClientDaJwt = String.valueOf( jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
+                    .getValoreClaimByName(JwtClaim.NomeClaim.IP_CLIENT) );
+
+            return JwtToken.isTokenValido(jwtTokenBase64UrlEncoded)
+                    && valoreCsrfTokenDaJwt.equals(valoreTokenCsrf)
+                    && valoreIdentificativoClientDaJwt.equals(identificativoClientOttenutoDaCookie)
+                    && valoreIndirizzoIPClientDaJwt.equals(indirizzoIPClient);
+
         } catch (NoSuchElementException | IllegalArgumentException e) {
             // Restituisce false se non trova i cookie cercati o se il token di autenticazione è mal formato
             return false;
         }
 
-    }
-
-
-    /**
-     * Verifica che il CSRF token passato come parametro corrisponda a
-     * quello indicato nel relativo token jwt e che sia stato usato dal
-     * client a cui quel CSRF token era stato rilasciato.
-     * Si verifica anche la validità del token JWT.
-     * @param valoreCsrfTokenDaVerificare Token CSRF da verificare.
-     * @param jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient Token JWT contenente nel payload il CSRF token e l'identificativo del client.
-     * @param valoreIdentificativoClientRicevuto Identificativo del client.
-     * @param nomeClaimCsrfTokenInJwtPayload Nome del claims contenente il Csrf Token all'interno del token JWT.
-     * @param valoreIndirizzoIPClientRicevuto Indirizzo IP del client che sta presentando il token CSRF da verificare.
-     * @param nomeClaimIPClientInJwtPayload Nome del claims contenente l'indirizzo IP del client a cui era stato
-     *                                      rilasciato il token CSRF all'interno del token JWT.
-     * @return true se il token specificato nel primo parametro è verificato
-     * e valido, false altrimenti.
-     */
-    private static boolean isCsrfTokenValido(String valoreCsrfTokenDaVerificare,
-                                             JwtToken jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient,
-                                             String valoreIdentificativoClientRicevuto,
-                                             String valoreIndirizzoIPClientRicevuto,
-                                             JwtClaim.NomeClaim nomeClaimCsrfTokenInJwtPayload,
-                                             JwtClaim.NomeClaim nomeClaimIPClientInJwtPayload ) {
-
-        String valoreCsrfTokenDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
-                .getValoreClaimByName(nomeClaimCsrfTokenInJwtPayload);
-
-        String valoreIdentificativoClientDaJwt = String.valueOf( jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
-                .getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE) );
-
-        String valoreIndirizzoIPClientDaJwt = (String)jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient
-                .getValoreClaimByName(nomeClaimIPClientInJwtPayload);
-
-        return jwtTokenRicevutoContenenteValoreCsrfEValoreIdentificativoClient.isTokenValido()
-                && valoreCsrfTokenDaJwt.equals(valoreCsrfTokenDaVerificare)
-                && valoreIdentificativoClientDaJwt.equals(valoreIdentificativoClientRicevuto)
-                && valoreIndirizzoIPClientDaJwt.equals(valoreIndirizzoIPClientRicevuto);
     }
 
 

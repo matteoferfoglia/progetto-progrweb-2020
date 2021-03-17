@@ -197,17 +197,15 @@ public class Autenticazione {
     public static boolean isClientAutenticato(HttpServletRequest httpServletRequest) {
 
         try {
-            JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest( httpServletRequest );
+            String tokenAutenticazione = getTokenAutenticazioneBearer(httpServletRequest);
+            JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
 
-            if( jwtTokenAutenticazione != null ) {
-                // Cookie ricevuti in questa richiesta HTTP
-                Cookie[] cookiesDaQuestaRichiestaHttp = Cookie.getCookieDaRichiestaHttp(httpServletRequest);
+            // Cookie ricevuti in questa richiesta HTTP
+            Cookie[] cookiesDaQuestaRichiestaHttp = Cookie.getCookieDaRichiestaHttp(httpServletRequest);
 
-                return jwtTokenAutenticazione.isTokenValido()
-                        && isStessoHashCookieIdNelToken(jwtTokenAutenticazione, cookiesDaQuestaRichiestaHttp);
-            } else {
-                return false;
-            }
+            return JwtToken.isTokenValido(tokenAutenticazione)
+                    && isStessoHashCookieIdNelToken(jwtTokenAutenticazione, cookiesDaQuestaRichiestaHttp);
+
         } catch (Exception e) {
             // Verifica autenticazione può generare eccezioni
             return false;
@@ -216,11 +214,11 @@ public class Autenticazione {
     }
 
     /** Data una HttpServletRequest, restituisce il token di autenticazione
-     * se presente, null altrimenti.*/
-    private static String getTokenAutenticazioneBearer(HttpServletRequest httpServletRequest) {
+     * se presente, stringa vuota altrimenti.*/
+    public static String getTokenAutenticazioneBearer(HttpServletRequest httpServletRequest) {
         String tokenAutenticazioneBearer = httpServletRequest.getHeader(NOME_HEADER_AUTHORIZATION);  // prende header con token
         if( tokenAutenticazioneBearer==null )
-            return null;
+            return "";
 
         tokenAutenticazioneBearer = tokenAutenticazioneBearer.replaceAll(".+ ", "");    // rimuove tutto ciò che precede il token (prima dello spazio, cioè rimuove "Bearer ")
         return tokenAutenticazioneBearer;
@@ -326,54 +324,27 @@ public class Autenticazione {
     }
 
     /** Restituisce il tipo di {@link Attore} in base alle informazioni contenute
-     * nel token JWT o null se l'informazione non è presente. */
+     * nel token JWT.
+     * @throws NoSuchElementException Se l'identificativo non viene trovato nel token.*/
     public static String getTipoAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
-        JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
-        if (jwtTokenAutenticazione != null) {
-            return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.TIPO_ATTORE );
-        }
-        return null;
+        JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(getTokenAutenticazioneBearer(httpServletRequest));
+        return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.TIPO_ATTORE );
     }
 
     /** Restituisce il nome dell'{@link Attore} in base alle informazioni contenute
-     * nel token JWT o null se l'informazione non è presente. */
+     * nel token JWT.
+     * @throws NoSuchElementException Se l'identificativo non viene trovato nel token.*/
     public static String getNomeAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
-        JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
-        if (jwtTokenAutenticazione != null) {
-            return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.NOME_ATTORE );
-        }
-        return null;
+        JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(getTokenAutenticazioneBearer(httpServletRequest));
+        return (String) jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.NOME_ATTORE );
     }
 
     /** Restituisce l'identificativo dell'{@link Attore} in base alle informazioni contenute
-     * nel token JWT o null se l'informazione non è presente. */
+     * nel token JWT.
+     * @throws NoSuchElementException Se l'identificativo non viene trovato nel token.*/
     public static Long getIdentificativoAttoreDaHttpServletRequest(HttpServletRequest httpServletRequest) {
-        JwtToken jwtTokenAutenticazione = getTokenDaHttpServletRequest(httpServletRequest);
-        if (jwtTokenAutenticazione != null) {
-            return (Long)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.ID_ATTORE );
-        }
-        return null;
-    }
-
-    /** Data la HttpServletRequest, restituisce il token di autenticazione
-     * oppure null se non è presente o se è mal formato.*/
-    public static JwtToken getTokenDaHttpServletRequest(HttpServletRequest httpServletRequest) {
-        String tokenAutenticazioneBearer = getTokenAutenticazioneBearer(httpServletRequest);
-
-        if (tokenAutenticazioneBearer == null)
-            return null;
-
-        // Calcolo del JWT token ottenuto dall'authorization header
-        JwtToken jwtTokenAutenticazione = null;
-        try {
-            boolean isStringaNonNullaNonVuota = ! tokenAutenticazioneBearer.trim().isEmpty();
-            if( isStringaNonNullaNonVuota )
-                jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazioneBearer);
-        } catch (IllegalArgumentException ignored) {
-            // jwtTokenAutenticazione resta null se tokenAutenticazioneBearer è mal formato.
-        }
-
-        return jwtTokenAutenticazione;
+        JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(getTokenAutenticazioneBearer(httpServletRequest));
+        return (Long)jwtTokenAutenticazione.getValoreClaimByName( JwtClaim.NomeClaim.ID_ATTORE );
     }
 
 }

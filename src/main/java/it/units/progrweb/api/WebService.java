@@ -56,9 +56,9 @@ public class WebService {
                                @FormDataParam("nomeFile")                           String nomeFile,
                                @FormDataParam("listaHashtag")                       String listaHashtag ) {
 
-        JwtToken tokenAutenticazione = Autenticazione.getTokenDaHttpServletRequest(httpServletRequest);
+        String tokenAutenticazione = Autenticazione.getTokenAutenticazioneBearer(httpServletRequest);
 
-        if (tokenAutenticazione!=null && tokenAutenticazione.isTokenValido()) {
+        if (JwtToken.isTokenValido(tokenAutenticazione)) {
 
             Attore mittente = Autenticazione.getAttoreDaDatabase(httpServletRequest);
             if (!(mittente instanceof Uploader)) // check autenticazione uploader mittente

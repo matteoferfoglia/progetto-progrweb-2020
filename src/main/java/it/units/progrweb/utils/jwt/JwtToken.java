@@ -95,11 +95,17 @@ public class JwtToken {
                 + "." + signature.getSignature();
     }
 
-    /** Verifica la validità di questa istanza del token JWT.*/
-    public boolean isTokenValido() {
+    /** Verifica la validità di questa istanza del token JWT.
+     * @param tokenJwtBas64UrlEncoded Rappresentazione Base64UrlEncoded di un token JWT.*/
+    public static boolean isTokenValido(String tokenJwtBas64UrlEncoded) {
 
-        boolean tokenScaduto = isTokenScaduto();
-        boolean signatureValida = isSignatureValida();
+        if( tokenJwtBas64UrlEncoded==null )
+            return false;
+
+        JwtToken jwtToken = JwtToken.creaJwtTokenDaStringaCodificata(tokenJwtBas64UrlEncoded);
+
+        boolean tokenScaduto = jwtToken.isTokenScaduto();
+        boolean signatureValida = isSignatureValida(tokenJwtBas64UrlEncoded);
 
         return !tokenScaduto && signatureValida;
 
@@ -124,23 +130,6 @@ public class JwtToken {
 
     }
 
-    /**
-     * Verifica che la firma su questa istanza di token sia valida: la
-     * firma viene ricalcolata e deve coincidere con quella di questa
-     * istanza, altrimenti quest'istanza viene considerata invalida.
-     */
-    public boolean isSignatureValida() {
-
-        JwtSignature signatureCalcolata;
-        try {
-            signatureCalcolata = new JwtSignature(header, payload);
-        } catch (Exception e) {
-            return false;
-        }
-
-        return signature.equals(signatureCalcolata);
-    }
-
     /** Data la rappresentazione Base64UrlEncoded di un token,
      * restituisce true se la firma risulta valida, false altrimenti.*/
     public static boolean isSignatureValida(String jwtTokenBase64) {
@@ -148,13 +137,13 @@ public class JwtToken {
         if( jwtTokenBase64==null )
             return false;
 
-        String[] partiToken = jwtTokenBase64.split(".");
-        if( partiToken.length!=3 )  // un token JWT è composto da tre parti
+        String[] componentiToken = jwtTokenBase64.split("\\.");
+        if( componentiToken.length!=NUMERO_COMPONENTI_JWT )
             return false;
 
-        String headerBase64    = partiToken[0];
-        String payloadBase64   = partiToken[1];
-        String signatureBase64 = partiToken[2];
+        String headerBase64    = componentiToken[0];
+        String payloadBase64   = componentiToken[1];
+        String signatureBase64 = componentiToken[2];
 
         try {
             return signatureBase64.equals( new JwtSignature(headerBase64, payloadBase64).getSignature() );
