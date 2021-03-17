@@ -38,14 +38,11 @@ class UploaderStorage extends Uploader {
 
     /** Copy-constructor, usato in {@link Attore#clone()}.
      * Vedere {@link #UploaderStorage(String, String, String, byte[], String)}*/
+    @SuppressWarnings("unused") // usato tramite reflection in Attore#clone()
     private UploaderStorage( UploaderStorage uploader )
             throws IOException {
         this( uploader.username, uploader.nominativo, uploader.email, uploader.immagineLogoUploader.getLogo(),
                 uploader.immagineLogoUploader.getEstensioneFileContenenteLogo() );
-    }
-
-    public byte[] getImmagineLogoBytes() {
-        return immagineLogoUploader.getLogo();
     }
 
     /** Modifica l'immagine logo dell'Uploader.*/

@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * Classe per rappresentare il resoconto di un {@link Uploader}.
  */
+@SuppressWarnings("unused") // getter e setter utilizzati da JAX-RS per de/serializzazione JSON
 public class Resoconto {
 
     /** Numero di documenti caricati. */
@@ -37,7 +38,7 @@ public class Resoconto {
                     .count();
     }
 
-    /** Default constructor. Inizializza i valori degli attributi a zero.*/
+    /** Default constructor. Necessario per JAX-RS ("The class [...] requires a zero argument constructor or a specified factory method.").*/
     public Resoconto() {
         this.numeroDiDocumentiCaricati = 0;
         this.numeroDiConsumersDiversiCuiTaliDocumentiAfferiscono = 0;

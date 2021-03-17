@@ -3,8 +3,6 @@ package it.units.progrweb;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -13,15 +11,6 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Matteo Ferfoglia
  */
 public class UtilsInTest {
-
-    /** Restituisce una stringa CSV creata da un array di stringhe.
-     * NON esegue escape di tutti i caratteri speciali: le funzionalità
-     * di questo metodo sono limitate a quanto richiesto dai test. */
-    public static String generaCsvDaArray(String[] arrayDiStringhe) {
-        return Arrays.stream(arrayDiStringhe)
-                .map( stringa -> "'" + stringa + "'")   // un elemento csv è delimitato da ' ' (https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests-sources-CsvSource)
-                .collect(Collectors.joining(", "));
-    }
 
     /** Scrive nel log per i test. */
     public static void scriviNelLogDeiTest(String daStampare) {

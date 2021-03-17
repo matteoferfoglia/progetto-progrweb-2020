@@ -75,12 +75,6 @@ public abstract class Uploader extends UtenteNonAdministrator {
                 new UploaderProxy((UploaderStorage) attoreTrovatoInDb) : null;
     }
 
-    /** Restituisce il nome del field contenente il logo
-     * di un Uploader.*/
-    public static String getNomeFieldLogoUploader() {
-        return UploaderProxy.getNomeFieldLogoUploader();
-    }
-
     /** @throws IOException Se le dimensioni del logo sono eccessive. Vedere {@link LogoUploader#setLogo(byte[], String)}. */
     public void setImmagineLogo(byte[] convertiInputStreamInByteArray, String estensioneDaNomeFile)
             throws IOException {
