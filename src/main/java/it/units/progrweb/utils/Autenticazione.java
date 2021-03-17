@@ -301,7 +301,7 @@ public class Autenticazione {
 
         try {
             JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
-            Long idAttore = (Long)jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE);
+            Long idAttore = ((Number)jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE)).longValue();
 
             return Attore.getAttoreDaIdentificativo(idAttore);
         } catch (IllegalArgumentException e) {
