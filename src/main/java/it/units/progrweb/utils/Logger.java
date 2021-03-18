@@ -12,7 +12,7 @@ public abstract class Logger {
      * Esempio invocazione di questo metodo:
      * <code>Logger.getLogger(NomeClasse.class)</code>.*/
     private static java.util.logging.Logger getLogger(Class<?> classe) {
-        return java.util.logging.Logger.getLogger(classe.toString());
+        return java.util.logging.Logger.getLogger(classe.getName());
     }
 
     /** Scrive nel log.
@@ -36,12 +36,6 @@ public abstract class Logger {
     @SuppressWarnings("unused") // anche se non usato, metodo mantenuto per completezza
     public static void scriviInfoNelLog(Class<?> classeCuiInfoSiRiferisce, String messaggio) {
         scriviNelLog(classeCuiInfoSiRiferisce, Level.INFO, messaggio);
-    }
-
-    /** Scrive un errore nel log associato alla classe indicata nel primo parametro.*/
-    @SuppressWarnings("unused") // anche se non usato, metodo mantenuto per completezza
-    public static void scriviErroreNelLog(Class<?> classeCuiErroreSiRiferisce, String messaggioErrore) {
-        scriviNelLog(classeCuiErroreSiRiferisce, Level.SEVERE, messaggioErrore);
     }
 
     /** Riporta un'eccezione nel log associato alla classe indicata nel primo parametro.*/
