@@ -250,13 +250,12 @@ export default {
         .then(rispostaConMappaFile_id_prop => new Map(Object.entries(rispostaConMappaFile_id_prop)))
 
         // Ordina mappa
-        .then(mappa => {
-          return ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti(
-                    mappa,
-                    this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
-                    this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO
-          );
-        })
+        .then(mappa =>
+            ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti(
+                mappa,
+                this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO,
+                this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO
+            ))
 
         // In ogni documento, aggiungi link di cancellazione e di download, poi restituisci la mappa
         .then(mappa =>
