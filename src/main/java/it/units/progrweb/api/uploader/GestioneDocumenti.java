@@ -42,7 +42,7 @@ public class GestioneDocumenti {
     public Response downloadFile(@PathParam("identificativoFile") Long identificativoFile,
                                  @Context HttpServletRequest httpServletRequest) {
 
-        return File.creaResponseConFile(identificativoFile, httpServletRequest, false);
+        return File.creaResponseConFile(identificativoFile, httpServletRequest, null, false);
 
     }
 
@@ -177,7 +177,7 @@ public class GestioneDocumenti {
         // TODO : metodo da verificare
 
         String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
-        String linkDownloadFile =  indirizzoServer + "/api/consumer/downloadDocumento/" + fileAggiunto.getIdentificativoFile();
+        String linkDownloadFile =  indirizzoServer + "/api/noauth/downloadDocumento/" + fileAggiunto.getIdentificativoFile() + "/" + fileAggiunto.getTokenCasuale();
 
         String oggettoNotifica   = "Filesharing - Nuovo documento disponibile";  // TODO : variabile d'ambiente il nome della piattaforma
         String emailDestinatario = destinatarioFile.getEmail();

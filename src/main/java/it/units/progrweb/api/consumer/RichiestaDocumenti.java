@@ -112,9 +112,9 @@ public class RichiestaDocumenti {
     @GET
     // Mediatype indicato nella response
     public Response downloadFileById(@PathParam("identificativoFile") Long identificativoFile,
-                                @Context HttpServletRequest httpServletRequest) {
+                                     @Context HttpServletRequest httpServletRequest) {
 
-        return File.creaResponseConFile(identificativoFile, httpServletRequest, true);
+        return File.creaResponseConFile(identificativoFile, httpServletRequest, null, true);
 
     }
 

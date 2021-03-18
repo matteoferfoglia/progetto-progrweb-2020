@@ -67,6 +67,20 @@ public abstract class File {
     @SuppressWarnings({"unused", "FieldCanBeLocal"}) // attributo necessario affinché venga salvato da Objectify
     private List<String> listaHashtag;
 
+    /** Token casuale associato ad un'istanza della classe.
+     * Esempio di utilizzo: creazione di un link di download diretto
+     * di un file: se un client (non autenticato) richiede questo file
+     * ed accoda questo token alla richiesta, allora (ad esempio) il
+     * server potrebbe (dipendentemente dall'implementazione) accettare
+     * la richiesta e restituire il file senza richiedere le credenziali:
+     * in pratica, questo token potrebbe essere usato per la "condivizione
+     * di un file tramite link".*/
+    private String tokenCasuale;
+
+    /** Lunghezza di {@link #tokenCasuale}. */
+    @Ignore
+    private static final int LUNGHEZZA_TOKEN_CASUALE = 64;
+
     /** Dimensione massima per la dimensione di un file, in byte. */
     @Ignore
     public static final long MAX_SIZE_FILE = 800*1024*1024;
@@ -107,6 +121,7 @@ public abstract class File {
         this.identificativoMittente = identificativoMittente;
         this.identificativoDestinatario = identificativoDestinatario;
         this.listaHashtag = listaHashtag;
+        this.tokenCasuale = GeneratoreTokenCasuali.generaTokenAlfanumerico(LUNGHEZZA_TOKEN_CASUALE);
     }
 
     /** Restituisce true se il file è stato eliminato, false altrimenti.*/
@@ -126,6 +141,10 @@ public abstract class File {
 
     public DateTime getDataEdOraDiVisualizzazione() {
         return DateTime.convertiDaString( dataEdOraDiVisualizzazione );
+    }
+
+    public String getTokenCasuale() {
+        return tokenCasuale;
     }
 
     protected void setDataEdOraDiVisualizzazione(DateTime dataEdOraDiVisualizzazione) {
@@ -217,16 +236,16 @@ public abstract class File {
      * allora restituisce il documento associato a quest'istanza ed imposta
      * data ed ora di visualizzazione e l'indirizzo IP di chi ha visualizzato
      * il documento, altrimenti restituisce null.
-     * @param salvaDataOraVisualizzazione true se si vuole salvare la data/ora
-     *                                    in cui il documento è richiesto (ignorato
-     *                                    se tale data/ora è già salvata).*/
+     * @param salvaDatiVisualizzazione true se si vogliono salvare i dati su chi
+     *                                 ha visualizzato il file (indirizzo IP e
+     *                                 data/ora).*/
     public static byte[] getContenutoFile(File file,
                                           String indirizzoIpVisualizzazione,
-                                          boolean salvaDataOraVisualizzazione) {
+                                          boolean salvaDatiVisualizzazione) {
         if( file instanceof FileStorage)
             return FileStorage.getContenutoFile((FileStorage) file,
                                                 indirizzoIpVisualizzazione,
-                                                salvaDataOraVisualizzazione );
+                                                salvaDatiVisualizzazione );
         else
             return null;
     }
@@ -329,21 +348,37 @@ public abstract class File {
      * richiesto sia in relazione con quel file (o {@link Consumer} o
      * {@link Uploader}) (non si possono recuperare i file di altri utenti).
      * Fonte: https://stackoverflow.com/a/12251265
-     * @param salvaDataOraVisualizzazione true se si vuole salvare la data/ora
-     *                                    in cui il documento è richiesto (ignorato
-     *                                    se tale data/ora è già salvata).*/
+     * @param identificativoFile Identificativo del file che si richiede.
+     * @param httpServletRequest {@link HttpServletRequest} di provenienza.
+     * @param tokenCasuale Token casuale associato al file: se questo valore è
+     *                     null, allora si verifica (tramite la {@link HttpServletRequest})
+     *                     che il client da cui proviene la richiesta sia autorizzato,
+     *                     altrimenti (se il token non è null) si verifica che tale token
+     *                     coincida con quello associato al file ed in caso positivo allora
+     *                     si restituisce il file senza verificare l'autorizzazione del client.
+     * @param salvaDatiVisualizzazione true se si vogliono salvare i dati su chi
+     *                                 ha visualizzato il file (indirizzo IP e
+     *                                 data/ora).*/
     public static Response creaResponseConFile(Long identificativoFile,
                                                HttpServletRequest httpServletRequest,
-                                               boolean salvaDataOraVisualizzazione   ) {
+                                               String tokenCasuale,
+                                               boolean salvaDatiVisualizzazione   ) {
 
-        Long identificativoAttoreDaHttpServletRequest =
-                Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
+        Long identificativoAttoreDaHttpServletRequest = null;
+        if( tokenCasuale==null )
+            identificativoAttoreDaHttpServletRequest =
+                    Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
         try {
 
             File file = File.getEntitaDaDbById(identificativoFile);
-            if(!(file.getIdentificativoDestinatario().equals(identificativoAttoreDaHttpServletRequest) ||
-                      file.getIdentificativoMittente().equals(identificativoAttoreDaHttpServletRequest) ))
+
+            boolean isClientAutorizzato =
+                    file.getTokenCasuale().equals(tokenCasuale) ||                                              // se token del file corretto, non servono ulteriori controlli
+                    (file.getIdentificativoDestinatario().equals(identificativoAttoreDaHttpServletRequest) ||
+                     file.getIdentificativoMittente().equals(identificativoAttoreDaHttpServletRequest) );       // altimenti bisogna verificare che chi richiede il file sia o il mittente o il destinatario di tale file
+
+            if(!isClientAutorizzato)
                 return Autenticazione.creaResponseForbidden("Accesso al file vietato.");
 
             if(file.isEliminato())
@@ -352,8 +387,8 @@ public abstract class File {
             byte[] contenutoFile = File.getContenutoFile(file,
                                                          httpServletRequest.getRemoteAddr()
                                                                            .replaceAll("\\[","")
-                                                                           .replaceAll("]",""),     // rimuove [] intorno all'indirizzo
-                                                         salvaDataOraVisualizzazione);
+                                                                           .replaceAll("]",""),     // rimuove "[]" intorno all'indirizzo
+                                                         salvaDatiVisualizzazione);
             return Response.ok(contenutoFile, MediaType.APPLICATION_OCTET_STREAM)
                            .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
                            .build();

@@ -11,10 +11,7 @@ import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,8 +31,20 @@ import java.util.function.Function;
  * autenticazione (chiunque può farne richiesta).
  * @author Matteo Ferfoglia
  */
-@Path("/info")
-public class RichiestaInfo {
+@Path("/noauth")
+public class RichiesteSenzaAutenticazione {
+
+    /** Gestisce il download di un file richiesto senza autenticazione del client,
+     * ma fornendo un token casuale associato al file richiesto come @PathParam.*/
+    @Path("/downloadDocumento/{idFile}/{tokenCasualeFile}")
+    @GET
+    // Response costruita senza @Produces per serializzare i dati in modo personalizzato
+    public Response getFileDownloadDiretto(@PathParam("idFile")           Long idFile,
+                                           @PathParam("tokenCasualeFile") String tokenCasualeFile,
+                                           @Context HttpServletRequest httpServletRequest) {
+        return File.creaResponseConFile(idFile, httpServletRequest, tokenCasualeFile, true);
+    }
+
 
     /** Restituisce un array contenente i nomi delle proprietà
      * comuni a tutti i documenti. Tale array può essere utilizzato
@@ -128,7 +137,7 @@ public class RichiestaInfo {
         Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
 
         if( uploader == null ) {
-            Logger.scriviEccezioneNelLog(RichiestaInfo.class, "Uploader non trovato", new NullPointerException());
+            Logger.scriviEccezioneNelLog(RichiesteSenzaAutenticazione.class, "Uploader non trovato", new NullPointerException());
         } else  {
             if( Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
                     .equals(Consumer.class.getSimpleName()) ) {
@@ -139,7 +148,7 @@ public class RichiestaInfo {
                     fieldUsername.setAccessible(true);
                     fieldUsername.set(uploader, null);
                 } catch (IllegalAccessException | NoSuchFieldException exception) {
-                    Logger.scriviEccezioneNelLog(RichiestaInfo.class,
+                    Logger.scriviEccezioneNelLog(RichiesteSenzaAutenticazione.class,
                             "Potrebbe essere stato modificato, nella classe, l'attributo con lo username di un attore.",
                             exception);
                 }

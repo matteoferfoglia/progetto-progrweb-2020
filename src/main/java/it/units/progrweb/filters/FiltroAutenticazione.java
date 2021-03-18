@@ -35,7 +35,7 @@ public class FiltroAutenticazione implements Filter {
             "/api/verificaTokenAutenticazione",
             "/api/registrazioneNuovoConsumer",
             "/api/CSRFToken/generaCSRFToken",
-            "/api/info",
+            "/api/noauth",
             "/api/openapi",
             "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo
     };
