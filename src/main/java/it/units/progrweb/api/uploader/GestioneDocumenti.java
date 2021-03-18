@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Classe per permettere ad un {@link Uploader} di gestire
@@ -110,8 +111,12 @@ public class GestioneDocumenti {
                                        Long identificativoConsumerDestinatario ) {
 
         if( contenuto != null && dettagliFile != null ) {
-            List<String> listaHashtag_list = Arrays.asList( listaHashtag.trim().split(", ") );
-
+            List<String> listaHashtag_list = Arrays.stream( listaHashtag.trim().split(",") )
+                                                   .map(String::trim)
+                                                   .filter(unHashtag -> unHashtag.length()>0)
+                                                   .distinct()
+                                                   .collect(Collectors.toList());
+;
             String estensioneFile = UtilitaGenerale.getEstensioneDaNomeFile(dettagliFile.getFileName());
 
             // Prima di caricare il file, verifica che il destinatario esista.
