@@ -276,8 +276,16 @@ export default {
 <style scoped>
 fieldset {
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   flex-wrap: wrap;
+  border: 2px solid rgba(0,0,0,.25);
+  border-radius: .25rem;
+  margin: 1% 0;
+}
+legend {
+  width: unset;
+  margin: 0 1%;
+  padding: 0 2px;
 }
 fieldset label {
   padding: 0 2%;

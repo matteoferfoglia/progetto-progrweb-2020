@@ -153,6 +153,9 @@ export default {
   button {
     margin: auto 1%;
   }
+  label {
+    max-width: 30rem;
+  }
 
   /** Icone dei pulsanti e dei link */
   button.modifica::before {
