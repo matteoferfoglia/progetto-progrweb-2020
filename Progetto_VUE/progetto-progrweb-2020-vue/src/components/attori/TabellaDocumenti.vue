@@ -33,7 +33,7 @@
                      @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
                               Se cliccato, mostra documenti con questo hashtag
                               Fonte: https://stackoverflow.com/a/41001483 */"
-                     :checked="listaHashtagDaMostrare.includes(hashtag)"/>
+                     :checked="listaHashtagDaMostrare.has(hashtag)"/>
               {{ hashtag === '' ? 'Senza hashtag' : hashtag }}
             </label>
           </p>
@@ -178,7 +178,7 @@ export default {
        * mostrati all'utente contengono (per poter essere mostrati
        * da questo componente) almeno uno degli hashtag presenti in
        * questo attributo.*/
-      listaHashtagDaMostrare: [],            // modificato dinamicamente in base al filtraggio dell'utente
+      listaHashtagDaMostrare: new Set(),            // modificato dinamicamente in base al filtraggio dell'utente
 
       /** Nome delle colonne di intestazione della tabella coi documenti.*/
       nomiPropDocumenti: [],
@@ -330,7 +330,7 @@ export default {
       .then(caricamentoComponente)
       .then( () => {
         // All'inizio mostra tutti gli hashtag
-        this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() );
+        this.listaHashtagDaMostrare = new Set( this.mappa_hashtag_idDocumenti.keys() );
         this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true) );
       })
       .then( () => this.isComponenteCaricato = true )
@@ -354,8 +354,8 @@ export default {
           this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare =>
               this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
           // Nascondi i documenti con hashtag da non mostrare
-          const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
-                                               .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
+          const listaHashtagNonMostrati = new Set( Array.from(this.mappa_hashtag_idDocumenti.keys())
+                                                        .filter(unHashtag => !this.listaHashtagDaMostrare.has(unHashtag)) );
           listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
 
           if( this.mappaDocumenti.size() > numeroDocumentiDisponibiliPreAggiornamento ) {
@@ -380,13 +380,13 @@ export default {
 
     /** Resetta tutti gli hashtag e mostra tutti i documenti disponibili.*/
     mostraTuttiIDocumenti() {
-      this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() ).sort();
+      this.listaHashtagDaMostrare = new Set(Array.from( this.mappa_hashtag_idDocumenti.keys() ).sort());
       this.mappaDocumentiDaMostrare.set( this.mappaDocumenti.get() );
     },
 
     /** Resetta tutti gli hashtag e nasconde tutti i documenti disponibili.*/
     nascondiTuttiIDocumenti() {
-      this.listaHashtagDaMostrare = [];
+      this.listaHashtagDaMostrare = new Set();
       this.mappaDocumentiDaMostrare.set( new MappaDocumenti() );
     },
 
@@ -400,15 +400,14 @@ export default {
 
       // Aggiorna lista di hashtag da mostrare
       if(daMostrare) {
-        this.listaHashtagDaMostrare.push(hashtag);
+        this.listaHashtagDaMostrare.add(hashtag);
       } else {
-        this.listaHashtagDaMostrare = this.listaHashtagDaMostrare
-                                          .filter( hashtagDaMostrare => hashtagDaMostrare!==hashtag);
+        this.listaHashtagDaMostrare = new Set( [...this.listaHashtagDaMostrare].filter( hashtagDaMostrare => hashtagDaMostrare!==hashtag) );
       }
 
       const listaIdDocumentiDaMostrare = new Set(                                   // utilizzo Set per evitare chiavi di documenti duplicate
           Array.from(this.mappa_hashtag_idDocumenti.entries())
-               .filter( entry => this.listaHashtagDaMostrare.includes(entry[0]) ) // entry[0] è la chiave (l'hashtag)
+               .filter( entry => this.listaHashtagDaMostrare.has(entry[0]) ) // entry[0] è la chiave (l'hashtag)
                .flatMap( entry => entry[1] )                               // entry[1] è l'array con gli id dei file che contengono l'hashtag specificato in entry[0]
           // Fonte (flatMap): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
       );
@@ -441,8 +440,10 @@ export default {
 
       // Aggiorna lista di hashtag da mostrare (se elimino un documento ed un hashtag
       // era presenta solo in quel documento, allora devo eliminare quell'hashtag)
-      this.listaHashtagDaMostrare = this.listaHashtagDaMostrare.filter( hashtag =>
-          Array.from(this.mappa_hashtag_idDocumenti.keys()).includes( hashtag ) );
+      this.listaHashtagDaMostrare = new Set(
+          [...this.listaHashtagDaMostrare].filter( hashtag =>
+              Array.from(this.mappa_hashtag_idDocumenti.keys()).includes( hashtag ) )
+      );
 
     },
 
