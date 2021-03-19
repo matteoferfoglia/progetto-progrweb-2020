@@ -31,6 +31,10 @@ detailed instructions.
 
     mvn verify
 
+## Javadoc
+La documentazione del progetto viene generata con il comando `mvn site`
+ed è disponibile nella cartella `target/site`.
+
 As you add / modify the source code (`src/main/java/...`) it's very useful to add
 [unit testing](https://cloud.google.com/appengine/docs/java/tools/localunittesting)
 to (`src/main/test/...`).  The following resources are quite useful:

@@ -6,6 +6,8 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
 
+    <description>Progetto per l'esame di Programmazione Web. Anno Accademico: 2019-2020.</description>
+
     <groupId>it.units.progrweb</groupId>
     <artifactId>progetto-progrweb-2020</artifactId>
 
@@ -351,4 +353,21 @@
             <!-- fine swagger -->
         </plugins>
     </build>
+
+
+    <!-- Javadoc sarà generato durante la fase mvn site, Fonte: https://maven.apache.org/plugins/maven-javadoc-plugin/usage.html -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <!-- Ignora doclint -->
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
 </project>
