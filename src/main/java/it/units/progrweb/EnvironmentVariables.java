@@ -14,4 +14,7 @@ public class EnvironmentVariables {
 
     /** Inizio dell'URI delle richieste "api".*/
     public static final String API_URL_PATTERN = "/api";
+
+    /** Nome dell'applicazione */
+    public static final String NOME_APPLICAZIONE = "FileSharing";
 }

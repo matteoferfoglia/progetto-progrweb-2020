@@ -1,6 +1,7 @@
 package it.units.progrweb.api.uploader;
 
 import com.google.apphosting.api.ApiProxy;
+import it.units.progrweb.EnvironmentVariables;
 import it.units.progrweb.api.consumer.RichiestaDocumenti;
 import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
 import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
@@ -116,7 +117,7 @@ public class GestioneDocumenti {
                                                    .filter(unHashtag -> unHashtag.length()>0)
                                                    .distinct()
                                                    .collect(Collectors.toList());
-;
+
             String estensioneFile = UtilitaGenerale.getEstensioneDaNomeFile(dettagliFile.getFileName());
 
             // Prima di caricare il file, verifica che il destinatario esista.
@@ -184,7 +185,7 @@ public class GestioneDocumenti {
         String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
         String linkDownloadFile =  indirizzoServer + "/api/noauth/downloadDocumento/" + fileAggiunto.getIdentificativoFile() + "/" + fileAggiunto.getTokenCasuale();
 
-        String oggettoNotifica   = "Filesharing - Nuovo documento disponibile";  // TODO : variabile d'ambiente il nome della piattaforma
+        String oggettoNotifica   = EnvironmentVariables.NOME_APPLICAZIONE + " - Nuovo documento disponibile";  // TODO : variabile d'ambiente il nome della piattaforma
         String emailDestinatario = destinatarioFile.getEmail();
         String nomeDestinatario  = destinatarioFile.getNominativo();
 

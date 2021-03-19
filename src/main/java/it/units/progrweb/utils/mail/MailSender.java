@@ -1,5 +1,7 @@
 package it.units.progrweb.utils.mail;
 
+import it.units.progrweb.EnvironmentVariables;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.validation.constraints.NotNull;
@@ -19,7 +21,7 @@ public class MailSender {
     private static final String INDIRIZZO_MAIL_MITTENTE      = "admin@example.com";
 
     /** Nome personale utilizzato nelle mail.*/
-    private static final String NOME_PERSONALE_MAIL_MITTENTE = "Servizio di Filesharing";
+    private static final String NOME_PERSONALE_MAIL_MITTENTE = "Servizio di " + EnvironmentVariables.NOME_APPLICAZIONE;
 
 
     /** Proprietà di configurazione del server SMTP.*/
