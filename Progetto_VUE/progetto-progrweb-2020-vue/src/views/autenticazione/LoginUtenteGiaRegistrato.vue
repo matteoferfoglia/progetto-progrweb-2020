@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" v-if="isComponenteCaricato">
     <h2 class="card-header">Login</h2>
     <Form class="card-body d-flex justify-content-between flex-wrap"
           @submit="validaEdInviaForm"
@@ -51,7 +51,9 @@ export default {
     return {
       username: undefined,
       password: undefined,
-      csrfToken: undefined
+      csrfToken: undefined,
+
+      isComponenteCaricato: false
     }
   },
   methods: {
@@ -71,6 +73,7 @@ export default {
 
     aggiornaCsrfToken(nuovoValore) {
       this.csrfToken = nuovoValore;
+      this.isComponenteCaricato = true;
       this.$emit('csrf-token-ricevuto', nuovoValore);
     },
 
