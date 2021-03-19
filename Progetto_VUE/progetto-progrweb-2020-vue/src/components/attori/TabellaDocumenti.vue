@@ -351,10 +351,11 @@ export default {
         .then( () => {
           // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
           this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
-          this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
+          this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare =>
+              this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
           // Nascondi i documenti con hashtag da non mostrare
           const listaHashtagNonMostrati = Array.from(this.mappa_hashtag_idDocumenti.keys())
-              .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
+                                               .filter(unHashtag => !this.listaHashtagDaMostrare.includes(unHashtag));
           listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
 
           if( this.mappaDocumenti.size() > numeroDocumentiDisponibiliPreAggiornamento ) {
