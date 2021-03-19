@@ -580,6 +580,20 @@ name: "SchedaDiUnAttore",
       }
     },
 
+    /**
+     * Osserva nel parametro della route se cambia l'identificativo
+     * dell'attore cui questa scheda si riferisce.*/
+    '$route.params': {
+      immediate: true,
+      deep: true,
+      handler: function( nuoviParametriRoute ) {
+        if ( nuoviParametriRoute[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE] ) {
+          this.isComponenteCaricato = false;
+          this.caricaQuestoComponente();
+        }
+      }
+    },
+
     csrfToken: {
       immediate: true,
       deep: true,
