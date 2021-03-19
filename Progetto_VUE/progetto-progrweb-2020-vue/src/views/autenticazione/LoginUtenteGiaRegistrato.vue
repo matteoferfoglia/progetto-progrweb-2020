@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" v-show="csrfToken">
     <h2 class="card-header">Login</h2>
     <Form class="card-body d-flex justify-content-between flex-wrap"
           @submit="validaEdInviaForm"
