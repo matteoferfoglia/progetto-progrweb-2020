@@ -130,7 +130,11 @@ import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiP
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
 import Loader from "../layout/Loader";
-import {getIdentificativoAttoreAttualmenteAutenticato, setTokenAutenticazione} from "../../utils/autenticazione";
+import {
+  getIdentificativoAttoreAttualmenteAutenticato,
+  logout,
+  setTokenAutenticazione
+} from "../../utils/autenticazione";
 export default {
 name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
@@ -469,16 +473,26 @@ name: "SchedaDiUnAttore",
 
     /** Richiede al server l'eliminazione di un attore.*/
     eliminaAttore() {
+      // Uploader può eliminare Consumer
+      // Administrator può eliminare Uploader o Administrator (sé compreso)
+
+      const idAttoreAttualmenteAutenticato = String(getIdentificativoAttoreAttualmenteAutenticato());
+      const idAttoreCuiQuestaSchedaSiRiferisce = String(this.idAttoreCuiQuestaSchedaSiRiferisce);
+
       const urlEliminazioneAttore = ( this.isUploaderAttualmenteAutenticato() ?
               process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
               process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) +
-                "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
+                "/" + idAttoreCuiQuestaSchedaSiRiferisce;
 
       const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
 
       richiestaDelete( urlEliminazioneAttore, parametriRichiestaDelete )
           .then( () => {
             alert(this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] + " eliminato." );
+
+            if( idAttoreCuiQuestaSchedaSiRiferisce === idAttoreAttualmenteAutenticato )
+              logout();   // logout se un Administrator ha eliminato sé
+
             this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
           })
           .catch( rispostaErrore => {
@@ -509,17 +523,14 @@ name: "SchedaDiUnAttore",
 
             this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // trucco per forzare l'aggiornamento dell'immagine
 
-            getIdentificativoAttoreAttualmenteAutenticato()
-              .then( idAttore => {
-                if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando
-                     tmp_vecchioNominativo !== this.nominativo ) {                    //  ed è stato modificato il nominativo
-                  richiestaGet(process.env.VUE_APP_URL_RICHIESTA_NUOVO_TOKEN_AUTENTICAZIONE)
-                    .then( setTokenAutenticazione )
-                    .then( () => this.$emit('nominativo-attore-modificato', this.nominativo) )
-                    .catch( console.error );
-                }
-              })
-              .catch( console.error );
+            const idAttore = getIdentificativoAttoreAttualmenteAutenticato();
+            if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando
+                 tmp_vecchioNominativo !== this.nominativo ) {                    //  ed è stato modificato il nominativo
+              richiestaGet(process.env.VUE_APP_URL_RICHIESTA_NUOVO_TOKEN_AUTENTICAZIONE)
+                .then( setTokenAutenticazione )
+                .then( () => this.$emit('nominativo-attore-modificato', this.nominativo) )
+                .catch( console.error );
+            }
 
             alert( "Modifiche effettuate!" );
           })
