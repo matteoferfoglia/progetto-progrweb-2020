@@ -227,22 +227,40 @@ export default {
 
           // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
           .then( getNomePropertyDataCaricamentoDocumenti )
-          .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp);
+          .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp)
+
+          // Richiede il nome della property di un documento contenente il nome del documento stesso
+          .then( getNomePropertyNomeDocumenti )
+          .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
+
+          // Richiede il nome della property di un documento contenere la lista di hashtag del documento stesso
+          .then( getNomePropertyListaHashtagDocumenti )
+          .then(nomeProp => this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomeProp);
+
     }
 
-    const caricamentoComponente = async () => {
+    /** Funzione per il caricamento di questo componente.
+     * @param rispostaServerConMappaDocumenti E' la mappatura dei documenti ricevuta dal server:
+     *                                        se questo parametro non viene specificato, allora
+     *                                        provvederà questo stesso metodo a richiedere tale
+     *                                        mappa al server, altrimenti (se tale parametro è
+     *                                        definito) il componente verrà caricato usando le
+     *                                        informazioni contenute in tale parametro.*/
+    const caricamentoComponente = async (rispostaServerConMappaDocumenti=undefined) => {
 
-        // Richiede mappa idFile-propFile per questo attore
-      await richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore)
+      const MSG_NOMI_PROP_DOCUMENTI_GIA_NOTE_AL_CLIENT = "I nomi delle properties di ogni documento sono già noti al client," +
+                                                         " quindi non serve richiederli al server";
+
+        // Richiede mappa idFile-propFile per questo attore se non già nota
+      await ( rispostaServerConMappaDocumenti === undefined ?
+          richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) :
+          Promise.resolve(rispostaServerConMappaDocumenti) )
 
         // Crea l'indice degli hashtag
         .then(rispostaConMappaFile_id_prop => {
-          richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
-              .then(nomePropertyHashtags => {
-                this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomePropertyHashtags;
-                this.mappa_hashtag_idDocumenti =
-                    creaIndiceDeiFileRispettoAgliHashtagCheContengono(rispostaConMappaFile_id_prop, nomePropertyHashtags);
-              });
+          this.mappa_hashtag_idDocumenti =
+              creaIndiceDeiFileRispettoAgliHashtagCheContengono(rispostaConMappaFile_id_prop,
+                                                                this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO);
           return rispostaConMappaFile_id_prop;
         })
 
@@ -279,8 +297,13 @@ export default {
         })
 
         // Richiede il nome della property di un documento contenente il nome del documento stesso
-        .then( () => richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO) )
-        .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
+        .then( () => {
+          if( this.nomiPropDocumenti.length > 0 ) {
+            // SE true ALLORA significa che i nomi delle prop dei documenti sono già note al client quindi non serve richiederle
+            //  (ciò succede quando questa funzione viene richiamata, per auto-aggiornamento del componente)
+            return Promise.reject(MSG_NOMI_PROP_DOCUMENTI_GIA_NOTE_AL_CLIENT);
+          }
+        })
 
         // Richiede l'elenco dei nomi delle properties dei documenti
         .then( () => richiestaGet(process.env.VUE_APP_URL_GET_NOMI_TUTTE_LE_PROP_DOCUMENTI) )
@@ -295,7 +318,10 @@ export default {
         })
 
 
-        .catch(console.error);
+        .catch( errore => {
+          if( errore !== MSG_NOMI_PROP_DOCUMENTI_GIA_NOTE_AL_CLIENT )
+            console.error(errore);
+        });
 
     };
 
@@ -306,8 +332,8 @@ export default {
         // All'inizio mostra tutti gli hashtag
         this.listaHashtagDaMostrare = Array.from( this.mappa_hashtag_idDocumenti.keys() );
         this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true) );
-        this.isComponenteCaricato = true;
       })
+      .then( () => this.isComponenteCaricato = true )
       .catch( errore => {
         console.error( "Errore durante il caricamento del componente " + this.$options.name + ": " + errore );
         alert( "Errore durante il caricamento dei documenti." );
@@ -586,6 +612,39 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
       .catch( rispostaErrore => {
         console.error("Errore durante la ricezione del nome dell'attributo " +
             "contenente la data di caricamento dei documenti: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+      });
+
+}
+
+/** Questa funzione richiede al server il nome dell'attributo di un
+ * oggetto "documento" il cui valore è il nome di quel documento.
+ * Se la richiesta va a buon fine, viene restituita una Promise
+ * risolta con valore il nome dell'attributo restituito dal server.*/
+const getNomePropertyNomeDocumenti = async () => {
+
+  return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
+      .then(  risposta       => risposta )
+      .catch( rispostaErrore => {
+        console.error("Errore durante la ricezione del nome dell'attributo " +
+            "contenente il nome dei documenti: " + rispostaErrore );
+        return Promise.reject(rispostaErrore);
+      });
+
+}
+
+/** Questa funzione richiede al server il nome dell'attributo di un
+ * oggetto "documento" il cui valore è la lista di hashtag di quel
+ * documento.
+ * Se la richiesta va a buon fine, viene restituita una Promise
+ * risolta con valore il nome dell'attributo restituito dal server.*/
+const getNomePropertyListaHashtagDocumenti = async () => {
+
+  return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
+      .then(  risposta       => risposta )
+      .catch( rispostaErrore => {
+        console.error("Errore durante la ricezione del nome dell'attributo " +
+            "contenente la lista di hashtag dei documenti: " + rispostaErrore );
         return Promise.reject(rispostaErrore);
       });
 
