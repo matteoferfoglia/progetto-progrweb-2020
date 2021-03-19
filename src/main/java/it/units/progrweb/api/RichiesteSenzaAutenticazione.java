@@ -136,8 +136,9 @@ public class RichiesteSenzaAutenticazione {
 
         Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
 
-        if( uploader!=null && Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
-                .equals(Consumer.class.getSimpleName()) ) {
+        if( uploader!=null &&
+                Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
+                              .equals(Consumer.class.getSimpleName()) ) {
             // Consumer non deve poter vedere username dell'Uploader
 
             try {
