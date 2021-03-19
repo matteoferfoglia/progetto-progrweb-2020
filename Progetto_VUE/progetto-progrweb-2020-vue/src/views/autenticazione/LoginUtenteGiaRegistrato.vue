@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-if="isComponenteCaricato">
+  <div class="card">
     <h2 class="card-header">Login</h2>
     <Form class="card-body d-flex justify-content-between flex-wrap"
           @submit="validaEdInviaForm"
@@ -51,9 +51,7 @@ export default {
     return {
       username: undefined,
       password: undefined,
-      csrfToken: undefined,
-
-      isComponenteCaricato: false
+      csrfToken: undefined
     }
   },
   methods: {
@@ -64,8 +62,8 @@ export default {
       if( this.username )
         richiestaPost(process.env.VUE_APP_URL_RESET_PASSWORD,
             {[process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME]: this.username})
-          .then( alert )  // alert con la risposta del server
-          .catch( risposta => console.log("ERRORE: " + risposta) );
+            .then( alert )  // alert con la risposta del server
+            .catch( risposta => console.log("ERRORE: " + risposta) );
       else
         alert("Inserire lo username");
 
@@ -73,7 +71,6 @@ export default {
 
     aggiornaCsrfToken(nuovoValore) {
       this.csrfToken = nuovoValore;
-      this.isComponenteCaricato = true;
       this.$emit('csrf-token-ricevuto', nuovoValore);
     },
 
@@ -100,7 +97,7 @@ export default {
 
           // Login probabilmente richiesto perché utente ha tentato di accedere a risorsa protetta
           // Quindi aggiungo tutti i params che mi arrivano su routes, così l'utente può riprende
-          // a lavorare da dove si era interrotto prima del login:  // TODO : un oggetto simile è creato anche nell'index di router: estrarre un metodo che faccia solo questo ! Forse non serve se si evita la redirection di login
+          // a lavorare da dove si era interrotto prima del login:  // TODO : un oggetto simile è creato anche nell'index di router: estrarre un metodo che faccia solo questo !
           [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
           [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA])
         };
