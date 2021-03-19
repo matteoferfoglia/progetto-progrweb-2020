@@ -190,7 +190,7 @@ export default {
               this.tipiAttoreCuiQuestoElencoSiRiferisce)
 
               .then(arrayConIdTuttiGliAttoriDaMostrare => {
-                if (areArrayEquivalenti(arrayConIdTuttiGliAttoriDaMostrare, this.mappa_idAttore_proprietaAttore.keys()))
+                if (areArrayEquivalenti(arrayConIdTuttiGliAttoriDaMostrare, Array.from(this.mappa_idAttore_proprietaAttore.keys())))
                   return Promise.reject(msg_NO_MODIFICHE);
                 else
                   return arrayConIdTuttiGliAttoriDaMostrare;
@@ -229,8 +229,8 @@ export default {
                 return this.$router.push({
                   name: this.NOME_ROUTE_SCHEDA_ATTORE,
                   params: {
-                    [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]: false,// vedere componente SchedaAttore
-                    [this.NOME_PARAM_ID_ATTORE_router]: entryMappa_unicoAttore[0],                   // idAttore nell'elemento [0]
+                    [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]: false, // vedere componente SchedaAttore
+                    [this.NOME_PARAM_ID_ATTORE_router]: entryMappa_unicoAttore[0],                          // idAttore nell'elemento [0]
                     [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
                     // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                   }
