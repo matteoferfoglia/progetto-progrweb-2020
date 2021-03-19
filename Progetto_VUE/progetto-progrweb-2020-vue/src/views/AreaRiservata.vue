@@ -60,13 +60,10 @@ export default {
   },
   created() {
     // Richiede l'identificativo dell'attore attualmente autenticato ed imposta l'uri a cui richiedere il suo logo
-    getIdentificativoAttoreAttualmenteAutenticato()
-        .then(identificativoAttore => {
-          this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
-          this.urlLogoUploader = process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore;
-          this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // query string per forzare l'aggiornamento del logo
-        })
-        .catch(console.error);
+    const identificativoAttore = getIdentificativoAttoreAttualmenteAutenticato()
+    this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
+    this.urlLogoUploader = process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore;
+    this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // query string per forzare l'aggiornamento del logo
   },
   methods: {
 

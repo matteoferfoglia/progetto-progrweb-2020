@@ -18,11 +18,11 @@
 
 import Header from "./components/layout/Header";
 import {
-  eliminaTokenAutenticazione, getNomeAttoreAttualmenteAutenticato,
+  getNomeAttoreAttualmenteAutenticato,
   getTipoAttoreAttualmenteAutenticato,
+  logout,
   verificaAutenticazione
 } from "./utils/autenticazione";
-import {richiestaGet} from "./utils/http";
 export default {
   name: 'App',
   components: { Header},
@@ -61,9 +61,7 @@ export default {
                           .then(tipo => this.tipoAttoreAutenticato = tipo )
                           .catch(console.error);
 
-                  await getNomeAttoreAttualmenteAutenticato()
-                          .then(nome => this.nomeAttoreAutenticato = nome)
-                          .catch(console.error);
+                  this.nomeAttoreAutenticato =  getNomeAttoreAttualmenteAutenticato();
                 }
 
                 return isUtenteAutenticato;
@@ -89,21 +87,12 @@ export default {
 
     /** Richiesta di logout al server. */
     logout() {
-
-      const parametriRichiestaGet = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
-      richiestaGet(process.env.VUE_APP_URL_LOGOUT, parametriRichiestaGet)
-          .catch( risposta => console.log("Logout fallito: " + risposta) );
-
-      // logout sul client
-      eliminaTokenAutenticazione();
-      this.$router.push({name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN})
-          .then( () => {
-            this.csrfToken = undefined;
-            this.tipoAttoreAutenticato = undefined;
-            this.nomeAttoreAutenticato = undefined;
-            this.isUtenteAutenticato = false;
-          });
-
+      const tmp_csrfToken = this.csrfToken;
+      this.csrfToken             = undefined;
+      this.tipoAttoreAutenticato = undefined;
+      this.nomeAttoreAutenticato = undefined;
+      this.isUtenteAutenticato   = false;
+      logout(tmp_csrfToken); // funzione importata dal modulo di autenticazione
     }
 
   },
