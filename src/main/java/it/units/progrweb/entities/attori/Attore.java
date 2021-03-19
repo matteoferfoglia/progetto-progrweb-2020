@@ -13,17 +13,14 @@ import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
-import javax.security.auth.Subject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.attribute.UserPrincipal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
  * @author Matteo Ferfoglia
  */
 @Entity
-public abstract class Attore implements UserPrincipal, Cloneable {
+public abstract class Attore implements Cloneable {
 
     /** Identificativo di un utente.*/
     @Id
@@ -322,20 +319,6 @@ public abstract class Attore implements UserPrincipal, Cloneable {
         result = 31 * result + nominativo.hashCode();
         result = 31 * result + email.hashCode();
         return result;
-    }
-
-
-
-    /** Vedere {@link Principal#getName()}.*/
-    @Override
-    public String getName() {
-        return username;
-    }
-
-    /** Restituisce sempre false.*/
-    @Override
-    public boolean implies(Subject subject) {
-        return false;
     }
 
     @Override
