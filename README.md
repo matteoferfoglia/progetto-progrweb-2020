@@ -1,59 +1,85 @@
-appengine-standard-archetype
+Progetto d'esame del corso di Programmazione Web
 ============================
 
-This is a generated App Engine Standard Java application from the appengine-standard-archetype archetype.
-
-See the [Google App Engine standard environment documentation][ae-docs] for more
-detailed instructions.
-
-[ae-docs]: https://cloud.google.com/appengine/docs/java/
-
-
-* [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* [Maven](https://maven.apache.org/download.cgi) (at least 3.5)
-* [Google Cloud SDK](https://cloud.google.com/sdk/) (aka gcloud)
-
-## Setup
-
-    gcloud init
-    gcloud auth application-default login
+Questo progetto *App Engine Standard Java application* è stato inizialmente generato
+con *Google Cloud SDK* (installabile da https://cloud.google.com/sdk/docs/install),
+usando l'archetipo *appengine-standard-archetype*.
 
 ## Maven
-### Running locally
+Questo progetto richiede la versione 3.5 di Maven.
+Di seguito vengono elencati alcuni comandi Maven (eseguibili nella forma
+`mvn ...`) che possono essere eseguiti dalla shell posizionata nella
+cartella principale del progetto.
+
+### Esecuzione locale del web server
+Il comando
+
+    mvn clean validate compile test package site verify appengine:run
+
+permette di eliminare il risultato di una precedente compilazione e
+ricompilare l'intero progetto, seguendo le fasi di Maven.
+
+Per evitare l'esecuzione dei test, eseguire il comando:
+
+    mvn clean validate compile package -Dmaven.test.skip=true appengine:run
+
+Assumendo che la web-application sia già stata compilata correttamente,
+il comando
 
     mvn appengine:run
 
+permette l'avvio del server di sviluppo (locale) di *Google App Engine*.
+
 ### Deploying
+Il comando
 
     mvn appengine:deploy
 
-## Testing
+permette il deploy sul server Google.
 
-    mvn verify
+### Testing
+Per creare i test Java è stato utilizzato il framework *JUnit 5*.
+Il comando
 
-## Javadoc
+    mvn test
+
+permette di eseguire i test del progetto.
+
+### Javadoc
 La documentazione del progetto viene generata con il comando `mvn site`
 ed è disponibile nella cartella `target/site`.
 
-As you add / modify the source code (`src/main/java/...`) it's very useful to add
-[unit testing](https://cloud.google.com/appengine/docs/java/tools/localunittesting)
-to (`src/main/test/...`).  The following resources are quite useful:
 
-* [Junit4](http://junit.org/junit4/)
-* [Mockito](http://mockito.org/)
-* [Truth](http://google.github.io/truth/)
+### Aggiornamento degli artefatti
+Il plugin [versions-plugin](http://www.mojohaus.org/versions-maven-plugin/)
+di Maven è stato utilizzato per controllare che le dipendenze utilizzate
+(definite nel *pom.xml*) siano aggiornate.
 
-## Updating to latest Artifacts
 
-An easy way to keep your projects up to date is to use the maven [Versions plugin][versions-plugin].
+## Servizi REST e programmazione lato client
 
-    mvn versions:display-plugin-updates
-    mvn versions:display-dependency-updates
-    mvn versions:use-latest-versions
+### Jersey
+Questo progetto realizza una *web application* basata su servizi di tipo *REST*
+implentati sfruttando il framework *Jersey*.
 
-Note - Be careful when changing `javax.servlet` as App Engine Standard uses 3.1 for Java 8, and 2.5
-for Java 7.
+### Swagger
+La documentazione delle API viene generata sfruttando *Swagger* (nel *pom.xml*)
+ed è disponibile:
+- in formato JSON, al request URI */api/openapi.json*;
+- in formato YAML, al request URI */api/openapi.yaml*;
+- in modo interattivo, direttamente dal browser, al request URI */swagger-ui/*.
 
-Our usual process is to test, update the versions, then test again before committing back.
 
-[plugin]: http://www.mojohaus.org/versions-maven-plugin/
+### Client-side
+Tutta la programmazione "lato client" è stata fatta con *Vue 3*.
+
+Il file *pom.xml* del progetto *Maven* è stato adattato in modo che,
+quando si crea il package "*.war*", venga generata la *release* Vue
+(creata con il comando `npm run build` eseguito dalla shell
+posizionata nella cartella contenete il progetto *Vue*) e copiata
+tra le risorse del Web Server, il tutto in modo completamente
+automatizzato (fatto nella fase Maven *prepare-package*).
+
+### Web Service
+Questo progetto implementa anche un Web Service REST e un client
+REST (in un progetto Maven annidato), come richiesto dalle specifiche.
