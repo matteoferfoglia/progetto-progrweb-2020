@@ -1,7 +1,7 @@
 package it.units.progrweb.entities.attori.administrator;
 
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.consumer.Consumer;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 

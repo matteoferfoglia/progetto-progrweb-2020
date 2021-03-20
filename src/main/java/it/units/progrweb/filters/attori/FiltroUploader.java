@@ -1,6 +1,6 @@
 package it.units.progrweb.filters.attori;
 
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.filters.FiltroAutenticazione;
 import it.units.progrweb.utils.Autenticazione;
 

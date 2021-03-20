@@ -1,6 +1,6 @@
 package it.units.progrweb.api.consumer;
 
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;

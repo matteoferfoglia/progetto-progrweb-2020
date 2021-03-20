@@ -2,10 +2,13 @@ package it.units.progrweb.entities.attori;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.administrator.Administrator;
+import it.units.progrweb.entities.attori.consumer.Consumer;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
@@ -48,7 +51,11 @@ public abstract class Attore implements Cloneable {
     protected String email;
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
-    protected TipoAttore tipoAttore;
+    @Ignore
+    protected TipoAttore tipoAttore =
+            this instanceof Consumer ? TipoAttore.Consumer :
+                this instanceof Uploader ? TipoAttore.Uploader :
+                this instanceof Administrator ? TipoAttore.Administrator : null;
 
     /** Questo metodo si occupa di modificare le informazioni di un attore.
      * Funzionamento di questo metodo: clona l'attore ottenuto dal database,
@@ -358,6 +365,20 @@ public abstract class Attore implements Cloneable {
     }
 
 
+    /**
+     * Eccezione generata quando si cerca di assegnare uno username ad
+     * un attore, ma quell'attore richiede un particolare formato di
+     * username che non è stato rispettato (ad esempio il codice fiscale).
+     *
+     * @author Matteo Ferfoglia
+     */
+    public static class FormatoUsernameInvalido extends RuntimeException {
+
+        public FormatoUsernameInvalido(String messaggioErrore) {
+            super( messaggioErrore );
+        }
+
+    }
 }
 
 

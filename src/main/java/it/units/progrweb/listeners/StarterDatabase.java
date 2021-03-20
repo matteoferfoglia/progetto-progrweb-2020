@@ -36,10 +36,10 @@ public class StarterDatabase implements ServletContextListener {
             "it.units.progrweb.entities.attori.Attore",
             "it.units.progrweb.entities.attori.administrator.Administrator",
             "it.units.progrweb.entities.attori.administrator.AdministratorStorage",
-            "it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader",
-            "it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage",
-            "it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer",
-            "it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage",
+            "it.units.progrweb.entities.attori.uploader.Uploader",
+            "it.units.progrweb.entities.attori.uploader.UploaderStorage",
+            "it.units.progrweb.entities.attori.consumer.Consumer",
+            "it.units.progrweb.entities.attori.consumer.ConsumerStorage",
             "it.units.progrweb.entities.RelazioneUploaderConsumer",
             "it.units.progrweb.entities.AuthenticationDatabaseEntry",
             "it.units.progrweb.entities.file.File",
@@ -89,7 +89,7 @@ public class StarterDatabase implements ServletContextListener {
 
                     {
                         // Creazione consumer
-                        Class<?> consumerStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.consumer.ConsumerStorage");
+                        Class<?> consumerStorage = Class.forName("it.units.progrweb.entities.attori.consumer.ConsumerStorage");
                         Constructor<?> constructorConsumerStorage = consumerStorage.getDeclaredConstructor(String.class, String.class, String.class);
                         constructorConsumerStorage.setAccessible(true);
                         consumerTest = constructorConsumerStorage.newInstance("PPPPLT80A01A952G", "Pippo Pluto", "pippopluto@example.com");
@@ -98,7 +98,7 @@ public class StarterDatabase implements ServletContextListener {
 
                     {
                         // Creazione Uploader
-                        Class<?> uploaderStorage = Class.forName("it.units.progrweb.entities.attori.nonAdministrator.uploader.UploaderStorage");
+                        Class<?> uploaderStorage = Class.forName("it.units.progrweb.entities.attori.uploader.UploaderStorage");
                         Constructor<?> constructorUploaderStorage = uploaderStorage.getDeclaredConstructor(String.class, String.class, String.class, byte[].class, String.class);
                         constructorUploaderStorage.setAccessible(true);
                         uploaderTest = constructorUploaderStorage.newInstance("AB01", "Banca Prova", "bancaprova@example.com",

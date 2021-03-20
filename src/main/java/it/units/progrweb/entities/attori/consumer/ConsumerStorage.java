@@ -1,8 +1,8 @@
-package it.units.progrweb.entities.attori.nonAdministrator.consumer;
+package it.units.progrweb.entities.attori.consumer;
 
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 
 import java.util.List;

@@ -3,10 +3,9 @@ package it.units.progrweb.api;
 import it.units.progrweb.api.administrator.GestioneAttori;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.FormatoUsernameInvalido;
 import it.units.progrweb.entities.attori.administrator.Administrator;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.consumer.Consumer;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
@@ -117,8 +116,8 @@ public class CreazioneAttore {
                     return attoreDaCreare;
 
 
-                } catch( FormatoUsernameInvalido e ) {
-                    throw new FormatoUsernameInvalido("Formato per il campo username non valido. " + e.getMessage());
+                } catch( Attore.FormatoUsernameInvalido e ) {
+                    throw new Attore.FormatoUsernameInvalido("Formato per il campo username non valido. " + e.getMessage());
                 } catch (IllegalArgumentException e) {
                     // Tipo attore ricevuto non valido
                     throw new IllegalArgumentException("Valori di input inseriti non validi: " + e.getMessage());
@@ -159,7 +158,7 @@ public class CreazioneAttore {
 
         } catch(NotAuthorizedException e) {
             return Autenticazione.creaResponseForbidden("Autorizzazione alla creazione di attori negata.");
-        } catch( FormatoUsernameInvalido e ) {
+        } catch( Attore.FormatoUsernameInvalido e ) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
                     .build();

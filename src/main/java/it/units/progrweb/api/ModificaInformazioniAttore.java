@@ -2,7 +2,7 @@ package it.units.progrweb.api;
 
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;

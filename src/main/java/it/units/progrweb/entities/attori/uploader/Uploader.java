@@ -1,9 +1,7 @@
-package it.units.progrweb.entities.attori.nonAdministrator.uploader;
+package it.units.progrweb.entities.attori.uploader;
 
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.FormatoUsernameInvalido;
-import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,7 +11,7 @@ import java.util.regex.Pattern;
  * @author Matteo Ferfoglia
  */
 @Subclass(index = true)
-public abstract class Uploader extends UtenteNonAdministrator {
+public abstract class Uploader extends Attore {
 
     /** RegEx per validare lo username di un {@link Uploader}.*/
     private final static String REGEX_VALIDITA_USERNAME_UPLOADER = "^\\w{4}$";

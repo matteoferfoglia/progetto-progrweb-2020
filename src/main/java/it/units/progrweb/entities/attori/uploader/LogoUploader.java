@@ -1,4 +1,4 @@
-package it.units.progrweb.entities.attori.nonAdministrator.uploader;
+package it.units.progrweb.entities.attori.uploader;
 
 import java.io.IOException;
 import java.io.Serializable;

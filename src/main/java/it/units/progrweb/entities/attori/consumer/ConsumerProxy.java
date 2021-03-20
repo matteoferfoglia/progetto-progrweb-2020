@@ -1,4 +1,4 @@
-package it.units.progrweb.entities.attori.nonAdministrator.consumer;
+package it.units.progrweb.entities.attori.consumer;
 
 /**
  * Classe proxy per {@link Consumer}.

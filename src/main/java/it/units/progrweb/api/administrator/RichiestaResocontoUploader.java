@@ -3,7 +3,7 @@ package it.units.progrweb.api.administrator;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.administrator.Resoconto;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.datetime.DateTime;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;

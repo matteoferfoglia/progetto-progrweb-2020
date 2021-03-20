@@ -1,9 +1,8 @@
-package it.units.progrweb.entities.attori.nonAdministrator.consumer;
+package it.units.progrweb.entities.attori.consumer;
 
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.UtenteNonAdministrator;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.RegexHelper;
 
@@ -15,7 +14,7 @@ import java.util.regex.Pattern;
  * @author Matteo Ferfoglia
  */
 @Subclass(index = true)
-public abstract class Consumer extends UtenteNonAdministrator {
+public abstract class Consumer extends Attore {
 
     /** RegEx per validare lo username di un {@link Uploader}.*/
     private static final String REGEX_VALIDITA_USERNAME_CONSUMER = RegexHelper.REGEX_CODICE_FISCALE;

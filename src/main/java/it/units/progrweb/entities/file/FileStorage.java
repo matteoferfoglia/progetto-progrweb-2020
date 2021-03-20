@@ -44,7 +44,7 @@ class FileStorage extends File {
             // Si tiene traccia di data e ora solo del primo accesso al file
 
             file.setDataEdOraDiVisualizzazione( DateTime.adesso() );
-            file.setIndirizzoIpVisualizzazione( indirizzoIpVisualizzazione );
+            file.setIndirizzoIpVisualizzatore( indirizzoIpVisualizzazione );
             DatabaseHelper.salvaEntita( file );
         }
 

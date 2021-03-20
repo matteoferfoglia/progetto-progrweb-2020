@@ -1,7 +1,7 @@
 package it.units.progrweb.api;
 
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
+import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.RegexHelper;

@@ -5,8 +5,8 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.nonAdministrator.consumer.Consumer;
-import it.units.progrweb.entities.attori.nonAdministrator.uploader.Uploader;
+import it.units.progrweb.entities.attori.consumer.Consumer;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.*;
@@ -151,8 +151,8 @@ public abstract class File {
         this.dataEdOraDiVisualizzazione = DateTime.convertiInString( dataEdOraDiVisualizzazione );
     }
 
-    protected void setIndirizzoIpVisualizzazione(String indirizzoIpVisualizzazione) {
-        this.indirizzoIpVisualizzatore = indirizzoIpVisualizzazione;
+    protected void setIndirizzoIpVisualizzatore(String indirizzoIpVisualizzatore) {
+        this.indirizzoIpVisualizzatore = indirizzoIpVisualizzatore;
     }
 
     /** Restituisce il nome dell'attributo che contiene il nome di un file.*/

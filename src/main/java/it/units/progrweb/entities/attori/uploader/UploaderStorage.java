@@ -1,4 +1,4 @@
-package it.units.progrweb.entities.attori.nonAdministrator.uploader;
+package it.units.progrweb.entities.attori.uploader;
 
 import com.googlecode.objectify.annotation.Serialize;
 import com.googlecode.objectify.annotation.Subclass;
