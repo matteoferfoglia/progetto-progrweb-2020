@@ -57,7 +57,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--Jersey! -->
+        <!-- Jersey! -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
