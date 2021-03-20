@@ -36,15 +36,6 @@ public class JwtTokenTest {
      * iterazioni successive corrispondono a diversi parametri per i test.*/
     private final static int QUANTI_TEST_PER_OGNI_TIPO_IN_QUESTA_CLASSE = 1000;
 
-    /** Test per {@link it.units.progrweb.utils.jwt.JwtToken#generaTokenJsonCodificatoBase64UrlEncoded()}.*/
-    @ParameterizedTest
-    @MethodSource("generaTokenECorrispondenteRappresentazioneComeStringaDelToken")
-    void generaTokenJsonTest(JwtToken token, String corrispondenteJsonCodificatoBase64UrlEncoded){
-
-        assertEquals(corrispondenteJsonCodificatoBase64UrlEncoded, token.generaTokenJsonCodificatoBase64UrlEncoded());
-
-    }
-
     /** Genera i parametri per {@link #generaToken()}.*/
     private static Stream<Arguments> generaTokenECorrispondenteRappresentazioneComeStringaDelToken() {
 
