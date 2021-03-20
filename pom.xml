@@ -20,6 +20,7 @@
         <archiveClasses>true</archiveClasses>
         <vue.project.directory>Progetto_VUE/progetto-progrweb-2020-vue</vue.project.directory><!-- directory contenente il progetto Vue -->
         <vue.build.target.directory>Progetto_VUE/progetto-progrweb-2020-vue/dist</vue.build.target.directory><!-- directory contenente la build del progetto Vue -->
+        <swagger.path.openapi.json>/api/openapi.json</swagger.path.openapi.json><!-- request URI in cui è disponibile in formato JSON la documentazione delle API, generata da Swagger -->
     </properties>
 
     <dependencies>
@@ -412,7 +413,7 @@
                     <replacements>
                         <replacement>
                             <token>https://petstore.swagger.io/v2/swagger.json</token>
-                            <value>/api/openapi.json</value>
+                            <value>${swagger.path.openapi.json}</value>
                         </replacement>
                     </replacements>
                 </configuration>
