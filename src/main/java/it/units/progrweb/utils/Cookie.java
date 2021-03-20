@@ -62,10 +62,9 @@ public class Cookie extends NewCookie {
                   String descrizioneCookie, int maxAge,
                   boolean secureCookie, boolean httpOnly) {
 
-        super(nomeCookie, valoreCookie, percorsoCookie, hostDomainCookie,
-                descrizioneCookie + "\";SameSite="+SAME_SITE_VALUE+"; \"",
-                maxAge, secureCookie, httpOnly);
-        // Aggiunge SameSite (non disponibile nella super classe utilizzata, quindi aggiunto manualmente in coda alla descrizione del cookie)
+        super(nomeCookie, valoreCookie + ";SameSite="+SAME_SITE_VALUE, percorsoCookie, hostDomainCookie,
+                descrizioneCookie, maxAge, secureCookie, httpOnly);
+        // Aggiunge SameSite (non disponibile nella super classe utilizzata, quindi aggiunto manualmente in coda al valore del cookie)
     }
 
     public Cookie(String nomeCookie, String valoreCookie, String descrizioneCookie) {
