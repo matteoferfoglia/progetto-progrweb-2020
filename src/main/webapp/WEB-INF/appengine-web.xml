@@ -9,6 +9,7 @@
     <static-files>
         <include path="/**.html"/>
         <include path="/**.js"/>
+        <!-- <include path="/**.js.map"/> --><!-- Se si usano i file "source map" in production -->
         <include path="/**.css"/>
         <include path="/**.png"/>
         <include path="/**.svg"/>

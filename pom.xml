@@ -18,6 +18,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <archiveClasses>true</archiveClasses>
+        <vue.build.target.directory>Progetto_VUE/progetto-progrweb-2020-vue/dist</vue.build.target.directory><!-- directory contenente la build del progetto Vue -->
     </properties>
 
     <dependencies>
@@ -256,9 +257,28 @@
                 <version>3.9.1</version>
             </plugin>
 
+            <!-- Copia della build Vue in webapp
+                 Fonte (tratto da): https://stackoverflow.com/q/28584442 -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${vue.build.target.directory}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -351,6 +371,7 @@
                 </configuration>
             </plugin>
             <!-- fine swagger -->
+
         </plugins>
     </build>
 
