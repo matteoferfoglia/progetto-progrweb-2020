@@ -9,12 +9,14 @@
     <static-files>
         <include path="/**.html"/>
         <include path="/**.js"/>
-        <!-- <include path="/**.js.map"/> --><!-- Se si usano i file "source map" in production -->
+        <include path="/**.js.map"/>
         <include path="/**.css"/>
+        <include path="/**.css.map"/>
         <include path="/**.png"/>
         <include path="/**.svg"/>
         <include path="/**.ico"/>
         <include path="/**.yaml"/>
+        <include path="/**.json"/>
     </static-files>
 
 </appengine-web-app>
