@@ -39,7 +39,6 @@ public abstract class File {
     protected Long identificativoFile;
 
     /** Nome del file.*/
-    @Index
     protected String nomeDocumento;
 
     /** Data e ora di caricamento del file salvati come Long.*/
@@ -63,7 +62,6 @@ public abstract class File {
     private Long identificativoDestinatario;
 
     /** Lista di hashtag associati a questo file. */
-    @Index
     @SuppressWarnings({"unused", "FieldCanBeLocal"}) // attributo necessario affinché venga salvato da Objectify
     private List<String> listaHashtag;
 
