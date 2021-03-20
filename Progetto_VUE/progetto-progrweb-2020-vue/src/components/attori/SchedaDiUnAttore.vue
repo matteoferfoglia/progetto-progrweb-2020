@@ -20,8 +20,8 @@
             </button>
           </h2>
           <div class="collapse" :class="{'show': isAdministratorAttualmenteAutenticato() &&
-                                                   !isQuestaSchedaRiferitaAdUnConsumer &&
-                                                   !isQuestaSchedaRiferitaAdUnUploader    }"
+                                                   !isQuestaSchedaRiferitaAdUnConsumer   &&
+                                                   !isQuestaSchedaRiferitaAdUnUploader      }"
                id="informazioniAttore"><div class="card-body"><!--Limitazione di Bootstrap: necessario doppio div -->
 
 
