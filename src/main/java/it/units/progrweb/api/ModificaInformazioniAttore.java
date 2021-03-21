@@ -40,7 +40,7 @@ public class ModificaInformazioniAttore {
      * </strong> viene modificato. 
      * <strong>Attenzione</strong>: se si modificano alcune delle
      * informazioni che sono presenti anche nel token di autenticazione
-     * del client, allora quel token diverterà invalido, infatti questo
+     * del client, allora quel token diventerà invalido, infatti questo
      * metodo restituisce nell'entity della risposta il nuovo token
      * di autenticazione (questo metodo fa uso di {@link
      * Autenticazione#creaResponseAutenticazionePerAttoreAutenticato(Attore)}).*/
