@@ -188,15 +188,25 @@ const aggiungiParametriAllaRequest = oggettoConParametri => {
  * pagina di autenticazione.*/
 const onErrorHandler = async errore => {
 
-    if( errore.response.status === HTTP_STATUS_CSRF_INVALIDO )
-        router.go(0);   // ricarica la pagina se è invalido il token CSRF
+    let rispostaErrore;
 
-    if( errore.response.status===HTTP_STATUS_UNAUTHORIZED ||
-        errore.response.status===HTTP_STATUS_FORBIDDEN ) {
-        // Redirection automatica a login
-        eliminaTokenAutenticazione();
-        await router.redirectVersoPaginaAutenticazione();
+    if( errore && errore.response ) {  // se definiti
+
+        rispostaErrore = errore.response;
+
+        if (errore.response.status === HTTP_STATUS_CSRF_INVALIDO)
+            router.go(0);   // ricarica la pagina se è invalido il token CSRF
+
+        if (errore.response.status === HTTP_STATUS_UNAUTHORIZED ||
+            errore.response.status === HTTP_STATUS_FORBIDDEN) {
+            // Redirection automatica a login
+            eliminaTokenAutenticazione();
+            await router.redirectVersoPaginaAutenticazione();
+        }
+
+    } else {
+        rispostaErrore = "NO RESPONSE";
     }
 
-    return Promise.reject( errore.response );
+    return Promise.reject( rispostaErrore );
 }
