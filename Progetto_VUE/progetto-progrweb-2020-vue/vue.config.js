@@ -8,5 +8,11 @@
  * Fonte: https://cli.vuejs.org/config/#global-cli-config */
 
 module.exports = {
-    productionSourceMap: false  // evita source maps in production
+    productionSourceMap: false,  // evita source maps in production
+    transpileDependencies: [     // transpiling delle dipendenze se hanno delle funzionalità non supportate nei browser in cui l'app dovrebbe funzionare
+        "axios",
+        "core-js",
+        "vue",
+        "vue-router"
+    ]
 }
