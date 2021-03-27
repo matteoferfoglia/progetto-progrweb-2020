@@ -41,6 +41,7 @@
                              :ripristinaValoriProp = "ripristinaValoriProperty"
                              :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer_onSubmit"
                              :csrfToken="csrfToken_wrapper"
+                             :tuttiICampi_required="true"
                              @submit="flag_inviaDatiForm = true"
                              @ripristina-valori-prop="ripristinaValoriProperty = false"
                              @dati-form-inviati="formModificaAttoreInviato($event)"
@@ -52,7 +53,8 @@
                        class="form-control-file" >
               </label>
 
-              <button @click.prevent="modificaAttore()"
+
+              <button type="submit"
                       class="modifica btn btn-info"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Modifica utente
@@ -69,6 +71,7 @@
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Elimina utente
               </button>
+
 
             </FormCampiAttore>
 
@@ -463,12 +466,6 @@ name: "SchedaDiUnAttore",
     isAdministratorAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato ===
           process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
-    },
-
-    /** Richiede al server la modifica di un attore in base ai valori attualmente
-     * inseriti nel form.*/
-    modificaAttore() {
-      this.flag_inviaDatiForm = true;
     },
 
     /** Richiede al server l'eliminazione di un attore.*/
