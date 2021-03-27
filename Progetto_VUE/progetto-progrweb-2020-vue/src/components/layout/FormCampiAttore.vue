@@ -45,7 +45,7 @@
                  aria-label="Email"
                  :required="!!tuttiICampi_required"
                  autocomplete="email">
-          <a :href="'mailto:' + email_wrapper" v-if="email_wrapper" class="input-group-append btn btn-link"></a>
+          <a :href="'mailto:' + email_wrapper" v-if="!!email_wrapper" class="input-group-append btn btn-link"></a>
         </span>
       </p>
     </div>
@@ -61,7 +61,7 @@
 
 <script>
 import FormConCsrfToken from "./FormConCsrfToken";
-import {generaIdUnivoco} from "../../utils/utilitaGenerale";
+import {generaIdUnivoco, isStringaNonNullaNonVuota} from "../../utils/utilitaGenerale";
 import {richiestaPost, richiestaPostConFile} from "../../utils/http";
 export default {
   name: "FormCampiAttore",
@@ -221,6 +221,12 @@ export default {
           };
           for( const prop in this.datiAggiuntiviDaInviareAlServer_wrapper ) {
             datiDaInviareAlServer[prop] = this.datiAggiuntiviDaInviareAlServer_wrapper[prop];
+          }
+
+          // Check proprietà prima di inviare (rimuove quelle non valide)
+          for(const prop in datiDaInviareAlServer) {
+            if(!isStringaNonNullaNonVuota(datiDaInviareAlServer[prop]))
+              delete isStringaNonNullaNonVuota[prop];
           }
 
           let promise;
