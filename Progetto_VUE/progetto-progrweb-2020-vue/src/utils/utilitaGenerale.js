@@ -125,3 +125,8 @@ export const capitalize = str =>
     str.split(' ')
        .map( unaParola => unaParola.charAt(0).toUpperCase() + unaParola.slice(1) )
        .join(' ');
+
+
+/** Verifica che una stringa non sia nè nulla nè vuota.*/
+export const isStringaNonNullaNonVuota = str =>
+    !!str && typeof str === "string" && !! str.trim();
