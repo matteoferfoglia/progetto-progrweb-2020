@@ -65,7 +65,7 @@
               :key="indice">
             <td>{{ indice+1 }}</td>
             <td v-for="propertyQuestaColonna in nomiPropDocumenti.filter( nomeColonna => nomeColonna!==NOME_PROP_LINK_DOWNLOAD_DOCUMENTO &&
-                                                                                       nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
+                                                                                         nomeColonna!==NOME_PROP_LINK_DELETE_DOCUMENTO     )"
                 :key="propertyQuestaColonna" >
               {{ documento[propertyQuestaColonna] }}
             </td>
