@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,21 @@ public abstract class Attore implements Cloneable {
             this instanceof Consumer ? TipoAttore.Consumer :
                 this instanceof Uploader ? TipoAttore.Uploader :
                 this instanceof Administrator ? TipoAttore.Administrator : null;
+
+    /**
+     * Copy-constructor.
+     * @param attore
+     */
+    public Attore(Attore attore) {
+        Arrays.asList(Attore.class.getDeclaredFields())
+              .forEach( field -> {
+                  try {
+                      field.set(this,field.get(attore));
+                  } catch (IllegalAccessException exception) {
+                      Logger.scriviEccezioneNelLog(this.getClass(),"Errore durante l'accesso ad un attributo dell'oggetto da copiare, con reflection.", exception);
+                  }
+              });
+    }
 
     /** Questo metodo si occupa di modificare le informazioni di un attore.
      * Funzionamento di questo metodo: clona l'attore ottenuto dal database,
@@ -102,7 +118,7 @@ public abstract class Attore implements Cloneable {
 
             return Response.ok()
                            .type( MediaType.APPLICATION_JSON )
-                           .entity( attoreDaModificare_conModificheRichiesteDaClient )
+                           .entity( new AttoreProxy(attoreDaModificare_conModificheRichiesteDaClient) )
                            .build();
 
         } else {
