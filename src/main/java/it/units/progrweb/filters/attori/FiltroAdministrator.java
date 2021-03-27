@@ -21,7 +21,7 @@ import java.io.IOException;
  * filtro.
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroAdministrator", asyncSupported = true)
+@WebFilter(filterName = "FiltroAdministrator")
 public class FiltroAdministrator implements Filter {
 
     public void destroy() {}

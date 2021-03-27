@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroCORS", asyncSupported = true)
+@WebFilter(filterName = "FiltroCORS")
 public class FiltroCORS implements Filter {
 
     /** Array di stringhe contenente le origini permesse dalla CORS policy (whitelist).*/

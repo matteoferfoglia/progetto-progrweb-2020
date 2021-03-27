@@ -37,7 +37,7 @@ import static it.units.progrweb.utils.UtilitaGenerale.getUrlPattern;
  *
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroCSRF", asyncSupported = true)
+@WebFilter(filterName = "FiltroCSRF")
 public class FiltroCSRF implements Filter {
 
     /** Blacklist di uri accessibili solo dopo il controllo CSRF.*/

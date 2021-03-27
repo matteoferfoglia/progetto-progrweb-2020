@@ -9,7 +9,7 @@ import java.io.IOException;
  * Filtro per rigettare le richieste non HTTP.
  * @author Matteo Ferfoglia
  */
-@WebFilter(filterName = "FiltroHttpServletRequest", asyncSupported = true)
+@WebFilter(filterName = "FiltroHttpServletRequest")
 public class FiltroHttpServletRequest implements Filter {
     public void destroy() {
     }
