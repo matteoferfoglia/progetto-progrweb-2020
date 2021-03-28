@@ -1,5 +1,6 @@
 package it.units.progrweb.utils.jwt.componenti;
 
+import it.units.progrweb.utils.Base64Helper;
 import it.units.progrweb.utils.GestoreSicurezza;
 
 import java.security.InvalidKeyException;
@@ -22,8 +23,8 @@ public class JwtSignature {
     public JwtSignature(JwtHeader jwtHeader, JwtPayload jwtPayload)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        this.signature = GestoreSicurezza.hmacSha256(jwtHeader.getClaimsSetInFormatJsonBase64UrlEncoded()
-                + "." + jwtPayload.getClaimsSetInFormatJsonBase64UrlEncoded() );
+        this( jwtHeader.getClaimsSetInFormatJsonBase64UrlEncoded(),
+              jwtPayload.getClaimsSetInFormatJsonBase64UrlEncoded() );
 
     }
 
@@ -36,7 +37,7 @@ public class JwtSignature {
     public JwtSignature(String jwtHeaderBase64, String jwtPayloadBase64)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
-        this.signature = GestoreSicurezza.hmacSha256(jwtHeaderBase64 + "." + jwtPayloadBase64 );
+        this.signature = Base64Helper.encodeToBase64UrlEncoded(GestoreSicurezza.hmacSha256(jwtHeaderBase64 + "." + jwtPayloadBase64 ));
 
     }
 
