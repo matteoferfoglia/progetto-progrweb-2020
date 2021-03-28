@@ -93,7 +93,7 @@ public abstract class Attore implements Cloneable {
 
             Attore copia_attore_attualmenteSalvatoInDB = attore_attualmenteSalvatoInDB.clone();
 
-            attore_attualmenteSalvatoInDB.setEmail(attoreDaModificare_conModificheRichiesteDaClient.getUsername());
+            attore_attualmenteSalvatoInDB.setEmail(attoreDaModificare_conModificheRichiesteDaClient.getEmail());
             attore_attualmenteSalvatoInDB.setNominativo(attoreDaModificare_conModificheRichiesteDaClient.getNominativo());
             // attore_attualmenteSalvatoInDB.setUsername(attoreDaModificare_conModificheRichiesteDaClient.getUsername()); // modifica username non permessa (da requisiti)
             if( attoreDaModificare_conModificheRichiesteDaClient instanceof Uploader ) {
