@@ -259,7 +259,7 @@ public abstract class DatabaseHelper {
             } catch (InterruptedException e) {
                 Logger.scriviEccezioneNelLog(DatabaseHelper.class,
                         "Eccezione nel completamento immediato di un'operazione" +
-                                " nel database, eccezione generata dal ritardo imposto nel codice", e);
+                        " nel database, eccezione generata dal ritardo imposto nel codice", e);
             }
         }
 
