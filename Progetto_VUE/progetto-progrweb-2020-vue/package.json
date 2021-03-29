@@ -8,7 +8,7 @@
     "email": "matteoferfoglia@gmail.com"
   },
   "scripts": {
-    "serve": "vue-cli-service test:unit && vue-cli-service serve",
+    "serve": "vue-cli-service serve",
     "build": "npm install && vue-cli-service test:unit && vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
