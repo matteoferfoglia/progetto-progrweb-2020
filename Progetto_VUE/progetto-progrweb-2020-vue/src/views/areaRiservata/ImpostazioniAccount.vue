@@ -56,7 +56,7 @@
                v-model="vecchiaPassword"
                class="form-control"
                maxlength="100"
-               autocomplete="current-password">
+               autocomplete="off">
       </label>
       <label>Nuova password
         <input type="password"
