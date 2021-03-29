@@ -1,13 +1,27 @@
 <template>
   <h2 class="card-header card-title">Impostazioni account</h2>
 
+  <article class="card">
+    <h3>Informazioni personali</h3>
+    <FormCampiAttore :flag_mostrareLabelCampiInput="true"
+                     :isQuestoFormRiferitoAConsumer="isConsumer()"
+                     :username_readOnly="true"
+                     :tuttiICampi_readOnly="true"
+                     :username="username"
+                     :nominativo="nominativo"
+                     :email="email">
+    </FormCampiAttore>
+  </article>
+
   <FormConCsrfToken
       :valoreQualsiasiPerAggiornareIComponenteSeModificato="valoreQualsiasiPerAggiornareIlComponenteSeModificato"
       :id="idForm_modificaInformazioniAttore"
-      class="card-body"
+      class="card"
       @change="isFormModificato = true"
       @submit="modificaInformazioni"
       @csrf-token-ricevuto="aggiornaCsrfToken($event)">
+
+    <h3>Modifica informazioni personali</h3>
 
     <p>
       Da questa pagina è possibile modificare le informazioni personali.
@@ -81,11 +95,17 @@
 
 <script>
 import FormConCsrfToken from "../../components/layout/FormConCsrfToken";
-import {richiestaPostConFile} from "../../utils/http";
-import {setTokenAutenticazione} from "../../utils/autenticazione";
+import {richiestaPostConFile} from "@/utils/http";
+import {
+  getEmailAttoreAttualmenteAutenticato,
+  getNomeAttoreAttualmenteAutenticato,
+  getUsernameAttoreAttualmenteAutenticato,
+  setTokenAutenticazione
+} from "@/utils/autenticazione";
+import FormCampiAttore from "@/components/layout/FormCampiAttore";
 export default {
   name: "ImpostazioniAccount",
-  components: {FormConCsrfToken},
+  components: {FormCampiAttore, FormConCsrfToken},
   emits: [
 
     /** Evento generato se si riceve un nuovo token dal server.
@@ -111,6 +131,14 @@ export default {
 
       /** Valore dell'attributo "id" del form per il caricamento dei documenti.*/
       idForm_modificaInformazioniAttore: "modificaInformazioniAttore",
+
+      /** Email dell'utente attualmente autenticato */
+      emailUtenteAutenticato: "",
+
+      // Dati dell'utente (inizializzati in created)
+      nominativo: "",
+      username: "",
+      email: "",
 
       // Dati per i campi di input
       nuovoNominativo       : "",
@@ -138,7 +166,19 @@ export default {
 
     }
   },
+  created() {
+
+    this.setupDatiComponente();
+
+  },
   methods: {
+
+    /** Setup del componente: carica i dati da mostrare. */
+    setupDatiComponente() {
+      this.nominativo = getNomeAttoreAttualmenteAutenticato();
+      this.email      = getEmailAttoreAttualmenteAutenticato();
+      this.username   = getUsernameAttoreAttualmenteAutenticato();
+    },
 
     /** Restituisce true se è un uploader, false altrimenti.*/
     isUploader() {
@@ -218,7 +258,8 @@ export default {
               await richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData)
                   .then(nuovoTokenAutenticazione => {  // Nella risposta c'è il nuovo token di autenticazione
                     setTokenAutenticazione(nuovoTokenAutenticazione);
-                    this.valoreQualsiasiPerAggiornareIlComponenteSeModificato = 1 - this.valoreQualsiasiPerAggiornareIlComponenteSeModificato;  // serve per aggiornare il componente
+                    this.valoreQualsiasiPerAggiornareIlComponenteSeModificato = 1 - this.valoreQualsiasiPerAggiornareIlComponenteSeModificato;  // vedere documentazione
+                    this.setupDatiComponente();
                     if (nominativoModificato) {  // truthy se è stato modificato
                       // Avvisa se è stato modificato il nominativo
                       this.$emit('nominativo-attore-modificato', nominativoModificato);
