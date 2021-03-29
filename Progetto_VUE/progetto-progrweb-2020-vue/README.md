@@ -17,7 +17,7 @@ invece, con questo approccio, sono centralizzati nei file
 Nel file *.env* vi sono le variabili d'ambiente per
 qualsiasi modalità (production/development). Potrebbe
 essere necessario modificare, ad esempio, gli
-url dei servizi resi disponibili dal server.
+URL dei servizi resi disponibili dal server.
 
 ### .env.development
 Il file *.env.development* contiene le variabili
@@ -27,25 +27,24 @@ d'ambiente per la modalità di sviluppo.
 Il file *.env.development* contiene le variabili
 d'ambiente per la modalità di produzione.
 
-## Project setup
-```
-npm install
-```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Comandi npm 
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### Setup del progetto ed esecuzione
+Per installare le dipendenze del progetto, utilizzare
+il comando `npm install`.
 
-### Lints and fixes files
-```
-npm run lint
-```
+### Compilazione ed Compiles and hot-reloads for development
+Il comando `npm run serve` compila i file del progetto e
+permette l'*hot-reload* dell'applicazione.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Compilazione e minificazione dei file per la fase di produzione
+Il comando `npm run build` si occupa di installare tutte le
+dipendenze richieste dal progetto, compilare i file, eseguire
+i test e produrre i file minificati da usare nella fase di
+produzione (*production*). Il risultato finale viene salvato
+nella cartella *dist*.
+
+### Validazione *Lints*
+Il comando `npm run lint` permette di validare i file del progetto
+usando *Lints*.
