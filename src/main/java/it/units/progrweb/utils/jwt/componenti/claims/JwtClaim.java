@@ -10,7 +10,7 @@ public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
     /** Nome del claims corrispondente all' "Expiration Time".*/
     public static final String JWT_EXPIRATION_TIME_CLAIM_NAME = "exp";
 
-    /** Nome del claim corrispondente al "Subject".*/
+    /** Nome del claim corrispondente al "Subject" (identificativo attore).*/
     public static final String JWT_SUBJECT_CLAIM_NAME = "sub";
 
     /** Nome del claim corrispondente al nome del subject.*/
