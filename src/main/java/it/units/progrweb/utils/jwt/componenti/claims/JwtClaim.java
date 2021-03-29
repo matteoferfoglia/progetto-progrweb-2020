@@ -19,6 +19,9 @@ public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
     /** Nome del claim corrispondente allo username del subject.*/
     public static final String JWT_USERNAME_SUBJECT_CLAIM_NAME = "Subject username";
 
+    /** Nome del claim corrispondente all'email del subject.*/
+    public static final String JWT_EMAIL_SUBJECT_CLAIM_NAME = "Subject email";
+
     /** Nome del claim corrispondente al tipo dell'{@link Attore}
      * con cui il possessore del token si sta qualificando.*/
     public static final String JWT_TIPO_ATTORE_CLAIM_NAME = "Tipo attore";
@@ -55,6 +58,9 @@ public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
 
         /**Vedere {@link JwtClaim#JWT_USERNAME_SUBJECT_CLAIM_NAME}. */
         USERNAME_ATTORE           (JWT_USERNAME_SUBJECT_CLAIM_NAME),
+
+        /**Vedere {@link JwtClaim#JWT_EMAIL_SUBJECT_CLAIM_NAME}. */
+        EMAIL_ATTORE           (JWT_EMAIL_SUBJECT_CLAIM_NAME),
 
         /**Vedere {@link JwtClaim#JWT_TIPO_ATTORE_CLAIM_NAME}. */
         TIPO_ATTORE               (JWT_TIPO_ATTORE_CLAIM_NAME),

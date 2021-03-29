@@ -288,6 +288,7 @@ public class Autenticazione {
         // Aggiunge gli attributi dell'attore
         jwtPayload.aggiungiClaim( new JwtNomeSubjectClaim(attore.getNominativo()) );
         jwtPayload.aggiungiClaim( new JwtUsernameSubjectClaim(attore.getUsername()) );
+        jwtPayload.aggiungiClaim( new JwtEmailSubjectClaim(attore.getEmail()) );
         jwtPayload.aggiungiClaim( new JwtTipoAttoreClaim( Attore.TipoAttore.valueOf(attore.getTipoAttore()) ) );
 
         return new JwtToken(jwtPayload).generaTokenJsonCodificatoBase64UrlEncoded();

@@ -158,6 +158,16 @@ export const getNomeAttoreAttualmenteAutenticato = () => {
     return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_NOMINATIVO_ATTORE );
 }
 
+/** Restituisce lo username dell'attore attualmente autenticato.*/
+export const getUsernameAttoreAttualmenteAutenticato = () => {
+    return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_USERNAME_ATTORE );
+}
+
+/** Restituisce l'email dell'attore attualmente autenticato.*/
+export const getEmailAttoreAttualmenteAutenticato = () => {
+    return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_EMAIL_ATTORE );
+}
+
 /** Restituisce l'identificativo dell'attore attualmente autenticato.*/
 export const getIdentificativoAttoreAttualmenteAutenticato = () => {
     return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_IDENTIFICATIVO_ATTORE );
