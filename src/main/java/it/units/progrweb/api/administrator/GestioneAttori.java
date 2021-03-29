@@ -65,7 +65,7 @@ public class GestioneAttori {
 
     /** Modifica di un {@link Attore} di quelli presenti nel sistema. */
     @Path("/modificaAttore")
-    @POST  // TODO : valutare se sostituire con metodo PUT (perché in realtà è idempotente)
+    @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaAttore(@Context HttpServletRequest httpServletRequest,
                                    @FormDataParam("identificativoAttore") Long identificativoAttore,

@@ -156,13 +156,7 @@ public class GestioneConsumer {
     /** Modifica di un {@link Consumer} dalla lista di quelli serviti
      * dall'Uploader che ne ha fatto richiesta. */
     @Path("/modificaConsumer")
-    @POST   // non si è usato PUT perché l'url identifica il servizio che gestisce la modifica della risorsa
-            // Fonte (https://tools.ietf.org/html/rfc7231#section-4.3.3):
-            // The target resource in a POST request is intended to handle the
-            //   enclosed representation according to the resource's own semantics,
-            //   whereas the enclosed representation in a PUT request is defined as
-            //   replacing the state of the target resource.
-        // TODO : valutare se sostituire con metodo PUT
+    @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaConsumer(@FormDataParam("username")   String nuovoUsername,
                                      @FormDataParam("nominativo") String nuovoNominativo,
