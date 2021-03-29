@@ -57,11 +57,8 @@ export default {
               .then( async isUtenteAutenticato => {
 
                 if (isUtenteAutenticato) {
-                  await getTipoAttoreAttualmenteAutenticato()
-                          .then(tipo => this.tipoAttoreAutenticato = tipo )
-                          .catch(console.error);
-
-                  this.nomeAttoreAutenticato =  getNomeAttoreAttualmenteAutenticato();
+                  this.tipoAttoreAutenticato = getTipoAttoreAttualmenteAutenticato();
+                  this.nomeAttoreAutenticato = getNomeAttoreAttualmenteAutenticato();
                 }
 
                 return isUtenteAutenticato;

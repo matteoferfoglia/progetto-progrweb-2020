@@ -121,36 +121,9 @@ const getValoreClaimDaTokenJwtAutenticazione = nomeClaimJwt => {
 
 };
 
-
-/** Ricerca il claim JWT il cui nome è specificato come parametro nel
- * token JWT di autenticazione: se lo trova, allora restituisce una
- * Promise risolta contenente il valore corrispondente a tale claim,
- * altrimenti effettua una richiesta GET all'inidirizzo specificato
- * come secondo parametro e restituisce la Promise risultante da tale
- * richiesta.
- * L'idea di questo metodo è: se il claim che si sta cercando
- * è presente nel token JWT di autenticazione, allora viene restituito
- * (in una Promise risolta) altrimenti lo si chiede al server. */
-const getValoreDaTokenJwtORichiediloAlServer = async ( nomeClaimJwt, urlRichiestaServerSeClaimNonPresente) => {
-
-    const valoreClaimDaTokenJwtAutenticazione = getValoreClaimDaTokenJwtAutenticazione(nomeClaimJwt);
-
-    if ( ! valoreClaimDaTokenJwtAutenticazione ) {  // se undefined
-        return richiestaGet(urlRichiestaServerSeClaimNonPresente)   // restituisce una Promise
-                .catch(rispostaErrore => {
-                    console.error("Errore durante il caricamento delle informazioni: " + rispostaErrore);
-                    return Promise.reject(rispostaErrore);
-                });
-    } else {
-        return Promise.resolve( valoreClaimDaTokenJwtAutenticazione );
-    }
-}
-
-
 /** Restituisce il tipo dell'attore attualmente autenticato in una Promise.*/
-export const getTipoAttoreAttualmenteAutenticato = async () => {
-    return getValoreDaTokenJwtORichiediloAlServer( process.env.VUE_APP_NOME_CLAIM_JWT_TIPO_ATTORE,
-                                                   process.env.VUE_APP_URL_GET_TIPO_UTENTE_AUTENTICATO );
+export const getTipoAttoreAttualmenteAutenticato = () => {
+    return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_TIPO_ATTORE );
 }
 
 /** Restituisce il nome dell'attore attualmente autenticato.*/
