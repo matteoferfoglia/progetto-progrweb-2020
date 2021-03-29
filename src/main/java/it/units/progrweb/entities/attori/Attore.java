@@ -166,6 +166,7 @@ public abstract class Attore implements Cloneable, Principal {
 
     /** Restituisce il tipo di un attore.*/
     public String getTipoAttore() {
+        // Per favorire la serializzazione (a cura di JAX-RS) viene restituito un tipo primitivo anziché un enum
         return tipoAttore == null ? "" : tipoAttore.name();
     }
 
