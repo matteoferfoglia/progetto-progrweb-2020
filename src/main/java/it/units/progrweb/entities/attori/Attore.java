@@ -16,6 +16,7 @@ import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
+import javax.security.auth.Subject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  * @author Matteo Ferfoglia
  */
 @Entity
-public abstract class Attore implements Cloneable {
+public abstract class Attore implements Cloneable, Principal {
 
     /** Identificativo di un utente.*/
     @Id
@@ -394,6 +396,18 @@ public abstract class Attore implements Cloneable {
             super( messaggioErrore );
         }
 
+    }
+
+    /** Restituisce il nominativo dell'attore. */
+    @Override   // definita in Principal
+    public String getName() {
+        return getNominativo();
+    }
+
+    /** Restituisce sempre false. */
+    @Override   // definita in Principal
+    public boolean implies(Subject subject) {
+        return false;
     }
 }
 
