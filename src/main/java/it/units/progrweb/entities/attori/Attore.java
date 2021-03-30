@@ -348,7 +348,7 @@ public abstract class Attore implements Cloneable, Principal {
         }
     }
 
-    /** Elimina l'attore corrispondente all'identificativo dato nel parametro.
+    /** Elimina dal database l'attore corrispondente all'identificativo dato nel parametro.
      * @return true se l'eliminazione viene completata, false se si verificano errori.*/
     public static boolean eliminaAttoreDaIdentificativo(Long identificativoAttore) {
         try {
@@ -360,8 +360,8 @@ public abstract class Attore implements Cloneable, Principal {
         }
     }
 
-    /** Restituisce l'attore corrispondente allo username fornito,
-     * oppure null se non trovato.*/
+    /** Ricerca nel database e restituisce l'attore corrispondente
+     * allo username fornito, oppure null se non trovato.*/
     public static Attore getAttoreDaUsername(String username) {
 
         String nomeAttributoQuery = "username";
@@ -382,8 +382,8 @@ public abstract class Attore implements Cloneable, Principal {
 
     }
 
-    /** Restituisce la lista degli identificativi di tutti gli Attori della
-     * classe data nel parametro registrati nel sistema.*/
+    /** Ricerca nel database e restituisce la lista degli identificativi di
+     * tutti gli Attori della classe data nel parametro registrati nel sistema.*/
     public static List<Long> getListaIdentificativiTuttiGliAttoriNelSistema( Class<?> classeAttore ) {
 
         return DatabaseHelper.listaEntitaNelDatabase(classeAttore)
