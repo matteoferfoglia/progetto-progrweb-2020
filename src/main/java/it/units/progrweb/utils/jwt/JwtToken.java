@@ -25,7 +25,7 @@ public class JwtToken {
     private final static short NUMERO_COMPONENTI_JWT = 3;
 
     /**
-     * Crea una rappresentazione come oggetto di un token JWT.
+     * Crea un token JWT a partire dal suo payload.
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
