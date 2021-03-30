@@ -1,17 +1,14 @@
 package it.units.progrweb.api;
 
 import it.units.progrweb.api.administrator.GestioneAttori;
-import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.attori.uploader.Uploader;
-import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.GeneratoreTokenCasuali;
 import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.mail.MailSender;
 
 import javax.mail.MessagingException;
 import javax.validation.constraints.NotNull;
@@ -101,17 +98,8 @@ public class CreazioneAttore {
                     if( attoreDaCreare == null )
                         throw new NullPointerException("L'attore da creare non dovrebbe mai essere null. Questo non dovrebbe mai succedere.");
 
-                    Long identificativoNuovoAttore = (Long) DatabaseHelper.salvaEntita(attoreDaCreare);
+                    Long identificativoNuovoAttore = Attore.salvaNuovoAttoreInDatabase(attoreDaCreare, password);
                     attoreDaCreare.setIdentificativoAttore(identificativoNuovoAttore);
-                    AuthenticationDatabaseEntry authenticationDatabaseEntry =
-                            new AuthenticationDatabaseEntry(username, password);
-                    DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
-
-                    MailSender mailSender = new MailSender();
-                    mailSender.inviaEmail(email, nominativo, "Creazione nuovo account",
-                            "E' stato creato un nuovo account nella piattaforma." +
-                                    "Sarà possibile accedervi con le seguenti credenziali: username:" + username +
-                                    ", password:" + password + ".");
 
                     return attoreDaCreare;
 
