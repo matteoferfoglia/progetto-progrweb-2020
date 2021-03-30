@@ -1,5 +1,6 @@
 package it.units.progrweb.utils.jwt;
 
+import it.units.progrweb.entities.AuthenticationTokenInvalido;
 import it.units.progrweb.utils.GestoreSicurezza;
 import it.units.progrweb.utils.jwt.componenti.*;
 import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
@@ -69,6 +70,10 @@ public class JwtToken {
 
     }
 
+    public JwtPayload getPayload() {
+        return payload;
+    }
+
     /**
      * Restituisce il valore di un claims nel token a partire dal nome del claims (parametro).
      * Tale claims viene cercato sia nell'header sia nel payload.
@@ -107,7 +112,9 @@ public class JwtToken {
         boolean tokenScaduto = jwtToken.isTokenScaduto();
         boolean signatureValida = isSignatureValida(tokenJwtBas64UrlEncoded);
 
-        return !tokenScaduto && signatureValida;
+        boolean tokenInvalidato = AuthenticationTokenInvalido.isTokenInvalido( tokenJwtBas64UrlEncoded );
+
+        return !tokenScaduto && signatureValida && !tokenInvalidato;
 
     }
 
@@ -122,7 +129,7 @@ public class JwtToken {
 
         try{
             return new JwtExpirationTimeClaim(payload.getClaimByName(JwtClaim.NomeClaim.EXP))
-                                    .isScaduto();
+                                                     .isScaduto();
         } catch(NoSuchElementException e) {
             // Se qui, non c'è Expiration Time nel token, quindi non è scaduto
             return false;

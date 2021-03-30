@@ -31,7 +31,8 @@ public class Autenticazione {
 
     /** Tempo in secondi durante il quale ad un attore che si è autenticato
      * non verranno chieste nuovamente le credenziali. */
-    private static final int TIMEOUT_AUTENTICAZIONE_IN_SECONDI = 1800;
+//    private static final int TIMEOUT_AUTENTICAZIONE_IN_SECONDI = 1800;
+    private static final int TIMEOUT_AUTENTICAZIONE_IN_SECONDI = 60;  // TODO : eliminare questa riga (usata solo per test) e lasciare scommentata la precedente (possibilmente metterla variabile d'ambiente)
 
     /** Lunghezza del token di autenticazione di un client.*/
     private static final int LUNGHEZZA_TOKEN_AUTENTICAZIONE = 128;

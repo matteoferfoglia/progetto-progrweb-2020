@@ -17,11 +17,11 @@
     <url-pattern>/api/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>FiltroCSRF</filter-name>
+    <filter-name>FiltroObjectify</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>FiltroObjectify</filter-name>
+    <filter-name>FiltroCSRF</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>

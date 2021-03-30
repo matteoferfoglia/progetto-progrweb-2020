@@ -5,6 +5,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
+import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -17,7 +18,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import static com.googlecode.objectify.ObjectifyService.ofy;
+import static it.units.progrweb.entities.AuthenticationTokenInvalido.EliminatoreTokenInvalidi.*;
 
 /**
  * Starter del database per indicare quali classi
@@ -42,6 +43,7 @@ public class StarterDatabase implements ServletContextListener {
             "it.units.progrweb.entities.attori.consumer.ConsumerStorage",
             "it.units.progrweb.entities.RelazioneUploaderConsumer",
             "it.units.progrweb.entities.AuthenticationDatabaseEntry",
+            "it.units.progrweb.entities.AuthenticationTokenInvalido",
             "it.units.progrweb.entities.file.File",
             "it.units.progrweb.entities.file.FileStorage"
     };
@@ -67,16 +69,16 @@ public class StarterDatabase implements ServletContextListener {
     }
 
     public void contextInitialized(ServletContextEvent sce) {
+
         registraClassiDatabase();
+        avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI);
 
         // Inizializzazione del database SOLO in ambiente di sviluppo
         // Fonte: https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server#detecting_the_application_runtime_environment
         if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
             // Local development server
 
-            // Caricamento di alcuni attori di prova
-
-
+            // Caricamento di alcune entità di prova
 
             try {
 
@@ -121,8 +123,8 @@ public class StarterDatabase implements ServletContextListener {
                 ObjectifyService.run(new VoidWork() {
                     // Fonte(usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
                     public void vrun() {
-                        Long idConsumer = ofy().save().entity(consumerTest).now().getId();
-                        Long idUploader = ofy().save().entity(uploaderTest).now().getId();
+                        Long idConsumer = (Long)DatabaseHelper.salvaEntita(consumerTest);
+                        Long idUploader = (Long)DatabaseHelper.salvaEntita(uploaderTest);
 
                         try {
                             // Creazione relazione consumer-uploader
@@ -132,9 +134,8 @@ public class StarterDatabase implements ServletContextListener {
                             costruttoreRelazione.setAccessible(true);
                             RelazioneUploaderConsumer relazione = costruttoreRelazione.newInstance(idConsumer, idUploader, null);
 
-                            ofy().save()
-                                    .entities(administratorTest, relazione, authConsumerTest, authUploaderTest, authAdministratorTest)
-                                    .now();
+                            Arrays.stream(new Object[]{administratorTest, relazione, authConsumerTest, authUploaderTest, authAdministratorTest})
+                                .forEach( DatabaseHelper::salvaEntita );
 
                         } catch (InstantiationException|IllegalAccessException|
                                 InvocationTargetException|NoSuchMethodException e) {
@@ -153,8 +154,14 @@ public class StarterDatabase implements ServletContextListener {
         } /* else {
             // Production
             // which is: SystemProperty.Environment.Value.Production
+            // TODO : all'avvio della piattaforma per la prima volta deve esserci un solo utente amministratore
+            // TODO    (attenzione che questo viene eseguito ogni volta che viene avviata un'istanza del servlet container,
+            // TODO      quindi, prima di salvare nel db, verifica che non sia già presente!!!!)
+
         } */
     }
 
-    public void contextDestroyed(ServletContextEvent sce) {}
+    public void contextDestroyed(ServletContextEvent sce) {
+        rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi();
+    }
 }

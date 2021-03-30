@@ -1,6 +1,7 @@
 package it.units.progrweb.api.autenticazioneERegistrazione;
 
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.AuthenticationTokenInvalido;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.filters.FiltroAutenticazione;
 import it.units.progrweb.persistence.NotFoundException;
@@ -39,7 +40,9 @@ public class LoginLogout {
     @Path("/logout")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response logout() {
+    public Response logout(@Context HttpServletRequest httpServletRequest) {
+        String tokenAutenticazione = Autenticazione.getTokenAutenticazioneBearer(httpServletRequest);
+        AuthenticationTokenInvalido.aggiungiATokenJwtInvalidi(tokenAutenticazione);
         return Autenticazione.creaResponseLogout();
     }
 
