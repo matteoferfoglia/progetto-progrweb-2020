@@ -18,7 +18,7 @@ public class JwtExpirationTimeClaim extends JwtClaim<Long> {
 
     /**
      * Crea un Expiration Time claims la cui scadenza è impostata
-     * tra il numero di secondi specificato come parametro.
+     * dal numero di secondi specificato come parametro.
      * @param scadenzaInSecondiDaAdesso Numero di secondi dopo i quali
      *                                  il token a cui questo claims si riferisce
      *                                  verrà considerato scaduto.
