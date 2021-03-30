@@ -30,8 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * esito positivo).
  *
  * Periodicamente (grazie a {@link ScheduledExecutorService},
- * i token scaduti vengono rimossi dal database
- * (<a href="https://www.roseindia.net/servlets/ServletContextListenerTimer.shtml">Fonte</a>).
+ * i token scaduti vengono rimossi dal database.
  *
  * @author Matteo Ferfoglia
  */
@@ -147,8 +146,7 @@ public class AuthenticationTokenInvalido {
 
     /** Classe che gestisce l'elimiminazione di token scaduti, che quindi verrebbero
      * in ogni caso rifiutati dal server, indipendentemente dalla loro presenza in
-     * questo database
-     * (<a href="https://www.roseindia.net/servlets/ServletContextListenerTimer.shtml">Fonte</a>).
+     * questo database.
      */
     public static class EliminatoreTokenInvalidi {
 
@@ -162,7 +160,7 @@ public class AuthenticationTokenInvalido {
         /** Metodo invocabile dallo starter del servlet container e da eseguire periodicamente
          * (ogni quanti secondi è specificato dal parametro) per cercare nel database ed eliminare
          * da esso i token non più validi
-         * (<a href="https://www.roseindia.net/servlets/ServletContextListenerTimer.shtml">Fonte</a>).
+         * (<a href="https://stackoverflow.com/a/15979300">Fonte</a>).
          *
          * @param ogniQuantiSecondiEseguire Tempo in secondi ogni quanto eseguire questo metodo.*/
         public static void avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(Long ogniQuantiSecondiEseguire, ServletContext servletContext) {
@@ -176,7 +174,6 @@ public class AuthenticationTokenInvalido {
                     // test se il nome dell'attributo esiste nella classe (altrimenti genera NoSuchFieldException)
                     AuthenticationTokenInvalido.class.getDeclaredField(nomeAttributoContenenteScadenzaToken);
 
-                    // Fonte (adattato da): https://stackoverflow.com/a/15979300
                     Thread thread = ThreadManager.createBackgroundThread(new Runnable() {
 
                         @Override
