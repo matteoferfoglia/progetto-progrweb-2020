@@ -4,6 +4,7 @@ Questo package contiene tutte le classi che saranno salvate come
 entità nel database.
 
 ## Utilizzo di _Objectify_
+Tratto dalla guida di _Objectify_.
 
 >Observe:
 >
