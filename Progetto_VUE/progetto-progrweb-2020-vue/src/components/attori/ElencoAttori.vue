@@ -251,10 +251,33 @@ export default {
 
     /** Aggiunge il nuovo attore, appena aggiunto dall'utente, all'elenco mostrato.*/
     aggiungiNuovoAttoreAllElenco( nuovoAttore ) {
-      this.mappa_idAttore_proprietaAttore
-          .set( nuovoAttore[process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD],
-                nuovoAttore );
-      this.ordinaElencoAttori();
+
+      let isNuovoAttoreDaAggiungereAllElenco = true;  // true di default, ma Administrator vede elenchi separati:
+                                                      // se è stato aggiunto un Uploader, non deve essere visinbile
+                                                      // nell'elenco degli Administrator e viceversa
+
+      if( this.isAdministratorAttualmenteAutenticato() ) {
+
+        if( this.tipiAttoreCuiQuestoElencoSiRiferisce === process.env.VUE_APP_TIPO_UTENTE__UPLOADER ) {
+          // SE qui, allora attualmente si sta mostrando la lista degli Uploader
+          isNuovoAttoreDaAggiungereAllElenco =
+              nuovoAttore[process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME] ===
+                process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
+
+        } else if( this.tipiAttoreCuiQuestoElencoSiRiferisce === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
+          isNuovoAttoreDaAggiungereAllElenco =
+              nuovoAttore[process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME] ===
+                process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
+        }
+
+      }
+
+      if( isNuovoAttoreDaAggiungereAllElenco ) {
+        this.mappa_idAttore_proprietaAttore
+            .set(nuovoAttore[process.env.VUE_APP_FORM_IDENTIFICATIVO_ATTORE_INPUT_FIELD],
+                nuovoAttore);
+        this.ordinaElencoAttori();
+      }
     },
 
     /** Ordina per nominativo l'elenco degli attori. Le modifiche vengono
