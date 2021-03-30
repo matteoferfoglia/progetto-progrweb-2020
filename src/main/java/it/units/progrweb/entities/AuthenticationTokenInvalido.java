@@ -51,7 +51,7 @@ public class AuthenticationTokenInvalido {
      * database e che quando si richiede la verifica di validità di un token
      * risponde sempre affermativamente.
      */
-    public final static boolean USARE_CLASSE_TOKEN_INVALIDI = true; // TODO : mettere false (molto oneroso in termini di accessi al db), possibilmente spostarlo in Environment Variables
+    public final static boolean USARE_CLASSE_TOKEN_INVALIDI = false;
 
 
     /** Id di un token invalido, assegnato dal DBMS. */
