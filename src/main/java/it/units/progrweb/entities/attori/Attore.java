@@ -352,8 +352,14 @@ public abstract class Attore implements Cloneable, Principal {
      * @return true se l'eliminazione viene completata, false se si verificano errori.*/
     public static boolean eliminaAttoreDaIdentificativo(Long identificativoAttore) {
         try {
+            Attore attoreDaEliminare = (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
+
             RelazioneUploaderConsumer.eliminaUploader(identificativoAttore);    // se non è un Uploader non fa nulla
             DatabaseHelper.cancellaAdessoEntitaById(identificativoAttore, Attore.class);
+
+            if( attoreDaEliminare != null )
+                AuthenticationDatabaseEntry.eliminaEntry( attoreDaEliminare.getUsername() );
+
             return true;
         } catch (Exception e) {
             return false;

@@ -86,6 +86,11 @@ public abstract class DatabaseHelper {
         database.delete().type(classeEntita).id(idEntitaDaEliminare);
     }
 
+    /** Elimina subito l'entità passata come parametro. Azione sincrona.*/
+    public static<Entita> void cancellaAdessoEntita(Entita entitaDaEliminare) {
+        database.delete().entity(entitaDaEliminare).now();
+    }
+
     /** Elimina l'entità corrispondente all'identificativo specificato
      * come parametro. Azione sincrona (attende l'eliminazione e genera
      * un'eccezione se causata dalla computazione richiesta).*/

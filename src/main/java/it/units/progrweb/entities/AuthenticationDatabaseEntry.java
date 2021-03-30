@@ -128,6 +128,16 @@ public class AuthenticationDatabaseEntry {
 
     public AuthenticationDatabaseEntry() {}
 
+    /** Se lo username fornito come parametro esiste nell'AuthDB, questo
+     * metodo elimina l'entry corrispondente. */
+    public static void eliminaEntry(String username) {
+        try {
+            DatabaseHelper.cancellaAdessoEntita(AuthenticationDatabaseEntry.cercaAttoreInAuthDb(username));
+        } catch (NotFoundException ignored) {
+            // entry già eliminata o comunque non presente
+        }
+    }
+
     /** Restituisce true se questo account è già stato verificato, false altrimenti.*/
     private boolean isAccountVerificato() {
         return tokenVerificaAccount==null;
@@ -282,7 +292,7 @@ public class AuthenticationDatabaseEntry {
      * altrimenti lancia un'eccezione.
      * @throws NotFoundException se non trova nell'AuthDB lo username  cercato.
      */
-    private static AuthenticationDatabaseEntry cercaAttoreInAuthDb(String username )
+    public static AuthenticationDatabaseEntry cercaAttoreInAuthDb(String username )
             throws NotFoundException {
 
         AuthenticationDatabaseEntry authenticationDatabaseEntry =

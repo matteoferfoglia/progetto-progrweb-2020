@@ -7,6 +7,7 @@ import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.persistence.DatabaseHelper;
+import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
 
@@ -172,12 +173,24 @@ public class StarterDatabase implements ServletContextListener {
                 if( Attore.getAttoreDaUsername( administrator.getUsername() ) == null  ) {
 
                     DatabaseHelper.salvaEntita( administrator );
-                    DatabaseHelper.salvaEntita( authAdministrator );    // TODO : controllare se username è già in AuthDB: in tal caso: eliminare l'entry di AuthDB e riscrivere questa
+
+                    // Controllo se entry esiste già in AuthDB
+                    try {
+                        AuthenticationDatabaseEntry authenticationDatabaseEntry =
+                                AuthenticationDatabaseEntry.cercaAttoreInAuthDb(administrator.getUsername());
+
+                        // Se qui, significa che l'entry esisteva già in AuthDB, quindi lo si rimuove e sovrascrive
+                        //  (incoerente che l'attore non era salvato ma la sua password sì)
+                        AuthenticationDatabaseEntry.eliminaEntry( administrator.getUsername() );
+
+                    } catch (NotFoundException ignored) {}
+
+                    DatabaseHelper.salvaEntita( authAdministrator );
 
                 } // altrimenti: attore già in DB, non serve reinserirlo
 
 
-            } catch ( ClassNotFoundException | NoSuchMethodException | InstantiationException |
+            }catch ( ClassNotFoundException | NoSuchMethodException | InstantiationException |
                       IllegalAccessException | InvocationTargetException | InvalidKeyException |
                       NoSuchAlgorithmException e ) {
 
