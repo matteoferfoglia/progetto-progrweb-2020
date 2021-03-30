@@ -54,7 +54,7 @@ public abstract class Consumer extends Attore {
     }
 
     /** Crea e restituisce un {@link Consumer}.*/
-    public static Consumer creaConsumer( String username, String nominativo, String email ) {
+    public static Consumer creaAttore(String username, String nominativo, String email ) {
         return new ConsumerStorage( username, nominativo, email );
     }
 

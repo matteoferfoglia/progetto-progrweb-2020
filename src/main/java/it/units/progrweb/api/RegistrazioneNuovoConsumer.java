@@ -34,7 +34,7 @@ public class RegistrazioneNuovoConsumer {
 
             if( ! Attore.isAttoreGiaRegistrato( codiceFiscale ) ) {
 
-                Consumer nuovoConsumer = Consumer.creaConsumer( codiceFiscale, nominativo, email );
+                Consumer nuovoConsumer = Consumer.creaAttore( codiceFiscale, nominativo, email );
 
                 boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password );
                 if( registrazioneConclusaConSuccesso )

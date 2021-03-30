@@ -92,7 +92,7 @@ public class CreazioneAttore {
                     } else if ( tipoAttoreRichiedenteCreazione.equals(Attore.TipoAttore.Uploader) &&
                             tipoAttoreDaCreare.equals(Attore.TipoAttore.Consumer) ) {
 
-                        attoreDaCreare = Consumer.creaConsumer(username, nominativo, email);
+                        attoreDaCreare = Consumer.creaAttore(username, nominativo, email);
 
                     } else {
                         throw new NotAuthorizedException("Autorizzazione alla creazione di attori negata.");
