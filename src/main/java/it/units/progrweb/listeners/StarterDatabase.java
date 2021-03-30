@@ -71,7 +71,7 @@ public class StarterDatabase implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
 
         registraClassiDatabase();
-        avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI);
+        avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI, sce.getServletContext());
 
         // Inizializzazione del database SOLO in ambiente di sviluppo
         // Fonte: https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server#detecting_the_application_runtime_environment
@@ -162,6 +162,6 @@ public class StarterDatabase implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
-        rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi();
+        rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi(sce.getServletContext());
     }
 }

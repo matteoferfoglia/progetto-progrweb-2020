@@ -1,7 +1,6 @@
 package it.units.progrweb.entities;
 
-import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.VoidWork;
+import com.google.appengine.api.ThreadManager;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -12,11 +11,8 @@ import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.claims.JwtClaim;
 import it.units.progrweb.utils.jwt.componenti.claims.JwtExpirationTimeClaim;
 
-import java.util.concurrent.Executors;
+import javax.servlet.ServletContext;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Classe rappresentante un token di autenticazione invalido.
@@ -35,7 +31,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  *
  * Periodicamente (grazie a {@link ScheduledExecutorService},
  * i token scaduti vengono rimossi dal database
- * (<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html">Fonte</a>).
+ * (<a href="https://www.roseindia.net/servlets/ServletContextListenerTimer.shtml">Fonte</a>).
  *
  * @author Matteo Ferfoglia
  */
@@ -152,101 +148,101 @@ public class AuthenticationTokenInvalido {
     /** Classe che gestisce l'elimiminazione di token scaduti, che quindi verrebbero
      * in ogni caso rifiutati dal server, indipendentemente dalla loro presenza in
      * questo database
-     * (<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html">Fonte</a>).
+     * (<a href="https://www.roseindia.net/servlets/ServletContextListenerTimer.shtml">Fonte</a>).
      */
     public static class EliminatoreTokenInvalidi {
 
         /** Specifica ogni quanti secondi deve essere eseguito il task che si occupa di
          * eliminare i token invalidi dal database associato a questa classe. */
-//        public static final long INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI = 3600;
-        public static final long INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI = 10;   // TODO : rimuovere quest riga e lasciare scommentata la precdente
+        public static final long INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI = 3600;
 
-        /** Scheduler per gestire la rimozione periodica dei token invalidi dal database. */
-        private static final ScheduledExecutorService scheduler =
-                Executors.newScheduledThreadPool(1);    // newScheduledThreadPool() creates a thread pool that can schedule commands to run after a given delay, or to execute periodically, Fonte: https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executors.html#newScheduledThreadPool-int-
-
-        /** Task da eseguire periodicamente per eliminare i token scaduti. */
-        private static ScheduledFuture<?> gestoreEliminatoreTokenInvalidi;
+        /** Nome del {@link ScheduledExecutorService} usaot per gestire la rimozione periodica dei token scaduti dal database. */
+        private static final String NOME_VARIABILE_THREAD_ELIMINATORE_TOKEN_SCADUTI = "timerEliminatoreTokenScaduti";
 
         /** Metodo invocabile dallo starter del servlet container e da eseguire periodicamente
          * (ogni quanti secondi è specificato dal parametro) per cercare nel database ed eliminare
          * da esso i token non più validi
-         * (<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html">Fonte</a>).
+         * (<a href="https://www.roseindia.net/servlets/ServletContextListenerTimer.shtml">Fonte</a>).
          *
          * @param ogniQuantiSecondiEseguire Tempo in secondi ogni quanto eseguire questo metodo.*/
-        public static void avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(Long ogniQuantiSecondiEseguire ) {
+        public static void avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(Long ogniQuantiSecondiEseguire, ServletContext servletContext) {
 
             if( USARE_CLASSE_TOKEN_INVALIDI ) {
 
-                if (gestoreEliminatoreTokenInvalidi == null) {   // se già stato inizializzato, significa che questo metodo è già stato invocato
+                final String nomeAttributoContenenteScadenzaToken = "scadenzaTokenInSecondiDaEpoch";
 
-                    final String nomeAttributoContenenteScadenzaToken = "scadenzaTokenInSecondiDaEpoch";
+                try {
 
-                    try {
+                    // test se il nome dell'attributo esiste nella classe (altrimenti genera NoSuchFieldException)
+                    AuthenticationTokenInvalido.class.getDeclaredField(nomeAttributoContenenteScadenzaToken);
 
-                        // test se il nome dell'attributo esiste nella classe (altrimenti genera NoSuchFieldException)
-                        AuthenticationTokenInvalido.class.getDeclaredField(nomeAttributoContenenteScadenzaToken);
+                    // Fonte (adattato da): https://stackoverflow.com/a/15979300
+                    Thread thread = ThreadManager.createBackgroundThread(new Runnable() {
 
-                        // Task che si occupa di eliminare i token scaduti dal database dei token invalidi
-                        final Runnable eliminatoreTokenScadutiDaDBTokenInvalidi = () -> {     // TODO : da testare
+                        @Override
+                        public void run() {
 
+                            // Ciclo infinito, altre API (Timer, ScheduledExecutorService, ...) non compatibili con Google AppEngine
+                            //noinspection InfiniteLoopStatement
+                            while( true ) {
 
-                            Logger.scriviEccezioneNelLog(AuthenticationTokenInvalido.class, DateTime.currentTimeInSecondi()+"   FUNZIONA", new Exception("FUNZIONA"));//TODO CANCELLA questa riga
-                            // Necessario usare ObjectifyService perché questo codice NON sarà eseguito
-                            //  nel contesto di una request (quindi Objectify Filter non verrà eseguito)
-                            ObjectifyService.run(new VoidWork() {
-                                // Fonte(usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
-                                public void vrun() {
-
-                                    Logger.scriviEccezioneNelLog(AuthenticationTokenInvalido.class, DateTime.currentTimeInSecondi()+"   FUNZIONA2", new Exception("FUNZIONA2"));//TODO CANCELLA questa riga
-
-                                    DatabaseHelper
-                                            .query(AuthenticationTokenInvalido.class,
-                                                    nomeAttributoContenenteScadenzaToken,
-                                                    DatabaseHelper.OperatoreQuery.MINORE,
-                                                    DateTime.currentTimeInSecondi()) // restituisce i token scaduti al momento in cui viene eseguito // TODO : sicuro che fa riferimento il momento in cui viene eseguito e non quando viene instanziato?
-                                            .forEach(unIstanzaDaEliminare -> {
-                                                DatabaseHelper.cancellaEntitaById((
-                                                        (AuthenticationTokenInvalido) unIstanzaDaEliminare).getIdTokenInvalido(),
-                                                        AuthenticationTokenInvalido.class
-                                                );
-                                            });
+                                try {
+                                    // Modalità di compatibilità con Google AppEngine
+                                    //noinspection BusyWait
+                                    Thread.sleep(ogniQuantiSecondiEseguire * 1000); // *1000 perché i parametri sono richiesti in millisecondi
+                                } catch (InterruptedException e) {
+                                    Logger.scriviEccezioneNelLog(AuthenticationTokenInvalido.class, e);
                                 }
-                            });
 
-                        };
+                                DatabaseHelper.query(AuthenticationTokenInvalido.class,
+                                                     nomeAttributoContenenteScadenzaToken,
+                                                     DatabaseHelper.OperatoreQuery.MINORE,
+                                                     DateTime.currentTimeInSecondi()) // restituisce i token scaduti al momento in cui viene eseguito // TODO : sicuro che fa riferimento il momento in cui viene eseguito e non quando viene instanziato?
+                                              .forEach(unIstanzaDaEliminare -> {
+                                                    DatabaseHelper.cancellaEntitaById(
+                                                         ((AuthenticationTokenInvalido) unIstanzaDaEliminare)
+                                                         .getIdTokenInvalido(),
+                                                         AuthenticationTokenInvalido.class
+                                                    );
+                                              });
 
-                        // Schedula il task da eseguire ogniQuantiSecondiEseguire
-                        gestoreEliminatoreTokenInvalidi =
-                                scheduler.scheduleAtFixedRate(
-                                        eliminatoreTokenScadutiDaDBTokenInvalidi,
-                                        ogniQuantiSecondiEseguire,
-                                        ogniQuantiSecondiEseguire,
-                                        SECONDS
-                                );   // scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently with the given period; that is executions will commence after initialDelay then initialDelay+period, then initialDelay + 2 * period, and so on. Fonte: https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html#scheduleAtFixedRate-java.lang.Runnable-long-long-java.util.concurrent.TimeUnit-
+                            }
 
-                    } catch (NoSuchFieldException e) {
-                        Logger.scriviEccezioneNelLog(AuthenticationTokenInvalido.class,
-                                "Attributo " + nomeAttributoContenenteScadenzaToken +
-                                        " non trovato nella classe " + AuthenticationTokenInvalido.class.getName() +
-                                        ". Potrebbe essere stato modificato il nome.",
-                                e);
-                    }
+                        }
+                    });
 
+                    thread.start();
+
+                    servletContext.setAttribute(NOME_VARIABILE_THREAD_ELIMINATORE_TOKEN_SCADUTI, thread);
+
+                } catch (NoSuchFieldException e) {
+                    Logger.scriviEccezioneNelLog(
+                            AuthenticationTokenInvalido.class,
+                            "Attributo " + nomeAttributoContenenteScadenzaToken +
+                                    " non trovato nella classe " + AuthenticationTokenInvalido.class.getName() +
+                                    ". Potrebbe essere stato modificato il nome.",
+                            e
+                    );
                 }
+
 
             }
 
         }
 
         /** Metodo invocabili dal servlet container per eliminare la schedulazione del task
-         * periodico di rimozione dei token invalidi, avviato da {@link #avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(Long)}.
-         * @return false se il task non può essere cancellato (generalmente perché è già terminato), false altrimenti.*/
-        public static boolean rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi() {
-            if( USARE_CLASSE_TOKEN_INVALIDI )
-                return gestoreEliminatoreTokenInvalidi.cancel(true);
-            else
-                return true;
+         * periodico di rimozione dei token invalidi, avviato da
+         * {@link #avviaSchedulazionePeriodicaEliminazioneTokenInvalidi(Long, ServletContext)}.*/
+        public static void rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi(ServletContext servletContext) {
+
+            if( USARE_CLASSE_TOKEN_INVALIDI ) {
+
+                Thread thread = (Thread) servletContext.getAttribute(NOME_VARIABILE_THREAD_ELIMINATORE_TOKEN_SCADUTI);
+
+                if( thread!=null )
+                    thread.interrupt();
+
+            }
         }
     }
 
