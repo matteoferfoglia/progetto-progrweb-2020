@@ -194,9 +194,7 @@ public abstract class Attore implements Cloneable, Principal {
 
         try {
             AuthenticationDatabaseEntry authenticationDatabaseEntry =
-                    new AuthenticationDatabaseEntry(
-                            EncoderPrevenzioneXSS.encodeForJava( attore.getUsername() ),
-                            EncoderPrevenzioneXSS.encodeForJava( password ) );
+                    new AuthenticationDatabaseEntry(attore.getUsername(), password);
 
             DatabaseHelper.salvaEntita(attore);
             DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
