@@ -5,6 +5,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
+import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.UtilitaGenerale;
@@ -151,14 +152,40 @@ public class StarterDatabase implements ServletContextListener {
                 Logger.scriviEccezioneNelLog(StarterDatabase.class, e);
             }
 
-        } /* else {
+        } else {
             // Production
             // which is: SystemProperty.Environment.Value.Production
-            // TODO : all'avvio della piattaforma per la prima volta deve esserci un solo utente amministratore
-            // TODO    (attenzione che questo viene eseguito ogni volta che viene avviata un'istanza del servlet container,
-            // TODO      quindi, prima di salvare nel db, verifica che non sia già presente!!!!)
 
-        } */
+            // Da requisiti: All’avvio della piattaforma per la prima volta, vi sarà un solo utente amministratore.
+            // TODO : da testare in ambiente di produzione
+
+            try {
+
+                // Creazione Administrator e relativa entry dell'AuthDB
+                Class<?> administratorStorage = Class.forName("it.units.progrweb.entities.attori.administrator.AdministratorStorage");
+                Constructor<?> constructorAdministratorStorage = administratorStorage.getDeclaredConstructor(String.class, String.class, String.class);
+                constructorAdministratorStorage.setAccessible(true);
+                Attore administrator = (Attore) constructorAdministratorStorage.newInstance("AdminTest", "Mario l'Amministratore", "marioadmin@example.com");
+                AuthenticationDatabaseEntry authAdministrator = new AuthenticationDatabaseEntry("AdminTest","9012", true);
+
+                // Salvataggio nel database
+                if( Attore.getAttoreDaUsername( administrator.getUsername() ) == null  ) {
+
+                    DatabaseHelper.salvaEntita( administrator );
+                    DatabaseHelper.salvaEntita( authAdministrator );    // TODO : controllare se username è già in AuthDB: in tal caso: eliminare l'entry di AuthDB e riscrivere questa
+
+                } // altrimenti: attore già in DB, non serve reinserirlo
+
+
+            } catch ( ClassNotFoundException | NoSuchMethodException | InstantiationException |
+                      IllegalAccessException | InvocationTargetException | InvalidKeyException |
+                      NoSuchAlgorithmException e ) {
+
+                Logger.scriviEccezioneNelLog( StarterDatabase.class, e );
+
+            }
+
+        }
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
