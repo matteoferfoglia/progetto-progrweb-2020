@@ -67,13 +67,13 @@ public class GestioneConsumer {
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
     public Response associaConsumerAdUploader( CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore ,
-                                              @Context HttpServletRequest httpServletRequest) {
+                                               @Context HttpServletRequest httpServletRequest) {
 
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest( httpServletRequest );
 
         try {
             CreazioneAttore.CampiFormAggiuntaAttore consumerAppenaAggiunto
-                    = associaConsumerAdUploader(campiFormAggiuntaAttore, identificativoUploader);
+                    = associaConsumerAdUploader(httpServletRequest, campiFormAggiuntaAttore, identificativoUploader);
             return Response.ok()
                            .entity(consumerAppenaAggiunto.getIdentificativoAttore())
                            .type(MediaType.TEXT_PLAIN)
@@ -92,22 +92,27 @@ public class GestioneConsumer {
      * associa il {@link Consumer} all'{@link Uploader}. Se il {@link Consumer} è già associato
      * all'{@link Uploader} allora questo metodo non fa nulla.
      * Se il {@link Consumer} specificato non esiste nella piattaforma, come prima cosa lo crea,
-     * sfruttando il metodo {@link CreazioneAttore#creaNuovoAttoreECreaResponse(CreazioneAttore.CampiFormAggiuntaAttore, Attore.TipoAttore)}
+     * sfruttando il metodo {@link CreazioneAttore#creaNuovoAttoreECreaResponse(HttpServletRequest, CreazioneAttore.CampiFormAggiuntaAttore, Attore.TipoAttore)}
+     * @param httpServletRequest La richiesta HTTP che ha richiesto l'associazione di un {@link Consumer} ad un {@link Uploader}.
+     * @param consumerDaCampiForm Istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante un {@link Consumer}.
+     * @param identificativoUploader Identificativo dell'{@link Uploader}.
      * @return L'istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante il
      *          {@link Consumer} appena creato, se l'operazione va a buon fine. */
     public static CreazioneAttore.CampiFormAggiuntaAttore
-    associaConsumerAdUploader(CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore,
+    associaConsumerAdUploader(HttpServletRequest httpServletRequest,
+                              CreazioneAttore.CampiFormAggiuntaAttore consumerDaCampiForm,
                               Long identificativoUploader)
             throws MessagingException, NoSuchAlgorithmException,
                    InvalidKeyException, UnsupportedEncodingException {
 
         // Verifica se il Consumer esiste nella piattaforma
-        Consumer consumerDalDB = Consumer.getAttoreDaUsername(campiFormAggiuntaAttore.getUsername());
+        Consumer consumerDalDB = Consumer.getAttoreDaUsername(consumerDaCampiForm.getUsername());
 
         if( consumerDalDB==null ) {
             // Creazione del consumer se non esiste già
             try {
-                consumerDalDB = (Consumer) CreazioneAttore.creaNuovoAttore( campiFormAggiuntaAttore,
+                consumerDalDB = (Consumer) CreazioneAttore.creaNuovoAttore( httpServletRequest,
+                                                                            consumerDaCampiForm,
                                                                             Attore.TipoAttore.Uploader );
                 if( consumerDalDB==null )
                     throw new NullPointerException("Non dobrebbe mai essere null.");
@@ -123,7 +128,7 @@ public class GestioneConsumer {
             }
         }
 
-        campiFormAggiuntaAttore.setIdentificativoAttore(consumerDalDB.getIdentificativoAttore());
+        consumerDaCampiForm.setIdentificativoAttore(consumerDalDB.getIdentificativoAttore());
 
         // Verifica che il Consumer NON sia già associato all'Uploader della richiesta (altrimenti non serve aggiungerlo di nuovo)
         if (!RelazioneUploaderConsumer.isConsumerServitoDaUploader(identificativoUploader, consumerDalDB.getIdentificativoAttore())) {
@@ -131,7 +136,7 @@ public class GestioneConsumer {
             RelazioneUploaderConsumer.aggiungiConsumerAdUploader(consumerDalDB.getIdentificativoAttore(), identificativoUploader);
         }
 
-        return campiFormAggiuntaAttore;
+        return consumerDaCampiForm;
     }
 
 
@@ -164,6 +169,8 @@ public class GestioneConsumer {
                                      @FormDataParam("identificativoAttore") Long identificativoConsumerDaModificare,
                                      @Context HttpServletRequest  httpServletRequest) {
 
+        // TODO : refactoring: metodo simile in Administrator, entrabi si rifanno ad un metodo di attore
+
         if( identificativoConsumerDaModificare != null ) {
             Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
@@ -179,7 +186,7 @@ public class GestioneConsumer {
                     Consumer consumer_conModificheRichiesteDalClient = (Consumer) consumer_attualmenteSalvatoInDB.clone();
                     consumer_conModificheRichiesteDalClient.setNominativo(nuovoNominativo);
                     consumer_conModificheRichiesteDalClient.setEmail(nuovaEmail);
-                    consumer_attualmenteSalvatoInDB.setUsername(nuovoUsername);
+                    // consumer_attualmenteSalvatoInDB.setUsername(nuovoUsername); // Da specifiche, lo username non è modificabile
 
                     return Attore.modificaAttore( consumer_conModificheRichiesteDalClient,
                                                   consumer_attualmenteSalvatoInDB );

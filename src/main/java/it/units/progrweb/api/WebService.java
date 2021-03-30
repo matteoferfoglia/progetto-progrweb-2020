@@ -1,5 +1,6 @@
 package it.units.progrweb.api;
 
+import it.units.progrweb.api.autenticazioneERegistrazione.CampiFormLogin;
 import it.units.progrweb.api.uploader.GestioneDocumenti;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.uploader.Uploader;
@@ -68,13 +69,16 @@ public class WebService {
 
                 // Non crea nulla se il consumer esiste già
                 CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore
-                        = associaConsumerAdUploader(new CreazioneAttore.CampiFormAggiuntaAttore(
-                                codiceFiscaleConsumerDestinatario,
-                                null,
-                                nomeCognomeConsumerDestinatario,
-                                emailConsumerDestinatario,
-                                Attore.TipoAttore.Consumer,
-                                null),
+                        = associaConsumerAdUploader(
+                                httpServletRequest,
+                                new CreazioneAttore.CampiFormAggiuntaAttore(
+                                    codiceFiscaleConsumerDestinatario,
+                                    null,
+                                    nomeCognomeConsumerDestinatario,
+                                    emailConsumerDestinatario,
+                                    Attore.TipoAttore.Consumer,
+                                    null
+                                ),
                         mittente.getIdentificativoAttore());
                 return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
                         mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());

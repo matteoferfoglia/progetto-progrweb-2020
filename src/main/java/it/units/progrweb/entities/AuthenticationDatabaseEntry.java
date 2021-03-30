@@ -2,6 +2,7 @@ package it.units.progrweb.entities;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
@@ -18,8 +19,47 @@ import java.util.function.Supplier;
  * Classe rappresentante un'entità dell'authentication database.
  * Nota: informazioni di autenticazione tenuti separate dalle
  * informazioni degli attori.
- * Ogni entità dell'authentication database ha i seguenti campi:
- * [ User, H(concat(password, salt)), salt ]
+ * Nel caso in cui un utente dimentichi la propria password, può
+ * recuperarla: a tal fine si usa il campo passwordTemporanea.
+ * Un account deve essere verificato (invocando il metodo
+ * {@link #verificaAccount(String, String)}, passando come parametro un
+ * token che viene generato alla creazione di un'istanza di questa
+ * classe) prima di poter essere usato: se l'account non è verificato,
+ * qualsiasi tentativo di autenticazione verrà rigettato. Se il
+ * tentativo di autenticazione avviene usando una password temporanea
+ * (ottenibile ad es. se l'utente dimentica la password), allora
+ * l'utente (se la password temporanea risultasse corretta) risulterà
+ * anche verificato (nel caso in cui non lo fosse).// TODO : da verificare
+ * Caso d'uso (esempio):
+ * <ol>
+ *     <li>utente si registra al sistema;
+ *     </li>
+ *     <li>utente riceve via mail un link di conferma (invio email non gestito da questa
+ *         classe, è un'esempio d'uso), contenente il token per la verifica dell'account;
+ *     </li>
+ *     <li>scenari possibili:
+ *         <ul>
+ *             <li>SE l'utente clicca su link di conferma nella mail, ALLORA il servizio
+ *             che risponde alla richiesta può invocare {@link #verificaAccount(String,String)}
+ *             passandogli il token di verifica, quindi quest'ultimo metodo renderà
+ *             l'accounta verificato.</li>
+ *             <li>SE l'utente tenta di autenticarsi senza aver prima verificato l'account,
+ *             ALLORA la richiesta di autenticazione fallirà.</li>
+ *             <li>SE l'utente richiede il reset della password (funzione "password
+ *             dimenticata"), quindi questa classe genererà una password temporanea, e poi
+ *             l'utente accede con la password temporanea corretta, ALLORA l'account risulterà
+ *             verificato. Quest'ultimo caso può essere utilizzato nel caso in cui l'utente
+ *             perda l'email contenente il link per la verifica dell'account; si assume che
+ *             le modalità di erogazione della password temporanea implicitamente verifichino
+ *             l'utente (ad es. invio della password temporanea all'email dell'utente: poiché
+ *             anche il token di verifica autenticazione era stato mandato alla mail dell'utente,
+ *             se quest'ultimo conosce la password temporanea, implicitamente significa che
+ *             ha ricevuto (salvo errori) anche la mail contenente il token di verifica, perciò
+ *             si può considerare l'account verificato).
+ *             </li>
+ *         </ul>
+ *     </li>
+ * </ol>
  *
  * @author Matteo Ferfoglia
  */
@@ -43,19 +83,96 @@ public class AuthenticationDatabaseEntry {
     /** Password temporanea, in chiaro.*/
     private String passwordTemporanea;
 
-    /** Crea un' entry dell'authentication database.
+    /** Token per verificare un account appena creato, per poterlo usare.
+     * Un account risulta verificato se questo token è null.*/
+    private String tokenVerificaAccount;        // TODO : aggiungere in diagramma ER
+
+    /** Lunghezza di {@link #tokenVerificaAccount}.*/
+    @Ignore
+    private static final int LUNGHEZZA_TOKEN_VERIFICA_ACCOUNT = 64;
+
+    /** Crea un' entry dell'authentication database. L'account creato con
+     * questo metodo risulta già verificato e "pronto all'uso".
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
      * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
      */
     public AuthenticationDatabaseEntry(String username, String passwordAttore)
             throws InvalidKeyException, NoSuchAlgorithmException {
 
+        this(username, passwordAttore, true);
+
+    }
+
+    /** Crea un' entry dell'authentication database.
+     * @param username Username dell'attore, per il salvataggio.
+     * @param passwordAttore Password in chiaro dell'attore, per il salvataggio.
+     * @param isAccountVerificato Flag: se impostato a false, allora l'account creato con
+     *         questo metodo risulta da verificare, quindi i tentativi di autenticazione
+     *         saranno tutti respinti finché l'account non verrà verificato, altrimenti,
+     *         se impostato a true, l'account è subito utilizzabile per l'autenticazione.
+     * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
+     */
+    public AuthenticationDatabaseEntry(String username, String passwordAttore, boolean isAccountVerificato)
+            throws InvalidKeyException, NoSuchAlgorithmException {
+
         this.username  = username ;
         this.salt = generaSalt();
         this.hashedSaltedPassword = calcolaHashedSaltedPassword(passwordAttore, this.salt);
+
+        this.tokenVerificaAccount = isAccountVerificato ?
+                                    null :  // se account già verificato, allora non serve generare un token da usare per verificarlo
+                                    GeneratoreTokenCasuali.generaTokenAlfanumerico(LUNGHEZZA_TOKEN_VERIFICA_ACCOUNT);
+
     }
 
     public AuthenticationDatabaseEntry() {}
+
+    /** Restituisce true se questo account è già stato verificato, false altrimenti.*/
+    private boolean isAccountVerificato() {
+        return tokenVerificaAccount==null;
+    }
+
+    /** Rende verificato l'account. */
+    private void rendiVerificatoQuestoAccount() {
+        tokenVerificaAccount = null;    // quando è null significa che l'account è verificato
+    }
+
+    public String getTokenVerificaAccount() {
+        return tokenVerificaAccount;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    /** Verifica un account, inteso come istanza di questa classe,
+     * già creato in precedenza.
+     * @param usernameAccountDaVerificare Username dell'account da verificare.
+     * @param tokenVerificaAccount Token per la verifica dell'account.
+     * @return true se la verifica va a buon fine, false altrimenti.
+     * @throws NotFoundException Se l'utente non viene trovato in AuthDB.
+     * @throws NullPointerException Se i parametri passati a questo metodo sono null.*/
+    public static boolean verificaAccount( String usernameAccountDaVerificare, String tokenVerificaAccount )
+            throws NotFoundException, NullPointerException {
+
+        if( usernameAccountDaVerificare==null || tokenVerificaAccount==null )
+            throw new NullPointerException("I parametri non possono essere null.");
+
+        AuthenticationDatabaseEntry authenticationDatabaseEntryDaVerificare =
+                cercaAttoreInAuthDb(usernameAccountDaVerificare);
+
+        if( authenticationDatabaseEntryDaVerificare.isAccountVerificato() )
+            return true;    // era già stato verificato
+
+        if( tokenVerificaAccount.equals(authenticationDatabaseEntryDaVerificare.tokenVerificaAccount) ) {
+            authenticationDatabaseEntryDaVerificare.rendiVerificatoQuestoAccount();
+            return true;
+        }
+
+        return false;
+
+    }
 
     /** Dati la password ed il salt, restituisce l'hash della password (hashed and salted)
      * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
@@ -100,8 +217,10 @@ public class AuthenticationDatabaseEntry {
         AuthenticationDatabaseEntry authenticationEntry;
                 
         try {
+
             authenticationEntry = cercaAttoreInAuthDb(username);
             credenzialiValide = verificaCredenziali(password, authenticationEntry);
+
         } catch (NotFoundException e) {
             // attore non trovato
             credenzialiValide = false;
@@ -122,8 +241,9 @@ public class AuthenticationDatabaseEntry {
 
 
         // Verifica password
-        if ( calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
-                .equals(authenticationEntry.hashedSaltedPassword) ) {
+        if ( authenticationEntry.isAccountVerificato() &&
+                calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
+                    .equals(authenticationEntry.hashedSaltedPassword) ) {
             // Credenziali (hashedSalted) valide
 
             // Elimina eventuali password temporanee
@@ -145,6 +265,9 @@ public class AuthenticationDatabaseEntry {
                     calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt);
             authenticationEntry.passwordTemporanea = null;
             DatabaseHelper.salvaEntita(authenticationEntry);
+
+            // Se l'account non era verificato, ora lo è implicitamente
+            authenticationEntry.rendiVerificatoQuestoAccount();
 
             return true;    // credenziali valide
         }

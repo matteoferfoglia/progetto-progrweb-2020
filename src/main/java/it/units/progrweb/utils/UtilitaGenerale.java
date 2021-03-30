@@ -37,7 +37,7 @@ public class UtilitaGenerale {
 
     /** Restituisce true se la richiesta è di tipo "api" (Ajax), false altrimenti.*/
     public static boolean isRichiestaApi(HttpServletRequest httpReq) {
-        return getUrlPattern(httpReq).startsWith(EnvironmentVariables.API_URL_PATTERN);
+        return getUrlPattern(httpReq).startsWith(EnvironmentVariables.API_CONTEXT_ROOT);
     }
 
     /** Restituisce una stringa con l'intero stacktrace di un'eccezione. */

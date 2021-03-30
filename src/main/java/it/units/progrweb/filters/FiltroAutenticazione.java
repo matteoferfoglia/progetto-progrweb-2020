@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static it.units.progrweb.EnvironmentVariables.API_CONTEXT_ROOT;
+import static it.units.progrweb.api.autenticazioneERegistrazione.VerificaRegistrazione.PATH_SERVIZIO_VERIFICA_ACCCOUNT;
 import static it.units.progrweb.utils.UtilitaGenerale.*;
 
 /**
@@ -27,16 +29,17 @@ public class FiltroAutenticazione implements Filter {
      * in questo array, allora quella risorsa è considerata ad accesso libero
      * e non si verifica l'autorizzazione del client.*/
     private static final String[] WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA = {
-            "/api/login",
-            "/api/logout",
-            "/api/resetPassword",
-            "/api/webService/login",
-            "/api/webService/uploadDocumento",
-            "/api/verificaTokenAutenticazione",
-            "/api/registrazioneNuovoConsumer",
-            "/api/CSRFToken/generaCSRFToken",
-            "/api/noauth",
-            "/api/openapi",
+            API_CONTEXT_ROOT+"/login",
+            API_CONTEXT_ROOT+"/logout",
+            PATH_SERVIZIO_VERIFICA_ACCCOUNT,
+            API_CONTEXT_ROOT+"/resetPassword",
+            API_CONTEXT_ROOT+"/webService/login",
+            API_CONTEXT_ROOT+"/webService/uploadDocumento",
+            API_CONTEXT_ROOT+"/verificaTokenAutenticazione",
+            API_CONTEXT_ROOT+"/registrazioneNuovoConsumer",
+            API_CONTEXT_ROOT+"/CSRFToken/generaCSRFToken",
+            API_CONTEXT_ROOT+"/noauth",
+            API_CONTEXT_ROOT+"/openapi",
             "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo
     };
 

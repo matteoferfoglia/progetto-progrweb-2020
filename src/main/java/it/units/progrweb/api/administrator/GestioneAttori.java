@@ -57,9 +57,10 @@ public class GestioneAttori {
     @Path("/aggiungiAttore")
     @POST
     @Consumes( MediaType.APPLICATION_JSON )
-    public Response aggiungiAttore( CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore ) {
+    public Response aggiungiAttore( @Context HttpServletRequest httpServletRequest,
+                                    CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore ) {
 
-        return CreazioneAttore.creaNuovoAttoreECreaResponse(campiFormAggiuntaAttore, Attore.TipoAttore.Administrator);
+        return CreazioneAttore.creaNuovoAttoreECreaResponse(httpServletRequest, campiFormAggiuntaAttore, Attore.TipoAttore.Administrator);
 
     }
 
@@ -77,6 +78,8 @@ public class GestioneAttori {
 
         Attore attoreDaModificare_attualmenteSalvatoInDB = Attore.getAttoreDaIdentificativo( identificativoAttore );
         if( attoreDaModificare_attualmenteSalvatoInDB != null ) {
+
+            // TODO : refactoring: metodo simile in Uploader
 
             // Crea una nuova istanza di Attore con le modifiche richieste
             // Poi Attore#modificheAttore confronta le versioni

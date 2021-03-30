@@ -1,4 +1,4 @@
-package it.units.progrweb.api;
+package it.units.progrweb.api.autenticazioneERegistrazione;
 
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
@@ -142,27 +142,3 @@ public class LoginLogout {
 
 }
 
-@SuppressWarnings("unused")
-class CampiFormLogin {
-    private String username;
-    private String password;
-
-    CampiFormLogin(){}
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = EncoderPrevenzioneXSS.encodeForJava(username==null ? "" : username);
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = EncoderPrevenzioneXSS.encodeForJava(password==null ? "" : password);
-    }
-
-}

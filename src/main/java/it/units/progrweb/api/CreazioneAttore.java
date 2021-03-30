@@ -11,6 +11,7 @@ import it.units.progrweb.utils.GeneratoreTokenCasuali;
 import it.units.progrweb.utils.Logger;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.MediaType;
@@ -32,6 +33,7 @@ public class CreazioneAttore {
      * per accedere al sistema.
      * @return null se l'attore che si vuole aggiungere esiste già, altrimenti restituisce
      *          l'attore appena creato.
+     * @param httpServletRequest La richiesta HTTP che richiede la creazione del nuovo attore.
      * @param campiFormAggiuntaAttore Istanza coi valori di input a partire da cui creare il
      *                                nuovo attore.
      * @param tipoAttoreRichiedenteCreazione Tipo di attore che richiede la creazione di un
@@ -46,7 +48,8 @@ public class CreazioneAttore {
      *                              l'attore appena creato dovessere risultare null a causa di
      *                              errori interni.
      */
-    public static Attore creaNuovoAttore(CampiFormAggiuntaAttore campiFormAggiuntaAttore,
+    public static Attore creaNuovoAttore(HttpServletRequest httpServletRequest,
+                                         CampiFormAggiuntaAttore campiFormAggiuntaAttore,
                                          Attore.TipoAttore tipoAttoreRichiedenteCreazione)
             throws NotAuthorizedException, IllegalArgumentException,
                    NoSuchAlgorithmException, InvalidKeyException,
@@ -98,7 +101,7 @@ public class CreazioneAttore {
                     if( attoreDaCreare == null )
                         throw new NullPointerException("L'attore da creare non dovrebbe mai essere null. Questo non dovrebbe mai succedere.");
 
-                    Long identificativoNuovoAttore = Attore.salvaNuovoAttoreInDatabase(attoreDaCreare, password);
+                    Long identificativoNuovoAttore = Attore.salvaNuovoAttoreInDatabase(attoreDaCreare, password, true, httpServletRequest);
                     attoreDaCreare.setIdentificativoAttore(identificativoNuovoAttore);
 
                     return attoreDaCreare;
@@ -122,14 +125,21 @@ public class CreazioneAttore {
 
 
 
-    public static Response creaNuovoAttoreECreaResponse(CampiFormAggiuntaAttore campiFormAggiuntaAttore,
+    /** Metodo per la creazione di un nuovo attore.
+     * @return L'oggetto {@link Response} derivante dalla creazione dell'attore.
+     * @param httpServletRequest La richiesta HTTP per la quale si sta creando l'attore.
+     * @param campiFormAggiuntaAttore L'oggetto {@link CampiFormAggiuntaAttore} a partire
+     *                                da cui si crea un nuovo attore.
+     * @param tipoAttoreRichiedenteCreazione Tipo di attore che richiede la creazione.*/
+    public static Response creaNuovoAttoreECreaResponse(HttpServletRequest httpServletRequest,
+                                                        CampiFormAggiuntaAttore campiFormAggiuntaAttore,
                                                         Attore.TipoAttore tipoAttoreRichiedenteCreazione) {
 
         Attore attoreDaCreare;
 
         try {
 
-            attoreDaCreare = creaNuovoAttore(campiFormAggiuntaAttore, tipoAttoreRichiedenteCreazione);
+            attoreDaCreare = creaNuovoAttore(httpServletRequest, campiFormAggiuntaAttore, tipoAttoreRichiedenteCreazione);
 
             if(attoreDaCreare==null)
                 return Response

@@ -4,6 +4,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
+import it.units.progrweb.api.autenticazioneERegistrazione.VerificaRegistrazione;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.administrator.Administrator;
@@ -15,12 +16,16 @@ import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.mail.MailSender;
 
+import javax.mail.MessagingException;
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
@@ -62,10 +67,10 @@ public abstract class Attore implements Cloneable, Principal {
 
     /**
      * Copy-constructor.
-     * @param attore
+     * @param attore L'attore da copiare.
      */
     public Attore(Attore attore) {
-        Arrays.asList(Attore.class.getDeclaredFields())
+        Arrays.asList(attore.getClass().getDeclaredFields())    //  TODO : verificare correttezza
               .forEach( field -> {
                   try {
                       field.set(this,field.get(attore));
@@ -188,17 +193,84 @@ public abstract class Attore implements Cloneable, Principal {
         return UtilitaGenerale.ricercaFieldPerNomeInQuestaClasse("nominativo", Attore.class);
     }
 
-    /** Salva un nuovo attore nel database.
+    /** Salva un nuovo attore nel database e notifica via email l'avvenuta
+     * registrazione all'attore stesso.
+     * @param attore Attore da salvare nel sistema.
+     * @param password Password dell'attore da salvare nel sistema.
+     * @param inviarePassword Flag: true se la notifica all'attore deve contenere
+     *                        anche la password in chiaro.
+     * @param httpServletRequest La richiesta HTTP che ha richiesto la creazione dell'attore.
      * @return l'identificativo dell'attore salvato nel database
-     *          se l'operazione va a buon fine, null altrimenti.*/
-    public static Long salvaNuovoAttoreInDatabase( Attore attore, String password ) {
+     *          se l'operazione va a buon fine, null altrimenti.
+     * @throws UnsupportedEncodingException Generata dal tentativo di invio dell'email.
+     * @throws MessagingException Generata dal tentativo di invio dell'email.*/
+    public static Long salvaNuovoAttoreInDatabase(Attore attore, String password,
+                                                  boolean inviarePassword,
+                                                  HttpServletRequest httpServletRequest)
+            throws UnsupportedEncodingException, MessagingException {
 
         try {
             AuthenticationDatabaseEntry authenticationDatabaseEntry =
-                    new AuthenticationDatabaseEntry(attore.getUsername(), password);
+                    new AuthenticationDatabaseEntry(attore.getUsername(), password, false);
+
+            // TODO: e se attore già registrato ? O Come Attore o in AuthDB?
+            // TODO : aggiungere tutta questa parte nelle note progettuali
 
             Long identificativoNuovoAttore = (Long) DatabaseHelper.salvaEntita(attore);
             DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
+
+            String urlPerVerificaAccount;
+            {
+                // Creazione link per la verifica dell'account
+                String indirizzoQuestoServer = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
+                urlPerVerificaAccount = indirizzoQuestoServer + VerificaRegistrazione.PATH_SERVIZIO_VERIFICA_ACCCOUNT +
+                        '?' + VerificaRegistrazione.NOME_QUERY_PARAM_CON_USERNAME_ACCOUNT_DA_VERIFICARE + '=' + authenticationDatabaseEntry.getUsername() + '&' +
+                              VerificaRegistrazione.NOME_QUERY_PARAM_CON_TOKEN_ACCOUNT_DA_VERIFICARE    + '=' + authenticationDatabaseEntry.getTokenVerificaAccount();
+                        // info per verificare l'account aggiunti come query param
+            }
+
+            {
+                // Invio email all'attore appena creato
+
+                String oggettoEmail = "Creazione nuovo account";
+
+                // Creazione del corpo del messaggio in formato HTML
+                // TODO : verificare correttezza html
+                String messaggioHtml =
+                        "<!DOCTYPE html>"                                                       +
+                        "<html>"                                                                +
+                            "<head>"                                                            +
+                                "<title>" + oggettoEmail + "</title>"                           +
+                            "</head>"                                                           +
+                            "<body>"                                                            +
+                                "<h1>" + oggettoEmail + "</h1>"                                 +
+                                "<p>"                                                           +
+                                    "E' stato creato un nuovo account nella piattaforma."       +
+                                    "Sarà possibile accedervi con le seguenti credenziali"      +
+                                    "<ul>"                                                      +
+                                        "<li>username: <strong>" + attore.getUsername() + "</strong></li>"  +
+                    ( inviarePassword ? "<li>password: <strong>" + password + "</strong></li>" : "")  +
+                                    "</ul>"                                                     +
+                    (inviarePassword ?
+                                    "E' <em>fortemente</em> raccomandata la modifica della"     +
+                                    "password al primo accesso al sistema."                     +
+                                "</p>"
+                                     : "")                                                      +
+                                "<p>"                                                           +
+                                    "Per poter essere utilizzato, l'account deve essere "       +
+                                    "confermato: cliccare"                                      +
+                                    "<a href=\"" + urlPerVerificaAccount + "\">qui</a>"         +
+                                    "per confermare l'account."                                 +
+                                "</p>"                                                          +
+                            "</body>"                                                           +
+                        "</html>";
+
+                new MailSender()
+                        .inviaEmailMultiPart( attore.getEmail(), attore.getNominativo(),
+                                              oggettoEmail, "", messaggioHtml,
+                                              null, null, null );
+
+            }
 
             return identificativoNuovoAttore;
 
