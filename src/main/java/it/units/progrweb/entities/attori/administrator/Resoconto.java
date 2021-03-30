@@ -27,7 +27,7 @@ public class Resoconto {
 
         List<File> occorrenzeDocumentiCaricatiDaUploader =
                 File.getOccorrenzeFiltratePerUploaderEPeriodoTemporale( identificativoUploader,
-                                                                            periodoDiRiferimento   );
+                                                                        periodoDiRiferimento   );
 
         this.numeroDiDocumentiCaricati = occorrenzeDocumentiCaricatiDaUploader.size();
         this.numeroDiConsumersDiversiCuiTaliDocumentiAfferiscono =
