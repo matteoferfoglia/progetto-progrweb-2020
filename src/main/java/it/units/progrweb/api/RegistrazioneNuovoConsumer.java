@@ -36,7 +36,7 @@ public class RegistrazioneNuovoConsumer {
 
                 Consumer nuovoConsumer = Consumer.creaAttore( codiceFiscale, nominativo, email );
 
-                boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password );
+                boolean registrazioneConclusaConSuccesso = Attore.salvaNuovoAttoreInDatabase( nuovoConsumer, password ) != null;
                 if( registrazioneConclusaConSuccesso )
                     return Autenticazione.creaResponseAutenticazione(codiceFiscale, password);  // utente risulterà subito autenticato
 

@@ -189,21 +189,22 @@ public abstract class Attore implements Cloneable, Principal {
     }
 
     /** Salva un nuovo attore nel database.
-     * @return true se la procedura va a buon fine, false altrimenti.*/
-    public static boolean salvaNuovoAttoreInDatabase( Attore attore, String password ) {
+     * @return l'identificativo dell'attore salvato nel database
+     *          se l'operazione va a buon fine, null altrimenti.*/
+    public static Long salvaNuovoAttoreInDatabase( Attore attore, String password ) {
 
         try {
             AuthenticationDatabaseEntry authenticationDatabaseEntry =
                     new AuthenticationDatabaseEntry(attore.getUsername(), password);
 
-            DatabaseHelper.salvaEntita(attore);
+            Long identificativoNuovoAttore = (Long) DatabaseHelper.salvaEntita(attore);
             DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
 
-            return true;
+            return identificativoNuovoAttore;
 
         } catch (InvalidKeyException|NoSuchAlgorithmException e) {
             Logger.scriviEccezioneNelLog( Attore.class, e );
-            return false;
+            return null;
         }
 
 
