@@ -45,10 +45,13 @@ public abstract class DatabaseHelper {
 
     }
 
-    /** Salva un'entità (subito) nel database e ne restituisce l'identificativo. */
+    /** Salva un'entità (subito) nel database e ne restituisce l'identificativo
+     * (può essere o di tipo {@link String} (se la chiave ha un nome) o di tipo
+     * {@link Long} (altrimenti)). */
     public static<Entita> Object salvaEntita(Entita entita) {
         Key<?> k = database.save().entity(entita).now();
-        return k.getId()==0 ? k.getName() : k.getId();  // getId() restituisce l'id o 0 se la chiave ha un nome
+        return k.getId()==0 ?   // getId() restituisce l'id o 0 se la chiave ha un nome
+                k.getName() : k.getId();
     }
 
     /** Restituisce un'entità, cercata per Id. Lancia un'eccezione
