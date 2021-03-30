@@ -69,6 +69,7 @@ public abstract class Attore implements Cloneable, Principal {
      * Copy-constructor.
      * @param attore L'attore da copiare.
      */
+    @SuppressWarnings("CopyConstructorMissesField") // tutti i campi sono copiati tramite reflection
     public Attore(Attore attore) {
         Arrays.asList(attore.getClass().getDeclaredFields())    //  TODO : verificare correttezza
               .forEach( field -> {
@@ -86,7 +87,7 @@ public abstract class Attore implements Cloneable, Principal {
      * nulli) e se risultano delle modifiche (rispetto al clone), le salva nel DB.
      * Le modifiche vanno fatte sull'oggetto ottenuto dal DB, altrimenti poi quando si
      * salva, viene creata una nuova entità anziché sovrascrivere quella esistente.
-     * @param attoreDaModificare_conModificheRichiesteDaClient E' la reappresentaazione
+     * @param attoreDaModificare_conModificheRichiesteDaClient E' la rappresentaazione
      *                              dell'attore con le modifiche richieste dal cliente.
      * @param attore_attualmenteSalvatoInDB E' lo stesso attore, ma con le
      *                       informazioni attualmente salvate nel database.*/
