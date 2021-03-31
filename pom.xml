@@ -26,6 +26,8 @@
     <dependencies>
 
         <!-- Compile/runtime dependencies -->
+
+        <!-- AppEngine -->
         <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-1.0-sdk</artifactId>
@@ -50,6 +52,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Firebase -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>6.8.1</version>
+        </dependency>
+
+        <!-- Java Servlet -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>

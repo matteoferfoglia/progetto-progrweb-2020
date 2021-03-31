@@ -1,5 +1,7 @@
 package it.units.progrweb.api.autenticazioneERegistrazione;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.AuthenticationTokenInvalido;
 import it.units.progrweb.entities.attori.Attore;
@@ -31,10 +33,43 @@ public class LoginLogout {
     @Path("/login")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
     public Response login(CampiFormLogin campiFormLogin){
         return Autenticazione.creaResponseAutenticazione(campiFormLogin.getUsername(), campiFormLogin.getPassword());
     }
+
+    /** Risponde alle richieste di login effettuate tramite Firebase:
+     * questo metodo attende il token JWT rilasciato da Firebase dopo
+     * aver autenticato l'utente, contenente le informazioni dell'utente.*/
+    @Path("/firebaseLogin")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response loginConFirebase(String tokenJwtAutenticazioneUtenteRilasciatoDaFirebase) {
+
+        if( tokenJwtAutenticazioneUtenteRilasciatoDaFirebase!=null ) {
+
+            try {
+
+                FirebaseToken decodedToken =
+                        FirebaseAuth.getInstance().verifyIdToken(tokenJwtAutenticazioneUtenteRilasciatoDaFirebase);
+
+                String emailAttoreDaToken = decodedToken.getEmail();
+
+                Attore attoreInDb = Attore.getAttoreDaEmail(emailAttoreDaToken);
+
+                return Autenticazione.creaResponseAutenticazione(attoreInDb);
+
+            } catch (Exception e) {
+                return Autenticazione.creaResponseUnauthorized();
+            }
+
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("Errore: ricevuto token nullo.")
+                           .build();
+        }
+
+    }
+
 
     /** Effettua il logout del client che ne fa richiesta. */
     @Path("/logout")
@@ -136,7 +171,7 @@ public class LoginLogout {
     @Produces(MediaType.TEXT_PLAIN)
     public Response creaNuovoTokenAutenticazione(@Context HttpServletRequest httpServletRequest){
         try {
-            return Autenticazione.creaResponseAutenticazionePerAttoreAutenticato(Autenticazione.getAttoreDaDatabase(httpServletRequest));
+            return Autenticazione.creaResponseAutenticazionePerAttore(Autenticazione.getAttoreDaDatabase(httpServletRequest));
         } catch (NotFoundException notFoundException) {
             Logger.scriviEccezioneNelLog(LoginLogout.class, "Attore non trovato nel sistema", notFoundException);
             return Response.serverError().build();

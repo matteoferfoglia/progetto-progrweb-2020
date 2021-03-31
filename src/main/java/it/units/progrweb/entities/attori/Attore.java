@@ -55,6 +55,7 @@ public abstract class Attore implements Cloneable, Principal {
     /** Nome e cognome dell'attore.*/
     protected String nominativo;
 
+    @Index
     /** Email dell'attore. */
     protected String email;
 
@@ -371,18 +372,46 @@ public abstract class Attore implements Cloneable, Principal {
     public static Attore getAttoreDaUsername(String username) {
 
         String nomeAttributoQuery = "username";
+        return ricercaInDatabase(username, nomeAttributoQuery);
+
+    }
+
+    /** Ricerca nel database e restituisce l'attore corrispondente
+     * all'email fornita, oppure null se non trovato.*/
+    public static Attore getAttoreDaEmail(String email) {
+
+        String nomeAttributoQuery = "email";
+        return ricercaInDatabase(email, nomeAttributoQuery);
+
+    }
+
+    /** Metodo privato per la ricerca di un {@link Attore} nel database,
+     * avente l'attributo specificato nei parametri con il valore specificato. */
+    private static Attore ricercaInDatabase(String valoreAttributoDaCercare, String nomeAttributoQuery) {
+
         if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoQuery, Attore.class ) ) {
-            List<?> risultatoQuery = DatabaseHelper.query(Attore.class,
-                    nomeAttributoQuery, DatabaseHelper.OperatoreQuery.UGUALE, username);
+
+            List<?> risultatoQuery = DatabaseHelper.query(
+                    Attore.class,
+                    nomeAttributoQuery,
+                    DatabaseHelper.OperatoreQuery.UGUALE,
+                    valoreAttributoDaCercare
+            );
+
             if( risultatoQuery.size() == 1 ) {
                 return (Attore) risultatoQuery.get(0);
             } else {
                 return null;
             }
+
         } else {
-            Logger.scriviEccezioneNelLog(Attore.class,
+
+            Logger.scriviEccezioneNelLog(
+                    Attore.class,
                     "Attributo " + nomeAttributoQuery + " non presente in questa classe.",
-                    new NoSuchFieldException());
+                    new NoSuchFieldException()
+            );
+
             return null;
         }
 

@@ -96,7 +96,7 @@ public class StarterDatabase implements ServletContextListener {
                         Class<?> consumerStorage = Class.forName("it.units.progrweb.entities.attori.consumer.ConsumerStorage");
                         Constructor<?> constructorConsumerStorage = consumerStorage.getDeclaredConstructor(String.class, String.class, String.class);
                         constructorConsumerStorage.setAccessible(true);
-                        consumerTest = constructorConsumerStorage.newInstance("PPPPLT80A01A952G", "Pippo Pluto", "pippopluto@example.com");
+                        consumerTest = constructorConsumerStorage.newInstance("PPPPLT80A01A952G", "Pippo Pluto", "matteoferfoglia3@gmail.com");
                         authConsumerTest = new AuthenticationDatabaseEntry("PPPPLT80A01A952G","1234");
                     }
 

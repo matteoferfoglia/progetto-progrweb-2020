@@ -106,9 +106,16 @@ public class Autenticazione {
 
         Attore attore = Autenticazione.getAttoreDaCredenziali(username, password);
 
-        if(Autenticazione.isAttoreAutenticato(attore)) {
+        return creaResponseAutenticazione(attore);
+    }
+
+    /** Come {@link #creaResponseAutenticazione(String, String)}, ma crea
+     * la risposta di autenticazione a partire da un {@link Attore} anziché
+     * dalle sue credenziali.*/
+    public static Response creaResponseAutenticazione(Attore attore) {
+        if( Autenticazione.isAttoreAutenticato(attore) ) {
             try {
-                return creaResponseAutenticazionePerAttoreAutenticato(attore);
+                return creaResponseAutenticazionePerAttore(attore);
             } catch (NotFoundException ignored) { /*viene comunque restituita la risposta unauthorized*/}
         }
 
@@ -126,8 +133,12 @@ public class Autenticazione {
     /** Invia una risposta al client indicando che non è autorizzato.*/
     public static void creaResponseUnauthorized(HttpServletResponse response)
             throws IOException {
-        response.sendError( Response.Status.UNAUTHORIZED.getStatusCode(),
-                Response.Status.UNAUTHORIZED.getReasonPhrase() );
+
+        response.sendError(
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getReasonPhrase()
+        );
+
     }
 
     public static Response creaResponseForbidden(String messaggio) {
@@ -160,7 +171,7 @@ public class Autenticazione {
      * @return Response con token e cookie di autenticazione per l'attore.
      * @throws NotFoundException Se le credenziali non sono corrette.
      */
-    public static Response creaResponseAutenticazionePerAttoreAutenticato(Attore attore)
+    public static Response creaResponseAutenticazionePerAttore(Attore attore)
             throws NotFoundException {
 
         try {
