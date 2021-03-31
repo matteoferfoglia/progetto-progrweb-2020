@@ -35,10 +35,28 @@ export default {
 
 </script>
 
-<style scoped>
-div {
+<style>
+div.card-autenticazione {
   max-width: 500px;
-  margin: 5% auto;
+  margin: 0 auto;
+}
+div.card-autenticazione label {
+  width: 100%;
+}
+div.card-autenticazione form p {
+  display: flex;
+  justify-content: center;
+  padding: 0 5%;
+}
+div.card-autenticazione div>input {
+  width: 20rem;
+  margin: 0 5%;
+}
+div.card-autenticazione label {
+  width: 100%;
+}
+div.card-autenticazione input[type=submit] {
+  width: 10rem;
 }
 #navAutenticazione>ul>li {
   list-style-type: none;

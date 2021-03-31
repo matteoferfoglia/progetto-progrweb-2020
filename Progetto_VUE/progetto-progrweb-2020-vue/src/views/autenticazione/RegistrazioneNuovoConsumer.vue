@@ -1,6 +1,6 @@
 <template>
 
-  <div class="card">
+  <div class="card card-autenticazione">
     <h2 class="card-header">Registrazione consumer</h2>
     <form class="card-body"
           @submit.prevent="validaEdInviaForm">
@@ -139,18 +139,4 @@ export default {
 
 </script>
 
-<style scoped>
-label {
-  width: 100%;
-}
-form p {
-  display: flex;
-  justify-content: center;
-  padding: 0 5%;
-}
-div>input {
-  width: 20rem;
-  margin: 0 5%;
-}
-
-</style>
+<style scoped></style>

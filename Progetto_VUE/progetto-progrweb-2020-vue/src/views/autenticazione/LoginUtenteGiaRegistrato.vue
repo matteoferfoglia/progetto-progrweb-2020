@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-show="csrfToken">
+  <div class="card card-autenticazione" v-show="csrfToken">
     <h2 class="card-header">Login</h2>
     <Form class="card-body d-flex justify-content-between flex-wrap"
           @submit="validaEdInviaForm"
@@ -151,11 +151,4 @@ export default {
 
 </script>
 
-<style>
-label {
-  width: 100%;
-}
-input[type=submit] {
-  width: 10rem;
-}
-</style>
+<style scoped></style>
