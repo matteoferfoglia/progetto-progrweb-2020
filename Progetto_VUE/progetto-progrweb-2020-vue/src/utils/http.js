@@ -34,6 +34,10 @@ const HTTP_HEADER_CONTENT_TYPE_NOME = "Content-Type";
  * quando nelle richieste post sono inclusi dei file.*/
 const HTTP_HEADER_CONTENT_TYPE_FILE_IN_POST = "multipart/form-data";
 
+/** Valore del Content-Type header nelle richieste HTTP
+ * corrispondente a "text/plain".*/
+const HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN = "text/plain"
+
 
 /** Oggetto contenente il token di autenticazione, accessibile
  * solo tramite getter e setter, realizzati grazie a closure.*/
@@ -141,6 +145,20 @@ export const richiestaPostConFile = (url, dati) => {
                 configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
                 return dati;
             });  // rimuove header senza interferire con i dati restituiti
+
+}
+
+/** Come {@link richiestaPost}, ma supporta l'invio di documenti
+ * caricati tramite input[type="file"].*/
+export const richiestaPostContenutoTextPlain = (url, dati) => {
+
+    configRichiesteHttp.impostaHeader(HTTP_HEADER_CONTENT_TYPE_NOME, HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN);
+
+    return richiestaPost(url, dati)
+        .finally( dati => {
+            configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
+            return dati;
+        });  // rimuove header senza interferire con i dati restituiti
 
 }
 

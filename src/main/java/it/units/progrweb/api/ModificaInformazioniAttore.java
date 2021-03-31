@@ -43,7 +43,7 @@ public class ModificaInformazioniAttore {
      * del client, allora quel token diventerà invalido, infatti questo
      * metodo restituisce nell'entity della risposta il nuovo token
      * di autenticazione (questo metodo fa uso di {@link
-     * Autenticazione#creaResponseAutenticazionePerAttoreAutenticato(Attore)}).*/
+     * Autenticazione#creaResponseAutenticazionePerAttore(Attore)}).*/
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaInformazioni(@Context HttpServletRequest httpServletRequest,
@@ -99,7 +99,7 @@ public class ModificaInformazioniAttore {
             try {
                 // Necessaria nuova response di autenticazione per il client perché ha modificato le sue informazioni
                 //  (come se avesse appena fatto il login)
-                return Autenticazione.creaResponseAutenticazionePerAttoreAutenticato(attoreDaModificare);
+                return Autenticazione.creaResponseAutenticazionePerAttore(attoreDaModificare);
             } catch (NotFoundException notFoundException) {
                 Logger.scriviEccezioneNelLog(ModificaInformazioniAttore.class, notFoundException);
                 return Response.serverError().build();

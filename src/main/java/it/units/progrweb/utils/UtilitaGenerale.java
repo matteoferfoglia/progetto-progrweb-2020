@@ -31,8 +31,8 @@ public class UtilitaGenerale {
     /** Restituisce true se l'array di stringhe dato contiene un
      * oggetto che inizia con la stringa da cercare. Altrimenti
      * restituisce false.*/
-    public static boolean isStessoPrefissoNellArray(String oggettoDaCercare, String[] array) {
-        return Arrays.stream(array).anyMatch(oggettoDaCercare::startsWith);
+    public static boolean isStessoPrefissoNellArray(String stringaDaCercare, String[] array) {
+        return Arrays.stream(array).anyMatch(stringaDaCercare::startsWith);
     }
 
     /** Restituisce true se la richiesta è di tipo "api" (Ajax), false altrimenti.*/

@@ -30,6 +30,7 @@ public class FiltroAutenticazione implements Filter {
      * e non si verifica l'autorizzazione del client.*/
     private static final String[] WHITE_LIST_URL_AUTENTICAZIONE_NON_RICHIESTA = {
             API_CONTEXT_ROOT+"/login",
+            API_CONTEXT_ROOT+"/firebaseLogin",
             API_CONTEXT_ROOT+"/logout",
             PATH_SERVIZIO_VERIFICA_ACCCOUNT,
             API_CONTEXT_ROOT+"/resetPassword",
