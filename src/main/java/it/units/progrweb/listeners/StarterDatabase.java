@@ -34,15 +34,15 @@ public class StarterDatabase implements ServletContextListener {
     /** Array di attori da creare e salvare nel DB in modalità di sviluppo.
      * Questi attori saranno giò presenti al primo accesso al sistema. */
     private final static AttoreConCredenziali[] attoriDaCreareInDevMod = {
-            new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Mario il Consumer", Attore.TipoAttore.Consumer),
-            new AttoreConCredenziali("AB01", "4567","bancaprova@example.com","Banca Prova", Attore.TipoAttore.Uploader),
-            new AttoreConCredenziali("AdminTest", "8910","marioadmin@example.com","Mario l'Amministratore", Attore.TipoAttore.Administrator),
-            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@example.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
+            new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Consumer di Prova", Attore.TipoAttore.Consumer),
+            new AttoreConCredenziali("AB01", "5678","uplaoderprova@example.com","Uploader di Prova", Attore.TipoAttore.Uploader),
+            new AttoreConCredenziali("AdminTest", "9012","adminprova@example.com","Amministratore di Prova", Attore.TipoAttore.Administrator),
+            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@gmail.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
     };
 
     /** Come {@link #attoriDaCreareInDevMod}, ma per la modalità di produzione. */
     private final static AttoreConCredenziali[] attoriDaCreareInProdMod = {
-            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@example.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
+            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@gmail.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
     };
 
 
@@ -55,13 +55,9 @@ public class StarterDatabase implements ServletContextListener {
      * registrare nel database. Utilizzare il <i>fully-qualified
      * name</i> delle classi.*/
     private final static String[] nomiEntitaGestiteDalDatabase = {
-            // TODO : non basta mettere gli storage?
             "it.units.progrweb.entities.attori.Attore",
-            "it.units.progrweb.entities.attori.administrator.Administrator",
             "it.units.progrweb.entities.attori.administrator.AdministratorStorage",
-            "it.units.progrweb.entities.attori.uploader.Uploader",
             "it.units.progrweb.entities.attori.uploader.UploaderStorage",
-            "it.units.progrweb.entities.attori.consumer.Consumer",
             "it.units.progrweb.entities.attori.consumer.ConsumerStorage",
             "it.units.progrweb.entities.RelazioneUploaderConsumer",
             "it.units.progrweb.entities.AuthenticationDatabaseEntry",
