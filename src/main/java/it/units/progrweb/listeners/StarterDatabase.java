@@ -4,20 +4,20 @@ import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
-import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.attori.administrator.Administrator;
+import it.units.progrweb.entities.attori.consumer.Consumer;
+import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import static it.units.progrweb.entities.AuthenticationTokenInvalido.EliminatoreTokenInvalidi.*;
@@ -30,6 +30,26 @@ import static it.units.progrweb.entities.AuthenticationTokenInvalido.Eliminatore
  */
 @WebListener
 public class StarterDatabase implements ServletContextListener {
+
+    /** Array di attori da creare e salvare nel DB in modalità di sviluppo.
+     * Questi attori saranno giò presenti al primo accesso al sistema. */
+    private final static AttoreConCredenziali[] attoriDaCreareInDevMod = {
+            new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Mario il Consumer", Attore.TipoAttore.Consumer),
+            new AttoreConCredenziali("AB01", "4567","bancaprova@example.com","Banca Prova", Attore.TipoAttore.Uploader),
+            new AttoreConCredenziali("AdminTest", "8910","marioadmin@example.com","Mario l'Amministratore", Attore.TipoAttore.Administrator),
+            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@example.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
+    };
+
+    /** Come {@link #attoriDaCreareInDevMod}, ma per la modalità di produzione. */
+    private final static AttoreConCredenziali[] attoriDaCreareInProdMod = {
+            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@example.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
+    };
+
+
+    // -------------- FINE PARAMETRI CONFIGURABILI --------------
+
+
+
 
     /** Array dei nomi delle classi corrispondenti alle entità da
      * registrare nel database. Utilizzare il <i>fully-qualified
@@ -79,129 +99,122 @@ public class StarterDatabase implements ServletContextListener {
         // Fonte: https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server#detecting_the_application_runtime_environment
         if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
             // Local development server
-
-            // Caricamento di alcune entità di prova
-
-            try {
-
-                // Creazione delle entità di test
-                Object consumerTest, uploaderTest, administratorTest;
-                AuthenticationDatabaseEntry authConsumerTest, authUploaderTest, authAdministratorTest;
-
-                {
-                    // Creazione delle entità (oggetti Java)
-
-                    {
-                        // Creazione consumer
-                        Class<?> consumerStorage = Class.forName("it.units.progrweb.entities.attori.consumer.ConsumerStorage");
-                        Constructor<?> constructorConsumerStorage = consumerStorage.getDeclaredConstructor(String.class, String.class, String.class);
-                        constructorConsumerStorage.setAccessible(true);
-                        consumerTest = constructorConsumerStorage.newInstance("PPPPLT80A01A952G", "Pippo Pluto", "matteoferfoglia3@gmail.com");
-                        authConsumerTest = new AuthenticationDatabaseEntry("PPPPLT80A01A952G","1234");
-                    }
-
-                    {
-                        // Creazione Uploader
-                        Class<?> uploaderStorage = Class.forName("it.units.progrweb.entities.attori.uploader.UploaderStorage");
-                        Constructor<?> constructorUploaderStorage = uploaderStorage.getDeclaredConstructor(String.class, String.class, String.class, byte[].class, String.class);
-                        constructorUploaderStorage.setAccessible(true);
-                        uploaderTest = constructorUploaderStorage.newInstance("AB01", "Banca Prova", "bancaprova@example.com",
-                                UtilitaGenerale.convertiInputStreamInByteArray(sce.getServletContext().getResourceAsStream("/favicon.ico") ), "ico");
-                        authUploaderTest = new AuthenticationDatabaseEntry("AB01","5678");
-                    }
-
-                    {
-                        // Creazione Administrator
-                        Class<?> administratorStorage = Class.forName("it.units.progrweb.entities.attori.administrator.AdministratorStorage");
-                        Constructor<?> constructorAdministratorStorage = administratorStorage.getDeclaredConstructor(String.class, String.class, String.class);
-                        constructorAdministratorStorage.setAccessible(true);
-                        administratorTest = constructorAdministratorStorage.newInstance("AdminTest", "Mario l'Amministratore", "marioadmin@example.com");
-                        authAdministratorTest = new AuthenticationDatabaseEntry("AdminTest","9012");
-                    }
-
-                }
-
-                // Salvataggio nel database locale
-                ObjectifyService.run(new VoidWork() {
-                    // Fonte(usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
-                    public void vrun() {
-                        Long idConsumer = (Long)DatabaseHelper.salvaEntita(consumerTest);
-                        Long idUploader = (Long)DatabaseHelper.salvaEntita(uploaderTest);
-
-                        try {
-                            // Creazione relazione consumer-uploader
-                            Constructor<RelazioneUploaderConsumer> costruttoreRelazione;
-                            costruttoreRelazione = RelazioneUploaderConsumer.class
-                                    .getDeclaredConstructor(Long.class, Long.class, Long.class);
-                            costruttoreRelazione.setAccessible(true);
-                            RelazioneUploaderConsumer relazione = costruttoreRelazione.newInstance(idConsumer, idUploader, null);
-
-                            Arrays.stream(new Object[]{administratorTest, relazione, authConsumerTest, authUploaderTest, authAdministratorTest})
-                                .forEach( DatabaseHelper::salvaEntita );
-
-                        } catch (InstantiationException|IllegalAccessException|
-                                InvocationTargetException|NoSuchMethodException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-            } catch (InvalidKeyException | NoSuchAlgorithmException |
-                    ClassNotFoundException | NoSuchMethodException |
-                    InstantiationException | IllegalAccessException |
-                    InvocationTargetException e) {
-                Logger.scriviEccezioneNelLog(StarterDatabase.class, e);
-            }
-
+            caricaEntitaInDB( attoriDaCreareInDevMod );
         } else {
             // Production
             // which is: SystemProperty.Environment.Value.Production
 
             // Da requisiti: All’avvio della piattaforma per la prima volta, vi sarà un solo utente amministratore.
             // TODO : da testare in ambiente di produzione
-
-            try {
-
-                // Creazione Administrator e relativa entry dell'AuthDB
-                Class<?> administratorStorage = Class.forName("it.units.progrweb.entities.attori.administrator.AdministratorStorage");
-                Constructor<?> constructorAdministratorStorage = administratorStorage.getDeclaredConstructor(String.class, String.class, String.class);
-                constructorAdministratorStorage.setAccessible(true);
-                Attore administrator = (Attore) constructorAdministratorStorage.newInstance("AdminTest", "Mario l'Amministratore", "marioadmin@example.com");
-                AuthenticationDatabaseEntry authAdministrator = new AuthenticationDatabaseEntry("AdminTest","9012", true);
-
-                // Salvataggio nel database
-                if( Attore.getAttoreDaUsername( administrator.getUsername() ) == null  ) {
-
-                    DatabaseHelper.salvaEntita( administrator );
-
-                    // Controllo se entry esiste già in AuthDB
-                    try {
-                        AuthenticationDatabaseEntry authenticationDatabaseEntry =
-                                AuthenticationDatabaseEntry.cercaAttoreInAuthDb(administrator.getUsername());
-
-                        // Se qui, significa che l'entry esisteva già in AuthDB, quindi lo si rimuove e sovrascrive
-                        //  (incoerente che l'attore non era salvato ma la sua password sì)
-                        AuthenticationDatabaseEntry.eliminaEntry( administrator.getUsername() );
-
-                    } catch (NotFoundException ignored) {}
-
-                    DatabaseHelper.salvaEntita( authAdministrator );
-
-                } // altrimenti: attore già in DB, non serve reinserirlo
-
-
-            }catch ( ClassNotFoundException | NoSuchMethodException | InstantiationException |
-                      IllegalAccessException | InvocationTargetException | InvalidKeyException |
-                      NoSuchAlgorithmException e ) {
-
-                Logger.scriviEccezioneNelLog( StarterDatabase.class, e );
-
-            }
+            caricaEntitaInDB( attoriDaCreareInProdMod );
 
         }
+    }
+
+    /** Metodo per il salvataggio nel database delle entità contenute
+     * nell'array passato come parametro. */
+    private void caricaEntitaInDB( AttoreConCredenziali[] attoriDaSalvare ) {
+        for( AttoreConCredenziali attore : attoriDaSalvare )
+            attore.salvaInDB();
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
         rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi(sce.getServletContext());
     }
+}
+
+/** Rappresentazione sintetica di un {@link Attore} e del corrispondente {@link AuthenticationDatabaseEntry}. */
+class AttoreConCredenziali {
+
+    /** L'{@link Attore} associato a quest'istanza. */
+    private final Attore attore;
+
+    /** L'istanza di {@link AuthenticationDatabaseEntry} rappresentante
+     * le credenziali di {@link #attore}. */
+    private final AuthenticationDatabaseEntry authenticationDatabaseEntry;
+
+    public AttoreConCredenziali(String username, String password,
+                                String email, String nominativo, Attore.TipoAttore tipoAttore ) {
+
+        switch( tipoAttore ) {
+            case Consumer:
+                this.attore = Consumer.creaAttore(username, nominativo, email);
+                break;
+            case Uploader:
+                this.attore = Uploader.creaAttore(username, nominativo, email);
+                break;
+            case Administrator:
+                this.attore = Administrator.creaAttore(username, nominativo, email);
+                break;
+            default:
+                throw new RuntimeException("Tipo attore non valido.");
+        }
+
+        try {
+            this.authenticationDatabaseEntry =
+                    new AuthenticationDatabaseEntry(username, password, true);
+        } catch (InvalidKeyException|NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);  // eventuale eccezione compare a runtime (unchecked exception)
+        }
+
+    }
+
+    public Attore getAttore() {
+        return attore;
+    }
+
+    public AuthenticationDatabaseEntry getAuthenticationDatabaseEntry() {
+        return authenticationDatabaseEntry;
+    }
+
+    /** Salva nel database l'{@link Attore} ed il corrispondente {@link AuthenticationDatabaseEntry}
+     * rappresentato da quest'istanza oppure, se l'{@link Attore} o il corrispondente
+     * {@link AuthenticationDatabaseEntry} sono già presente nel database, scrive l'eccezione
+     * usando la classe {@link Logger}.*/
+    public void salvaInDB() {
+
+        // Fonte (usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
+        ObjectifyService.run(
+
+                new VoidWork() {
+                    @Override
+                    public void vrun() {
+
+                        String usernameAttoreDaSalvare = getAttore().getUsername();
+
+                        // Verifica se l'attore da salvare esiste già nel sistema
+                        boolean attoreGiaNelSistema;
+                        try {
+                            AuthenticationDatabaseEntry.cercaAttoreInAuthDb( usernameAttoreDaSalvare );
+
+                            // Se non vengono generate eccezioni, significa che l'attore è stato trovato in AuthDB
+                            attoreGiaNelSistema = true;
+                        } catch (NotFoundException notFoundException) {
+                            // Se qui: attore non trovato in AuthDB
+                            attoreGiaNelSistema = Attore.getAttoreDaUsername(usernameAttoreDaSalvare) != null;
+                        }
+
+                        if( !attoreGiaNelSistema ) {
+
+                            DatabaseHelper.salvaEntita(getAttore());
+                            DatabaseHelper.salvaEntita(getAuthenticationDatabaseEntry());
+
+                        } else {
+                            String messaggioErrore = "Attore " + usernameAttoreDaSalvare +
+                                    " o le sue credenziali sono già presenti nel Database";
+
+                            Logger.scriviEccezioneNelLog(
+                                    StarterDatabase.class,
+                                    "Errore durante lo starter del database: " + messaggioErrore,
+                                    new SQLException( messaggioErrore )
+                            );
+                        }
+
+                    }
+                }
+
+        );
+
+    }
+
 }
