@@ -5,11 +5,18 @@ Questo progetto *App Engine Standard Java application* è stato inizialmente gen
 con *Google Cloud SDK* (installabile da https://cloud.google.com/sdk/docs/install),
 usando l'archetipo *appengine-standard-archetype*.
 
-## Maven
+## Maven e Google Cloud SDK
 Questo progetto richiede la versione 3.5 di Maven.
 Di seguito vengono elencati alcuni comandi Maven (eseguibili nella forma
 `mvn ...`) che possono essere eseguiti dalla shell posizionata nella
 cartella principale del progetto.
+
+E' necessario installare Google Cloud SDK, seguendo la procedura:
+1. installare [Google Cloud SDK](https://cloud.google.com/sdk/docs/install);
+2. dal terminale, installare *app-engine-java* con il seguente comando
+```
+gcloud components install app-engine-java
+```
 
 ### Esecuzione locale del web server
 Il comando
