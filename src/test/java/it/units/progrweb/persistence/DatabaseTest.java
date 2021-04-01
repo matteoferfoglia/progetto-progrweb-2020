@@ -41,7 +41,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 public class DatabaseTest {
 
     /** Fattore di replicazione delle istanze di test create in {@link #generaEntitaDaSalvareNelDatabase()}.*/
-    final static int NUMERO_RIPETIZIONI_OGNI_TEST = 1000;
+    final static int NUMERO_RIPETIZIONI_OGNI_TEST = 10;
 
     // ------------ SETUP APPENGINE e OBJECTIFY ------------
 
@@ -54,7 +54,6 @@ public class DatabaseTest {
     @BeforeEach
     public void starterDatabase() {
         ObjectifyService.setFactory(new ObjectifyFactory());    // Specifico per Objectify (Fonte: https://stackoverflow.com/a/36247734)
-        this.session = ObjectifyService.begin();    // Specifico per Objectify (Fonte: https://stackoverflow.com/a/36247734)
         try {
             Method registrazioneClassiDatabase = StarterDatabase.class.getDeclaredMethod("registraClassiDatabase");
             registrazioneClassiDatabase.setAccessible(true);
