@@ -91,18 +91,6 @@ public class AuthenticationDatabaseEntry {
     @Ignore
     private static final int LUNGHEZZA_TOKEN_VERIFICA_ACCOUNT = 64;
 
-    /** Crea un' entry dell'authentication database. L'account creato con
-     * questo metodo risulta già verificato e "pronto all'uso".
-     * @throws InvalidKeyException generata da {@link GestoreSicurezza#hmacSha256(String)}
-     * @throws NoSuchAlgorithmException generata da {@link GestoreSicurezza#hmacSha256(String)}
-     */
-    public AuthenticationDatabaseEntry(String username, String passwordAttore)
-            throws InvalidKeyException, NoSuchAlgorithmException {
-
-        this(username, passwordAttore, true);
-
-    }
-
     /** Crea un' entry dell'authentication database.
      * @param username Username dell'attore, per il salvataggio.
      * @param passwordAttore Password in chiaro dell'attore, per il salvataggio.
