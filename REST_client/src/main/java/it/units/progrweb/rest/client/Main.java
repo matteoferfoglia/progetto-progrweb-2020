@@ -35,16 +35,16 @@ public class Main {
 
         // Parametri per l'invio dei file
 //        String codiceFiscaleConsumer = "PPPPLT80A01A952G";
-//        String emailConsumer = "pippopluto@example.com";
-//        String nomeCognomeConsumer = "Pippo Pluto";
+//        String emailConsumer = "consumerprova@example.com";
+//        String nomeCognomeConsumer = "Consumer di Prova";
 
-        String codiceFiscaleConsumer = "RSSMRA80A01F205X";
-        String emailConsumer = "mariorossi@example.com";
-        String nomeCognomeConsumer = "Mario Rossi";
+//        String codiceFiscaleConsumer = "RSSMRA80A01F205X";
+//        String emailConsumer = "mariorossi@example.com";
+//        String nomeCognomeConsumer = "Mario Rossi";
 
-//        String codiceFiscaleConsumer = "NDRNDR80A01A182X";
-//        String emailConsumer = "andreaandrei@example.com";
-//        String nomeCognomeConsumer = "Andrea Andrei";
+        String codiceFiscaleConsumer = "NDRNDR80A01A182X";
+        String emailConsumer = "matteoferfoglia2@gmail.com";
+        String nomeCognomeConsumer = "Matteo Ferfoglia Consumer";
 
         String nomeFile = "file prova";
         String listaHashtag = "rest, file, prova, primo file";
@@ -54,7 +54,7 @@ public class Main {
         // ---- FINE PARAMETRI ----
 
 
-        File file;  // da inizializzare
+        File file;
         {
             // Lettura del file
             URL urlFileLocale = Main.class.getClassLoader().getResource(percorsoFileLocale);
