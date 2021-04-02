@@ -42,7 +42,14 @@ Il comando
 
     mvn appengine:deploy
 
-permette il deploy sul server Google.
+permette il deploying sul server Google.
+
+Per l'operazione di deploying dell'applicazione *Google AppEngine*,
+l'account di fatturazione associato al progetto deve essere abilitato
+e l'applicazione *AppEngine* sul server di Google deve essere abilitata
+(quindi non in stato *stopped*, vedere la sezione
+[*Impostazioni*](https://console.cloud.google.com/appengine/settings) di
+*AppEngine* del progetto).
 
 ### Testing
 Per creare i test Java è stato utilizzato il framework *JUnit 5*.
