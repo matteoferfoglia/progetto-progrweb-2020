@@ -48,6 +48,10 @@ export default {
           firebase.auth.GoogleAuthProvider.PROVIDER_ID // login con account Google
         ],
 
+        /** Permette di scegliere come mostrare le opzioni di autenticazione:
+         * redirect (predefinito) o popup (apre una nuova finestra). */
+        signInFlow: "popup",
+
         /** Funzioni di callbacks invocate quando cambia lo stato dell'autenticazione */
         callbacks: {
 
