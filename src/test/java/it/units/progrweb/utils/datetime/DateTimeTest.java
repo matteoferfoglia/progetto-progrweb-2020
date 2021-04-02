@@ -96,7 +96,9 @@ public class DateTimeTest {
     /** Test per {@link it.units.progrweb.utils.datetime.DateTime#currentTimeInSecondi()} .*/
     @Test
     void currentTimeInSecondiTest(){
-        assertEquals(System.currentTimeMillis()/1000, DateTime.currentTimeInSecondi());
+        int epsilon_millisecondi = 2;   // milliseecondi di tolleranza
+        boolean esito_test = Math.abs(System.currentTimeMillis()/1000 - DateTime.currentTimeInSecondi()) < epsilon_millisecondi;
+        assertTrue( esito_test );
     }
 
     /** Test per {@link it.units.progrweb.utils.datetime.DateTime#convertiDaDate(java.util.Date)}
