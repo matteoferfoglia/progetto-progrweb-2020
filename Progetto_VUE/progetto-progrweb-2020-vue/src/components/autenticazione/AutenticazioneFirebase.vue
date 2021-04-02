@@ -1,7 +1,9 @@
 <template>
 
   <div id="firebaseui-auth-container"></div>
-  <small class="mt-1 text-center d-block text-secondary">Accedere utilizzando l'indirizzo e-mail registrato nell'applicazione.</small>
+  <small class="mt-1 text-center d-block text-secondary">
+    Accedere utilizzando l'indirizzo e-mail registrato nell'applicazione.
+  </small>
 
   <Loader v-if="attendendoRispostaDaServerApplicazione"
           class="fullscreen-loader">
