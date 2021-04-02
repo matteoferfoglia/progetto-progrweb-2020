@@ -3,6 +3,10 @@
   <div id="firebaseui-auth-container"></div>
   <small class="mt-1 text-center d-block text-secondary">Accedere utilizzando l'indirizzo e-mail registrato nell'applicazione.</small>
 
+  <Loader v-if="attendendoRispostaDaServerApplicazione"
+          class="fullscreen-loader">
+  </Loader>
+
 </template>
 
 <script>
@@ -18,10 +22,11 @@ import 'firebase/auth'; // Add the Firebase services that you want to use
 import * as firebaseui from 'firebaseui'
 
 import {richiestaPostContenutoTextPlain} from "@/utils/http";
+import Loader from "@/components/layout/Loader";
 
 export default {
   name: "AutenticazioneFirebase",
-
+  components: {Loader},
   emits: [
 
     /** Evento emesso quando l'intera procedura di login, sia con Firebase sia
@@ -40,6 +45,10 @@ export default {
 
     return {
 
+      /** Flag: true quando il client si è già autenticato con Firebase e sta
+       * attendendo risposta dal server dell'applicazione. */
+      attendendoRispostaDaServerApplicazione: false,
+
       /** Configurazione interfaccia grafica */
       uiConfig: {
 
@@ -57,6 +66,9 @@ export default {
 
           /** Funzione eseguita se il login con Firebase va a buon fine. */
           signInSuccessWithAuthResult: authResult => {
+
+            this.attendendoRispostaDaServerApplicazione = true; // login con Firebase ok,
+            // ora chiederà autenticazione al server dell'applicazione
 
             authResult.user.getIdToken()
                 .then( tokenJwtDaFirebase =>
@@ -97,6 +109,8 @@ export default {
     /** Funzione per creare ed avviare la Auth User Interface di Firebase. */
     creaEAvviaAuthUiFirebase() {
 
+      this.attendendoRispostaDaServerApplicazione = false;
+
       const creaAuthUiFirebase = () => {
 
         // Creazione della AuthUI di Firebase
@@ -128,5 +142,18 @@ export default {
 }
 </script>
 
-<!-- Stile Firebase, importato da node_module -->
-<style src="firebaseui/dist/firebaseui.css"></style>
+<style scoped>
+
+/* Stile Firebase, importato da node_module */
+@import "../../../node_modules/firebaseui/dist/firebaseui.css";
+
+.fullscreen-loader {
+  /* Sfondo bianco, applicato all'intera finestra del browser*/
+  background-color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+}
+</style>
