@@ -38,11 +38,11 @@ il comando
 permette l'avvio del server di sviluppo (locale) di *Google App Engine*.
 
 ### Deploying
-Il comando
+Creare il *package* del progetto (`mvn package`), poi usare il comando
 
     mvn appengine:deploy
 
-permette il deploying sul server Google.
+per eseguire il deploying sul server Google.
 
 Per l'operazione di deploying dell'applicazione *Google AppEngine*,
 l'account di fatturazione associato al progetto deve essere abilitato
