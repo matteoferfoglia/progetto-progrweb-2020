@@ -181,38 +181,33 @@ public class AuthenticationTokenInvalido {
                     // test se il nome dell'attributo esiste nella classe (altrimenti genera NoSuchFieldException)
                     AuthenticationTokenInvalido.class.getDeclaredField(nomeAttributoContenenteScadenzaToken);
 
-                    Thread thread = ThreadManager.createBackgroundThread(new Runnable() {
+                    Thread thread = ThreadManager.createBackgroundThread( () -> {   // funzione lambda rappresentante il metodo run
 
-                        @Override
-                        public void run() {
+                        // Ciclo infinito, altre API (Timer, ScheduledExecutorService, ...) non compatibili con Google AppEngine
+                        //noinspection InfiniteLoopStatement
+                        while( true ) {
 
-                            // Ciclo infinito, altre API (Timer, ScheduledExecutorService, ...) non compatibili con Google AppEngine
-                            //noinspection InfiniteLoopStatement
-                            while( true ) {
-
-                                try {
-                                    // Modalità di compatibilità con Google AppEngine
-                                    //noinspection BusyWait
-                                    Thread.sleep(ogniQuantiSecondiEseguire * 1000); // *1000 perché i parametri sono richiesti in millisecondi
-                                } catch (InterruptedException e) {
-                                    Logger.scriviEccezioneNelLog(AuthenticationTokenInvalido.class, e);
-                                }
-
-                                DatabaseHelper.query(AuthenticationTokenInvalido.class,
-                                                     nomeAttributoContenenteScadenzaToken,
-                                                     DatabaseHelper.OperatoreQuery.MINORE,
-                                                     DateTime.currentTimeInSecondi()) // restituisce i token scaduti al momento in cui viene eseguito
-                                              .forEach(unIstanzaDaEliminare -> {
-                                                    DatabaseHelper.cancellaEntitaById(
-                                                         ((AuthenticationTokenInvalido) unIstanzaDaEliminare)
-                                                         .getIdTokenInvalido(),
-                                                         AuthenticationTokenInvalido.class
-                                                    );
-                                              });
-
+                            try {
+                                // Modalità di compatibilità con Google AppEngine
+                                //noinspection BusyWait
+                                Thread.sleep(ogniQuantiSecondiEseguire * 1000); // *1000 perché i parametri sono richiesti in millisecondi
+                            } catch (InterruptedException e) {
+                                Logger.scriviEccezioneNelLog(AuthenticationTokenInvalido.class, e);
                             }
 
+                            DatabaseHelper.query(AuthenticationTokenInvalido.class,
+                                                 nomeAttributoContenenteScadenzaToken,
+                                                 DatabaseHelper.OperatoreQuery.MINORE,
+                                                 DateTime.currentTimeInSecondi()) // restituisce i token scaduti al momento in cui viene eseguito
+                                          .forEach(unIstanzaDaEliminare ->
+                                                  DatabaseHelper.cancellaEntitaById(
+                                                       ((AuthenticationTokenInvalido) unIstanzaDaEliminare).getIdTokenInvalido(),
+                                                       AuthenticationTokenInvalido.class
+                                                  )
+                                          );
+
                         }
+
                     });
 
                     thread.start();
