@@ -55,8 +55,8 @@ public abstract class Attore implements Cloneable, Principal {
     /** Nome e cognome dell'attore.*/
     protected String nominativo;
 
-    @Index
     /** Email dell'attore. */
+    @Index
     protected String email;
 
     /** Tipo di attore (quale sottoclasse di {@link Attore}).*/
