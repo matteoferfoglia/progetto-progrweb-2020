@@ -94,7 +94,11 @@ public abstract class Attore implements Cloneable, Principal {
                       field.setAccessible(true);
                       field.set(this, field.get(attore));    // modifica del valore
                   } catch (IllegalAccessException exception) {
-                      Logger.scriviEccezioneNelLog(this.getClass(),"Errore durante l'accesso ad un attributo dell'oggetto da copiare, con reflection.", exception);
+                      Logger.scriviEccezioneNelLog(
+                              this.getClass(),
+                              "Errore durante l'accesso ad un attributo dell'oggetto da copiare, con reflection.",
+                              exception
+                      );
                   }
 
               });
