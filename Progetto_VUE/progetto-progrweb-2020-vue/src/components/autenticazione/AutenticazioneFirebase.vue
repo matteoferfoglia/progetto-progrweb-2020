@@ -51,6 +51,9 @@ export default {
        * attendendo risposta dal server dell'applicazione. */
       attendendoRispostaDaServerApplicazione: false,
 
+      /** ID dell'elemento html container per Firebase. */
+      idHtmlFirebaseContainer: 'firebaseui-auth-container',
+
       /** Configurazione interfaccia grafica */
       uiConfig: {
 
@@ -117,7 +120,7 @@ export default {
 
         // Creazione della AuthUI di Firebase
         const ui = new firebaseui.auth.AuthUI(firebase.auth());
-        ui.start("#firebaseui-auth-container", this.uiConfig);
+        ui.start("#" + this.idHtmlFirebaseContainer, this.uiConfig);
 
       }
 
@@ -137,6 +140,14 @@ export default {
   },
 
   mounted() {
+
+    // Elimina vecchi contenuti Firebase dal DOM se presenti
+    const vecchioFirebaseContainer = document.getElementById(this.idHtmlFirebaseContainer);
+    if( vecchioFirebaseContainer && typeof vecchioFirebaseContainer.remove === "function" ) {
+      vecchioFirebaseContainer
+          .querySelectorAll('*')
+          .forEach(el => el.remove());
+    }
 
     this.creaEAvviaAuthUiFirebase() ;
 
