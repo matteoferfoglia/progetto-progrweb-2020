@@ -35,7 +35,7 @@ public class StarterDatabase implements ServletContextListener {
      * Questi attori saranno giò presenti al primo accesso al sistema. */
     private final static AttoreConCredenziali[] attoriDaCreareInDevMod = {
             new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Consumer di Prova", Attore.TipoAttore.Consumer),
-            new AttoreConCredenziali("AB01", "5678","uplaoderprova@example.com","Uploader di Prova", Attore.TipoAttore.Uploader),
+            new AttoreConCredenziali("AB01", "5678","uploaderprova@example.com","Uploader di Prova", Attore.TipoAttore.Uploader),
             new AttoreConCredenziali("AdminTest", "9012","adminprova@example.com","Amministratore di Prova", Attore.TipoAttore.Administrator),
             new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@gmail.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
     };
