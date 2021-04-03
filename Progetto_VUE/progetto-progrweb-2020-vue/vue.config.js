@@ -9,7 +9,7 @@
 
 module.exports = {
     productionSourceMap: false,  // evita source maps in production
-    chainWebpack: config => config.optimization.minimize(false),    // non esegue minificazione dei file in production mode (default: true)
+    chainWebpack: config => config.optimization.minimize(true),    // non esegue minificazione dei file in production mode (default: true)
     transpileDependencies: [     // transpiling delle dipendenze se hanno delle funzionalità non supportate nei browser in cui l'app dovrebbe funzionare
         "axios",
         "core-js",
