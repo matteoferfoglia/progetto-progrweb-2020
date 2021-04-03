@@ -241,7 +241,7 @@ export default {
           let stringaInformativaDelleModifiche = "Stanno per essere modificate le seguenti informazioni: " +
               informazioniCheSarannoModificate.join(", ").replace(/,([^,]+)$/,' e$1') + ".";
                                                           // $1 è il primo parenthesized substring match.
-                                                          // Sostituisce ', ' con ' e '
+                                                          // Sostituisce ultima ', ' con ' e '
 
           const confermaModifiche = confirm(stringaInformativaDelleModifiche);
 
