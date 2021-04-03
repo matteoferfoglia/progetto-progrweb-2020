@@ -63,7 +63,6 @@ public class UtilitaGenerale {
      * </ul>
      */
     public static String getUrlPattern(@NotNull HttpServletRequest httpRequest) {
-        // TODO : testare
         return httpRequest.getRequestURI().substring(httpRequest.getContextPath().length());
     }
 
@@ -72,8 +71,6 @@ public class UtilitaGenerale {
      * Esempio: se il request URL è  http://nome.server.com:8080/app/file
      * allora questo metodo restituirà http://nome.server.com:8080 .*/
     public static String getIndirizzoServer(@NotNull HttpServletRequest httpServletRequest) {
-
-        // TODO : testare
 
         String requestUrl = httpServletRequest.getRequestURL().toString();
         String requestUri = httpServletRequest.getRequestURI();
