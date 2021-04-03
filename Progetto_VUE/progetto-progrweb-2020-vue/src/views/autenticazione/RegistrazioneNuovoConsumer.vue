@@ -101,7 +101,10 @@ export default {
         this.confermaPassword = "";
       }
 
-      const registrazioneCompletata = () => this.$router.push({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});
+      const registrazioneCompletata = risposta => {
+        alert(risposta);
+        this.$router.push({path: process.env.VUE_APP_ROUTER_NOME_COMPONENTE_AREA_RISERVATA});
+      }
 
       const registrazioneFallita = ris => {
         console.error( "Errore durante la registrazione: " + JSON.stringify(ris) );
@@ -123,7 +126,7 @@ export default {
         }
 
         richiestaPost(process.env.VUE_APP_URL_REGISTRAZIONE_CONSUMER, campiFormDaInviareAlServer)
-            .then(  ()       => registrazioneCompletata() )
+            .then(  risposta => registrazioneCompletata(risposta) )
             .catch( risposta => registrazioneFallita(risposta) );
       };
 
