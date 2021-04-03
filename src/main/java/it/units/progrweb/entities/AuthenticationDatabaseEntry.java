@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  * Nota: informazioni di autenticazione tenuti separate dalle
  * informazioni degli attori.
  * Nel caso in cui un utente dimentichi la propria password, può
- * recuperarla: a tal fine si usa il campo passwordTemporanea.
+ * recuperarla: a tal fine si usa il campo hashedSaltedPasswordTemporanea.
  * Un account deve essere verificato (invocando il metodo
  * {@link #verificaAccount(String, String)}, passando come parametro un
  * token che viene generato alla creazione di un'istanza di questa
@@ -80,12 +80,27 @@ public class AuthenticationDatabaseEntry {
     /** Salt utilizzato. */
     private String salt;
 
-    /** Password temporanea, in chiaro.*/
-    private String passwordTemporanea;
+    /** Password temporanea. Motivo di utilizzo di un ulteriore campo per
+     * la password temporanea: la password temporanea può essere utilizzata
+     * per il recupero della propria password (se l'utente se la dimentica); se
+     * vi fosse un solo campo nel database per la password, allora, quando
+     * l'utente ne richiede il reset, quell'unico campo verrebbe sovrascritto, quindi
+     * chiunque conosca lo username di un particolare utente, può richiederne il
+     * reset della password: ciò non va bene, quindi si è deciso di memorizzare
+     * la password temporanea in un campo separato, cosicché se non era stato
+     * l'utente a richiederne il reset, allora quest'ultimo può tranquillamente
+     * autenticarsi con la sua usuale password (e quella temporanea viene cancellata)
+     * - si noti che per quest'operazione è necessario che non venga alterato il salt
+     * associato alla password iniziale, nemmeno a seguito della generazione della
+     * password temporanea, perché altrimenti sarebbe impossibile verificare la
+     * password iniziale -, invece se è stato l'utente a richiederne la modifica,
+     * allora può accedere con la password temporanea che diventa quindi definitiva
+     * finché l'utente non la modificherà. */
+    private String hashedSaltedPasswordTemporanea;
 
     /** Token per verificare un account appena creato, per poterlo usare.
      * Un account risulta verificato se questo token è null.*/
-    private String tokenVerificaAccount;        // TODO : aggiungere in diagramma ER
+    private String tokenVerificaAccount;
 
     /** Lunghezza di {@link #tokenVerificaAccount}.*/
     @Ignore
@@ -131,7 +146,8 @@ public class AuthenticationDatabaseEntry {
         return tokenVerificaAccount==null;
     }
 
-    /** Rende verificato l'account. */
+    /** Rende verificato l'account. Questo metodo <strong>NON</strong> salva le modifiche
+     * nel database.*/
     private void rendiVerificatoQuestoAccount() {
         if( tokenVerificaAccount!=null ) {    // quando è null significa che l'account è verificato
             tokenVerificaAccount = null;
@@ -168,6 +184,7 @@ public class AuthenticationDatabaseEntry {
 
         if( tokenVerificaAccount.equals(authenticationDatabaseEntryDaVerificare.tokenVerificaAccount) ) {
             authenticationDatabaseEntryDaVerificare.rendiVerificatoQuestoAccount();
+            DatabaseHelper.salvaEntita(authenticationDatabaseEntryDaVerificare);
             return true;
         }
 
@@ -192,20 +209,29 @@ public class AuthenticationDatabaseEntry {
     }
 
     /** Dato uno username, genera una password casuale temporanea per quell'utente.
-     * La vecchia password resta valida. La password appena generata viene salvata
-     * in chiaro (senza né hash né salt) e viene restituita in chiaro.
+     * La vecchia password resta valida. Nel database viene salvata la password
+     * temporanea in modalità Hashed&Salted, <strong>senza</strong> generare un
+     * nuovo salt.
      * @param username Lo username per cui creare una password temporanea.
+     * @return La password temporanea generata casualmente, in chiaro.
+     * @throws NoSuchAlgorithmException In caso di errori nel calcolo dell'hash della password.
+     * @throws InvalidKeyException In caso di errori nel calcolo dell'hash della password.
      * @throws NotFoundException Se lo username dato non viene trovato.*/
     public static String creaPasswordTemporanea(String username)
-            throws NotFoundException {  // TODO : password temporanea può essere salvata cifrata con l'hash già presente
+            throws NotFoundException, NoSuchAlgorithmException, InvalidKeyException {
 
         AuthenticationDatabaseEntry authenticationDatabaseEntry =
                 cercaAttoreInAuthDb(username);
 
-        authenticationDatabaseEntry.passwordTemporanea = GeneratoreTokenCasuali.generaTokenAlfanumerico(PASSWORD_TEMPORANEA_LENGTH);
+        String passwordTemporaneaInChiaro =
+                GeneratoreTokenCasuali.generaTokenAlfanumerico(PASSWORD_TEMPORANEA_LENGTH);
+
+        authenticationDatabaseEntry.hashedSaltedPasswordTemporanea =
+                calcolaHashedSaltedPassword(passwordTemporaneaInChiaro, authenticationDatabaseEntry.salt);
+
         DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
 
-        return authenticationDatabaseEntry.passwordTemporanea;
+        return passwordTemporaneaInChiaro;
 
     }
 
@@ -248,8 +274,8 @@ public class AuthenticationDatabaseEntry {
             // Credenziali (hashedSalted) valide
 
             // Elimina eventuali password temporanee
-            if( authenticationEntry.passwordTemporanea != null ) {
-                authenticationEntry.passwordTemporanea = null;
+            if( authenticationEntry.hashedSaltedPasswordTemporanea != null ) {
+                authenticationEntry.hashedSaltedPasswordTemporanea = null;
                 DatabaseHelper.salvaEntita(authenticationEntry);
             }
 
@@ -258,17 +284,18 @@ public class AuthenticationDatabaseEntry {
 
 
         // Verifica password temporanea (se la verifica della password fallisce)
-        if(authenticationEntry.passwordTemporanea!=null &&
-                authenticationEntry.passwordTemporanea.equals(passwordDaVerificare)) {
-            // Se si sta accedendo con una password temporanea (salvata in chiaro), allora la si rende "hashedSalted"
-            authenticationEntry.salt = generaSalt();
-            authenticationEntry.hashedSaltedPassword =
-                    calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt);
-            authenticationEntry.passwordTemporanea = null;
-            DatabaseHelper.salvaEntita(authenticationEntry);
+        if(authenticationEntry.hashedSaltedPasswordTemporanea !=null &&
+                calcolaHashedSaltedPassword(passwordDaVerificare, authenticationEntry.salt)
+                        .equals(authenticationEntry.hashedSaltedPasswordTemporanea) ) {
+            // Se si sta accedendo con una password temporanea, allora la si rende definitiva
+            authenticationEntry.hashedSaltedPassword = authenticationEntry.hashedSaltedPasswordTemporanea;
+            authenticationEntry.hashedSaltedPasswordTemporanea = null;
 
             // Se l'account non era verificato, ora lo è implicitamente
             authenticationEntry.rendiVerificatoQuestoAccount();
+
+            // Salva le modifiche in DB
+            DatabaseHelper.salvaEntita(authenticationEntry);
 
             return true;    // credenziali valide
         }

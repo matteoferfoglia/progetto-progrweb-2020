@@ -19,6 +19,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Classe per la gestione dell'autenticazione dei client.
@@ -130,6 +132,8 @@ public class LoginLogout {
 
         String username = campiFormLogin.getUsername();
 
+        final String MSG_ERRORE_INTERNO = "Errore interno, riprovare più tardi.";
+
         if(username == null)
             return "Specificare lo username.";
 
@@ -148,10 +152,12 @@ public class LoginLogout {
                                         " al primo accesso tale password. Se non è stata richiesta la modifica, ignorare" +
                                         " questa email.");
                     } catch (MessagingException | UnsupportedEncodingException e) {
-                        Logger.scriviEccezioneNelLog(LoginLogout.class,
+                        Logger.scriviEccezioneNelLog(
+                                LoginLogout.class,
                                 "Errore nell'invio della mail per il reset della password",
-                                e);
-                        return "Errore interno, riprovare più tardi.";
+                                e
+                        );
+                        return MSG_ERRORE_INTERNO;
                     }
                 } else {
                     throw new NotFoundException();
@@ -161,6 +167,13 @@ public class LoginLogout {
             return "E' stata inviata tramite email la nuova password per accedere al sistema.";
         } catch (NotFoundException e) {
             return "Username non trovato nel sistema";
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            Logger.scriviEccezioneNelLog(
+                    LoginLogout.class,
+                    "Errore nel calcolo dell'hash della password temporanea.",
+                    e
+            );
+            return MSG_ERRORE_INTERNO;
         }
 
     }
