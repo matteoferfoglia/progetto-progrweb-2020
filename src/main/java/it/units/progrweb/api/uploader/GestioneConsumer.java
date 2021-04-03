@@ -6,7 +6,6 @@ import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.attori.consumer.ConsumerProxy;
 import it.units.progrweb.entities.attori.uploader.Uploader;
-import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -163,43 +162,27 @@ public class GestioneConsumer {
     @Path("/modificaConsumer")
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
-    public Response modificaConsumer(@FormDataParam("username")   String nuovoUsername,
-                                     @FormDataParam("nominativo") String nuovoNominativo,
+    public Response modificaConsumer(@FormDataParam("nominativo") String nuovoNominativo,
                                      @FormDataParam("email")      String nuovaEmail,
                                      @FormDataParam("identificativoAttore") Long identificativoConsumerDaModificare,
                                      @Context HttpServletRequest  httpServletRequest) {
 
-        // TODO : refactoring: metodo simile in Administrator, entrabi si rifanno ad un metodo di attore
-
         if( identificativoConsumerDaModificare != null ) {
-            Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
+            Long identificativoUploaderRichiedenteModifica =
+                    Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
-            if( RelazioneUploaderConsumer.
-                    isConsumerServitoDaUploader(identificativoUploader,
-                            identificativoConsumerDaModificare) ) {
+            if( RelazioneUploaderConsumer
+                    .isConsumerServitoDaUploader(identificativoUploaderRichiedenteModifica,
+                                                 identificativoConsumerDaModificare) ) {
 
-                Consumer consumer_attualmenteSalvatoInDB =
-                        (Consumer) Attore.getAttoreDaIdentificativo( identificativoConsumerDaModificare );
-
-                if( consumer_attualmenteSalvatoInDB != null ) {
-
-                    Consumer consumer_conModificheRichiesteDalClient = (Consumer) consumer_attualmenteSalvatoInDB.clone();
-                    consumer_conModificheRichiesteDalClient.setNominativo(nuovoNominativo);
-                    consumer_conModificheRichiesteDalClient.setEmail(nuovaEmail);
-                    // consumer_attualmenteSalvatoInDB.setUsername(nuovoUsername); // Da specifiche, lo username non è modificabile
-
-                    return Attore.modificaAttore( consumer_conModificheRichiesteDalClient,
-                                                  consumer_attualmenteSalvatoInDB );
-
-                } else {
-                    Logger.scriviEccezioneNelLog( GestioneConsumer.class,
-                                                  "Consumer [" + identificativoConsumerDaModificare + "] " +
-                                                     "collegato ad un Uploader ma non trovato nel sistema.",
-                                                 new NotFoundException() );
-
-                    return Response.serverError().build();
-
-                }
+                return Attore.modificaAttore(
+                        nuovoNominativo,
+                        nuovaEmail,
+                        identificativoConsumerDaModificare,
+                        null,
+                        null,
+                        true
+                );
 
             } else {
 
@@ -209,10 +192,11 @@ public class GestioneConsumer {
                         .build();
 
             }
+
         } else {
             return Response
                     .status( Response.Status.BAD_REQUEST )
-                    .entity("Specificare l'identificativo del Consumer da specificare.")
+                    .entity( "Identificativo del consumer da modificare non può essere null." )
                     .build();
         }
 

@@ -4,7 +4,6 @@ import it.units.progrweb.api.CreazioneAttore;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.uploader.Uploader;
-import it.units.progrweb.utils.UtilitaGenerale;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
@@ -13,7 +12,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -70,49 +68,29 @@ public class GestioneAttori {
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response modificaAttore(@Context HttpServletRequest httpServletRequest,
                                    @FormDataParam("identificativoAttore") Long identificativoAttore,
-                                   @FormDataParam("username")             String nuovoUsername,
                                    @FormDataParam("nominativo")           String nuovoNominativo,
                                    @FormDataParam("email")                String nuovaEmail,
                                    @FormDataParam("immagineLogo")         InputStream nuovoLogo,
                                    @FormDataParam("immagineLogo")         FormDataContentDisposition dettagliNuovoLogo) {
 
-        Attore attoreDaModificare_attualmenteSalvatoInDB = Attore.getAttoreDaIdentificativo( identificativoAttore );
-        if( attoreDaModificare_attualmenteSalvatoInDB != null ) {
+        if( identificativoAttore != null ) {
 
-            // TODO : refactoring: metodo simile in Uploader
-
-            // Crea una nuova istanza di Attore con le modifiche richieste
-            // Poi Attore#modificheAttore confronta le versioni
-
-            Attore attore_conModificheRichiesteDalClient = attoreDaModificare_attualmenteSalvatoInDB.clone();
-            attore_conModificheRichiesteDalClient.setNominativo( nuovoNominativo );
-            attore_conModificheRichiesteDalClient.setEmail( nuovaEmail );
-
-            if( attoreDaModificare_attualmenteSalvatoInDB instanceof Uploader &&
-                nuovoLogo != null && dettagliNuovoLogo != null && dettagliNuovoLogo.getFileName()!=null) {
-                // se queste condizioni sono true, allora un nuovo logo è stato caricato
-
-                try {
-                    ((Uploader)attoreDaModificare_attualmenteSalvatoInDB)
-                            .setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
-                                             UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
-                } catch (IOException e) {
-                    // Dimensione immagine logo eccessiva
-                    return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
-                                   .entity( e.getMessage() )
-                                   .build();
-                }
-
-            }
-
-            return Attore.modificaAttore(attore_conModificheRichiesteDalClient, attoreDaModificare_attualmenteSalvatoInDB);
+            return Attore.modificaAttore(
+                    nuovoNominativo,
+                    nuovaEmail,
+                    identificativoAttore,
+                    nuovoLogo,
+                    dettagliNuovoLogo,
+                    false
+            );
 
         } else {
-            // Attore non trovato nel DB
-            return Response.status( Response.Status.NOT_FOUND )
-                           .entity( "Attore [" + identificativoAttore + "] non trovato." )
-                           .build();
+            return Response
+                    .status( Response.Status.BAD_REQUEST )
+                    .entity("Specificare l'identificativo del Consumer da specificare.")
+                    .build();
         }
+
 
     }
 

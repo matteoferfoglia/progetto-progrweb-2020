@@ -17,6 +17,7 @@ import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.mail.MailSender;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import javax.mail.MessagingException;
 import javax.security.auth.Subject;
@@ -25,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -43,6 +45,13 @@ import java.util.stream.Collectors;
  */
 @Entity
 public abstract class Attore implements Cloneable, Principal {
+
+    /** Tipi di attori permessi nel sistema.*/
+    public enum TipoAttore {
+        Consumer,
+        Uploader,
+        Administrator
+    }
 
     /** Identificativo di un utente.*/
     @Id
@@ -82,67 +91,88 @@ public abstract class Attore implements Cloneable, Principal {
               });
     }
 
-    /** Questo metodo si occupa di modificare le informazioni di un attore.
-     * Funzionamento di questo metodo: clona l'attore ottenuto dal database,
-     * una copia la sovrascrive coi nuovi dati mandati dal client (se non
-     * nulli) e se risultano delle modifiche (rispetto al clone), le salva nel DB.
-     * Le modifiche vanno fatte sull'oggetto ottenuto dal DB, altrimenti poi quando si
-     * salva, viene creata una nuova entità anziché sovrascrivere quella esistente.
-     * @param attoreDaModificare_conModificheRichiesteDaClient E' la rappresentaazione
-     *                              dell'attore con le modifiche richieste dal cliente.
-     * @param attore_attualmenteSalvatoInDB E' lo stesso attore, ma con le
-     *                       informazioni attualmente salvate nel database.*/
-    public static Response modificaAttore(Attore attoreDaModificare_conModificheRichiesteDaClient,
-                                          Attore attore_attualmenteSalvatoInDB ) {
+    /** Metodo per modificare un {@link Attore}.
+     * @param identificativoAttoreDaModificare Identificativo dell'{@link Attore} da modificare.
+     * @param nuovoNominativo Nuovo nominativo. Può essere null.
+     * @param nuovaEmail Nuova email. Può essere null.
+     * @param nuovoLogo Nuovo logo dell'{@link Attore}. Può essere null.
+     * @param dettagliNuovoLogo Dettagli relativi al logo se lo si vuole modificare. Può essere null.
+     * @param modificaRichiestaDaUploader Flag: true se la modifica viene richiesta da un {@link Uploader}.
+     * @return Istanza di {@link Response} già pronta per essere inviata al client.
+     */
+    public static Response modificaAttore(String nuovoNominativo,
+                                          String nuovaEmail,
+                                          @NotNull Long identificativoAttoreDaModificare,
+                                          InputStream nuovoLogo,
+                                          FormDataContentDisposition dettagliNuovoLogo,
+                                          boolean modificaRichiestaDaUploader) {
 
-        if( attore_attualmenteSalvatoInDB != null &&
-                attoreDaModificare_conModificheRichiesteDaClient != null) {
+        Attore attore_recuperatoDaDB =
+                getAttoreDaIdentificativo(identificativoAttoreDaModificare);
 
-            // Creazione dell'attore con le modifiche richieste dal client (Attore è una classe astratta)
+        if( attore_recuperatoDaDB != null ) {
 
-            Attore copia_attore_attualmenteSalvatoInDB = attore_attualmenteSalvatoInDB.clone();
+            if( modificaRichiestaDaUploader &&
+                    ! (attore_recuperatoDaDB instanceof Consumer) ) {
 
-            attore_attualmenteSalvatoInDB.setEmail(attoreDaModificare_conModificheRichiesteDaClient.getEmail());
-            attore_attualmenteSalvatoInDB.setNominativo(attoreDaModificare_conModificheRichiesteDaClient.getNominativo());
-            // attore_attualmenteSalvatoInDB.setUsername(attoreDaModificare_conModificheRichiesteDaClient.getUsername()); // modifica username non permessa (da requisiti)
-            if( attoreDaModificare_conModificheRichiesteDaClient instanceof Uploader ) {
-                // SE si sta modificando un Uploader
-                Uploader uploader_attualmenteSalvatoInDB = (Uploader) attore_attualmenteSalvatoInDB;
-                try {
-                    uploader_attualmenteSalvatoInDB
-                            .setImmagineLogo( uploader_attualmenteSalvatoInDB.getImmagineLogo(),
-                                              uploader_attualmenteSalvatoInDB.getEstensioneImmagineLogo() );
-                } catch (IOException e) {
-                    return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
-                                   .entity( e.getMessage() )
-                                   .build();
+                return Response
+                        .status(Response.Status.FORBIDDEN)
+                        .entity("Un " + TipoAttore.Uploader + " può modificare solo un " + TipoAttore.Consumer)
+                        .build();
+
+            } else {
+
+                // Recupera dal DB l'attore da modificare, ne crea un clone di riferimento,
+                // modifica l'entità recuperata dal database e se ci sono modifiche valide
+                // allora aggiorna l'entità salvata in database
+
+                Attore clone_attoreRecuperatoDaDB = attore_recuperatoDaDB.clone();
+                clone_attoreRecuperatoDaDB.setIdentificativoAttore( attore_recuperatoDaDB.getIdentificativoAttore() );
+
+                attore_recuperatoDaDB.setNominativo(nuovoNominativo);
+                attore_recuperatoDaDB.setEmail(nuovaEmail);
+
+                if( attore_recuperatoDaDB instanceof Uploader &&    // Solo Uploader ha il logo
+                        nuovoLogo!=null && dettagliNuovoLogo!=null && dettagliNuovoLogo.getFileName()!=null) {
+                    // se queste condizioni sono true, allora un nuovo logo è stato caricato
+
+                    try {
+                        ((Uploader)attore_recuperatoDaDB)
+                                .setImmagineLogo(
+                                        UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
+                                        UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName())
+                                );
+                    } catch (IOException e) {
+                        // Dimensione immagine logo eccessiva
+                        return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
+                                .entity( e.getMessage() )
+                                .build();
+                    }
+
                 }
-                attore_attualmenteSalvatoInDB = uploader_attualmenteSalvatoInDB;
+
+                // Salvataggio delle modifiche in DB (se presenti)
+                if( ! attore_recuperatoDaDB.equals(clone_attoreRecuperatoDaDB) ) {
+                    // Se non ci sono modifiche, risparmio l'inutile accesso in scrittura al DB
+                    DatabaseHelper.salvaEntita(attore_recuperatoDaDB);
+                }
+
+                return Response.ok()
+                        .type( MediaType.APPLICATION_JSON )
+                        .entity( new AttoreProxy(attore_recuperatoDaDB) )
+                        .build();
             }
 
-            if( ! attore_attualmenteSalvatoInDB.equals(copia_attore_attualmenteSalvatoInDB) ) {
-                // Se non ci sono modifiche, risparmio l'inutile accesso in scrittura al DB
-                DatabaseHelper.salvaEntita(attore_attualmenteSalvatoInDB);
-            }
-
-            return Response.ok()
-                           .type( MediaType.APPLICATION_JSON )
-                           .entity( new AttoreProxy(attoreDaModificare_conModificheRichiesteDaClient) )
-                           .build();
 
         } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Attore da modificare non trovato nel sistema." )
+
+            return Response
+                    .status( Response.Status.BAD_REQUEST )
+                    .entity("Attore da modificare non presente nel sistema.")
                     .build();
+
         }
 
-    }
-
-    /** Tipi di attori permessi nel sistema.*/
-    public enum TipoAttore {
-        Consumer,
-        Uploader,
-        Administrator
     }
 
     /**
