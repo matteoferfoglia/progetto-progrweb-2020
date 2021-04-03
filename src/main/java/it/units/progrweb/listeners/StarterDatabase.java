@@ -172,42 +172,42 @@ class AttoreConCredenziali {
         // Fonte (usare Objectify fuori dal contesto di una request): https://stackoverflow.com/a/34484715
         ObjectifyService.run(
 
-                new VoidWork() {
-                    @Override
-                    public void vrun() {
+            new VoidWork() {
+                @Override
+                public void vrun() {
 
-                        String usernameAttoreDaSalvare = getAttore().getUsername();
+                    String usernameAttoreDaSalvare = getAttore().getUsername();
 
-                        // Verifica se l'attore da salvare esiste già nel sistema
-                        boolean attoreGiaNelSistema;
-                        try {
-                            AuthenticationDatabaseEntry.cercaAttoreInAuthDb( usernameAttoreDaSalvare );
+                    // Verifica se l'attore da salvare esiste già nel sistema
+                    boolean attoreGiaNelSistema;
+                    try {
+                        AuthenticationDatabaseEntry.cercaAttoreInAuthDb( usernameAttoreDaSalvare );
 
-                            // Se non vengono generate eccezioni, significa che l'attore è stato trovato in AuthDB
-                            attoreGiaNelSistema = true;
-                        } catch (NotFoundException notFoundException) {
-                            // Se qui: attore non trovato in AuthDB
-                            attoreGiaNelSistema = Attore.getAttoreDaUsername(usernameAttoreDaSalvare) != null;
-                        }
-
-                        if( !attoreGiaNelSistema ) {
-
-                            DatabaseHelper.salvaEntita(getAttore());
-                            DatabaseHelper.salvaEntita(getAuthenticationDatabaseEntry());
-
-                        } else {
-                            String messaggioErrore = "Attore " + usernameAttoreDaSalvare +
-                                    " o le sue credenziali sono già presenti nel Database";
-
-                            Logger.scriviEccezioneNelLog(
-                                    StarterDatabase.class,
-                                    "Errore durante lo starter del database: " + messaggioErrore,
-                                    new SQLException( messaggioErrore )
-                            );
-                        }
-
+                        // Se non vengono generate eccezioni, significa che l'attore è stato trovato in AuthDB
+                        attoreGiaNelSistema = true;
+                    } catch (NotFoundException notFoundException) {
+                        // Se qui: attore non trovato in AuthDB
+                        attoreGiaNelSistema = Attore.getAttoreDaUsername(usernameAttoreDaSalvare) != null;
                     }
+
+                    if( !attoreGiaNelSistema ) {
+
+                        DatabaseHelper.salvaEntita(getAttore());
+                        DatabaseHelper.salvaEntita(getAuthenticationDatabaseEntry());
+
+                    } else {
+                        String messaggioErrore = "Attore " + usernameAttoreDaSalvare +
+                                " o le sue credenziali sono già presenti nel Database";
+
+                        Logger.scriviEccezioneNelLog(
+                                StarterDatabase.class,
+                                "Errore durante lo starter del database: " + messaggioErrore,
+                                new SQLException( messaggioErrore )
+                        );
+                    }
+
                 }
+            }
 
         );
 
