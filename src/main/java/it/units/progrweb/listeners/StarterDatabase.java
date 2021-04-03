@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import static it.units.progrweb.entities.AuthenticationTokenInvalido.*;
 import static it.units.progrweb.entities.AuthenticationTokenInvalido.EliminatoreTokenInvalidi.*;
 
 /**

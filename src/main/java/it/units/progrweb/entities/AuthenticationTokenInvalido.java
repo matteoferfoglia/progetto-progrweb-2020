@@ -52,6 +52,17 @@ public class AuthenticationTokenInvalido {
      */
     public final static boolean USARE_CLASSE_TOKEN_INVALIDI = false;
 
+    /** Specifica ogni quanti secondi deve essere eseguito il task che si occupa di
+     * eliminare i token invalidi dal database associato a questa classe. */
+    public static final long INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI = 3600;
+
+
+
+    // ---------------- FINE parametri configurabili ----------------
+
+
+
+
 
     /** Id di un token invalido, assegnato dal DBMS. */
     @Id
@@ -144,15 +155,11 @@ public class AuthenticationTokenInvalido {
     }
 
 
-    /** Classe che gestisce l'elimiminazione di token scaduti, che quindi verrebbero
+    /** Classe che gestisce l'eliminazione di token scaduti, che quindi verrebbero
      * in ogni caso rifiutati dal server, indipendentemente dalla loro presenza in
      * questo database.
      */
     public static class EliminatoreTokenInvalidi {
-
-        /** Specifica ogni quanti secondi deve essere eseguito il task che si occupa di
-         * eliminare i token invalidi dal database associato a questa classe. */
-        public static final long INTERVALLO_ESECUZIONE_TASK_ELIMINATORE_TOKEN_INVALIDI_IN_SECONDI = 3600;
 
         /** Nome del {@link ScheduledExecutorService} usaot per gestire la rimozione periodica dei token scaduti dal database. */
         private static final String NOME_VARIABILE_THREAD_ELIMINATORE_TOKEN_SCADUTI = "timerEliminatoreTokenScaduti";
@@ -194,7 +201,7 @@ public class AuthenticationTokenInvalido {
                                 DatabaseHelper.query(AuthenticationTokenInvalido.class,
                                                      nomeAttributoContenenteScadenzaToken,
                                                      DatabaseHelper.OperatoreQuery.MINORE,
-                                                     DateTime.currentTimeInSecondi()) // restituisce i token scaduti al momento in cui viene eseguito // TODO : sicuro che fa riferimento il momento in cui viene eseguito e non quando viene instanziato?
+                                                     DateTime.currentTimeInSecondi()) // restituisce i token scaduti al momento in cui viene eseguito
                                               .forEach(unIstanzaDaEliminare -> {
                                                     DatabaseHelper.cancellaEntitaById(
                                                          ((AuthenticationTokenInvalido) unIstanzaDaEliminare)
