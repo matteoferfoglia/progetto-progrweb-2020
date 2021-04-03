@@ -6,7 +6,7 @@ package it.units.progrweb.entities.attori;
  * {@link Attore}.
  * @author Matteo Ferfoglia
  */
-public class AttoreProxy extends Attore{
+public class AttoreProxy extends Attore {
 
     /** Crea un'istanza proxy di {@link Attore}. */
     public AttoreProxy(Attore attore) {

@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -76,18 +78,25 @@ public abstract class Attore implements Cloneable, Principal {
                 this instanceof Administrator ? TipoAttore.Administrator : null;
 
     /**
-     * Copy-constructor.
+     * Copy-constructor. Copia tutti i {@link Field} <strong>non static e non final</strong>
+     * dell'oggetto passato come parametro in un nuovo oggetto di tipo {@link Attore}.
+     * <strong>Non vengono copiati i metodi di eventuali classi derivate da questa.</strong>
      * @param attore L'attore da copiare.
      */
-    @SuppressWarnings("CopyConstructorMissesField") // tutti i campi sono copiati tramite reflection
+    @SuppressWarnings("CopyConstructorMissesField") // tutti i campi di interesse sono copiati tramite reflection
     public Attore(Attore attore) {
-        Arrays.asList(attore.getClass().getDeclaredFields())    //  TODO : verificare correttezza
+
+        Arrays.stream( Attore.class.getDeclaredFields() )
+              .filter( field -> ! Modifier.isStatic( field.getModifiers() ) )   // Check che i campi non siano static, Fonte: https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Member.html
               .forEach( field -> {
+
                   try {
-                      field.set(this,field.get(attore));
+                      field.setAccessible(true);
+                      field.set(this, field.get(attore));    // modifica del valore
                   } catch (IllegalAccessException exception) {
                       Logger.scriviEccezioneNelLog(this.getClass(),"Errore durante l'accesso ad un attributo dell'oggetto da copiare, con reflection.", exception);
                   }
+
               });
     }
 
@@ -364,7 +373,7 @@ public abstract class Attore implements Cloneable, Principal {
 
     }
 
-    /** @throws IllegalArgumentException – Se il parametro non è valido.*/
+    /** @throws IllegalArgumentException Se il parametro non è valido.*/
     public void setTipoAttore(String tipoAttore) {
         this.tipoAttore = TipoAttore.valueOf(tipoAttore);
     }
