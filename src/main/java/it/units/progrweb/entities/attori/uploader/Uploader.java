@@ -2,8 +2,12 @@ package it.units.progrweb.entities.attori.uploader;
 
 import com.googlecode.objectify.annotation.Subclass;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.utils.UtilitaGenerale;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -71,6 +75,27 @@ public abstract class Uploader extends Attore {
         Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoUploader);
         return attoreTrovatoInDb instanceof UploaderStorage ?
                 new UploaderProxy((UploaderStorage) attoreTrovatoInDb) : null;
+    }
+
+    /** Aggiorna nel database gli attributi di un {@link Uploader}
+     * con quelli forniti nei parametri (solo se validi).
+     * @throws IOException Se il logo ha una dimensione eccessiva.*/
+    public static void modificaInfoUploader(@NotNull Uploader uploaderDaModificare,
+                                            InputStream nuovoLogo, FormDataContentDisposition dettagliNuovoLogo,
+                                            String nuovoNominativo, String nuovaEmail)
+            throws IOException {
+
+        if( nuovoLogo!=null && dettagliNuovoLogo!=null && dettagliNuovoLogo.getFileName()!=null ) {
+            // se queste condizioni sono true, allora un nuovo logo valido è stato caricato
+            uploaderDaModificare
+                    .setImmagineLogo(
+                            UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
+                            UtilitaGenerale.getEstensioneDaNomeFile( dettagliNuovoLogo.getFileName() )
+                    );
+        }
+
+        modificaInfoAttore( uploaderDaModificare, nuovoNominativo, nuovaEmail );
+
     }
 
     /** @throws IOException Se le dimensioni del logo sono eccessive. Vedere {@link LogoUploader#setLogo(byte[], String)}. */

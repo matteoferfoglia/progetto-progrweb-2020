@@ -142,19 +142,18 @@ public abstract class Attore implements Cloneable, Principal {
                 Attore clone_attoreRecuperatoDaDB = attore_recuperatoDaDB.clone();
                 clone_attoreRecuperatoDaDB.setIdentificativoAttore( attore_recuperatoDaDB.getIdentificativoAttore() );
 
-                attore_recuperatoDaDB.setNominativo(nuovoNominativo);
-                attore_recuperatoDaDB.setEmail(nuovaEmail);
-
-                if( attore_recuperatoDaDB instanceof Uploader &&    // Solo Uploader ha il logo
-                        nuovoLogo!=null && dettagliNuovoLogo!=null && dettagliNuovoLogo.getFileName()!=null) {
-                    // se queste condizioni sono true, allora un nuovo logo è stato caricato
+                if( attore_recuperatoDaDB instanceof Uploader) {    // Solo Uploader ha il logo
 
                     try {
-                        ((Uploader)attore_recuperatoDaDB)
-                                .setImmagineLogo(
-                                        UtilitaGenerale.convertiInputStreamInByteArray( nuovoLogo ),
-                                        UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName())
-                                );
+
+                        Uploader.modificaInfoUploader(
+                                ((Uploader)attore_recuperatoDaDB),
+                                nuovoLogo,
+                                dettagliNuovoLogo,
+                                nuovoNominativo,
+                                nuovaEmail
+                        );
+
                     } catch (IOException e) {
                         // Dimensione immagine logo eccessiva
                         return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
@@ -162,6 +161,8 @@ public abstract class Attore implements Cloneable, Principal {
                                 .build();
                     }
 
+                } else {
+                    modificaInfoAttore(attore_recuperatoDaDB, nuovoNominativo, nuovaEmail);
                 }
 
                 // Salvataggio delle modifiche in DB (se presenti)
@@ -185,6 +186,23 @@ public abstract class Attore implements Cloneable, Principal {
                     .build();
 
         }
+
+    }
+
+    /** Aggiorna <strong>nel database</strong> gli attributi di un {@link Attore}
+     * con quelli forniti nei parametri (solo se validi).*/
+    public static void modificaInfoAttore(@NotNull Attore attoreDaModificare,
+                                          String nuovoNominativo, String nuovaEmail) {
+
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovoNominativo) ) {
+            attoreDaModificare.setNominativo( nuovoNominativo );
+        }
+
+        if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovaEmail) ) {
+            attoreDaModificare.setEmail( nuovaEmail );
+        }
+
+        DatabaseHelper.salvaEntita( attoreDaModificare );
 
     }
 

@@ -1,9 +1,9 @@
 package it.units.progrweb.api;
 
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.AuthenticationTokenInvalido;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.uploader.Uploader;
-import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
@@ -12,7 +12,6 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -46,15 +45,13 @@ public class ModificaInformazioniAttore {
      * Autenticazione#creaResponseAutenticazionePerAttore(Attore)}).*/
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
-    public Response modificaInformazioni(@Context HttpServletRequest httpServletRequest,
-                                         @FormDataParam("nominativo")      String nuovoNominativo,
-                                         @FormDataParam("email")           String nuovaEmail,
-                                         @FormDataParam("vecchiaPassword") String vecchiaPassword,
-                                         @FormDataParam("password")        String nuovaPassword,
-                                         @FormDataParam("immagineLogo")    InputStream nuovoLogo,
-                                         @FormDataParam("immagineLogo")    FormDataContentDisposition dettagliNuovoLogo) {
-
-        // TODO : duplicazione di codice con GestioneAttori -> modificaAttore
+    public Response modificaProprieInformazioni(@Context HttpServletRequest httpServletRequest,
+                                                @FormDataParam("nominativo")      String nuovoNominativo,
+                                                @FormDataParam("email")           String nuovaEmail,
+                                                @FormDataParam("vecchiaPassword") String vecchiaPassword,
+                                                @FormDataParam("password")        String nuovaPassword,
+                                                @FormDataParam("immagineLogo")    InputStream nuovoLogo,
+                                                @FormDataParam("immagineLogo")    FormDataContentDisposition dettagliNuovoLogo) {
 
         Attore attoreDaModificare = Autenticazione.getAttoreDaDatabase(httpServletRequest);
 
@@ -62,12 +59,12 @@ public class ModificaInformazioniAttore {
 
             String username = attoreDaModificare.getUsername();
 
-            // Per l'aggiornamento del database cerco di raggruppare insieme
-            // tutti i campi della stessa entità (solo un accesso al database).
-            // Minore leggibilità del codice, ma non spreco accessi nel database.
+            // Obiettivo: minimizzare il #accessi al db, prevedendo un meccanismo di rollback se qualche dato è invalido
+            // Minore leggibilità del codice, ma non spreco accessi al database.
 
             Optional<?> optionalModificaAuthDb = Optional.of("qualsiasi valore di inizializzazione," +
                                                              "così isPresent() restituirà true se non viene modificato");
+
 
             // Aggiorno prima AuthDb : se ci sono problemi non accedo altre volte (non necessarie) al database
             //  (tutti gli attori sono registrati nell'AuthDB)
@@ -76,29 +73,30 @@ public class ModificaInformazioniAttore {
                 optionalModificaAuthDb = AuthenticationDatabaseEntry.modificaPassword(username, vecchiaPassword, nuovaPassword);
             }
 
-            if (optionalModificaAuthDb.isPresent()) {
+            if ( optionalModificaAuthDb.isPresent() ) {
 
-                if (Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest).equals(Uploader.class.getSimpleName())) {
+                if ( attoreDaModificare.getTipoAttore().equals(Attore.TipoAttore.Uploader.name()) ) {
                     try {
-                        modificaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
+                        Uploader.modificaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
                     } catch (IOException e) {
                         // Dimensioni logo eccessive
-                        return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )  // TODO : codice duplicato dal metodo API di modifica Attori degli Administrator
+                        return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
                                        .entity( e.getMessage() )
                                        .build();
                     }
                 } else {
-                    modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
+                    Attore.modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
                 }
 
                 if( optionalModificaAuthDb.get() instanceof Supplier )
-                    ((Supplier<?>) optionalModificaAuthDb.get()).get();
+                    ((Supplier<?>) optionalModificaAuthDb.get()).get(); // esegue il Supplier restituito da AuthenticationDatabaseEntry#modificaPassword
 
             }
 
             try {
                 // Necessaria nuova response di autenticazione per il client perché ha modificato le sue informazioni
                 //  (come se avesse appena fatto il login)
+                AuthenticationTokenInvalido.aggiungiATokenJwtInvalidi( Autenticazione.getTokenAutenticazioneBearer(httpServletRequest) );   // vecchio token di autenticazione diventa invalido
                 return Autenticazione.creaResponseAutenticazionePerAttore(attoreDaModificare);
             } catch (NotFoundException notFoundException) {
                 Logger.scriviEccezioneNelLog(ModificaInformazioniAttore.class, notFoundException);
@@ -111,44 +109,6 @@ public class ModificaInformazioniAttore {
                            .entity( "Problemi nel recupero delle informazioni dell'autore della richiesta." )
                            .build();
         }
-
-    }
-
-    /** Aggiorna nel database gli attributi di un {@link Uploader}
-     * con quelli forniti nei parametri (solo se validi).
-     * @throws IOException Se il logo ha una dimensione eccessiva.*/
-    private void modificaInfoUploader(@NotNull Uploader uploaderDaModificare,
-                                      InputStream nuovoLogo, FormDataContentDisposition dettagliNuovoLogo,
-                                      String nuovoNominativo, String nuovaEmail)
-            throws IOException {
-
-        // TODO : perché questo metodo non è utilizzato anche quando è un Administrator a modificare le info di un Uploader?
-        // TODO : dov'è usato questo metodo? Controllare che dettagliNuovoLogo.getFileName() != null
-
-        if( dettagliNuovoLogo != null ) {
-            uploaderDaModificare.setImmagineLogo(UtilitaGenerale.convertiInputStreamInByteArray(nuovoLogo),
-                    UtilitaGenerale.getEstensioneDaNomeFile(dettagliNuovoLogo.getFileName()));
-        }
-
-        modificaInfoAttore( uploaderDaModificare, nuovoNominativo, nuovaEmail );
-    }
-
-    /** Aggiorna nel database gli attributi di un {@link Attore}
-     * con quelli forniti nei parametri (solo se validi).*/
-    private static void modificaInfoAttore(@NotNull Attore attoreDaModificare,
-                                           String nuovoNominativo, String nuovaEmail) {
-
-        // TODO : duplicazione di codice con GestioneAttori#modificaAttore e Attore#modificaAttore
-
-        if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovoNominativo) ) {
-            attoreDaModificare.setNominativo( nuovoNominativo );
-        }
-
-        if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovaEmail) ) {
-            attoreDaModificare.setEmail( nuovaEmail );
-        }
-
-        DatabaseHelper.salvaEntita( attoreDaModificare );
 
     }
 
