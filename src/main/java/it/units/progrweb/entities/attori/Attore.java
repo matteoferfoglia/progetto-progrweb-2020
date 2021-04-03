@@ -276,9 +276,6 @@ public abstract class Attore implements Cloneable, Principal {
             AuthenticationDatabaseEntry authenticationDatabaseEntry =
                     new AuthenticationDatabaseEntry(attore.getUsername(), password, false);
 
-            // TODO: e se attore già registrato ? O Come Attore o in AuthDB?
-            // TODO : aggiungere tutta questa parte nelle note progettuali
-
             Long identificativoNuovoAttore = (Long) DatabaseHelper.salvaEntita(attore);
             DatabaseHelper.salvaEntita(authenticationDatabaseEntry);
 

@@ -29,7 +29,7 @@ import java.util.function.Supplier;
  * tentativo di autenticazione avviene usando una password temporanea
  * (ottenibile ad es. se l'utente dimentica la password), allora
  * l'utente (se la password temporanea risultasse corretta) risulterà
- * anche verificato (nel caso in cui non lo fosse).// TODO : da verificare
+ * anche verificato (nel caso in cui non lo fosse).
  * Caso d'uso (esempio):
  * <ol>
  *     <li>utente si registra al sistema;

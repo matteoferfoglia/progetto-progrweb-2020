@@ -2,7 +2,6 @@ package it.units.progrweb.api.autenticazioneERegistrazione;
 
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.consumer.Consumer;
-import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
@@ -51,12 +50,16 @@ public class RegistrazioneNuovoConsumer {
                     registrazioneConclusaConSuccesso = false;
                 }
                 if( registrazioneConclusaConSuccesso )
-                    return Autenticazione.creaResponseAutenticazione(codiceFiscale, password);  // utente risulterà subito autenticato
+                    return Response.ok()
+                            .type( MediaType.TEXT_PLAIN )
+                            .entity("La registrazione è andata buon fine. Seguire le indicazioni inviate via e-mail.")
+                            .build();
 
                 else return Response.serverError().build();
 
             } else {
                 return Response.status( Response.Status.CONFLICT )
+                               .type( MediaType.TEXT_PLAIN )
                                .entity( codiceFiscale + " risulta gia' registrato nella piattaforma." )
                                .build();
             }
@@ -64,6 +67,7 @@ public class RegistrazioneNuovoConsumer {
         } else {
 
             return Response.status( Response.Status.BAD_REQUEST )
+                           .type( MediaType.TEXT_PLAIN )
                            .entity( "Valori di input inseriti non validi." )
                            .build();
 

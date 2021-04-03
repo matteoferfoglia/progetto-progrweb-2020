@@ -49,7 +49,8 @@
       </label>
     </fieldset>
 
-    <fieldset v-if="!isConsumer()">
+<!--    <fieldset v-if="!isConsumer()"> I requisiti non specificano se un Consumer possa modificare la sua password -->
+    <fieldset>
       <legend>Modifica password</legend>
       <label>Vecchia password
         <input type="password"

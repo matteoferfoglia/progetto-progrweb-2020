@@ -282,18 +282,19 @@ public abstract class File {
 
     /** Restituisce l'array di tutti gli attributi di {@link File questa} classe.
      * @param includiMetadati true se si vogliono anche i metadati.*/
-    public static Field[] getAnteprimaProprietaFile( boolean includiMetadati ) {    // TODO : usare FileProxy per evitare di dover escludere manualmente degli attributi
+    public static Field[] getAnteprimaProprietaFile( boolean includiMetadati ) {
 
-        List<String> nomeAttributiInQuestaClasseDaMostrare;
+        List<String> nomeAttributiInQuestaClasseDaMostrareAiClient;
                 
         {
-            // Creazione dela lista coi nomi degli attributi di questa classe
-            nomeAttributiInQuestaClasseDaMostrare = new ArrayList<>(Arrays.asList(elencoAttributiDaMostrareAiClient));
+            // Creazione dela lista coi nomi degli attributi di questa classe da mostrare ai client
+
+            nomeAttributiInQuestaClasseDaMostrareAiClient = new ArrayList<>(Arrays.asList(elencoAttributiDaMostrareAiClient));
             
             if (includiMetadati)
-                nomeAttributiInQuestaClasseDaMostrare.addAll(Arrays.asList(elencoMetaAttributi));
+                nomeAttributiInQuestaClasseDaMostrareAiClient.addAll(Arrays.asList(elencoMetaAttributi));
 
-            nomeAttributiInQuestaClasseDaMostrare
+            nomeAttributiInQuestaClasseDaMostrareAiClient
                 .forEach(nomeUnAttributo -> {
                     if (!UtilitaGenerale.esisteAttributoInClasse(nomeUnAttributo, File.class)) {
                         // Informa se il field non si trova
@@ -304,13 +305,13 @@ public abstract class File {
                                 new NoSuchFieldException());
 
                         // e rimuovilo da quelli da mostrare (altrimenti si generà un'eccezione)
-                        nomeAttributiInQuestaClasseDaMostrare.remove(nomeUnAttributo);
+                        nomeAttributiInQuestaClasseDaMostrareAiClient.remove(nomeUnAttributo);
                     }
                 });
         }
         
         return Arrays.stream(File.class.getDeclaredFields())
-                     .filter( field -> UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaMostrare.toArray() ) )
+                     .filter( field -> UtilitaGenerale.isPresenteNellArray( field.getName(), nomeAttributiInQuestaClasseDaMostrareAiClient.toArray() ) )
                      .toArray(Field[]::new);
         // L'ordine con cui vengono restituiti i field nell'array è quello con cui gli attributi sono dichiarati nella classe
     }
