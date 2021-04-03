@@ -133,7 +133,10 @@ public class AuthenticationDatabaseEntry {
 
     /** Rende verificato l'account. */
     private void rendiVerificatoQuestoAccount() {
-        tokenVerificaAccount = null;    // quando è null significa che l'account è verificato
+        if( tokenVerificaAccount!=null ) {    // quando è null significa che l'account è verificato
+            tokenVerificaAccount = null;
+            DatabaseHelper.salvaEntita(this);
+        }
     }
 
     public String getTokenVerificaAccount() {
@@ -194,7 +197,7 @@ public class AuthenticationDatabaseEntry {
      * @param username Lo username per cui creare una password temporanea.
      * @throws NotFoundException Se lo username dato non viene trovato.*/
     public static String creaPasswordTemporanea(String username)
-            throws NotFoundException {
+            throws NotFoundException {  // TODO : password temporanea può essere salvata cifrata con l'hash già presente
 
         AuthenticationDatabaseEntry authenticationDatabaseEntry =
                 cercaAttoreInAuthDb(username);
@@ -327,8 +330,8 @@ public class AuthenticationDatabaseEntry {
      *                            appena modificata.
      */
     public static Optional<?> modificaPassword(String username,
-                                                                         String vecchiaPassword,
-                                                                         String nuovaPassword   ) {
+                                               String vecchiaPassword,
+                                               String nuovaPassword   ) {
 
         AuthenticationDatabaseEntry authenticationDatabaseEntry;
         try {
