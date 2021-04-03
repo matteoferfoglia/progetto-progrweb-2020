@@ -8,6 +8,7 @@ package it.units.progrweb.entities.attori;
  */
 public class AttoreProxy extends Attore{
 
+    /** Crea un'istanza proxy di {@link Attore}. */
     public AttoreProxy(Attore attore) {
         super(attore);
     }
