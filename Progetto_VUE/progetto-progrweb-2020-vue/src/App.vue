@@ -84,12 +84,14 @@ export default {
 
     /** Richiesta di logout al server. */
     logout() {
-      const tmp_csrfToken = this.csrfToken;
-      this.csrfToken             = undefined;
-      this.tipoAttoreAutenticato = undefined;
-      this.nomeAttoreAutenticato = undefined;
-      this.isUtenteAutenticato   = false;
-      logout(tmp_csrfToken); // funzione importata dal modulo di autenticazione
+      logout( this.csrfToken )  // funzione importata dal modulo di autenticazione
+        .then( () => {
+          this.csrfToken             = undefined;
+          this.tipoAttoreAutenticato = undefined;
+          this.nomeAttoreAutenticato = undefined;
+          this.isUtenteAutenticato   = false;
+        })
+        .catch( console.error );
     }
 
   },
