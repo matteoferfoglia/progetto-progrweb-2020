@@ -218,6 +218,7 @@ const onErrorHandler = async errore => {
         if (errore.response.status === HTTP_STATUS_UNAUTHORIZED ||
             errore.response.status === HTTP_STATUS_FORBIDDEN) {
             // Redirection automatica a login
+            alert( "Autenticarsi." );
             eliminaTokenAutenticazione();
             await router.redirectVersoPaginaAutenticazione();
         }
