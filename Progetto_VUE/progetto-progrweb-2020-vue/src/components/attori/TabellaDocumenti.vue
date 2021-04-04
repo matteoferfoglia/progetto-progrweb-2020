@@ -183,6 +183,9 @@ export default {
       /** Nome delle colonne di intestazione della tabella coi documenti.*/
       nomiPropDocumenti: [],
 
+      /** Nome della route associata a questo componente. */
+      nomeRouteQuestoComponente: this.$route.name,
+
       /** In un documento, è il nome della property (se presente)
        * il cui valore è un link di download di quel documento.*/
       NOME_PROP_LINK_DOWNLOAD_DOCUMENTO: "Download",
@@ -341,34 +344,42 @@ export default {
 
     // Gestione dell'auto-aggiornamento della tabella
     this.timerAutoUpdate = setInterval(async () => {
-      const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
-      const numeroDocumentiDisponibiliPreAggiornamento = this.mappaDocumenti.size();
 
-      // Richiesta al server se l'elenco dei documenti è stato modificato
-      richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
-                         {[process.env.VUE_APP_URL_QUERYPARAM_NUM_ELEMENTI_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
-        .then( caricamentoComponente )  // Se risposta è NOT_MODIFIED, allora non esegue then e va direttamente a catch
-        .then( () => {
-          // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
-          this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
-          this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare =>
-              this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
-          // Nascondi i documenti con hashtag da non mostrare
-          const listaHashtagNonMostrati = new Set( Array.from(this.mappa_hashtag_idDocumenti.keys())
-                                                        .filter(unHashtag => !this.listaHashtagDaMostrare.has(unHashtag)) );
-          listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
+      if( this.nomeRouteQuestoComponente!==this.$route.name ) {
+        // se è stata cambiata route, si elimina il timer
+        clearInterval( this.timerAutoUpdate );
+      } else {
 
-          if( this.mappaDocumenti.size() > numeroDocumentiDisponibiliPreAggiornamento ) {
-            alert("Sono disponibili dei nuovi documenti");
-          }
+        const listaHashtagMostratiPreAggiornamento = this.listaHashtagDaMostrare;
+        const numeroDocumentiDisponibiliPreAggiornamento = this.mappaDocumenti.size();
 
-        })
-        .catch( errore => {
-          if(errore.status!==HTTP_STATUS_NOT_MODIFIED) {
-            console.error( errore );
-            alert("Errore nel caricamento dei documenti");
-          }
-        })
+        // Richiesta al server se l'elenco dei documenti è stato modificato
+        richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore,
+            {[process.env.VUE_APP_URL_QUERYPARAM_NUM_ELEMENTI_NOTI_AL_CLIENT]: this.mappaDocumenti.size()})
+            .then( caricamentoComponente )  // Se risposta è NOT_MODIFIED, allora non esegue then e va direttamente a catch
+            .then( () => {
+              // Nei nuovi documenti caricati, mostra solo gli hashtag filtrati
+              this.listaHashtagDaMostrare = listaHashtagMostratiPreAggiornamento;
+              this.listaHashtagDaMostrare.forEach(unHashtagDaMostrare =>
+                  this.mostraDocumentiConHashtagFiltrato(unHashtagDaMostrare, true));
+              // Nascondi i documenti con hashtag da non mostrare
+              const listaHashtagNonMostrati = new Set( Array.from(this.mappa_hashtag_idDocumenti.keys())
+                  .filter(unHashtag => !this.listaHashtagDaMostrare.has(unHashtag)) );
+              listaHashtagNonMostrati.forEach(unHashtagDaNonMostrare => this.mostraDocumentiConHashtagFiltrato(unHashtagDaNonMostrare, false));
+
+              if( this.mappaDocumenti.size() > numeroDocumentiDisponibiliPreAggiornamento ) {
+                alert("Sono disponibili dei nuovi documenti");
+              }
+
+            })
+            .catch( errore => {
+              if(errore.status!==HTTP_STATUS_NOT_MODIFIED) {
+                console.error( errore );
+                alert("Errore nel caricamento dei documenti");
+              }
+            });
+
+      }
 
     }, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
