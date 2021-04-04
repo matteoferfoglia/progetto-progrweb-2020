@@ -60,7 +60,7 @@
                 Modifica utente
               </button>
 
-              <button @click.prevent="ripristinaValoriProperty = true"
+              <button @click.prevent="ripristinaValoriForm"
                       class="reset btn btn-secondary"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Reset modifiche
@@ -473,6 +473,12 @@ export default {
           process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     },
 
+
+    /** Ripristina i valori del form antecedenti le modifiche. */
+    ripristinaValoriForm() {
+      this.ripristinaValoriProperty = true; // vedere componente figlio che gestisce il form
+    },
+
     /** Richiede al server l'eliminazione di un attore.*/
     eliminaAttore() {
       // Uploader può eliminare Consumer
@@ -510,40 +516,46 @@ export default {
      *        {@link FormCampiAttore.script.default.watch.flag_inviaDatiForm}.
      */
     formModificaAttoreInviato ( oggetto ) {
-      oggetto.promiseRispostaServer
-          .then( rispostaServer => {
 
-            const tmp_vecchioNominativo = this.nominativo;
+      if( oggetto && oggetto.promiseRispostaServer!==undefined ) {
+        oggetto.promiseRispostaServer
+            .then( rispostaServer => {
 
-            // Aggiorna i dati della vista
-            // NOTA: aggiungere un carattere in fondo e rimuoverlo con slice() è un trucco per far attivare il watch
-            //       che aggiorna i valori scritti nel form, così se i valori dovessero "sporcarsi", con queste istruzioni
-            //       vengono ripristinati ai valori giusti
-            this.username   = (rispostaServer[ process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
-            this.nominativo = (rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
-            this.email      = (rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+              const tmp_vecchioNominativo = this.nominativo;
 
-            this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // trucco per forzare l'aggiornamento dell'immagine
+              // Aggiorna i dati della vista
+              // NOTA: aggiungere un carattere in fondo e rimuoverlo con slice() è un trucco per far attivare il watch
+              //       che aggiorna i valori scritti nel form, così se i valori dovessero "sporcarsi", con queste istruzioni
+              //       vengono ripristinati ai valori giusti
+              this.username   = (rispostaServer[ process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+              this.nominativo = (rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
+              this.email      = (rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
 
-            const idAttore = getIdentificativoAttoreAttualmenteAutenticato();
-            if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando
-                 tmp_vecchioNominativo !== this.nominativo ) {                    //  ed è stato modificato il nominativo
-              richiestaGet(process.env.VUE_APP_URL_RICHIESTA_NUOVO_TOKEN_AUTENTICAZIONE)
-                .then( setTokenAutenticazione )
-                .then( () => this.$emit('nominativo-attore-modificato', this.nominativo) )
-                .catch( console.error );
-            }
+              this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // trucco per forzare l'aggiornamento dell'immagine
 
-            alert( "Modifiche effettuate!" );
-          })
-          .catch( rispostaServer => {
-            console.error( rispostaServer );
-            alert( "ERRORE: "+ rispostaServer.data );
-          })
-          .finally( () => {
-            this.flag_inviaDatiForm = false;
-            document.querySelector('#' + this.idHtmlQuestoComponente + ' form').reset();  // pulizia dei campi
-          });
+              const idAttore = getIdentificativoAttoreAttualmenteAutenticato();
+              if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando
+                  tmp_vecchioNominativo !== this.nominativo ) {                    //  ed è stato modificato il nominativo
+                richiestaGet(process.env.VUE_APP_URL_RICHIESTA_NUOVO_TOKEN_AUTENTICAZIONE)
+                    .then( setTokenAutenticazione )
+                    .then( () => this.$emit('nominativo-attore-modificato', this.nominativo) )
+                    .catch( console.error );
+              }
+
+              alert( "Modifiche effettuate!" );
+            })
+            .catch( rispostaServer => {
+              console.error( rispostaServer );
+              alert( "ERRORE: "+ rispostaServer.data );
+            });
+      } else {
+        this.ripristinaValoriForm();  // utente non ha confermato le modifiche, quindi si ripristano i valori precedenti
+      }
+
+      // In ogni caso, reset delle proprietà per predisporre la pagina alle interazioni successive
+      this.flag_inviaDatiForm = false;
+      document.querySelector('#' + this.idHtmlQuestoComponente + ' form').reset();  // pulizia dei campi (es.: input file)  // TODO : questa linea serve?
+
     },
 
     /** Chiude la scheda dell'attore attualmente mostrato.*/

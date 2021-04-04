@@ -205,7 +205,11 @@ export default {
      * Restituisce un oggetto con due property: "datiInviati" contiene
      * l'oggetto coi dati inviati, "promiseRispostaServer" contiene
      * la promise che si occupa dell'invio della richiesta al server
-     * (da quest'ultima è possibile leggere la risposta del server).*/
+     * (da quest'ultima è possibile leggere la risposta del server).
+     * Questo metodo chiede la conferma all'utente prima di inviare
+     * la richiesta di modifica dati al server: se l'utente non conferma,
+     * allora "promiseRispostaServer" (nell'oggetto restituito) sarà
+     * undefined.*/
     flag_inviaDatiForm: {
       immediate: true,
       deep: true,
@@ -229,47 +233,61 @@ export default {
               delete isStringaNonNullaNonVuota[prop];
           }
 
-          let promise;
-          if( this.isContentType_JSON ) {
-            // Content-type application/json
-            promise = richiestaPost(this.urlInvioFormTramitePost, datiDaInviareAlServer);
+          // Richiesta conferma modifiche
 
-          } else {
-            // Content-type multipart/form-data
-            const datiDaInviareAlServer_comeFormData = new FormData();
-            for( const prop in datiDaInviareAlServer ) {
-              datiDaInviareAlServer_comeFormData.append(prop, datiDaInviareAlServer[prop]);
-            }
+          let promise;  // attualmente è undefined
 
-            // Se presente un file, lo aggiunge ai dati da inviare
-            const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
-            if( inputFile != null && inputFile.files != null) { // null quando non c'è l'input[type=file]
-              datiDaInviareAlServer_comeFormData.append(inputFile.name, inputFile.files[0]);
-            }
+          confirm( "Modificare le informazioni dell'utente?\n\n")
+              .then( () => {  // utente ha confermato
 
-            promise = richiestaPostConFile(this.urlInvioFormTramitePost, datiDaInviareAlServer_comeFormData);
+                // Si procede con la richiesta di modifiche al server
+                if( this.isContentType_JSON ) {
+                  // Content-type application/json
+                  promise = richiestaPost(this.urlInvioFormTramitePost, datiDaInviareAlServer);
 
-          }
+                } else {
+                  // Content-type multipart/form-data
+                  const datiDaInviareAlServer_comeFormData = new FormData();
+                  for( const prop in datiDaInviareAlServer ) {
+                    datiDaInviareAlServer_comeFormData.append(prop, datiDaInviareAlServer[prop]);
+                  }
 
-          promise
-            .then( risposta => {
+                  // Se presente un file, lo aggiunge ai dati da inviare
+                  const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
+                  if( inputFile != null && inputFile.files != null) { // null quando non c'è l'input[type=file]
+                    datiDaInviareAlServer_comeFormData.append(inputFile.name, inputFile.files[0]);
+                  }
 
-              if( this.resetCampiInputDopoInvioForm_wrapper ) {
-                // pulizia dei campi del form
-                this.username_wrapper   = "";
-                this.nominativo_wrapper = "";
-                this.email_wrapper      = "";
-                document.querySelector("#" + this.idHtml).reset();
-              }
+                  promise = richiestaPostConFile(this.urlInvioFormTramitePost, datiDaInviareAlServer_comeFormData);
 
-              return risposta
-            })
-            .catch( console.error );            // tiene traccia dell'eventuale errore
+                }
 
-          this.$emit('dati-form-inviati', {
-            'datiInviati'          : datiDaInviareAlServer,
-            'promiseRispostaServer': promise
-          });  // informa il componente padre
+                promise
+                  .then( risposta => {
+
+                    if( this.resetCampiInputDopoInvioForm_wrapper ) {
+                      // pulizia dei campi del form
+                      this.username_wrapper   = "";
+                      this.nominativo_wrapper = "";
+                      this.email_wrapper      = "";
+                      document.querySelector("#" + this.idHtml).reset();
+                    }
+
+                    return risposta
+                  })
+                  .catch( console.error );            // tiene traccia dell'eventuale errore
+
+              })
+              .catch( () => {} ) // utente non ha confermato le modifiche, non si fa nulla
+              .finally( () => {
+
+                // In ogni caso, informare il componente padre
+                this.$emit('dati-form-inviati', {
+                  'datiInviati'          : datiDaInviareAlServer,
+                  'promiseRispostaServer': promise
+                });  // informa il componente padre
+
+              });
 
         }
 
