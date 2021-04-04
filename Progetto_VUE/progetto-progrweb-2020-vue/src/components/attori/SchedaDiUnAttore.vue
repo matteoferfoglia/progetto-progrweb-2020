@@ -127,8 +127,8 @@
 
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
-import {generaIdUnivoco} from "../../utils/utilitaGenerale";
-import {richiestaDelete, richiestaGet} from "../../utils/http";
+import {generaIdUnivoco} from "@/utils/utilitaGenerale";
+import {richiestaDelete, richiestaGet} from "@/utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
@@ -137,9 +137,9 @@ import {
   getIdentificativoAttoreAttualmenteAutenticato,
   logout,
   setTokenAutenticazione
-} from "../../utils/autenticazione";
+} from "@/utils/autenticazione";
 export default {
-name: "SchedaDiUnAttore",
+  name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
   inheritAttrs: false,
   emits: [
@@ -280,12 +280,17 @@ name: "SchedaDiUnAttore",
             /** Aggiunge listener per modificare lo stile dei toggle corrispondenti
              * a card "aperti" o "collassati".
              * @param el Elemento html padre del toggle.*/
-            const eventListenerHideCollapse = (el) => {
-              el = el.querySelector("*[class|=icona-toggle]");
-              const collapsibleElement = document.querySelector(el.parentElement.getAttribute("data-target"));
+            const eventListenerHideCollapse = el => {
+              const elIconaToggle = el.querySelector("*[class|=icona-toggle]");  // ricerca l'elemento html contenente l'icona toggle
+
+              // L'elemento padre di quello contenente l'icona toggle contiene l'attributo "data-target"
+              // indicante l'elemento a cui l'azione a cui il toggle si riferisce
+              const collapsibleElement = document.querySelector(elIconaToggle.parentElement.getAttribute("data-target")); // elemento a cui il toggle si riferisce
+
               this.impostaClasseStileToggleDiElementoCollapsible(collapsibleElement, true);
             };
-            document.querySelectorAll(".card-header")
+
+            document.querySelectorAll(".accordion>.card>.card-header")
                 .forEach( el => {
                   el.addEventListener( 'click', () => eventListenerHideCollapse(el));
                 })
