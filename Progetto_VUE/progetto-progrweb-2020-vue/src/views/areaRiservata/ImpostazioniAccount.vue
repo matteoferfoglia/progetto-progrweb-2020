@@ -244,9 +244,7 @@ export default {
                                                           // $1 è il primo parenthesized substring match.
                                                           // Sostituisce ultima ', ' con ' e '
 
-          const confermaModifiche = confirm(stringaInformativaDelleModifiche);
-
-          if (confermaModifiche) {
+          confirm(stringaInformativaDelleModifiche).then( () => {
 
             (async () => { // Richiesta di modifica al server
 
@@ -279,7 +277,10 @@ export default {
 
             })();
 
-          }
+          })
+
+          .catch( () => alert("Nessuna modifica apportata.") );
+
         }
 
 
@@ -292,6 +293,10 @@ export default {
         this.confermaNuovaPassword = "";
         this.isFileLogoCaricato    = false;
         this.isFormModificato      = false
+
+      } else {
+
+        alert("Nessuna modifica.");
 
       }
 
