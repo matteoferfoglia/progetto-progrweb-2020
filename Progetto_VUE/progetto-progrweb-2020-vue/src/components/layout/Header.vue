@@ -2,8 +2,6 @@
 
   <header>
 
-
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
       <router-link :to="{name: NOME_ROOT_APPLICAZIONE}" class="navbar-brand">
@@ -52,6 +50,14 @@ import FormConCsrfToken from "./FormConCsrfToken";
 export default {
   name: "Header",
   components: {FormConCsrfToken},
+  emits: [
+    /** Evento emesso quando si clicca sul pulsante di logout. */
+    'logout',
+
+    /** Evento emesso quando questo componente riceve il token CSRF.
+     * Il valore associato a questo evento è il token. */
+    'csrf-token-ricevuto'
+  ],
   props: [
     /** Nome dell'attore attualmente autenticato.*/
    'nomeUtenteAutenticato',
