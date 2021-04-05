@@ -196,7 +196,16 @@ export default {
       this.username_wrapper   = this.username   ? this.username   : "";
       this.nominativo_wrapper = this.nominativo ? this.nominativo : "";
       this.email_wrapper      = this.email      ? this.email      : "";
+    },
+
+    /** Questo metodo restituisce true se sono state apportate delle
+     * modifiche ai campi del form, false altrimenti. */
+    isFormModificato() {
+      return ! ( this.username_wrapper===this.username     &&
+                 this.nominativo_wrapper===this.nominativo &&
+                 this.email_wrapper===this.email              );
     }
+
   },
   watch: {
 
@@ -215,111 +224,129 @@ export default {
       deep: true,
       handler( flag_inviaDatiForm ) {
 
+        /** Funzione per informare il componente padre che l'evento di
+         * richiesta invio dati del form è stato gestito.
+         * @param promiseRispostaServer Promise la cui risoluzione contiene
+         * la risposta del server a seguito delle modifiche, oppure oggetto
+         * undefined se non viene inviata alcuna richiesta al server.
+         * @param datiInviatiAlServer Dati eventualmente inviati al server. */
+        const informaComponentePadreEventoGestito = (promiseRispostaServer, datiInviatiAlServer) => {
+          this.$emit('dati-form-inviati', {
+            'datiInviati': datiInviatiAlServer,
+            'promiseRispostaServer': promiseRispostaServer
+          });
+        };
+
         if( flag_inviaDatiForm ) {
 
-          const datiDaInviareAlServer = {
-            [process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]      : this.csrfToken_wrapper,
-            [process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME]     : this.email_wrapper,
-            [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME]: this.nominativo_wrapper,
-            [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME]  : this.username_wrapper
-          };
-          for( const prop in this.datiAggiuntiviDaInviareAlServer_wrapper ) {
-            datiDaInviareAlServer[prop] = this.datiAggiuntiviDaInviareAlServer_wrapper[prop];
-          }
+          if (this.isFormModificato()) {
 
-          // Check proprietà prima di inviare (rimuove quelle non valide)
-          for(const prop in datiDaInviareAlServer) {
-            if(!isStringaNonNullaNonVuota(datiDaInviareAlServer[prop]))
-              delete isStringaNonNullaNonVuota[prop];
-          }
+            const datiDaInviareAlServer = {
+              [process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken_wrapper,
+              [process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME]: this.email_wrapper,
+              [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME]: this.nominativo_wrapper,
+              [process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME]: this.username_wrapper
+            };
+            for (const prop in this.datiAggiuntiviDaInviareAlServer_wrapper) {
+              datiDaInviareAlServer[prop] = this.datiAggiuntiviDaInviareAlServer_wrapper[prop];
+            }
+
+            // Check proprietà prima di inviare (rimuove quelle non valide)
+            for (const prop in datiDaInviareAlServer) {
+              if (!isStringaNonNullaNonVuota(datiDaInviareAlServer[prop]))
+                delete isStringaNonNullaNonVuota[prop];
+            }
 
 
-          // Richiesta conferma modifiche
+            // Richiesta conferma modifiche
 
-          let promise;  // attualmente è undefined
+            let promise;  // attualmente è undefined
 
-          // Creazione messaggio con le modifiche che risulteranno
-          const msg = JSON.stringify( datiDaInviareAlServer )
-                          .replaceAll( ',', '\n' )
-                          .replaceAll( ':', ': ' )
-                          .replaceAll( '"', '' )
-                          .replaceAll('{','')
-                          .replaceAll('}','')
-                          .split('\n')
-                          .map( unaLinea => unaLinea[0].toUpperCase() + unaLinea.substr(1) )  // upper case del primo carattere
-                          .filter( unaLinea => {
-                            // rimuove le prop csrf token e id attore (all'utente che deve confermare i dati da modificare non interessa vedere i dettagli tecnici)
+            // Creazione messaggio con le modifiche che risulteranno
+            const msg = JSON.stringify(datiDaInviareAlServer)
+                .replaceAll(',', '\n')
+                .replaceAll(':', ': ')
+                .replaceAll('"', '')
+                .replaceAll('{', '')
+                .replaceAll('}', '')
+                .split('\n')
+                .map(unaLinea => unaLinea[0].toUpperCase() + unaLinea.substr(1))  // upper case del primo carattere
+                .filter(unaLinea => {
+                  // rimuove le prop csrf token e id attore (all'utente che deve confermare i dati da modificare non interessa vedere i dettagli tecnici)
 
-                            // Controllo che le proprietà da scartare esistano (magari è stato cambiato il nome, così ci si accorge)
-                            const nomePropCsrfToken = 'csrfToken';
-                            const nomePropIdAttore = 'identificativoAttore';
-                            if(!datiDaInviareAlServer[nomePropCsrfToken])
-                              throw (nomePropCsrfToken + ' non è una property');
-                            if(!datiDaInviareAlServer[nomePropIdAttore])
-                              throw (nomePropIdAttore + ' non è una property');
+                  // Controllo che le proprietà da scartare esistano (magari è stato cambiato il nome, così ci si accorge)
+                  const nomePropCsrfToken = 'csrfToken';
+                  const nomePropIdAttore = 'identificativoAttore';
+                  if (!datiDaInviareAlServer[nomePropCsrfToken])
+                    throw (nomePropCsrfToken + ' non è una property');
+                  if (!datiDaInviareAlServer[nomePropIdAttore])
+                    throw (nomePropIdAttore + ' non è una property');
 
-                            const lineaContieneProp = (linea,propDaCercare) =>
-                                linea.toLowerCase().startsWith(propDaCercare.toLowerCase());
+                  const lineaContieneProp = (linea, propDaCercare) =>
+                      linea.toLowerCase().startsWith(propDaCercare.toLowerCase());
 
-                            // escludo la prop
-                            return ! ( lineaContieneProp(unaLinea, nomePropCsrfToken) ||
-                                       lineaContieneProp(unaLinea, nomePropIdAttore )    );
-                          })
-                          .sort() // ordine alfabetico
-                          .join('\n');
+                  // escludo la prop
+                  return !(lineaContieneProp(unaLinea, nomePropCsrfToken) ||
+                      lineaContieneProp(unaLinea, nomePropIdAttore));
+                })
+                .sort() // ordine alfabetico
+                .join('\n');
 
-          confirm( "Verranno apportate le seguenti modifiche.\n\n" + msg)
-              .then( () => {  // utente ha confermato
+            confirm("Verranno apportate le seguenti modifiche.\n\n" + msg)
+                .then(() => {  // utente ha confermato
 
-                // Si procede con la richiesta di modifiche al server
-                if( this.isContentType_JSON ) {
-                  // Content-type application/json
-                  promise = richiestaPost(this.urlInvioFormTramitePost, datiDaInviareAlServer);
+                  // Si procede con la richiesta di modifiche al server
+                  if (this.isContentType_JSON) {
+                    // Content-type application/json
+                    promise = richiestaPost(this.urlInvioFormTramitePost, datiDaInviareAlServer);
 
-                } else {
-                  // Content-type multipart/form-data
-                  const datiDaInviareAlServer_comeFormData = new FormData();
-                  for( const prop in datiDaInviareAlServer ) {
-                    datiDaInviareAlServer_comeFormData.append(prop, datiDaInviareAlServer[prop]);
-                  }
-
-                  // Se presente un file, lo aggiunge ai dati da inviare
-                  const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
-                  if( inputFile != null && inputFile.files != null) { // null quando non c'è l'input[type=file]
-                    datiDaInviareAlServer_comeFormData.append(inputFile.name, inputFile.files[0]);
-                  }
-
-                  promise = richiestaPostConFile(this.urlInvioFormTramitePost, datiDaInviareAlServer_comeFormData);
-
-                }
-
-                promise
-                  .then( risposta => {
-
-                    if( this.resetCampiInputDopoInvioForm_wrapper ) {
-                      // pulizia dei campi del form
-                      this.username_wrapper   = "";
-                      this.nominativo_wrapper = "";
-                      this.email_wrapper      = "";
-                      document.querySelector("#" + this.idHtml).reset();
+                  } else {
+                    // Content-type multipart/form-data
+                    const datiDaInviareAlServer_comeFormData = new FormData();
+                    for (const prop in datiDaInviareAlServer) {
+                      datiDaInviareAlServer_comeFormData.append(prop, datiDaInviareAlServer[prop]);
                     }
 
-                    return risposta
-                  })
-                  .catch( console.error );            // tiene traccia dell'eventuale errore
+                    // Se presente un file, lo aggiunge ai dati da inviare
+                    const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
+                    if (inputFile != null && inputFile.files != null) { // null quando non c'è l'input[type=file]
+                      datiDaInviareAlServer_comeFormData.append(inputFile.name, inputFile.files[0]);
+                    }
 
-              })
-              .catch( () => {} ) // utente non ha confermato le modifiche, non si fa nulla
-              .finally( () => {
+                    promise = richiestaPostConFile(this.urlInvioFormTramitePost, datiDaInviareAlServer_comeFormData);
 
-                // In ogni caso, informare il componente padre
-                this.$emit('dati-form-inviati', {
-                  'datiInviati'          : datiDaInviareAlServer,
-                  'promiseRispostaServer': promise
-                });  // informa il componente padre
+                  }
 
-              });
+                  promise
+                      .then(risposta => {
 
+                        if (this.resetCampiInputDopoInvioForm_wrapper) {
+                          // pulizia dei campi del form
+                          this.username_wrapper = "";
+                          this.nominativo_wrapper = "";
+                          this.email_wrapper = "";
+                          document.querySelector("#" + this.idHtml).reset();
+                        }
+
+                        return risposta
+                      })
+                      .catch(console.error);            // tiene traccia dell'eventuale errore
+
+                })
+                .catch(() => {
+                }) // utente non ha confermato le modifiche, non si fa nulla
+                .finally(() => {
+
+                  // In ogni caso, informare il componente padre
+                  informaComponentePadreEventoGestito(promise, datiDaInviareAlServer);
+
+                });
+
+          } else {
+            // In ogni caso, informare il componente padre
+            informaComponentePadreEventoGestito();
+            alert( "Nessuna modifica rilevata." );
+          }
         }
 
       }
