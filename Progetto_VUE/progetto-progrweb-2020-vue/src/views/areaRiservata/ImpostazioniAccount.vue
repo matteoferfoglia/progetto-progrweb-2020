@@ -237,62 +237,68 @@ export default {
           alert("Per modificare la password, la nuova password deve coincidere con quella inserita nel campo di conferma.");
         }
 
-        if( informazioniCheSarannoModificate.length>0 ) {
 
-          let stringaInformativaDelleModifiche = "Stanno per essere modificate le seguenti informazioni: " +
-              informazioniCheSarannoModificate.join(", ").replace(/,([^,]+)$/,' e$1') + ".";
-                                                          // $1 è il primo parenthesized substring match.
-                                                          // Sostituisce ultima ', ' con ' e '
 
-          confirm(stringaInformativaDelleModifiche).then( () => {
+        // Tutti gli eventuali dati da inviare al server sono stati raccolti
+        // Ora, se ci sono modifiche, si chiede conferma all'utente e si invia al server
 
-            (async () => { // Richiesta di modifica al server
+        ( async () => {
+          if( informazioniCheSarannoModificate.length>0 ) {
 
-              // Salvo la variabile nella funzione perché, trattandosi di richieste
-              // asincrone, intanto il valore della variabile potrebbe cambiare
-              // (questo è il motivo di utilizzo di una funzione: closure)
-              const nominativoModificato = this.nuovoNominativo;
-              const isLogoCaricato = this.isFileLogoCaricato;
+            let stringaInformativaDelleModifiche = "Stanno per essere modificate le seguenti informazioni: " +
+                informazioniCheSarannoModificate.join(", ").replace(/,([^,]+)$/,' e$1') + ".";
+            // $1 è il primo parenthesized substring match.
+            // Sostituisce ultima ', ' con ' e '
 
-              await richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData)
-                  .then(nuovoTokenAutenticazione => {  // Nella risposta c'è il nuovo token di autenticazione
-                    setTokenAutenticazione(nuovoTokenAutenticazione);
-                    this.valoreQualsiasiPerAggiornareIlComponenteSeModificato = 1 - this.valoreQualsiasiPerAggiornareIlComponenteSeModificato;  // vedere documentazione
-                    this.setupDatiComponente();
-                    if (nominativoModificato) {  // truthy se è stato modificato
-                      // Avvisa se è stato modificato il nominativo
-                      this.$emit('nominativo-attore-modificato', nominativoModificato);
-                    }
-                    if(isLogoCaricato) {
-                      // SE è stato modificato il logo
-                      this.$emit('logo-attore-modificato');
-                      this.isFileLogoCaricato = false;  // ripristina il valore iniziale
-                    }
-                    alert("Modifiche salvate!");
-                  })
-                  .catch(errore => {
+            const MSG_ERR_UTENTE_NON_CONFERMA = "Utente non ha confermato modifiche";
+            return confirm(stringaInformativaDelleModifiche)
+                .catch( () => Promise.reject(MSG_ERR_UTENTE_NON_CONFERMA) ) // utente non ha confermato
+                .then( () =>   // eseguito solo se utente ha confermato
+                    richiestaPostConFile(process.env.VUE_APP_URL_MODIFICA_INFORMAZIONI_ATTORI, formData) )
+                .then(nuovoTokenAutenticazione => {  // Nella risposta c'è il nuovo token di autenticazione
+
+                  setTokenAutenticazione(nuovoTokenAutenticazione);
+                  this.valoreQualsiasiPerAggiornareIlComponenteSeModificato =
+                      1 - this.valoreQualsiasiPerAggiornareIlComponenteSeModificato;  // vedere documentazione della property
+                  this.setupDatiComponente();
+
+                  if (this.nuovoNominativo) {  // truthy se è stato modificato
+                    // Avvisa se è stato modificato il nominativo
+                    this.$emit('nominativo-attore-modificato', this.nuovoNominativo);
+                  }
+                  if(this.isFileLogoCaricato) {
+                    // SE è stato modificato il logo
+                    this.$emit('logo-attore-modificato');
+                    this.isFileLogoCaricato = false;  // ripristina il valore iniziale
+                  }
+
+                  alert("Modifiche salvate!");
+                })
+                .catch( errore => {
+                  if( errore===MSG_ERR_UTENTE_NON_CONFERMA ) {
+                    alert("Nessuna modifica apportata.");
+                  } else {
                     alert("Si è verificato un errore durante l'aggiornamento delle informazioni. " + errore.data );
                     console.error(errore);
-                  })
+                  }
+                });
 
-            })();
+          }
+        })().finally( () => {
 
-          })
+          // Reset dei campi input
+          document.getElementById(this.idForm_modificaInformazioniAttore).reset();
+          this.nuovoNominativo       = "";
+          this.nuovaEmail            = "";
+          this.vecchiaPassword       = "";
+          this.nuovaPassword         = "";
+          this.confermaNuovaPassword = "";
 
-          .catch( () => alert("Nessuna modifica apportata.") );
+          this.isFileLogoCaricato    = false;
+          this.isFormModificato      = false
 
-        }
+        });
 
-
-        // Reset dei campi input
-        document.getElementById(this.idForm_modificaInformazioniAttore).reset();
-        this.nuovoNominativo       = "";
-        this.nuovaEmail            = "";
-        this.vecchiaPassword       = "";
-        this.nuovaPassword         = "";
-        this.confermaNuovaPassword = "";
-        this.isFileLogoCaricato    = false;
-        this.isFormModificato      = false
 
       } else {
 
