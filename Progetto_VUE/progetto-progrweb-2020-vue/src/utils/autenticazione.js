@@ -41,11 +41,18 @@ export const logout = csrfToken => {
     richiestaGet(process.env.VUE_APP_URL_LOGOUT, parametriRichiestaGet)
         .catch( risposta => console.log("Logout fallito: " + risposta) );
 
-    eliminaTokenAutenticazione();
-    impostaTokenDiAutenticazioneSeEsiste();
+    eliminaInfoAutenticazione();
 
     // logout sul client
     return router.push({name: process.env.VUE_APP_ROUTER_NOME_ROUTE_LOGIN});
+}
+
+/** Funzione per eliminare dal cliente le informazioni di autenticazione.
+ * Il client, dopo l'esecuzione di questo metodo, risulterà non autenticato.*/
+export const eliminaInfoAutenticazione = () => {
+    eliminaTokenAutenticazione();
+    impostaTokenDiAutenticazioneSeEsiste();
+    rimuoviAuthorizationHeader();
 }
 
 /**

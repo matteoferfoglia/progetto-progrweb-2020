@@ -67,9 +67,7 @@
 
 <script>
 
-// TODO in caso di errore (input inserito dall'utente non valido) evidenziare la casella di input invalida (selector css ":invalid")
-
-import {getHttpResponseStatus, HTTP_STATUS_CONFLICT, richiestaPost} from "../../utils/http";
+import {getHttpResponseStatus, HTTP_STATUS_CONFLICT, richiestaPost} from "@/utils/http";
 
 export default {
   name: 'RegistrazioneNuovoConsumer',

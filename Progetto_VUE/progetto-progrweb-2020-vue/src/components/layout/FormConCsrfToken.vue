@@ -7,15 +7,13 @@
 
 <script>
 
-// TODO : TESTARE e provare attacchi csrf
-
 /** Questo componente offre un form già predisposto con il campo
  * per il token CSRF. Tramite l'evento 'csrf-token-ricevuto',
  * generato quando questo componente riceve il token dal server,
  * viene inoltrato tale token al componente padre.
  */
 
-import {richiediCSRFTokenAlServer} from "../../utils/CSRF";
+import {richiediCSRFTokenAlServer} from "@/utils/CSRF";
 
 export default {
   name: 'FormConCsrfToken',

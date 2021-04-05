@@ -86,16 +86,8 @@ export default {
     loginRiuscito(tokenAutenticazione) {
 
       const parametriRouter = {
-        [process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE]: tokenAutenticazione,
-
-        // TODO : cancellare questo commento
-        // Login probabilmente richiesto perché utente ha tentato di accedere a risorsa protetta
-        // Quindi aggiungo tutti i params che mi arrivano su routes, così l'utente può riprende
-        // a lavorare da dove si era interrotto prima del login:  // TODO : un oggetto simile è creato anche nell'index di router: estrarre un metodo che faccia solo questo !
-        [process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA]: this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_FULLPATH_ROUTE_RICHIESTA_PRIMA],
-        [process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA]: JSON.stringify(this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_PARAMS_ROUTE_RICHIESTA_PRIMA])
+        [process.env.VUE_APP_ROUTER_PARAMETRO_TOKEN_AUTENTICAZIONE]: tokenAutenticazione
       };
-
       this.$emit('login', parametriRouter);
 
     },

@@ -12,12 +12,21 @@
  *  https://router.vuejs.org/guide/essentials/nested-routes.html
  */
 
-// TODO : rivedere ed eventualmente ristrutturare questo script
-
 import {createRouter, createWebHashHistory} from 'vue-router'
-import {eliminaTokenAutenticazione, verificaAutenticazione} from "../utils/autenticazione";
-import {getProprietaAttoreTarget, getTipoAttoreTarget} from "../utils/richiesteInfoSuAttori";
-import {rimuoviAuthorizationHeader} from "../utils/http";
+import {
+  eliminaInfoAutenticazione,
+  verificaAutenticazione
+} from "@/utils/autenticazione";
+import {getProprietaAttoreTarget, getTipoAttoreTarget} from "@/utils/richiesteInfoSuAttori";
+
+/** Oggetto contenente i possibili campi "meta" usati nelle
+ * route, qua definiti in stile "enum".*/
+const metaProps_enum = {
+  requiresNonAuth:    0,    // se una route richiede di non essere autenticato
+  requiresAuth:       1,    // se una route richiede di essere autenticato
+  requiresInfoAttore: 2,    // se una route richiede info su un attore
+};
+Object.freeze(metaProps_enum); // A frozen object can no longer be changed. Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
 
 
 const routes = [
@@ -26,7 +35,7 @@ const routes = [
   {
     // Route non trovata (url invalido) (Fonte: https://router.vuejs.org/guide/essentials/redirect-and-alias.html#redirect)
     path: '/:pathMatch(.*)*',
-    props: true,
+    props: true,  // When props is set to true, the route.params will be set as the component props. Fonte: https://router.vuejs.org/guide/essentials/passing-props.html#boolean-mode
     redirect: { name: process.env.VUE_APP_ROUTER_ROOT_NOME }
   },
 
@@ -44,7 +53,7 @@ const routes = [
     path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH,
     component: () => import('../views/PaginaAutenticazione'),
     meta: {
-      requiresNonAuth: true
+      [metaProps_enum.requiresNonAuth]: true
     },
     children: [
       {
@@ -68,7 +77,7 @@ const routes = [
     component: () => import('../views/AreaRiservata'),
     props: true,
     meta: {
-      requiresAuth: true
+      [metaProps_enum.requiresAuth]: true
     },
     children: [
       {
@@ -97,7 +106,7 @@ const routes = [
             component: () => import('../components/attori/SchedaDiUnAttore'),
             props: true,
             meta: {
-              requiresInfoAttore: true  // questa route richiede di conoscere le informazioni sull'attore di cui mostrare la scheda
+              [metaProps_enum.requiresInfoAttore]: true  // questa route richiede di conoscere le informazioni sull'attore di cui mostrare la scheda
             },
             children: [
               {
@@ -132,88 +141,75 @@ const router = createRouter({
 
 router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
-  // TODO : rivedere bene i percorsi di instradamento
-
-  if( routeDestinazione.matched.some(route => route.meta["requiresNonAuth"]) ){
-    // SE route richiede di non essere autenticato, allora rimuove header di autenticazione
-    eliminaTokenAutenticazione();
-    rimuoviAuthorizationHeader();
+  if( routeDestinazione.matched.some(route => route.meta[metaProps_enum.requiresNonAuth]) ){
+    // SE route richiede di non essere autenticato, allora logout
+    eliminaInfoAutenticazione();
   }
 
-  (async () => {
-    // funzione asincrona
+  if( routeDestinazione.matched.some(route => route.meta[metaProps_enum.requiresAuth]) ) {
+    // Gestione instradamento per route che richiede autenticazione
 
-    if( routeDestinazione.matched.some(route => route.meta["requiresAuth"]) ) {
-      // Gestione instradamento per route che richiede autenticazione
+    verificaAutenticazione(routeDestinazione)
+      .then( async isUtenteAutenticato => {
 
-      await verificaAutenticazione(routeDestinazione)
-        .then( async isUtenteAutenticato => {
+        if(isUtenteAutenticato) {
+          // Autenticato
+          routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";  // salvata come String
 
-          if(isUtenteAutenticato) {
-            // Autenticato
-            routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";
+          if (routeDestinazione.matched.some(route => route.meta[metaProps_enum.requiresInfoAttore])) {
 
-            if (routeDestinazione.matched.some(route => route.meta["requiresInfoAttore"])) {
+              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
+                // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni
+                console.error("Identificativo dell'attore non presente, selezionare un utente dall'elenco.");
+                return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+              }
 
-                if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
-                  // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni
-                  console.error("Identificativo dell'attore non presente, selezionare un utente dall'elenco.");
-                  await router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
-                }
+              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]) {
+                // Se qui, nella route manca il tipo attore
+                await getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
+                    .then(tipoAttoreTarget =>
+                        routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] = String(tipoAttoreTarget)
+                    )
+                    .catch(errore => {
+                      console.error(errore);
+                      return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                    });
+              }
 
-                if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]) {
-                  // Se qui, nella route manca il tipo attore
-                  await getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
-                      .then(tipoAttoreTarget =>
-                          routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] = String(tipoAttoreTarget)
-                      )
-                      .catch(errore => {
-                        console.error(errore);
-                        router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
-                      });
-                }
+              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]) {
+                // Se qui, nella route manca il tipo attore
+                await getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
+                    .then(propAttoreTarget => {
+                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
+                          JSON.stringify(propAttoreTarget);
+                    })
+                    .catch(errore => {
+                      console.error(errore);
+                      return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                    });
+              }
 
-                if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]) {
-                  // Se qui, nella route manca il tipo attore
-                  await getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
-                      .then(propAttoreTarget => {
-                        routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
-                            JSON.stringify(propAttoreTarget);
-                      })
-                      .catch(errore => {
-                        console.error(errore);
-                        router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
-                      });
-                }
-
-                next();
-
-            } else {
               next();
-            }
 
           } else {
-            // Non autenticato
-            next(router.creaRouteAutenticazione());
+            next();
           }
 
-        })
-        .catch(error => {
-          console.error(error);
-          router.push({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
-        })
+        } else {
+          // Non autenticato
+          next(router.creaRouteAutenticazione());
+        }
 
-    } else  {
-      // SE route non richiede autorizzazione, ALLORA instrada senza problemi
-      next();
+      })
+      .catch( error => {
+        console.error(error);
+        return router.push({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
+      })
 
-    }
-
-  })()
-      .catch( errore => {
-        console.error(errore);
-        router.go(0); // ricarica la pagina
-      });
+  } else  {
+    // SE route non richiede autorizzazione, ALLORA instrada senza problemi
+    next();
+  }
 
 });
 
