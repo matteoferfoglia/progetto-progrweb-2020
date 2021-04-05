@@ -233,11 +233,42 @@ export default {
               delete isStringaNonNullaNonVuota[prop];
           }
 
+
           // Richiesta conferma modifiche
 
           let promise;  // attualmente è undefined
 
-          confirm( "Modificare le informazioni dell'utente?\n\n")
+          // Creazione messaggio con le modifiche che risulteranno
+          const msg = JSON.stringify( datiDaInviareAlServer )
+                          .replaceAll( ',', '\n' )
+                          .replaceAll( ':', ': ' )
+                          .replaceAll( '"', '' )
+                          .replaceAll('{','')
+                          .replaceAll('}','')
+                          .split('\n')
+                          .map( unaLinea => unaLinea[0].toUpperCase() + unaLinea.substr(1) )  // upper case del primo carattere
+                          .filter( unaLinea => {
+                            // rimuove le prop csrf token e id attore (all'utente che deve confermare i dati da modificare non interessa vedere i dettagli tecnici)
+
+                            // Controllo che le proprietà da scartare esistano (magari è stato cambiato il nome, così ci si accorge)
+                            const nomePropCsrfToken = 'csrfToken';
+                            const nomePropIdAttore = 'identificativoAttore';
+                            if(!datiDaInviareAlServer[nomePropCsrfToken])
+                              throw (nomePropCsrfToken + ' non è una property');
+                            if(!datiDaInviareAlServer[nomePropIdAttore])
+                              throw (nomePropIdAttore + ' non è una property');
+
+                            const lineaContieneProp = (linea,propDaCercare) =>
+                                linea.toLowerCase().startsWith(propDaCercare.toLowerCase());
+
+                            // escludo la prop
+                            return ! ( lineaContieneProp(unaLinea, nomePropCsrfToken) ||
+                                       lineaContieneProp(unaLinea, nomePropIdAttore )    );
+                          })
+                          .sort() // ordine alfabetico
+                          .join('\n');
+
+          confirm( "Verranno apportate le seguenti modifiche.\n\n" + msg)
               .then( () => {  // utente ha confermato
 
                 // Si procede con la richiesta di modifiche al server
