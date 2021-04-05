@@ -185,7 +185,7 @@ public class GestioneDocumenti {
         String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
         String linkDownloadFile =  indirizzoServer + "/api/noauth/downloadDocumento/" + fileAggiunto.getIdentificativoFile() + "/" + fileAggiunto.getTokenCasuale();
 
-        String oggettoNotifica   = EnvironmentVariables.NOME_APPLICAZIONE + " - Nuovo documento disponibile";  // TODO : variabile d'ambiente il nome della piattaforma
+        String oggettoNotifica   = EnvironmentVariables.NOME_APPLICAZIONE + " - Nuovo documento disponibile";
         String emailDestinatario = destinatarioFile.getEmail();
         String nomeDestinatario  = destinatarioFile.getNominativo();
 
@@ -221,15 +221,6 @@ public class GestioneDocumenti {
             Logger.scriviEccezioneNelLog( GestioneDocumenti.class,
                             "Problemi durante l'invio dell'e-mail", e );
         }
-
-
-
-        // TODO : refactoring: creare una classe solo per la gestione dei documenti,
-        //        che sia comune a tutti gli attori: metter lì il metodo per il calcolo
-        //        dell'url di download (visto che sarà quella classe a gestirlo).
-        //        Ricorda che anche sul Client nella tabella mostrata all'Uploader si
-        //        crea un url di download/upload. Sarebbe meglio che chiedesse al server
-        //        quale sia l'url (del tipo:    GET .../api/documenti/urlDownload/{idDocumento}
 
     }
 

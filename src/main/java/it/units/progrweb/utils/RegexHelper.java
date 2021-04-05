@@ -7,7 +7,6 @@ package it.units.progrweb.utils;
 public class RegexHelper {
 
     /** RegEx per email (<a href="https://html.spec.whatwg.org/multipage/input.html">Fonte</a>). */
-    // TODO : verificare regex
     public final static String REGEX_EMAIL = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
 
     /** Regex per il codice fiscale
@@ -16,11 +15,11 @@ public class RegexHelper {
 
     /** Valida un email sulla base di una regex. */
     public static boolean isEmailValida(String emailDaValidare) {
-        return emailDaValidare.matches(REGEX_EMAIL);    // TODO: testare che funzioni
+        return emailDaValidare.matches(REGEX_EMAIL);
     }
 
     /** Valida un codice fiscale sulla base di una regex. */
     public static boolean isCodiceFiscaleValido(String codiceFiscale) {
-        return codiceFiscale.matches(REGEX_CODICE_FISCALE);    // TODO: testare che funzioni
+        return codiceFiscale.matches(REGEX_CODICE_FISCALE);
     }
 }
