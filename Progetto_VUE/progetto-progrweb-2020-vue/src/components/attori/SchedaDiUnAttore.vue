@@ -554,7 +554,7 @@ export default {
 
       // In ogni caso, reset delle proprietà per predisporre la pagina alle interazioni successive
       this.flag_inviaDatiForm = false;
-      document.querySelector('#' + this.idHtmlQuestoComponente + ' form').reset();  // pulizia dei campi (es.: input file)  // TODO : questa linea serve?
+      document.querySelector('#' + this.idHtmlQuestoComponente + ' form').reset();  // pulizia dei campi (altrimenti rimane input file)
 
     },
 

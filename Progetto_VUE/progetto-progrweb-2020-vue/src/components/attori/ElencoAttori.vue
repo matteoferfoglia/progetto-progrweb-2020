@@ -284,8 +284,6 @@ export default {
      * apportate sullo stesso oggetto (stesso indirizzo in memoria).*/
     ordinaElencoAttori() {
 
-      // TODO : cercare metodo più efficiente
-
       // Algoritmo: copia le entries dell'elenco, ordinale, poi elimina
       // tutte le entries dall'elenco vero ed aggiungi una ad una quelle
       // dall'elenco ordinato.

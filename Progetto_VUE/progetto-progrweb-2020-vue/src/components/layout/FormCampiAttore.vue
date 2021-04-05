@@ -203,7 +203,15 @@ export default {
     isFormModificato() {
       return ! ( this.username_wrapper===this.username     &&
                  this.nominativo_wrapper===this.nominativo &&
-                 this.email_wrapper===this.email              );
+                 this.email_wrapper===this.email              ) ||
+            !!this.fileDaForm() ;  // se è stato caricato un file, allora c'è stata una modifica
+    },
+
+    /** Restituisce la {@link FileList} degli eventuali file caricati nel form,
+     * oppure null se non ce ne sono.*/
+    fileDaForm() {
+      const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
+      return inputFile!==null && inputFile.files!==null && inputFile.files.length>0 ? inputFile.files : null;
     }
 
   },
@@ -264,33 +272,33 @@ export default {
 
             // Creazione messaggio con le modifiche che risulteranno
             const msg = JSON.stringify(datiDaInviareAlServer)
-                .replaceAll(',', '\n')
-                .replaceAll(':', ': ')
-                .replaceAll('"', '')
-                .replaceAll('{', '')
-                .replaceAll('}', '')
-                .split('\n')
-                .map(unaLinea => unaLinea[0].toUpperCase() + unaLinea.substr(1))  // upper case del primo carattere
-                .filter(unaLinea => {
-                  // rimuove le prop csrf token e id attore (all'utente che deve confermare i dati da modificare non interessa vedere i dettagli tecnici)
+                            .replaceAll(',', '\n')
+                            .replaceAll(':', ': ')
+                            .replaceAll('"', '')
+                            .replaceAll('{', '')
+                            .replaceAll('}', '')
+                            .split('\n')
+                            .map(unaLinea => unaLinea[0].toUpperCase() + unaLinea.substr(1))  // upper case del primo carattere
+                            .filter(unaLinea => {
+                              // rimuove le prop csrf token e id attore (all'utente che deve confermare i dati da modificare non interessa vedere i dettagli tecnici)
 
-                  // Controllo che le proprietà da scartare esistano (magari è stato cambiato il nome, così ci si accorge)
-                  const nomePropCsrfToken = 'csrfToken';
-                  const nomePropIdAttore = 'identificativoAttore';
-                  if (!datiDaInviareAlServer[nomePropCsrfToken])
-                    throw (nomePropCsrfToken + ' non è una property');
-                  if (!datiDaInviareAlServer[nomePropIdAttore])
-                    throw (nomePropIdAttore + ' non è una property');
+                              // Controllo che le proprietà da scartare esistano (magari è stato cambiato il nome, così ci si accorge)
+                              const nomePropCsrfToken = 'csrfToken';
+                              const nomePropIdAttore = 'identificativoAttore';
+                              if (!datiDaInviareAlServer[nomePropCsrfToken])
+                                throw (nomePropCsrfToken + ' non è una property');
+                              if (!datiDaInviareAlServer[nomePropIdAttore])
+                                throw (nomePropIdAttore + ' non è una property');
 
-                  const lineaContieneProp = (linea, propDaCercare) =>
-                      linea.toLowerCase().startsWith(propDaCercare.toLowerCase());
+                              const lineaContieneProp = (linea, propDaCercare) =>
+                                  linea.toLowerCase().startsWith(propDaCercare.toLowerCase());
 
-                  // escludo la prop
-                  return !(lineaContieneProp(unaLinea, nomePropCsrfToken) ||
-                      lineaContieneProp(unaLinea, nomePropIdAttore));
-                })
-                .sort() // ordine alfabetico
-                .join('\n');
+                              // escludo la prop
+                              return ! ( lineaContieneProp(unaLinea, nomePropCsrfToken) ||
+                                         lineaContieneProp(unaLinea, nomePropIdAttore)     );
+                            })
+                            .sort() // ordine alfabetico
+                            .join('\n') + String(this.fileDaForm() ? "\n Verrà  modificato il logo." : "");
 
             confirm("Verranno apportate le seguenti modifiche.\n\n" + msg)
                 .then(() => {  // utente ha confermato
@@ -308,9 +316,9 @@ export default {
                     }
 
                     // Se presente un file, lo aggiunge ai dati da inviare
-                    const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
-                    if (inputFile != null && inputFile.files != null) { // null quando non c'è l'input[type=file]
-                      datiDaInviareAlServer_comeFormData.append(inputFile.name, inputFile.files[0]);
+                    const filesDaForm = this.fileDaForm();
+                    if( filesDaForm ) { // se truthy, allora c'è un file caricato nel form
+                      datiDaInviareAlServer_comeFormData.append(filesDaForm.name, filesDaForm.files[0]);
                     }
 
                     promise = richiestaPostConFile(this.urlInvioFormTramitePost, datiDaInviareAlServer_comeFormData);
