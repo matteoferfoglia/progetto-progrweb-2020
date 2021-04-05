@@ -27,8 +27,8 @@ window.confirm = msg =>
             title: "Richiesta conferma",
             text: msg,
             icon: "warning",
-            buttons: true,
-            dangerMode: true,
+            buttons: ["Cancella", "OK"],
+            dangerMode: false,
     }).then( esitoConfirm => {
             if(esitoConfirm)
                     return Promise.resolve();
