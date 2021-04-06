@@ -21,7 +21,14 @@
                  @input.prevent="setDataFine($event.target.value)"
                  required>
         </label>
-        <button type="submit" class="btn btn-primary">Invia</button>
+        <button type="submit"
+                class="btn btn-primary"
+                id="buttonRichiestaResoconto"
+                onmouseup="document.getElementById('buttonRichiestaResoconto').blur()
+                          /*Rilascia il button quando si rilascia il mouse (altrimenti il pulsante
+                           * rimaneva premuto. */">
+          Invia
+        </button>
       </div>
     </fieldset>
   </form>
