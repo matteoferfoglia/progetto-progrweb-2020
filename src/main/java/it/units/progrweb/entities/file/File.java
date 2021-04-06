@@ -62,8 +62,7 @@ public abstract class File {
     private Long identificativoDestinatario;
 
     /** Lista di hashtag associati a questo file. */
-    @SuppressWarnings({"unused", "FieldCanBeLocal"}) // attributo necessario affinché venga salvato da Objectify
-    private List<String> listaHashtag;
+    private String listaHashtag;    // da requisiti è richiesto che sia una stringa
 
     /** Token casuale associato ad un'istanza della classe.
      * Esempio di utilizzo: creazione di un link di download diretto
@@ -118,7 +117,7 @@ public abstract class File {
         this.dataEdOraDiCaricamento = DateTime.convertiInString( dataEdOraDiCaricamento );
         this.identificativoMittente = identificativoMittente;
         this.identificativoDestinatario = identificativoDestinatario;
-        this.listaHashtag = listaHashtag;
+        this.setListaHashtag(listaHashtag);
         this.tokenCasuale = GeneratoreTokenCasuali.generaTokenAlfanumerico(LUNGHEZZA_TOKEN_CASUALE);
     }
 
@@ -151,6 +150,16 @@ public abstract class File {
 
     protected void setIndirizzoIpVisualizzatore(String indirizzoIpVisualizzatore) {
         this.indirizzoIpVisualizzatore = indirizzoIpVisualizzatore;
+    }
+
+    public List<String> getListaHashtag() {
+        return Arrays.asList(
+                listaHashtag.substring(1,listaHashtag.length()-1)   // elimina [ ]
+                            .split(", ")    // crea l'array
+        );
+    }
+    public void setListaHashtag(List<String> listaHashtag) {
+        this.listaHashtag = "[" + String.join(", ", listaHashtag) + "]";
     }
 
     /** Restituisce il nome dell'attributo che contiene il nome di un file.*/
@@ -330,7 +339,14 @@ public abstract class File {
      * metodo.
      * @param includiMetadati true se si vogliono anche i metadati.*/
     public Map<String, ?> toMap_nomeProprieta_valoreProprieta(boolean includiMetadati) {
-        return UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(includiMetadati), this);
+        Map<String, Object> mappaPropUnFile =
+                UtilitaGenerale.getMappaNomeValoreProprieta(getAnteprimaProprietaFile(includiMetadati), this);
+
+        // Campo listaHashtag salvato come String per soddisfare i requisiti di progetto
+        // ma riconvertito in List per corretta semantica
+        mappaPropUnFile.replace(getNomeAttributoContenenteHashtagNeiFile(), getListaHashtag()); // conversione in arraylist per serializzazione corretta della mappa
+
+        return mappaPropUnFile;
     }
 
     public String getNomeDocumento() {
