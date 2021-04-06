@@ -111,12 +111,12 @@ const routes = [
             children: [
               {
                 path: process.env.VUE_APP_ROUTER_PATH_CARICAMENTO_DOCUMENTI,
-                alias: '',  // percorso default
                 name: process.env.VUE_APP_ROUTER_NOME_CARICAMENTO_DOCUMENTI,
                 component: () => import('../components/attori/uploader/CaricamentoDocumentoPerConsumer')
               },
               {
                 path: process.env.VUE_APP_ROUTER_PATH_TABELLA_DOCUMENTI,
+                alias: '',  // percorso default
                 name: process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
                 component: () => import('../components/attori/TabellaDocumenti')
               }

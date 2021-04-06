@@ -64,7 +64,7 @@ export default {
     if( this.$route.name === this.nomeRouteListaDocumentiVistaDaUploader ||
           this.$route.name === this.nomeRouteSchedaAttore )
       this.$router.push({
-        name: this.nomeRouteCaricamentoDocumenti,
+        name: this.nomeRouteTabellaDocumenti,
         params: this.$route.params
       });
   },
