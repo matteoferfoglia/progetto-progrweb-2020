@@ -43,6 +43,8 @@
                           params: {
                             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
                             [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
+                            [nomeProp_mostrarePulsanteChiusuraSchedaAttore]: isConsumerAttualmenteAutenticato() &&
+                                                                              mappa_idAttore_proprietaAttore.size>1,
                             [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
                               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                           }
@@ -149,6 +151,7 @@ export default {
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
       tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR,
       nomePropTipoAttore: process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME,
+      nomeProp_mostrarePulsanteChiusuraSchedaAttore: process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE, // vedere componente mostrante la scheda di un attore
 
       // Import funzione
       creaUrlLogo: creaUrlLogo

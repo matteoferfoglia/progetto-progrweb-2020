@@ -276,7 +276,7 @@ export default {
           .then( () => {
             // Modifica lo stile dei toggle corrispondenti ai collapsible attualmente mostrati "aperti"
             document.querySelectorAll(".collapse.show")
-                .forEach( this.impostaClasseStileToggleDiElementoCollapsible );
+                    .forEach( this.impostaClasseStileToggleDiElementoCollapsible );
 
             /** Aggiunge listener per modificare lo stile dei toggle corrispondenti
              * a card "aperti" o "collassati".
@@ -390,9 +390,7 @@ export default {
           if (this.$route && this.$route.params &&  // controllare che sia definita
               this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]) {
             this.mostrarePulsanteChiusuraQuestaSchedaAttore =
-                this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE];
-            this.mostrarePulsanteChiusuraQuestaSchedaAttore = this.mostrarePulsanteChiusuraQuestaSchedaAttore === undefined ?
-                true : this.mostrarePulsanteChiusuraQuestaSchedaAttore;
+                this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]==="true"; // parametri VueRouter salvato come String
           } else {
             this.mostrarePulsanteChiusuraQuestaSchedaAttore = !this.isConsumerAttualmenteAutenticato();
           }
