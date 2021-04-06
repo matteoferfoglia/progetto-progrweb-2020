@@ -1,5 +1,6 @@
 package it.units.progrweb.utils.mail;
 
+import com.google.appengine.api.utils.SystemProperty;
 import it.units.progrweb.EnvironmentVariables;
 
 import javax.mail.*;
@@ -18,7 +19,8 @@ import java.util.Properties;
 public class MailSender {
 
     /** Indirizzo email in formato RFC822.*/
-    private static final String INDIRIZZO_MAIL_MITTENTE      = "admin@example.com";
+    private static final String INDIRIZZO_MAIL_MITTENTE      = "noreply-" + EnvironmentVariables.NOME_APPLICAZIONE +
+            "@" + SystemProperty.applicationId.get() + ".appspotmail.com";  // Fonte: https://cloud.google.com/appengine/docs/standard/python/mail#who_can_send_mail
 
     /** Nome personale utilizzato nelle mail.*/
     private static final String NOME_PERSONALE_MAIL_MITTENTE = "Servizio di " + EnvironmentVariables.NOME_APPLICAZIONE;

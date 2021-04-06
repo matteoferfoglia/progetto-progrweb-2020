@@ -134,7 +134,6 @@ export default {
         inviaForm();
       } else {
         informaUtenteFormInvalido();
-        // TODO : si potrebbe evidenziare i campi invalidi
       }
 
     }

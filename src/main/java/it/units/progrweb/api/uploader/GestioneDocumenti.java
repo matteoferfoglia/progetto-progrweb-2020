@@ -180,8 +180,6 @@ public class GestioneDocumenti {
                                                                              @NotNull Consumer destinatarioFile,
                                                                              @Context HttpServletRequest httpServletRequest) {
 
-        // TODO : metodo da verificare
-
         String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
         String linkDownloadFile =  indirizzoServer + "/api/noauth/downloadDocumento/" + fileAggiunto.getIdentificativoFile() + "/" + fileAggiunto.getTokenCasuale();
 
@@ -191,12 +189,11 @@ public class GestioneDocumenti {
 
         String messaggioHtmlNotifica;
         {
-            // TODO : verificare sintassi HTML corretta
 
             // Creazione del corpo del messaggio in formato HTML
             messaggioHtmlNotifica =
                     "<!DOCTYPE html>"                                                       +
-                    "<html>"                                                                +
+                    "<html lang=\"it\">"                                                    +
                         "<head>"                                                            +
                             "<title>" + oggettoNotifica + "</title>"                        +
                         "</head>"                                                           +

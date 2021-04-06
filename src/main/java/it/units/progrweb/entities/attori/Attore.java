@@ -295,32 +295,36 @@ public abstract class Attore implements Cloneable, Principal {
                 String oggettoEmail = "Creazione nuovo account";
 
                 // Creazione del corpo del messaggio in formato HTML
-                // TODO : verificare correttezza html
                 String messaggioHtml =
                         "<!DOCTYPE html>"                                                       +
-                        "<html>"                                                                +
+                        "<html lang=\"it\">"                                                                +
                             "<head>"                                                            +
                                 "<title>" + oggettoEmail + "</title>"                           +
                             "</head>"                                                           +
                             "<body>"                                                            +
                                 "<h1>" + oggettoEmail + "</h1>"                                 +
                                 "<p>"                                                           +
-                                    "E' stato creato un nuovo account nella piattaforma."       +
-                                    "Sarà possibile accedervi con le seguenti credenziali"      +
-                                    "<ul>"                                                      +
-                                        "<li>username: <strong>" + attore.getUsername() + "</strong></li>"  +
-                    ( inviarePassword ? "<li>password: <strong>" + password + "</strong></li>" : "")  +
-                                    "</ul>"                                                     +
-                    (inviarePassword ?
-                                    "E' <em>fortemente</em> raccomandata la modifica della"     +
-                                    "password al primo accesso al sistema."                     +
+                                    "E' stato creato un nuovo account nella piattaforma. "      +
+                                    "Sarà possibile accedervi con le seguenti credenziali:"     +
+                                "</p>"                                                          +
+                                "<ul>"                                                      +
+                                    "<li>username: <strong>" + attore.getUsername() + "</strong></li>"  +
+                                    "<li>password: "                                         +
+                    ( inviarePassword ? "<strong>" + password + "</strong>"
+                                      : "<span style=\"font-style: italic\">utilizzare la password scelta in fase di registrazione.</span>")  +
+                                    "</li>"                                                 +
+                                "</ul>"                                                     +
+                    ( inviarePassword ?
+                                "<p>" +
+                                    "E' <em>fortemente</em> raccomandata la modifica della "+
+                                    "password al primo accesso al sistema."                 +
                                 "</p>"
-                                     : "")                                                      +
+                                      : "")                                                      +
                                 "<p>"                                                           +
                                     "Per poter essere utilizzato, l'account deve essere "       +
-                                    "confermato: cliccare"                                      +
+                                    "confermato: cliccare "                                     +
                                     "<a href=\"" + urlPerVerificaAccount + "\">qui</a>"         +
-                                    "per confermare l'account."                                 +
+                                    " per confermare l'account."                                +
                                 "</p>"                                                          +
                             "</body>"                                                           +
                         "</html>";

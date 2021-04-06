@@ -102,7 +102,6 @@ public class StarterDatabase implements ServletContextListener {
             // which is: SystemProperty.Environment.Value.Production
 
             // Da requisiti: All’avvio della piattaforma per la prima volta, vi sarà un solo utente amministratore.
-            // TODO : da testare in ambiente di produzione
             caricaEntitaInDB( attoriDaCreareInProdMod );
 
         }

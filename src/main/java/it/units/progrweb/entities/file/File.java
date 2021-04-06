@@ -76,7 +76,7 @@ public abstract class File {
     private String tokenCasuale;
 
     /** Lunghezza di {@link #tokenCasuale}. */
-    @Ignore
+    @Ignore // campi statici comunque ignorati da Objectify
     private static final int LUNGHEZZA_TOKEN_CASUALE = 64;
 
     /** Dimensione massima per la dimensione di un file, in byte. */

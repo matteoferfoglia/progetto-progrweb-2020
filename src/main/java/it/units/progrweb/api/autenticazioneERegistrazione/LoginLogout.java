@@ -128,8 +128,6 @@ public class LoginLogout {
     @Produces(MediaType.TEXT_PLAIN)
     public String resetPassword( CampiFormLogin campiFormLogin ) {
 
-        // TODO : testare questo metodo che funzioni correttamente con le mail
-
         String username = campiFormLogin.getUsername();
 
         final String MSG_ERRORE_INTERNO = "Errore interno, riprovare più tardi.";
@@ -147,14 +145,15 @@ public class LoginLogout {
                     MailSender mailSender = new MailSender();
                     try {
                         mailSender.inviaEmail(attore.getEmail(), attore.getNominativo(), "Reset password",
-                                "E' stato richiesto il reset della password per il Suo account." +
-                                        " La nuova password è: " + passwordTemporanea + ". Si consiglia di modificare" +
-                                        " al primo accesso tale password. Se non è stata richiesta la modifica, ignorare" +
-                                        " questa email.");
+                                "E' stato richiesto il reset della password per il Suo account.\n" +
+                                        "La nuova password è: \"" + passwordTemporanea + "\".\n" +
+                                        "Si consiglia di modificare tale password al primo accesso.\n" +
+                                        "Se non è stato Lei a richiedere la modifica della password, ignorare" +
+                                        " questa e-mail.");
                     } catch (MessagingException | UnsupportedEncodingException e) {
                         Logger.scriviEccezioneNelLog(
                                 LoginLogout.class,
-                                "Errore nell'invio della mail per il reset della password",
+                                "Errore nell'invio dell'e-mail per il reset della password",
                                 e
                         );
                         return MSG_ERRORE_INTERNO;

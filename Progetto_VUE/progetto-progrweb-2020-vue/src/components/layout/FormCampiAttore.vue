@@ -287,20 +287,21 @@ export default {
                               const nomePropIdAttore = 'identificativoAttore';
                               if (!datiDaInviareAlServer[nomePropCsrfToken])
                                 throw (nomePropCsrfToken + ' non è una property');
-                              if (!datiDaInviareAlServer[nomePropIdAttore])
-                                throw (nomePropIdAttore + ' non è una property');
+                              // if (!datiDaInviareAlServer[nomePropIdAttore])  // commentato perché non tutti i componenti hanno questa proprietà
+                              //   throw (nomePropIdAttore + ' non è una property');
 
                               const lineaContieneProp = (linea, propDaCercare) =>
                                   linea.toLowerCase().startsWith(propDaCercare.toLowerCase());
 
                               // escludo la prop
                               return ! ( lineaContieneProp(unaLinea, nomePropCsrfToken) ||
-                                         lineaContieneProp(unaLinea, nomePropIdAttore)     );
+                                          ( !!datiDaInviareAlServer[nomePropIdAttore] &&
+                                              lineaContieneProp(unaLinea, nomePropIdAttore) ) );
                             })
                             .sort() // ordine alfabetico
                             .join('\n') + String(this.fileDaForm() ? "\n Verrà  modificato il logo." : "");
 
-            confirm("Verranno apportate le seguenti modifiche.\n\n" + msg)
+            confirm("Riepilogo.\n\n" + msg)
                 .then(() => {  // utente ha confermato
 
                   // Si procede con la richiesta di modifiche al server
