@@ -35,8 +35,23 @@
       <h2>Elenco attori</h2>
       <ol v-if="mappa_idAttore_proprietaAttore.size>0">
         <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
-            class="list-group-item list-group-item-action"
+            class="list-group-item list-group-item-action d-flex"
             :key="attore[0]/*Id dell'attore*/">
+
+          <button @click.prevent="() => {
+                                    eliminaAttore( attore[0],
+                                                   String(getIdentificativoAttoreAttualmenteAutenticato()),
+                                                   tipoAttoreAutenticato,
+                                                   csrfToken_wrapper,
+                                                   attore[1][NOME_PROP_NOMINATIVO],
+                                                   attore[0]===String(getIdentificativoAttoreAttualmenteAutenticato()),
+                                                   $router                                                              );
+                                    mappa_idAttore_proprietaAttore.delete( attore[0] ); // elimina l'attore dall'elenco mostrato nel client
+                                  }"
+                  class="x-circle btn btn-danger btn-elimina-attore"
+                  v-if="isUploaderAttualmenteAutenticato()/* Funzione solo per Uplaoder */">
+          </button>
+
           <router-link class="w-100 d-flex align-items-center"
                        :to="{
                           name: NOME_ROUTE_SCHEDA_ATTORE,
@@ -48,6 +63,7 @@
                               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                           }
                         }">
+
           <img :src="creaUrlLogo(attore[0])"
                alt=""
                class="logo logo-elenco"
@@ -55,6 +71,7 @@
           <div class="nominativo-attore w-100 d-flex justify-content-between">
             {{ attore[1][NOME_PROP_NOMINATIVO] }}
           </div>
+
           </router-link>
         </li>
       </ol>
@@ -76,9 +93,10 @@
 <script>
 import {richiestaGet} from "@/utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
-import {creaUrlLogo, getMappa_idAttore_proprietaAttore} from "@/utils/richiesteInfoSuAttori";
+import {creaUrlLogo, eliminaAttore, getMappa_idAttore_proprietaAttore} from "@/utils/richiesteSuAttori";
 import Loader from "../layout/Loader";
 import {areArrayEquivalenti} from "@/utils/utilitaGenerale";
+import {getIdentificativoAttoreAttualmenteAutenticato} from "@/utils/autenticazione";
 
 export default {
   name: "ElencoAttori",
@@ -152,8 +170,10 @@ export default {
       nomePropTipoAttore: process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME,
       nomeProp_mostrarePulsanteChiusuraSchedaAttore: process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE, // vedere componente mostrante la scheda di un attore
 
-      // Import funzione
-      creaUrlLogo: creaUrlLogo
+      // Import funzioni
+      creaUrlLogo: creaUrlLogo,
+      eliminaAttore: eliminaAttore,
+      getIdentificativoAttoreAttualmenteAutenticato: getIdentificativoAttoreAttualmenteAutenticato
 
     }
   },
@@ -350,6 +370,12 @@ export default {
           process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
 
+    /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
+    isUploaderAttualmenteAutenticato() {
+      return this.tipoAttoreAutenticato_wrapper ===
+          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
+    },
+
     /** Restituisce true se l'attore attualmente autenticato è un Administrator.*/
     isAdministratorAttualmenteAutenticato() {
       return this.tipoAttoreAutenticato_wrapper ===
@@ -462,5 +488,8 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
   }
   #elencoAttori {
     border: 0;
+  }
+  .btn-elimina-attore {
+    margin-right: 2rem;
   }
 </style>

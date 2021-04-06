@@ -17,7 +17,7 @@ import {
   eliminaInfoAutenticazione,
   verificaAutenticazione
 } from "@/utils/autenticazione";
-import {getProprietaAttoreTarget, getTipoAttoreTarget} from "@/utils/richiesteInfoSuAttori";
+import {getProprietaAttoreTarget, getTipoAttoreTarget} from "@/utils/richiesteSuAttori";
 
 /** Oggetto contenente i possibili campi "meta" usati nelle
  * route, qua definiti in stile "enum".*/

@@ -67,7 +67,13 @@
                 Reset modifiche
               </button>
 
-              <button @click.prevent="eliminaAttore()"
+              <button @click.prevent="eliminaAttore( idAttoreCuiQuestaSchedaSiRiferisce,
+                                                     String(getIdentificativoAttoreAttualmenteAutenticato()),
+                                                     tipoAttoreAutenticato,
+                                                     csrfToken_wrapper,
+                                                     proprietaAttoreCuiQuestaSchedaSiRiferisce[NOME_PROP_USERNAME],
+                                                     idAttoreCuiQuestaSchedaSiRiferisce===String(getIdentificativoAttoreAttualmenteAutenticato()),
+                                                     $router                                                                                       )"
                       class="x-circle btn btn-danger"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Elimina utente
@@ -129,17 +135,16 @@
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
 import {generaIdUnivoco} from "@/utils/utilitaGenerale";
-import {richiestaDelete, richiestaGet} from "@/utils/http";
+import {richiestaGet} from "@/utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
 import Loader from "../layout/Loader";
 import {
   getIdentificativoAttoreAttualmenteAutenticato,
-  logout,
   setTokenAutenticazione
 } from "@/utils/autenticazione";
-import {creaUrlLogo} from "@/utils/richiesteInfoSuAttori";
+import {creaUrlLogo, eliminaAttore} from "@/utils/richiesteSuAttori";
 export default {
   name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
@@ -259,6 +264,10 @@ export default {
 
       /** Flag: diventa true quando il componente è caricato.*/
       isComponenteCaricato: false,
+
+      // Import funzioni per visibilità in template
+      getIdentificativoAttoreAttualmenteAutenticato: getIdentificativoAttoreAttualmenteAutenticato,
+      eliminaAttore: eliminaAttore,
 
 
       // Wrapper
@@ -466,37 +475,6 @@ export default {
     ripristinaValoriForm() {
       this.ripristinaValoriProperty = true; // vedere componente figlio che gestisce il form
     },
-
-    /** Richiede al server l'eliminazione di un attore.*/
-    eliminaAttore() {
-      // Uploader può eliminare Consumer
-      // Administrator può eliminare Uploader o Administrator (sé compreso)
-
-      const idAttoreAttualmenteAutenticato = String(getIdentificativoAttoreAttualmenteAutenticato());
-      const idAttoreCuiQuestaSchedaSiRiferisce = String(this.idAttoreCuiQuestaSchedaSiRiferisce);
-
-      const urlEliminazioneAttore = ( this.isUploaderAttualmenteAutenticato() ?
-              process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
-              process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) +
-                "/" + idAttoreCuiQuestaSchedaSiRiferisce;
-
-      const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: this.csrfToken};
-
-      richiestaDelete( urlEliminazioneAttore, parametriRichiestaDelete )
-          .then( () => {
-            alert(this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME] + " eliminato." );
-
-            if( idAttoreCuiQuestaSchedaSiRiferisce === idAttoreAttualmenteAutenticato )
-              logout();   // logout se un Administrator ha eliminato sé
-
-            this.$router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
-          })
-          .catch( rispostaErrore => {
-            console.error("Errore durante l'eliminazione: " + rispostaErrore );
-          });
-
-    },
-
 
     /** Metodo invocato quando il form per la modifica di un attore viene
      * inviato.

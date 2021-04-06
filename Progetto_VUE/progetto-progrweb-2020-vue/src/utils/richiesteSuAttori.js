@@ -1,7 +1,8 @@
 /** Questo script contiene delle funzioni utilizzabili in contesti diversi per
  * richiedere al server delle informazioni su un attore.*/
 
-import {richiestaGet} from "./http";
+import {richiestaDelete, richiestaGet} from "./http";
+import {logout} from "@/utils/autenticazione";
 
 /** Richiede le informazioni relative all'attore il cui identificativo
  * è passato come parametro. Se la richiesta va a buon fine, viene
@@ -91,4 +92,48 @@ export const creaUrlLogo = identificativoAttore => {
                                                   '?' + new Date().getTime(); // query string per evitare cache;
     else
         return undefined;
+};
+
+/** Richiede al server l'eliminazione di un attore.
+ * @param idAttoreDaEliminare Identificativo dell'attore per cui
+ *                            viene richiesta l'eliminazione.
+ * @param idAttoreRichiedenteEliminazione Eliminazione Identificativo dell'attore
+ *                            che richiede l'eliminazione.
+ * @param tipoAttoreRichiedente Tipo dell'attore che richiede l'eliminazione.
+ * @param csrfToken Token CSRF da allegare alla richiesta.*
+ * @param usernameONominativoAttoreDaEliminare Stringa che comparirà nel messaggio
+ *                            di confermata eliminazione.
+ * @param logoutAFineOperazione Flag: true se al termine dell'operazione di eliminazione
+ *                            bisogna eseguire il logout (es.: se un Administrator elimina
+ *                            se stesso, poi non esisterà più e non potrà fare nulla, quindi
+ *                            è corretto eseguire il logout).
+ * @param router L'oggetto $router. */
+export const eliminaAttore = ( idAttoreDaEliminare, idAttoreRichiedenteEliminazione,
+                               tipoAttoreRichiedente, csrfToken,
+                               usernameONominativoAttoreDaEliminare, logoutAFineOperazione,
+                               router ) => {
+
+    // Uploader può eliminare Consumer
+    // Administrator può eliminare Uploader o Administrator (sé compreso)
+
+    const urlEliminazioneAttore = ( tipoAttoreRichiedente ?
+        process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
+        process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) +
+        "/" + idAttoreDaEliminare;
+
+    const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: csrfToken};
+
+    richiestaDelete( urlEliminazioneAttore, parametriRichiestaDelete )
+        .then( () => {
+            alert( usernameONominativoAttoreDaEliminare + " eliminato." );
+
+            if( logoutAFineOperazione )
+                logout();   // logout se un Administrator ha eliminato sé
+
+            router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
+        })
+        .catch( rispostaErrore => {
+            console.error("Errore durante l'eliminazione: " + rispostaErrore );
+        });
+
 };
