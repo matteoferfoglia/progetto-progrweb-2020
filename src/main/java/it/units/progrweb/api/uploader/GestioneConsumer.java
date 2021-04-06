@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.InputMismatchException;
 import java.util.List;
 
 /**
@@ -82,6 +83,10 @@ public class GestioneConsumer {
             return Response.serverError()
                            .entity("Errore durante la creazione del consumer.")
                            .build();
+        } catch (InputMismatchException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(e.getMessage())
+                           .build();
         }
 
 
@@ -95,6 +100,9 @@ public class GestioneConsumer {
      * @param httpServletRequest La richiesta HTTP che ha richiesto l'associazione di un {@link Consumer} ad un {@link Uploader}.
      * @param consumerDaCampiForm Istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante un {@link Consumer}.
      * @param identificativoUploader Identificativo dell'{@link Uploader}.
+     * @throws InputMismatchException Se il {@link Consumer} da associare viene trovato nel database
+     *          ma i valori per i suoi attributi specificati tramite {@link CreazioneAttore.CampiFormAggiuntaAttore}
+     *          non corrispondono con quelli salvati nel sistema.
      * @return L'istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante il
      *          {@link Consumer} appena creato, se l'operazione va a buon fine. */
     public static CreazioneAttore.CampiFormAggiuntaAttore
@@ -125,6 +133,15 @@ public class GestioneConsumer {
                 Logger.scriviEccezioneNelLog(GestioneConsumer.class, e);
                 throw e;
             }
+        } else { // Consumer trovato nella piattaforma
+
+            // Verifica che gli attributi del Consumer nel sistema coincidano con quelli
+            //  del Consumer che si sta aggiungendo
+            if( !consumerDaCampiForm.equals( consumerDalDB ) ) {
+                // username ok, ma altri campi non corrispondono a quelli inseriti
+                throw new InputMismatchException("Username trovato nel sistema, forse si intende: \n" + consumerDalDB);
+            }
+
         }
 
         consumerDaCampiForm.setIdentificativoAttore(consumerDalDB.getIdentificativoAttore());

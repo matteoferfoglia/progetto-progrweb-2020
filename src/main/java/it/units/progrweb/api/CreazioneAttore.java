@@ -208,6 +208,15 @@ public class CreazioneAttore {
             this.setIdentificativoAttore(attore.getIdentificativoAttore());
         }
 
+        /** Restituisce true se quest'istanza è equivalente all'{@link Attore}
+         * dato come parametro, verificando username, nominativo, tipoAttore ed email.*/
+        public boolean equals(Attore attore) {
+            return this.getUsername().equals(attore.getUsername()) &&
+                    this.getNominativo().equals(attore.getNominativo()) &&
+                    this.getTipoAttore().equals(attore.getTipoAttore()) &&
+                    this.getEmail().equals(attore.getEmail());
+        }
+
         /** Crea un'istanza di questa classe coi parametri dati.*/
         public CampiFormAggiuntaAttore(@NotNull String username, @NotNull String password,
                                        @NotNull String nominativo, @NotNull String email,
