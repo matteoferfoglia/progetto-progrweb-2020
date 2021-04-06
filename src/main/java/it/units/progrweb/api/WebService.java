@@ -49,13 +49,13 @@ public class WebService {
     @POST
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     public Response uploadFile(@Context HttpServletRequest httpServletRequest,
-                               @FormDataParam("contenutoFile")                      InputStream contenuto,
-                               @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile,
-                               @FormDataParam("nomeCognomeConsumerDestinatario")    String nomeCognomeConsumerDestinatario,
                                @FormDataParam("codiceFiscaleConsumerDestinatario")  String codiceFiscaleConsumerDestinatario,
                                @FormDataParam("emailConsumerDestinatario")          String emailConsumerDestinatario,
+                               @FormDataParam("nomeCognomeConsumerDestinatario")    String nomeCognomeConsumerDestinatario,
                                @FormDataParam("nomeFile")                           String nomeFile,
-                               @FormDataParam("listaHashtag")                       String listaHashtag ) {
+                               @FormDataParam("listaHashtag")                       String listaHashtag,
+                               @FormDataParam("contenutoFile")                      InputStream contenuto,
+                               @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile ) {
 
         String tokenAutenticazione = Autenticazione.getTokenAutenticazioneBearer(httpServletRequest);
 
