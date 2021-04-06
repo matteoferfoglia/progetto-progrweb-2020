@@ -48,9 +48,9 @@
                           }
                         }">
           <img :src="creaUrlLogo(attore[0])"
-               alt="Logo uploader"
+               alt=""
                class="logo logo-elenco"
-               v-if="tipiAttoreCuiQuestoElencoSiRiferisce===tipoAttore_uploader"/>
+               v-if="attore[1][nomePropTipoAttore]===tipoAttore_uploader"/>
           <div class="nominativo-attore w-100 d-flex justify-content-between">
             {{ attore[1][NOME_PROP_NOMINATIVO] }}
           </div>
@@ -148,6 +148,7 @@ export default {
       tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
       tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR,
+      nomePropTipoAttore: process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME,
 
       // Import funzione
       creaUrlLogo: creaUrlLogo
