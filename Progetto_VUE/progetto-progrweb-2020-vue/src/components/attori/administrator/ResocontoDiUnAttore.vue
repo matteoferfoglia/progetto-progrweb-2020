@@ -15,7 +15,7 @@
         <label>a
           <input type="date"
                  :value="dataFine"
-                 :min="dataGiornoSuccessivoRispettoAData(dataInizio)"
+                 :min="dataInizio"
                  :id="idDataFine"
                  class="form-control"
                  @input.prevent="setDataFine($event.target.value)"
@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import {camelCaseToHumanReadable, generaIdUnivoco} from "../../../utils/utilitaGenerale";
-import {richiestaGet} from "../../../utils/http";
+import {camelCaseToHumanReadable, generaIdUnivoco} from "@/utils/utilitaGenerale";
+import {richiestaGet} from "@/utils/http";
 
 export default {
   name: "ResocontoDiUnAttore",
@@ -102,14 +102,14 @@ export default {
         // In realtà non dovrebbe mai succedere che venga impostata una data sbagliata
         // perché è stato impostato l'attributo "min" del campo di input (ma non si sa mai)
         alert("La data iniziale non può essere posteriore alla data finale.");
-        this.dataFine = this.dataGiornoSuccessivoRispettoAData( this.dataInizio );
+        this.dataFine = this.dataInizio;
       } else {
         this.dataFine = nuovoValoreDataFinale;
       }
 
       const inputDataFine = document.getElementById( this.idDataFine );
       inputDataFine.value = this.dataFine;
-      inputDataFine.setAttribute( "min", this.dataGiornoSuccessivoRispettoAData( this.dataInizio ) );
+      inputDataFine.setAttribute( "min", this.dataInizio ); // data finale uguale a quella iniziale
 
     },
 
@@ -123,33 +123,11 @@ export default {
 
       if(  Number( nuovoValoreDataIniziale.replaceAll("-","")) >
            Number( this.dataFine.replaceAll("-","") )  ) {
-        this.setDataFine( this.dataGiornoSuccessivoRispettoAData( this.dataInizio ) );
+        this.setDataFine( this.dataInizio );
       }
 
       document.getElementById( this.idDataInizio ).value = this.dataInizio;
 
-    },
-
-    /** Restituisce il giorno successivo alla data indicata nel parametro.
-     * @param dataIniziale Stringa rappresentante la data iniziale (formato: yyyy-mm-dd).
-     * @return il giorno successivo alla data rappresentata dal parametro, restituito
-     *         come stringa (formato: yyyy-mm-dd)*/
-    dataGiornoSuccessivoRispettoAData( dataIniziale ) {
-      // Prima converto in Date() poi riporto in stringa (lascio che sia Date
-      // a gestire la somma di giorni, per ottenere il giorno successivo)
-
-      // Note: Parsing of date strings with the Date constructor (and Date.parse(),
-      // which works the same way) is strongly discouraged due to browser differences
-      // and inconsistencies. Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/Date
-      const dataComeArray_yyyy_mm_dd = dataIniziale.split("-");
-      const anno   = Number( dataComeArray_yyyy_mm_dd[0] );
-      const mese   = Number( dataComeArray_yyyy_mm_dd[1] ) - 1; // mesi: in [1-12] nel formato "umano", in [0-11] (monthIndex) nel costruttore Date()
-      const giorno = Number( dataComeArray_yyyy_mm_dd[2] );
-
-      const data_giornoSuccessivo = new Date();
-      data_giornoSuccessivo.setFullYear(anno, mese, giorno+1 ); // giorno successivo
-
-      return restituisciArrayDaDate_yyyy_mm_dd(data_giornoSuccessivo).join("-");
     },
 
     /** Richiede il resoconto al server nel periodo scelto.
