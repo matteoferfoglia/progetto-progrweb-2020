@@ -3,6 +3,7 @@ package it.units.progrweb.listeners;
 import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
+import it.units.progrweb.EnvironmentVariables;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
@@ -32,18 +33,22 @@ import static it.units.progrweb.entities.AuthenticationTokenInvalido.Eliminatore
 @WebListener
 public class StarterDatabase implements ServletContextListener {
 
+    /** Email di servizio utilizzata. */
+    private final static String EMAIL_SERVIZIO =
+            EnvironmentVariables.NOME_APPLICAZIONE + "@" + SystemProperty.applicationId.get() + ".appspotmail.com";
+
     /** Array di attori da creare e salvare nel DB in modalità di sviluppo.
      * Questi attori saranno giò presenti al primo accesso al sistema. */
     private final static AttoreConCredenziali[] attoriDaCreareInDevMod = {
             new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Consumer di Prova", Attore.TipoAttore.Consumer),
             new AttoreConCredenziali("AB01", "5678","uploaderprova@example.com","Uploader di Prova", Attore.TipoAttore.Uploader),
             new AttoreConCredenziali("AdminTest", "9012","adminprova@example.com","Amministratore di Prova", Attore.TipoAttore.Administrator),
-            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@gmail.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
+            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw", EMAIL_SERVIZIO,"Primo Admin", Attore.TipoAttore.Administrator)
     };
 
     /** Come {@link #attoriDaCreareInDevMod}, ma per la modalità di produzione. */
     private final static AttoreConCredenziali[] attoriDaCreareInProdMod = {
-            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw","matteoferfoglia3@gmail.com","Matteo Ferfoglia", Attore.TipoAttore.Administrator)
+            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw", EMAIL_SERVIZIO,"Primo Admin", Attore.TipoAttore.Administrator)
     };
 
 
