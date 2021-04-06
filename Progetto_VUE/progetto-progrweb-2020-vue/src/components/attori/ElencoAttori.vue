@@ -450,8 +450,10 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
   }
   .logo-elenco {
     width: 2.5rem;
+    height: auto;
     min-width: 2.5rem;
     max-height: 3rem;
+    min-height: unset;
   }
   ol {
     padding: 0
