@@ -6,7 +6,7 @@
         <img :src="urlLogoUploader"
              alt=""
              class="logo"
-             v-if="urlLogoUploader"/>
+             v-if="urlLogoUploader && isQuestaSchedaRiferitaAdUnUploader"/>
         <h2>{{ nominativo }}</h2>
       </header>
 
