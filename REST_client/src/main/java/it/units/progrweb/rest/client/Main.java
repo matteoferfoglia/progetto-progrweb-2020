@@ -21,7 +21,8 @@ public class Main {
     public static void main(String[] args) {
 
         // Uri base del server a cui eseguire le richieste
-        final String uri_baseUrl = "http://localhost:8910/api/webService";
+//        final String uri_baseUrl = "http://localhost:8910/api/webService";
+        final String uri_baseUrl = "https://progettoprogrweb2020.ew.r.appspot.com/api/webService";
 
         // Uri web service
         final String uri_webService = uri_baseUrl + "/uploadDocumento";
