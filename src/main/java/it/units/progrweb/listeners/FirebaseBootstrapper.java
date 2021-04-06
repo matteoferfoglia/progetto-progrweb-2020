@@ -8,7 +8,6 @@ import it.units.progrweb.utils.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.io.File;
 import java.io.FileInputStream;
 
 /**
@@ -25,7 +24,7 @@ public class FirebaseBootstrapper implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try {
             FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(new FileInputStream(new File("WEB-INF/credenzialiFirebase.json"))))
+                    .setCredentials(GoogleCredentials.fromStream(new FileInputStream("WEB-INF/credenzialiFirebase.json")))
                     .build();
             FirebaseApp.initializeApp(options);
             Logger.scriviInfoNelLog(FirebaseBootstrapper.class,"Firebase operativo");
