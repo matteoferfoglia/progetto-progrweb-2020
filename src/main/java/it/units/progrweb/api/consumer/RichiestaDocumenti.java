@@ -87,20 +87,20 @@ public class RichiestaDocumenti {
                                                        boolean includiMetadatiFileNellaResponse,
                                                        String URI_redirection) {
 
-        if( numeroDocumentiAttualmenteNotiAlClient !=null ) {
+        if( numeroDocumentiAttualmenteNotiAlClient!=null ) {
             if (numeroDocumentiAttualmenteNotiAlClient.equals(listaFile.size())) {
                 return Response.notModified().build();
             } else {
                 try {
-                    return Response.seeOther(new URI(URI_redirection)).build();    // redirect a questa stessa api
+                    return Response.seeOther(new URI(URI_redirection)).build();    // redirect a questa stessa api, con numeroDocumentiAttualmenteNotiAlClient=null
                 } catch (URISyntaxException e) {
                     Logger.scriviEccezioneNelLog(RichiestaDocumenti.class, e);
                     return Response.serverError().build();
                 }
             }
+        } else {
+            return UtilitaGenerale.rispostaJsonConMappaConValoriJSON(File.getMappa_idFile_propFile(listaFile, includiMetadatiFileNellaResponse));
         }
-
-        return UtilitaGenerale.rispostaJsonConMappaConValoriJSON(File.getMappa_idFile_propFile(listaFile, includiMetadatiFileNellaResponse));
 
     }
 
