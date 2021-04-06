@@ -37,7 +37,7 @@
         <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
             class="list-group-item list-group-item-action"
             :key="attore[0]/*Id dell'attore*/">
-          <router-link class="w-100"
+          <router-link class="w-100 d-flex align-items-center"
                        :to="{
                           name: NOME_ROUTE_SCHEDA_ATTORE,
                           params: {
@@ -47,9 +47,13 @@
                               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                           }
                         }">
-          <span class="nominativo-attore d-flex justify-content-between">
+          <img :src="creaUrlLogo(attore[0])"
+               alt="Logo uploader"
+               class="logo logo-elenco"
+               v-if="tipiAttoreCuiQuestoElencoSiRiferisce===tipoAttore_uploader"/>
+          <div class="nominativo-attore w-100 d-flex justify-content-between">
             {{ attore[1][NOME_PROP_NOMINATIVO] }}
-          </span>
+          </div>
           </router-link>
         </li>
       </ol>
@@ -69,11 +73,11 @@
 </template>
 
 <script>
-import {richiestaGet} from "../../utils/http";
+import {richiestaGet} from "@/utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
-import {getMappa_idAttore_proprietaAttore} from "../../utils/richiesteInfoSuAttori";
+import {creaUrlLogo, getMappa_idAttore_proprietaAttore} from "@/utils/richiesteInfoSuAttori";
 import Loader from "../layout/Loader";
-import {areArrayEquivalenti} from "../../utils/utilitaGenerale";
+import {areArrayEquivalenti} from "@/utils/utilitaGenerale";
 
 export default {
   name: "ElencoAttori",
@@ -143,7 +147,10 @@ export default {
       // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template
       tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
-      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR
+      tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR,
+
+      // Import funzione
+      creaUrlLogo: creaUrlLogo
 
     }
   },
@@ -439,6 +446,11 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
   .nominativo-attore::after {
     /* Fonte icona: https://icons.getbootstrap.com/icons/pen/ */
     content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/></svg>');
+  }
+  .logo-elenco {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    max-height: 3rem;
   }
   ol {
     padding: 0
