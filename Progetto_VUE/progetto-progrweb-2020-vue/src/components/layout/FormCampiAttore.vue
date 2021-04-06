@@ -204,12 +204,12 @@ export default {
       return ! ( this.username_wrapper===this.username     &&
                  this.nominativo_wrapper===this.nominativo &&
                  this.email_wrapper===this.email              ) ||
-            !!this.fileDaForm() ;  // se è stato caricato un file, allora c'è stata una modifica
+            !!this.filesDaForm() ;  // se è stato caricato un file, allora c'è stata una modifica
     },
 
     /** Restituisce la {@link FileList} degli eventuali file caricati nel form,
      * oppure null se non ce ne sono.*/
-    fileDaForm() {
+    filesDaForm() {
       const inputFile = document.querySelector('#' + this.idHtml + ' input[type=file]');
       return inputFile!==null && inputFile.files!==null && inputFile.files.length>0 ? inputFile.files : null;
     }
@@ -299,7 +299,7 @@ export default {
                                               lineaContieneProp(unaLinea, nomePropIdAttore) ) );
                             })
                             .sort() // ordine alfabetico
-                            .join('\n') + String(this.fileDaForm() ? "\n Verrà  modificato il logo." : "");
+                            .join('\n') + String(this.filesDaForm() ? "\n Verrà  modificato il logo." : "");
 
             confirm("Riepilogo.\n\n" + msg)
                 .then(() => {  // utente ha confermato
@@ -317,9 +317,10 @@ export default {
                     }
 
                     // Se presente un file, lo aggiunge ai dati da inviare
-                    const filesDaForm = this.fileDaForm();
+                    const filesDaForm = this.filesDaForm();
                     if( filesDaForm ) { // se truthy, allora c'è un file caricato nel form
-                      datiDaInviareAlServer_comeFormData.append(filesDaForm.name, filesDaForm.files[0]);
+                      const fileDaForm = filesDaForm[0];
+                      datiDaInviareAlServer_comeFormData.append(process.env.VUE_APP_FORM_LOGO_UPLOADER_INPUT_FIELD_NAME, fileDaForm);
                     }
 
                     promise = richiestaPostConFile(this.urlInvioFormTramitePost, datiDaInviareAlServer_comeFormData);
