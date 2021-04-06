@@ -518,12 +518,9 @@ public abstract class Attore implements Cloneable, Principal {
 
     @Override
     public String toString() {
-        return "Attore{" +
-                "identificativo='" + identificativoAttore + '\'' +
-                ", username='" + username + '\'' +
-                ", nominativo='" + nominativo + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return "\nusername: '" + username + '\'' +
+               "\nnominativo: '" + nominativo + '\'' +
+               "\nemail: '" + email + '\'';
     }
 
 
