@@ -122,7 +122,7 @@ public class GestioneConsumer {
                                                                             consumerDaCampiForm,
                                                                             Attore.TipoAttore.Uploader );
                 if( consumerDalDB==null )
-                    throw new NullPointerException("Non dobrebbe mai essere null.");
+                    throw new NullPointerException("Non dovrebbe mai essere null.");
             } catch ( NoSuchAlgorithmException | InvalidKeyException |
                       UnsupportedEncodingException | MessagingException e ) {
                 Logger.scriviEccezioneNelLog(GestioneConsumer.class,
