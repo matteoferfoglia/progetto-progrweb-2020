@@ -97,7 +97,8 @@ export default {
 
 <style>
 img.logo {
-  max-height: 5rem;
+  max-height: 4rem;
+  min-height: 2rem;
   width: auto;
   margin: 1em;
 }

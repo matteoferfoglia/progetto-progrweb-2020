@@ -5,7 +5,8 @@
       <header class="card-header titolo-scheda d-flex align-items-center">
         <img :src="urlLogoUploader"
              alt=""
-             v-if="urlLogoUploader && isQuestaSchedaRiferitaAdUnUploader"/>
+             class="logo"
+             v-if="urlLogoUploader"/>
         <h2>{{ nominativo }}</h2>
       </header>
 
