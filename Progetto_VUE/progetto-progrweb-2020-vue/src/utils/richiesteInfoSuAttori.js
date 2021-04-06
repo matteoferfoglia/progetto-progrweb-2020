@@ -70,7 +70,6 @@ export const getTipoAttoreTarget = async idAttoreTarget => {
             })
 }
 
-
 /** Dato l'id di un attore, se l'utente attualmente autenticato è autorizzato
  * a saperlo, restituisce le proprietà dell'attore "target" il cui id è stato fornito
  * in una Promise risolta, altrimenti restituisce una Promise rigettata.*/
@@ -82,3 +81,14 @@ export const getProprietaAttoreTarget = async idAttoreTarget => {
             return Promise.reject(errore);
         })
 }
+
+/** Dato l'identificativo di un attore, restituisce l'url per richiedere
+ * al server il logo di quell'attore. Se il parametro risulta falsy, questo
+ * metodo restituisce undefined. */
+export const creaUrlLogo = identificativoAttore => {
+    if( identificativoAttore )
+        return process.env.VUE_APP_URL_GET_LOGO + "/" + identificativoAttore +
+                                                  '?' + new Date().getTime(); // query string per evitare cache;
+    else
+        return undefined;
+};

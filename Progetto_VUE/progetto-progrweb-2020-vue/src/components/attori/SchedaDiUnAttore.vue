@@ -3,9 +3,9 @@
   <Loader :isComponenteCaricato="isComponenteCaricato">
     <section class="card" :id="idHtmlQuestoComponente">
       <header class="card-header titolo-scheda d-flex align-items-center">
-        <img :src="urlLogoUploader_wrapper"
+        <img :src="urlLogoUploader"
              alt=""
-             v-if="urlLogoUploader_wrapper && isQuestaSchedaRiferitaAdUnUploader"/>
+             v-if="urlLogoUploader && isQuestaSchedaRiferitaAdUnUploader"/>
         <h2>{{ nominativo }}</h2>
       </header>
 
@@ -138,6 +138,7 @@ import {
   logout,
   setTokenAutenticazione
 } from "@/utils/autenticazione";
+import {creaUrlLogo} from "@/utils/richiesteInfoSuAttori";
 export default {
   name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},
@@ -263,7 +264,6 @@ export default {
       NOME_PROP_USERNAME_wrapper  : this.NOME_PROP_USERNAME,
       NOME_PROP_NOMINATIVO_wrapper: this.NOME_PROP_NOMINATIVO,
       NOME_PROP_EMAIL_wrapper     : this.NOME_PROP_EMAIL,
-      urlLogoUploader_wrapper: this.urlLogoUploader,
 
       csrfToken_wrapper: this.csrfToken
 
@@ -299,16 +299,6 @@ export default {
 
   },
   methods:{
-
-    /** Dato l'identificativo di un attore, restituisce l'url per richiedere
-     * al server il logo di quell'attore. Se il parametro risulta falsy, questo
-     * metodo restituisce undefined. */
-    creaUrlLogo( identificativoAttore ) {
-      if( identificativoAttore )
-        return process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + this.idAttoreCuiQuestaSchedaSiRiferisce;
-      else
-        return undefined;
-    },
 
     /** Dato un elemento della classe collapse, restituisce il corrispondente
      * pulsante toggle che gestisce la sua attivazione.
@@ -406,8 +396,7 @@ export default {
             this.mostrarePulsanteChiusuraQuestaSchedaAttore = !this.isConsumerAttualmenteAutenticato();
           }
 
-          this.urlLogoUploader = this.creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
-          this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // query string per evitare cache
+          this.urlLogoUploader = creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
 
           this.urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader =
               process.env.VUE_APP_URL_GET_ELENCO_DOCUMENTI__RICHIESTA_DA_CONSUMER +
@@ -531,7 +520,7 @@ export default {
               this.nominativo = (rispostaServer[ process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
               this.email      = (rispostaServer[ process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME ] + ' ').slice(0,-1);
 
-              this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // trucco per forzare l'aggiornamento dell'immagine
+              this.urlLogoUploader = creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
 
               const idAttore = getIdentificativoAttoreAttualmenteAutenticato();
               if( idAttore === Number(this.idAttoreCuiQuestaSchedaSiRiferisce) &&  // true se questa scheda si riferisce proprio all'attore che la sta guardando

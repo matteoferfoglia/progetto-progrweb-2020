@@ -2,16 +2,16 @@
 
   <div class="d-flex justify-content-between">
     <h1>Area riservata</h1>
-    <img :src="urlLogoUploader_wrapper"
+    <img :src="urlLogoUploader"
          alt="Logo uploader"
          class="logo"
-         v-if="urlLogoUploader_wrapper && isUploaderAttualmenteAutenticato()"/>
+         v-if="urlLogoUploader && isUploaderAttualmenteAutenticato()"/>
   </div>
 
   <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
                :csrfToken="csrfToken_wrapper"
                @nominativo-attore-modificato="$emit('nominativo-attore-modificato', $event)"
-               @logo-attore-modificato="urlLogoUploader_wrapper = urlLogoUploader + '?' + new Date().getTime()
+               @logo-attore-modificato="urlLogoUploader= creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce)
                                         /*query string per aggiornare l'immagine allo stesso url*/"
                @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"  />
 
@@ -19,7 +19,8 @@
 
 <script>
 
-import {getIdentificativoAttoreAttualmenteAutenticato} from "../utils/autenticazione";
+import {getIdentificativoAttoreAttualmenteAutenticato} from "@/utils/autenticazione";
+import {creaUrlLogo} from "@/utils/richiesteInfoSuAttori";
 
 export default {
   inheritAttrs: false,  // Fonte (warning when using dynamic components and custom-events): https://stackoverflow.com/a/65555712
@@ -54,16 +55,17 @@ export default {
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
-      urlLogoUploader_wrapper: this.urlLogoUploader,
-      csrfToken_wrapper: this.csrfToken
+      csrfToken_wrapper: this.csrfToken,
+
+      // Funzione importata
+      creaUrlLogo: creaUrlLogo
     }
   },
   created() {
     // Richiede l'identificativo dell'attore attualmente autenticato ed imposta l'uri a cui richiedere il suo logo
     const identificativoAttore = getIdentificativoAttoreAttualmenteAutenticato()
     this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
-    this.urlLogoUploader = process.env.VUE_APP_URL_GET_LOGO_UPLOADER + "/" + identificativoAttore;
-    this.urlLogoUploader_wrapper = this.urlLogoUploader + '?' + new Date().getTime(); // query string per forzare l'aggiornamento del logo
+    this.urlLogoUploader = creaUrlLogo(identificativoAttore);
   },
   methods: {
 
