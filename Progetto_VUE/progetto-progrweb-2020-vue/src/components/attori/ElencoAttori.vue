@@ -43,8 +43,7 @@
                           params: {
                             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
                             [NOME_PARAM_TIPO_ATTORE]            : tipiAttoreCuiQuestoElencoSiRiferisce,
-                            [nomeProp_mostrarePulsanteChiusuraSchedaAttore]: isConsumerAttualmenteAutenticato() &&
-                                                                              mappa_idAttore_proprietaAttore.size>1,
+                            [nomeProp_mostrarePulsanteChiusuraSchedaAttore]: mappa_idAttore_proprietaAttore.size>1,
                             [NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(attore[1]),
                               // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
                           }
