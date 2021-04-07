@@ -82,7 +82,8 @@ permette di eseguire i test del progetto.
 
 ### Documentazione e Javadoc
 La documentazione del progetto viene generata con il comando `mvn site`
-ed è disponibile nella cartella `target/site`.
+ed è disponibile nella cartella `target/site` in formato HTML (vedere
+*target/site/index.html*)
 
 
 ### Aggiornamento degli artefatti

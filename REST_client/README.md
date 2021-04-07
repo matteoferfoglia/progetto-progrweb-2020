@@ -20,12 +20,14 @@ permette l'eliminazione delle eventuali vecchie *build* e la creazione
 della *build* di questo progetto nella cartella *target*.
 Il file *JAR* sarà disponibile nella cartella radice del progetto.
 
+#### Documentazione
 Il comando
 
     mvn clean package site
 
 oltre a creare il nuovo file *JAR* del progetto, genera anche la
-documentazione (compreso *Javadoc*) nella cartella *target/site*.
+documentazione (compreso *Javadoc*) nella cartella *target/site*,
+in formato HTML (vedere *target/site/index.html*).
 
 ### Esecuzione
 Dopo aver creato il *package* del progetto (`mvn package`), è
