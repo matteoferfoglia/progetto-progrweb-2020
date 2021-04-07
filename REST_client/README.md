@@ -57,3 +57,10 @@ Tale comando deve essere eseguito dal terminale posizionato nella
 stessa cartella in cui è salvato il file *jar* e si assume che nella
 medesima cartella sia presente anche il file (in questo esempio
 chiamato *fileProva.txt*) da caricare.
+In questo esempio, l'Uploader - con username *AB01* e password *5678* -
+caricherà per il Consumer - con username *PPPPLT80A01A952G*, email
+*consumerprova@example.com* e nominativo *Consumer di Prova*- il file
+*fileProva.txt* (salvato nella stessa cartella in cui viene eseguito
+il programma), associandogli il nome *file prova* (visibile sulla
+piattaforma di caricamento) e la lista di hashtag *rest, file, prova,
+primo file*.
