@@ -95,7 +95,7 @@ di Maven è stato utilizzato per controllare che le dipendenze utilizzate
 
 ### Jersey
 Questo progetto realizza una *web application* basata su servizi di tipo *REST*
-implentati sfruttando il framework *Jersey*.
+implementati sfruttando il framework *Jersey*.
 
 ### Swagger
 La documentazione delle API viene generata sfruttando *Swagger* (nel *pom.xml*)
