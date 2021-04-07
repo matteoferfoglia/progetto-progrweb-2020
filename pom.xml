@@ -6,13 +6,24 @@
     <packaging>war</packaging>
     <version>1-0-0</version>
 
-    <description>Progetto per l'esame di Programmazione Web. Anno Accademico: 2019-2020.</description>
-
     <groupId>it.units.progrweb</groupId>
     <artifactId>progetto-progrweb-2020</artifactId>
 
+    <name>Progetto Programmazione Web</name>
+    <description>Progetto d'esame del corso di Programmazione Web. Anno Accademico: 2019-2020.</description>
+
+    <developers>
+        <developer>
+            <name>Matteo Ferfoglia</name>
+            <email>matteoferfoglia@gmail.com</email>
+            <url>https://github.com/matteoferfoglia</url>
+            <organization>Università degli Studi di Trieste</organization>
+        </developer>
+    </developers>
+
     <properties>
-        <project.id.appengine>progettoprogrweb2020</project.id.appengine>   <!-- ID del progetto AppEngine -->
+        <project.id.appengine>progettoprogrweb2020</project.id.appengine>                        <!-- ID del progetto AppEngine -->
+        <project.url.applicazione>${project.id.appengine}.appspot.com</project.url.applicazione> <!-- URL dell'applicazione web -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -23,6 +34,8 @@
         <vue.build.target.directory>Progetto_VUE/progetto-progrweb-2020-vue/dist</vue.build.target.directory><!-- directory contenente la build del progetto Vue -->
         <swagger.path.openapi.json>/api/openapi.json</swagger.path.openapi.json><!-- request URI in cui è disponibile in formato JSON la documentazione delle API, generata da Swagger -->
     </properties>
+
+    <url>${project.url.applicazione}</url>
 
     <dependencies>
 
@@ -446,6 +459,9 @@
                 <configuration>
                     <!-- Ignora doclint -->
                     <doclint>none</doclint>
+
+                    <!-- Mostra anche i campi privati in Javadoc, Fonte: https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html#show -->
+                    <show>private</show>
                 </configuration>
             </plugin>
         </plugins>

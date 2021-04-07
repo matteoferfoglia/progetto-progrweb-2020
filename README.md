@@ -80,7 +80,7 @@ Il comando
 
 permette di eseguire i test del progetto.
 
-### Javadoc
+### Documentazione e Javadoc
 La documentazione del progetto viene generata con il comando `mvn site`
 ed è disponibile nella cartella `target/site`.
 
