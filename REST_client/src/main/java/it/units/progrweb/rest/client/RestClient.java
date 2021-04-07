@@ -1,5 +1,6 @@
 package it.units.progrweb.rest.client;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
@@ -32,7 +33,8 @@ class RestClient {
     public RestClient(String webServiceUri) {
         this.restWebServiceUri = webServiceUri;
         this.client =  ClientBuilder.newClient();
-        this.client.register(MultiPartFeature.class);
+        this.client.register(MultiPartFeature.class)    // Per serializzazione Multipart
+                   .register(JacksonFeature.class);     // Per serializzazione JSON
         this.tokenAutenticazione = "";
     }
 
