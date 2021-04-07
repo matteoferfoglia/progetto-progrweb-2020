@@ -67,13 +67,14 @@
                 Reset modifiche
               </button>
 
-              <button @click.prevent="eliminaAttore( idAttoreCuiQuestaSchedaSiRiferisce,
+              <button @click.prevent=" eliminaAttore( idAttoreCuiQuestaSchedaSiRiferisce,
                                                      String(getIdentificativoAttoreAttualmenteAutenticato()),
                                                      tipoAttoreAutenticato,
                                                      csrfToken_wrapper,
                                                      proprietaAttoreCuiQuestaSchedaSiRiferisce[NOME_PROP_USERNAME],
                                                      idAttoreCuiQuestaSchedaSiRiferisce===String(getIdentificativoAttoreAttualmenteAutenticato()),
-                                                     $router                                                                                       )"
+                                                     $router                                                                                       )
+                                          .catch( () => {/*ignored, utente non ha confermato l'eliminazione */} ) "
                       class="x-circle btn btn-danger"
                       v-if="! isConsumerAttualmenteAutenticato()">
                 Elimina utente

@@ -44,16 +44,15 @@
               class="list-group-item list-group-item-action d-flex"
               :key="attore[0]/*Id dell'attore*/">
 
-            <button @click.prevent="() => {
-                                    eliminaAttore( attore[0],
-                                                   String(getIdentificativoAttoreAttualmenteAutenticato()),
-                                                   tipoAttoreAutenticato,
-                                                   csrfToken_wrapper,
-                                                   attore[1][NOME_PROP_NOMINATIVO],
-                                                   attore[0]===String(getIdentificativoAttoreAttualmenteAutenticato()),
-                                                   $router                                                              );
-                                    mappa_idAttore_proprietaAttore.delete( attore[0] ); // elimina l'attore dall'elenco mostrato nel client
-                                  }"
+            <button @click.prevent=" () => eliminaAttore( attore[0],
+                                                       String(getIdentificativoAttoreAttualmenteAutenticato()),
+                                                       tipoAttoreAutenticato,
+                                                       csrfToken_wrapper,
+                                                       attore[1][NOME_PROP_NOMINATIVO],
+                                                       attore[0]===String(getIdentificativoAttoreAttualmenteAutenticato()),
+                                                       $router                                                              )
+                                               .then( () => mappa_idAttore_proprietaAttore.delete( attore[0] ) ) // elimina l'attore dall'elenco mostrato nel client
+                                               .catch( () => {/*ignored, utente non ha confermato l'eliminazione */} ) "
                     class="x-circle btn btn-danger btn-elimina-attore"
                     v-if="isUploaderAttualmenteAutenticato()/* Funzione solo per Uplaoder */">
             </button>

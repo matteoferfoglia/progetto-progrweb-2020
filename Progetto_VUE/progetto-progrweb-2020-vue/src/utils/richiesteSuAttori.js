@@ -107,7 +107,11 @@ export const creaUrlLogo = identificativoAttore => {
  *                            bisogna eseguire il logout (es.: se un Administrator elimina
  *                            se stesso, poi non esisterà più e non potrà fare nulla, quindi
  *                            è corretto eseguire il logout).
- * @param router L'oggetto $router. */
+ * @param router L'oggetto $router.
+ * @return Promise risolta se l'eliminazione va a buon fine, oppure Promise risolta e
+ *          reindirizzamento a schermata iniziale tramite $router.push() se è richiesto
+ *          il logout al termine dell'operazione, oppure Promise rigettata se l'utente
+ *          non conferma le modifiche.*/
 export const eliminaAttore = ( idAttoreDaEliminare, idAttoreRichiedenteEliminazione,
                                tipoAttoreRichiedente, csrfToken,
                                usernameONominativoAttoreDaEliminare, logoutAFineOperazione,
@@ -116,24 +120,45 @@ export const eliminaAttore = ( idAttoreDaEliminare, idAttoreRichiedenteEliminazi
     // Uploader può eliminare Consumer
     // Administrator può eliminare Uploader o Administrator (sé compreso)
 
-    const urlEliminazioneAttore = ( tipoAttoreRichiedente ?
-        process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
-        process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) +
-        "/" + idAttoreDaEliminare;
 
-    const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: csrfToken};
 
-    richiestaDelete( urlEliminazioneAttore, parametriRichiestaDelete )
-        .then( () => {
-            alert( usernameONominativoAttoreDaEliminare + " eliminato." );
+    const MSG_ERR_UTENTE_NON_CONFERMA = "Utente non ha confermato modifiche";
+    return confirm("Eliminare " + usernameONominativoAttoreDaEliminare + '?')   // richiede conferma prima di eliminare
+            .catch( () => Promise.reject(MSG_ERR_UTENTE_NON_CONFERMA) ) // utente non ha confermato
+            .then( () => {                                              // eseguito solo se utente ha confermato
 
-            if( logoutAFineOperazione )
-                logout();   // logout se un Administrator ha eliminato sé
+                const urlEliminazioneAttore = ( tipoAttoreRichiedente ?
+                    process.env.VUE_APP_URL_DELETE_CONSUMER_PER_QUESTO_UPLOADER__RICHIESTA_DA_UPLOADER  :
+                    process.env.VUE_APP_URL_DELETE_ATTORE__RICHIESTA_DA_ADMIN ) + "/" + idAttoreDaEliminare;
 
-            router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
-        })
-        .catch( rispostaErrore => {
-            console.error("Errore durante l'eliminazione: " + rispostaErrore );
-        });
+                const parametriRichiestaDelete = {[process.env.VUE_APP_FORM_CSRF_INPUT_FIELD_NAME]: csrfToken};
+
+                return richiestaDelete( urlEliminazioneAttore, parametriRichiestaDelete );
+
+            })
+            .then( () => {
+                alert( usernameONominativoAttoreDaEliminare + " eliminato." );
+
+                if( logoutAFineOperazione )
+                    return logout();   // logout se un Administrator ha eliminato sé
+
+                return router.push({path: process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA});
+            })
+            .catch( errore => {
+
+                let msgErrore;
+
+                if( errore===MSG_ERR_UTENTE_NON_CONFERMA ) {
+                    msgErrore = "Nessuna modifica apportata."
+                    alert(msgErrore);
+                } else {
+                    msgErrore = "Si è verificato un errore durante l'aggiornamento delle informazioni. " + errore.data;
+                    alert(msgErrore);
+                    console.error(msgErrore + "Errore durante l'eliminazione: " + errore );
+                }
+
+                return Promise.reject(msgErrore);
+
+            });
 
 };
