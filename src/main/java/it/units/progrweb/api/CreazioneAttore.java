@@ -273,7 +273,7 @@ public class CreazioneAttore {
             return tipoAttore.name();
         }
 
-        /** @throws IllegalArgumentException Se il parametro non corrisponde ad un valido valore di {@link Attore.TipoAttore}. */
+        /** @throws IllegalArgumentException Se il parametro non corrisponde ad un valido valore di TipoAttore. */
         public void setTipoAttore(String tipoAttoreStringa) throws IllegalArgumentException {
             this.tipoAttore = Attore.TipoAttore.valueOf(EncoderPrevenzioneXSS.encodeForJava(tipoAttoreStringa));
         }

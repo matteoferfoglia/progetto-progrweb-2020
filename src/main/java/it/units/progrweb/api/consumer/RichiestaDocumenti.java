@@ -35,7 +35,7 @@ public class RichiestaDocumenti {
      * l'oggetto che rappresenta il documento (descritto in base ai suoi
      * attributi, tutti e soli quelli dati da {@link File#getAnteprimaProprietaFile(boolean)}.
      * Nel caso in cui venga specificato il QueryParam numeroElementiAttualmenteNotiAlClient,
-     * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
+     * questo metodo restituisce Response.Status#NOT_MODIFIED nel caso in cui il numero
      * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
      * redirect a questa stessa api, ma senza query string, così da restituire tutti i documenti.
      * @param httpServletRequest La richiesta HTTP.

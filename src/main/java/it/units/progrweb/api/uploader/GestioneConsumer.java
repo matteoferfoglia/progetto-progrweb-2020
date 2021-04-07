@@ -98,12 +98,12 @@ public class GestioneConsumer {
      * Se il {@link Consumer} specificato non esiste nella piattaforma, come prima cosa lo crea,
      * sfruttando il metodo {@link CreazioneAttore#creaNuovoAttoreECreaResponse(HttpServletRequest, CreazioneAttore.CampiFormAggiuntaAttore, Attore.TipoAttore)}
      * @param httpServletRequest La richiesta HTTP che ha richiesto l'associazione di un {@link Consumer} ad un {@link Uploader}.
-     * @param consumerDaCampiForm Istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante un {@link Consumer}.
+     * @param consumerDaCampiForm Istanza di CreazioneAttore.CampiFormAggiuntaAttore rappresentante un {@link Consumer}.
      * @param identificativoUploader Identificativo dell'{@link Uploader}.
      * @throws InputMismatchException Se il {@link Consumer} da associare viene trovato nel database
-     *          ma i valori per i suoi attributi specificati tramite {@link CreazioneAttore.CampiFormAggiuntaAttore}
+     *          ma i valori per i suoi attributi specificati tramite CreazioneAttore.CampiFormAggiuntaAttore
      *          non corrispondono con quelli salvati nel sistema.
-     * @return L'istanza di {@link CreazioneAttore.CampiFormAggiuntaAttore} rappresentante il
+     * @return L'istanza di CreazioneAttore.CampiFormAggiuntaAttore rappresentante il
      *          {@link Consumer} appena creato, se l'operazione va a buon fine. */
     public static CreazioneAttore.CampiFormAggiuntaAttore
     associaConsumerAdUploader(HttpServletRequest httpServletRequest,

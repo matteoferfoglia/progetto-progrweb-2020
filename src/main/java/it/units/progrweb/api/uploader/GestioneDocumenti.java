@@ -228,7 +228,7 @@ public class GestioneDocumenti {
      * destinati al {@link Consumer} il cui identificativo è specificato come
      * PathParam.
      * Nel caso in cui venga specificato il PathParam numeroElementiAttualmenteNotiAlClient,
-     * questo metodo restituisce {@link Response.Status#NOT_MODIFIED} nel caso in cui il numero
+     * questo metodo restituisce Response.Status#NOT_MODIFIED nel caso in cui il numero
      * di documenti noti al client sia lo stesso del numero dei documenti noti al server, altrimenti
      * restituisce l'oggetto con tutti i documenti, come sopra descritto.*/
     @Path("/mappa-idFile-propFile/{identificativoConsumer}")

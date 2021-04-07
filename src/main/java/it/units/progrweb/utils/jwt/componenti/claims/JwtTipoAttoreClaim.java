@@ -11,7 +11,7 @@ public class JwtTipoAttoreClaim extends JwtClaim<Attore.TipoAttore> {
 
     /**
      * Crea un "tipo attore" claims.
-     * @param tipoAttore Il {@link Attore.TipoAttore} di {@link Attore} che
+     * @param tipoAttore Il tipoAttore di {@link Attore} che
      *                   possiede il token.
      */
     public JwtTipoAttoreClaim(Attore.TipoAttore tipoAttore) {
