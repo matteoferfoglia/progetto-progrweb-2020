@@ -91,7 +91,7 @@ di Maven è stato utilizzato per controllare che le dipendenze utilizzate
 (definite nel *pom.xml*) siano aggiornate.
 
 
-## Servizi REST e programmazione lato client
+## Servizi REST
 
 ### Jersey
 Questo progetto realizza una *web application* basata su servizi di tipo *REST*
@@ -105,8 +105,8 @@ ed è disponibile:
 - in modo interattivo, direttamente dal browser, al request URI */swagger-ui/*.
 
 
-### Client-side
-Tutta la programmazione "lato client" è stata fatta con *Vue 3*.
+## Front-end
+Si è utilizzato *Vue 3* per la programmazione del *front-end*.
 
 Il file *pom.xml* del progetto *Maven* è stato adattato in modo che,
 quando si crea il package "*.war*", venga generata la *release* Vue
@@ -115,6 +115,6 @@ posizionata nella cartella contenete il progetto *Vue*) e copiata
 tra le risorse del Web Server, il tutto in modo completamente
 automatizzato (fatto nella fase Maven *prepare-package*).
 
-### Web Service
+## Web Service
 Questo progetto implementa anche un Web Service REST e un client
 REST (in un progetto Maven annidato), come richiesto dalle specifiche.
