@@ -6,13 +6,38 @@
 
     <groupId>it.units.progrweb.rest.client</groupId>
     <artifactId>REST_client</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-0-0</version>
+    <name>Client REST</name>
+    <description>
+        Client REST dimostrativo del funzionamento del Web Service implementato
+        per il progetto d'esame del Corso di Programmazione Web (Anno Accademico
+        2019-2020).
+        Questa applicazione può essere utilizzata da un Uploader per caricare
+        nella piattaforma (vedere progetto in cui viene implementato il Web
+        Service) un file destinato ad un Consumer.
+    </description>
 
     <properties>
+        <project.main.class>it.units.progrweb.rest.client.Main</project.main.class>
+        <project.resource.dir>src/main/resources</project.resource.dir>
+        <project.build.dependencies.dir.prefix>dependency-jars/</project.build.dependencies.dir.prefix><!-- Nella cartella target, dove saranno salvate le copie delle dipendenze del progetto -->
+        <project.build.dependencies.dir>${project.build.directory}/${project.build.dependencies.dir.prefix}</project.build.dependencies.dir><!-- Cartella in cui copiare tutte le dipendenze del progetto -->
+        <project.build.nome.jar.con.dipendenze>ClientREST_distribuibile</project.build.nome.jar.con.dipendenze><!-- Nome per il file JAR distribuibile (sono assemblate in esso tutte le dipendenze) -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding><!-- Evita warning: Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent! -->
     </properties>
+
+    <url/><!-- Evita warning: No project URL defined - decoration links will not be relativized! -->
+
+    <developers>
+        <developer>
+            <name>Matteo Ferfoglia</name>
+            <email>matteoferfoglia@gmail.com</email>
+            <url>https://github.com/matteoferfoglia</url>
+            <organization>Università degli Studi di Trieste</organization>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -43,11 +68,147 @@
     </dependencies>
 
     <build>
-        <resources> <!-- Caricamento delle risorse -->
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.9.1</version>
+            </plugin>
+
+            <!-- Configurazione per l'esecuzione -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>${project.main.class}</mainClass>
+                    <commandlineArgs>
+                        AB01;5678;PPPPLT80A01A952G;consumerprova@example.com;Consumer di Prova;file prova;target/fileProva.txt;rest, file, prova, primo file
+                    </commandlineArgs>
+                </configuration>
+            </plugin>
+
+            <!-- Copia di un file di prova da main/resources in target (a titolo esemplificativo) -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.resource.dir}</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Copia delle dipendenze necessarie per il progetto -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.dependencies.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Creazione del file JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>${project.build.dependencies.dir.prefix}</classpathPrefix>
+                            <mainClass>${project.main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Assemblaggio di tutte le dipendenze usate nel progetto in un unico file JAR -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${project.main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                    <finalName>${project.build.nome.jar.con.dipendenze}</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
     </build>
+
+    <!-- Javadoc sarà generato durante la fase mvn site -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <show>private</show>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

@@ -15,7 +15,7 @@ import java.io.File;
  * Classe rappresentante un client REST.
  * @author Matteo Ferfoglia
  */
-public class RestClient {
+class RestClient {
 
     /** URL del web service REST.*/
     private final String restWebServiceUri;
@@ -26,7 +26,9 @@ public class RestClient {
     /** Token di autenticazione per questo client */
     private String tokenAutenticazione;
 
-    /** Costruttore. */
+    /** Costruttore.
+     * @param webServiceUri URI del Web Service a cui questo
+     *                      client invierpà le richieste.*/
     public RestClient(String webServiceUri) {
         this.restWebServiceUri = webServiceUri;
         this.client =  ClientBuilder.newClient();
@@ -56,11 +58,11 @@ public class RestClient {
             public FileDaCaricare(String codiceFiscaleConsumer, String emailConsumer, String nomeCognomeConsumer,
                                   String nomeFile, String listaHashtag, File file) {
                 this.codiceFiscaleConsumer = codiceFiscaleConsumer;
-                this.emailConsumer = emailConsumer;
-                this.nomeCognomeConsumer = nomeCognomeConsumer;
-                this.nomeFile = nomeFile;
-                this.listaHashtag = listaHashtag;
-                this.file = file;
+                this.emailConsumer         = emailConsumer;
+                this.nomeCognomeConsumer   = nomeCognomeConsumer;
+                this.nomeFile              = nomeFile;
+                this.listaHashtag          = listaHashtag;
+                this.file                  = file;
             }
 
             /** Restituisce un'istanza della classe {@link FormDataMultiPart} avente
@@ -69,8 +71,11 @@ public class RestClient {
             FormDataMultiPart getFormDataMultiPart() {
 
                 FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
-                FileDataBodyPart fileDataBodyPart = new FileDataBodyPart("contenutoFile", file,
-                        MediaType.APPLICATION_OCTET_STREAM_TYPE);
+                FileDataBodyPart fileDataBodyPart = new FileDataBodyPart(
+                        "contenutoFile",
+                        file,
+                        MediaType.APPLICATION_OCTET_STREAM_TYPE
+                );
 
                 formDataMultiPart.field("codiceFiscaleConsumerDestinatario", codiceFiscaleConsumer);
                 formDataMultiPart.field("emailConsumerDestinatario",         emailConsumer);
@@ -95,6 +100,9 @@ public class RestClient {
     }
 
     /** Metodo per eseguire il login.
+     * @param credenziali_username Username dell'Uploader.
+     * @param credenziali_password Password (in chiaro) dell'Uploader.
+     * @param loginUri URI presso cui autenticarsi.
      * @return True se il login va a buon fine, false altrimenti. */
     public boolean login(String credenziali_username, String credenziali_password, String loginUri) {
 
@@ -129,9 +137,9 @@ public class RestClient {
         }
 
         Response risposta = client.target( loginUri )
-                                  .request( MediaType.TEXT_PLAIN_TYPE )
+                                  .request( MediaType.TEXT_PLAIN )
                                   .post( Entity.entity(new Login(credenziali_username, credenziali_password),
-                                         MediaType.APPLICATION_JSON_TYPE) );
+                                         MediaType.APPLICATION_JSON) );
 
         if( 200<=risposta.getStatus() && risposta.getStatus()<300 ) {
             // Se login ok, attendo il token di autenticazione nella risposta
