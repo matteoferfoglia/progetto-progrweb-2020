@@ -454,14 +454,19 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.1.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <!-- Ignora doclint -->
-                    <doclint>none</doclint>
-
                     <!-- Mostra anche i campi privati in Javadoc, Fonte: https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html#show -->
                     <show>private</show>
+
+                    <!-- Ignora verifiche doclint su Javadoc -->
+                    <doclint>none</doclint>
                 </configuration>
             </plugin>
         </plugins>
