@@ -149,6 +149,7 @@ export default {
       confermaNuovaPassword : "",
       isFileLogoCaricato    : false,
       isFormModificato      : false,  // diventa true se l'utente modifica il form
+                                      // (se non ci sono modifiche, non serve inviare dati al server)
 
       // NOMI DEI PARAMETRI ATTESI DAL SERVER
       nomeParametro_nominativo     : process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME,
