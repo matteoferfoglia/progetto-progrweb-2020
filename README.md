@@ -51,6 +51,27 @@ e l'applicazione *AppEngine* sul server di Google deve essere abilitata
 [*Impostazioni*](https://console.cloud.google.com/appengine/settings) di
 *AppEngine* del progetto).
 
+#### Indici del Datastore
+Se viene modificato il file *WEB-INF/index.yaml* contenente la definizione
+degli indici composti per l'esecuzione di query complesse, prima di eseguire
+il deploying dell'applicazione (come soprascritto), bisogna eseguire il
+seguente comando *gcloud* per il deploying del file *index.yaml* dal
+terminale posizionato nella cartella radice di questo progetto *Maven* 
+([Fonte](https://cloud.google.com/appengine/docs/standard/java/configuring-datastore-indexes-with-index-yaml)).
+
+    gcloud app deploy src\main\webapp\WEB-INF\index.yaml
+
+#### Deploying: procedura completa
+Riepilogando, per eseguire il deploying dell’applicazione nei server di
+*Google App Engine*, bisogna eseguire i seguenti comandi dal terminale
+posizionato nella cartella radice del progetto *Maven*:
+1) `gcloud app deploy src\main\webapp\WEB-INF\index.yaml`
+    per e seguire il deploying del file *index.yaml.*;
+2) `mvn clean validate compile test package site verify appengine:deploy`
+    per creare il file *WAR* dell’applicazione ed eseguirne il deploying,
+    seguendo tutte le fasi *Maven* (*clean, validate, compile, test,
+    package, site, verify*).
+
 ### Testing
 Per creare i test Java è stato utilizzato il framework *JUnit 5*.
 Il comando
