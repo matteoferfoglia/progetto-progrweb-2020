@@ -1,0 +1,28 @@
+# File di configurazione per la definizione degli indici necessari per
+#   le query complesse nel Datastore.
+# Per eseguire il deploy di questo file (non viene eseguito automaticamente
+#   con il comando mvn appengine:deploy) utilizzare il seguente comando dal
+#   terminale posizionato nella cartella radice del progetto:
+#         gcloud app deploy src\main\webapp\WEB-INF\index.yaml
+#
+# Fonte: https://cloud.google.com/appengine/docs/standard/java/configuring-datastore-indexes-with-index-yaml
+
+indexes:
+
+  - kind: File
+    ancestor: no
+    properties:
+      - name: identificativoMittente
+        direction: asc
+      - name: dataEdOraDiCaricamento
+        direction: asc
+
+  - kind: File
+    ancestor: no
+    properties:
+    - name: identificativoDestinatario
+      direction: asc
+    - name: identificativoMittente
+      direction: asc
+    - name: dataEdOraDiCaricamento
+      direction: desc
