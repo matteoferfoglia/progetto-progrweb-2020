@@ -33,12 +33,18 @@
 
     <article class="card" id="elencoAttori">
       <h2>Elenco attori</h2>
-      <ol v-if="mappa_idAttore_proprietaAttore.size>0">
-        <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
-            class="list-group-item list-group-item-action d-flex"
-            :key="attore[0]/*Id dell'attore*/">
 
-          <button @click.prevent="() => {
+      <FormConCsrfToken :csrf-token_prop="csrfToken_wrapper"
+                        @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)" >
+        <!-- Dall'elenco è possibile eliminare un attore, cioè modificare
+             lo stato, quindi necessaria protezione CSRF -->
+
+        <ol v-if="mappa_idAttore_proprietaAttore.size>0">
+          <li v-for="attore in Array.from(mappa_idAttore_proprietaAttore.entries())"
+              class="list-group-item list-group-item-action d-flex"
+              :key="attore[0]/*Id dell'attore*/">
+
+            <button @click.prevent="() => {
                                     eliminaAttore( attore[0],
                                                    String(getIdentificativoAttoreAttualmenteAutenticato()),
                                                    tipoAttoreAutenticato,
@@ -48,12 +54,12 @@
                                                    $router                                                              );
                                     mappa_idAttore_proprietaAttore.delete( attore[0] ); // elimina l'attore dall'elenco mostrato nel client
                                   }"
-                  class="x-circle btn btn-danger btn-elimina-attore"
-                  v-if="isUploaderAttualmenteAutenticato()/* Funzione solo per Uplaoder */">
-          </button>
+                    class="x-circle btn btn-danger btn-elimina-attore"
+                    v-if="isUploaderAttualmenteAutenticato()/* Funzione solo per Uplaoder */">
+            </button>
 
-          <router-link class="w-100 d-flex align-items-center"
-                       :to="{
+            <router-link class="w-100 d-flex align-items-center"
+                         :to="{
                           name: NOME_ROUTE_SCHEDA_ATTORE,
                           params: {
                             [NOME_PARAM_ID_ATTORE_router]       : attore[0],
@@ -64,24 +70,28 @@
                           }
                         }">
 
-          <img :src="creaUrlLogo(attore[0])"
-               alt=""
-               class="logo logo-elenco"
-               v-if="attore[1][nomePropTipoAttore]===tipoAttore_uploader"/>
-          <div class="nominativo-attore w-100 d-flex justify-content-between">
-            {{ attore[1][NOME_PROP_NOMINATIVO] }}
-          </div>
+              <img :src="creaUrlLogo(attore[0])"
+                   alt=""
+                   class="logo logo-elenco"
+                   v-if="attore[1][nomePropTipoAttore]===tipoAttore_uploader"/>
+              <div class="nominativo-attore w-100 d-flex justify-content-between">
+                {{ attore[1][NOME_PROP_NOMINATIVO] }}
+              </div>
 
-          </router-link>
-        </li>
-      </ol>
+            </router-link>
+          </li>
+        </ol>
 
-      <p v-else>Nessun
-        <i v-if="isAdministratorAttualmenteAutenticato()">attore</i>
-        <i v-else-if="isConsumerAttualmenteAutenticato()">Uploader</i>
-        <i v-else>Consumer</i>
-         disponibile.
-      </p>
+        <p v-else>Nessun
+          <i v-if="isAdministratorAttualmenteAutenticato()">attore</i>
+          <i v-else-if="isConsumerAttualmenteAutenticato()">Uploader</i>
+          <i v-else>Consumer</i>
+          disponibile.
+        </p>
+
+      </FormConCsrfToken>
+
+
 
     </article>
 
@@ -97,10 +107,11 @@ import {creaUrlLogo, eliminaAttore, getMappa_idAttore_proprietaAttore} from "@/u
 import Loader from "../layout/Loader";
 import {areArrayEquivalenti} from "@/utils/utilitaGenerale";
 import {getIdentificativoAttoreAttualmenteAutenticato} from "@/utils/autenticazione";
+import FormConCsrfToken from "@/components/layout/FormConCsrfToken";
 
 export default {
   name: "ElencoAttori",
-  components: {Loader, AggiuntaAttore},
+  components: {FormConCsrfToken, Loader, AggiuntaAttore},
   inheritAttrs: false,
   emits: [
       /** Evento emesso quando riceve un token CSRF da un componente figlio.*/
