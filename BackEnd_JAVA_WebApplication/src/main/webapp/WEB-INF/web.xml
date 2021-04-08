@@ -67,4 +67,16 @@
     <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
 
+  <!-- Accetta solo richieste HTTPS, richieste HTTP reindirizzate su HTTPS
+       Fonte: https://cloud.google.com/appengine/docs/standard/java/config/webxml#secure-urls -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>profile</web-resource-name>
+      <url-pattern>/*</url-pattern><!-- /* per tutti gli URL -->
+    </web-resource-collection>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
 </web-app>
