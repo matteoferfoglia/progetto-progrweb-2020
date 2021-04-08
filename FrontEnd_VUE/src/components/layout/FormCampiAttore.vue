@@ -6,6 +6,7 @@
     <div class="d-flex justify-content-around flex-wrap align-items-center form-items-container">
       <p v-if="username!==null">
         <label :for="idUsername" v-if="flag_mostrareLabelCampiInput">{{ usernameCodFisc }}</label>
+        <!--suppress HtmlFormInputWithoutLabel --><!-- La label è associata tramite :for al campo input-->
         <input type="text"
                v-model="username_wrapper"
                maxlength="100"

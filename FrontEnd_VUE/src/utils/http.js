@@ -140,11 +140,10 @@ export const richiestaPostConFile = (url, dati) => {
 
     configRichiesteHttp.impostaHeader(HTTP_HEADER_CONTENT_TYPE_NOME, HTTP_HEADER_CONTENT_TYPE_FILE_IN_POST);
 
-    return richiestaPost(url, dati)
-            .finally( dati => {
-                configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
-                return dati;
-            });  // rimuove header senza interferire con i dati restituiti
+    const promise = richiestaPost(url, dati);
+    configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
+
+    return promise;
 
 }
 
@@ -154,11 +153,10 @@ export const richiestaPostContenutoTextPlain = (url, dati) => {
 
     configRichiesteHttp.impostaHeader(HTTP_HEADER_CONTENT_TYPE_NOME, HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN);
 
-    return richiestaPost(url, dati)
-        .finally( dati => {
-            configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
-            return dati;
-        });  // rimuove header senza interferire con i dati restituiti
+    const promise = richiestaPost(url, dati)
+    configRichiesteHttp.rimuoviHeader(HTTP_HEADER_CONTENT_TYPE_NOME);
+
+    return promise;
 
 }
 
