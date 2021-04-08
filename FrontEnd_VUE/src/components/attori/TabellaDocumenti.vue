@@ -255,6 +255,7 @@ export default {
                                                          " quindi non serve richiederli al server";
 
         // Richiede mappa idFile-propFile per questo attore se non già nota
+        // noinspection JSCheckFunctionSignatures // segnala warning con Object.entries(..), ma in realtà rispetta le specifiche
       await ( rispostaServerConMappaDocumenti === undefined ?
           richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) :
           Promise.resolve(rispostaServerConMappaDocumenti) )
@@ -470,6 +471,11 @@ export default {
 
       richiestaGet( urlDownloadDocumento, {}, true)
         .then( risposta => {
+
+          // "noinspection JSCheckFunctionSignatures" soppresso perché primo parametro del costruttore deve essere
+          // "An Array of ArrayBuffer, ArrayBufferView, Blob, USVString objects" (Fonte: https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob#parameters)
+          // ed effettivamente lo è
+          // noinspection JSCheckFunctionSignatures
           const blob = new Blob( [risposta], {type: "octet/stream"} );
 
           const downloadUrl = window.URL.createObjectURL(blob);

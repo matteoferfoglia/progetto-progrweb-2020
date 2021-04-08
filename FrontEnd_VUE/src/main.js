@@ -20,6 +20,7 @@ createApp(App).use(router).mount('#app');
 window.alert = msg => swal( msg );
 
 // Riscrittura della funzione window.confirm
+// noinspection JSValidateTypes // funzione ridefinita
 /** Restituisce una Promise risolta se l'utente conferma,
  * oppure una Promise rigettata se l'utente rifiuta. */
 window.confirm = msg =>

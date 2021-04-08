@@ -49,6 +49,11 @@ export const getMappa_idAttore_proprietaAttore = async (arrayIdAttore,
                                                         tipoAttoriDiCuiRichiedereInfo) => {
     // Richiede al server info su ogni Attore nell'array
 
+    // "noinspection JSCheckFunctionSignatures" perché segnalava un warning sul costruttore 'new Map(...)' ma in realtà
+    // il parametro inserito rispetta le specifiche (Iterable is an Array or other iterable object whose elements are
+    // key-value pairs (2-element Arrays).
+    // Fonte: https://developer.mozilla.org/it/docs/Web/JavaScript/Reference/Global_Objects/Map#parameters )
+    // noinspection JSCheckFunctionSignatures
     return Promise.all( arrayIdAttore.map( idAttore => getInfoAttore( idAttore, tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiRichiedereInfo ) ))
         //  una Promise per ogni Attore, quindi Promise.all per poi aspettarle tutte (Fonte: https://stackoverflow.com/a/31414472)
 

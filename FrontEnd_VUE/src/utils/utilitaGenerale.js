@@ -31,9 +31,11 @@ export const areMappeEquivalenti = (mappa1, mappa2) => {
         // Se qui, i due oggetti sono entrambe mappe della stessa lunghezza
         for( const chiave in mappa1.keys() ) {
 
+            // noinspection JSUnfilteredForInLoop   // utilizza .has()
             if( ! mappa2.has(chiave) )
                 return false;
 
+            // noinspection JSUnfilteredForInLoop   // già utilizzato .has()
             if( mappa1.get(chiave) !== mappa2.get(chiave) )
                 return false;
 
@@ -75,11 +77,19 @@ export const areArrayEquivalenti = (array1, array2) => {
  di entrambi. Se entrambi gli oggetti hanno la stessa property,
  quella del primo oggetto viene persa.*/
 export const unisciOggetti = ( oggetto1, oggeto2 ) => {
+
     const oggettoUnito = {};
-    for( let propName in oggetto1 )
-        oggettoUnito[propName] = oggetto1[propName];
-    for ( let propName in oggeto2 )
-        oggettoUnito[propName] = oggeto2[propName];
+    
+    const aggiungiPropAdOggetto = (oggettoSorgente, oggettoUnito) => {
+        for( let propName in oggettoSorgente ) {
+            // noinspection JSUnfilteredForInLoop   // iterazione sulle prop ("reflection")
+            oggettoUnito[propName] = oggettoSorgente[propName];
+        }
+    }
+
+    aggiungiPropAdOggetto(oggetto1, oggettoUnito);
+    aggiungiPropAdOggetto(oggeto2, oggettoUnito);
+
     return oggettoUnito;
 }
 
