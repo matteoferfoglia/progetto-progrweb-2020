@@ -172,12 +172,12 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2</artifactId>
-            <version>2.1.2</version>
+            <version>2.1.7</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.10.2</version>
+            <version>2.12.2</version>
         </dependency>
         <!-- Fine SWAGGER -->
 
@@ -292,7 +292,7 @@
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.11.2</version>
+                <version>1.11.3</version>
 
                 <configuration>
                     <workingDirectory>${vue.project.directory}</workingDirectory>
@@ -386,7 +386,7 @@
             <!-- swagger -->
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.1.2</version>
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
