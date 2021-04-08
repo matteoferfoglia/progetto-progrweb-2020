@@ -29,10 +29,10 @@ class RestClient {
 
     /** Costruttore.
      * @param webServiceUri URI del Web Service a cui questo
-     *                      client invierpà le richieste.*/
+     *                      client invierà le richieste.*/
     public RestClient(String webServiceUri) {
         this.restWebServiceUri = webServiceUri;
-        this.client =  ClientBuilder.newClient();
+        this.client = ClientBuilder.newClient();
         this.client.register(MultiPartFeature.class)    // Per serializzazione Multipart
                    .register(JacksonFeature.class);     // Per serializzazione JSON
         this.tokenAutenticazione = "";
