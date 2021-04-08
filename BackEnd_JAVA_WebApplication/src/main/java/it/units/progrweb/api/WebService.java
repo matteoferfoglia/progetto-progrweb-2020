@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.InputMismatchException;
 
 import static it.units.progrweb.api.uploader.GestioneConsumer.associaConsumerAdUploader;
 
@@ -84,9 +85,14 @@ public class WebService {
                 return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
                         mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());
 
+            } catch (InputMismatchException e) {
+                // Consumer trovato nel sistema, ma incoerenza nei campi
+                return Response.status( Response.Status.BAD_REQUEST )
+                        .entity( e.getMessage() )
+                        .build();
             } catch (MessagingException | NoSuchAlgorithmException |
                     InvalidKeyException | UnsupportedEncodingException e) {
-                return Response.serverError().entity(e).build();
+                return Response.serverError().entity( e.getMessage() ).build();
             }
         } else {
             return Autenticazione.creaResponseUnauthorized();
