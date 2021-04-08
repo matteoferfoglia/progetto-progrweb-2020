@@ -18,6 +18,9 @@
             <email>matteoferfoglia@gmail.com</email>
             <url>https://github.com/matteoferfoglia</url>
             <organization>Università degli Studi di Trieste</organization>
+            <properties>
+                <picUrl>https://github.com/matteoferfoglia.png?size=100</picUrl>
+            </properties>
         </developer>
     </developers>
 
@@ -30,8 +33,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <archiveClasses>true</archiveClasses>
-        <vue.project.directory>Progetto_VUE/progetto-progrweb-2020-vue</vue.project.directory><!-- directory contenente il progetto Vue -->
-        <vue.build.target.directory>Progetto_VUE/progetto-progrweb-2020-vue/dist</vue.build.target.directory><!-- directory contenente la build del progetto Vue -->
+        <vue.project.directory>../FrontEnd_VUE</vue.project.directory><!-- directory contenente il progetto Vue -->
+        <vue.build.target.directory>${vue.project.directory}/dist</vue.build.target.directory><!-- directory contenente la build del progetto Vue -->
         <swagger.path.openapi.json>/api/openapi.json</swagger.path.openapi.json><!-- request URI in cui è disponibile in formato JSON la documentazione delle API, generata da Swagger -->
     </properties>
 
@@ -219,7 +222,7 @@
     </dependencies>
 
     <build>
-        <!-- for hot reload of the web application-->
+        <!-- Server locale AppEngine -->
         <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
         <plugins>
             <plugin>

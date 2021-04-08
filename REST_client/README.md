@@ -1,15 +1,13 @@
 # Client REST
 
 In questo progetto *Maven* è stato implementato un semplice client *REST*
-in Java, con l'obiettivo di dimostrare il corretto funzionamento del 
-web service *REST* implementato sul server.
+in *Java*, con l'obiettivo di dimostrare il corretto funzionamento del 
+*Web Service REST* implementato sul server.
 
 Il funzionamento può essere verificato eseguendo il metodo *main* della
 classe *Main*.
 
 ## Build ed esecuzione
-
-Il seguente comando, eseguito dal terminale nella cartella 
 
 ### Clean and build
 Il comando
@@ -18,7 +16,7 @@ Il comando
 
 permette l'eliminazione delle eventuali vecchie *build* e la creazione
 della *build* di questo progetto nella cartella *target*.
-Il file *JAR* sarà disponibile nella cartella radice del progetto.
+Il file *JAR* così creato sarà disponibile nella cartella *target*.
 
 #### Documentazione
 Il comando
@@ -31,18 +29,18 @@ in formato HTML (vedere *target/site/index.html*).
 
 ### Esecuzione
 Dopo aver creato il *package* del progetto (`mvn package`), è
-possibile eseguire il programma Client REST eseguendo il comando.
+possibile eseguire il programma *Client REST* eseguendo il comando.
 
     mvn exec:java
 
 In questo modo, vengono passati al metodo main dei parametri
-preconfigurati nel file *pom.xml*.
+preconfigurati (a titolo esemplificativo) nel file *pom.xml*.
 
 
 ## Distribuzione
 Il file di configurazione *pom.xml* è stato programmato per creare,
 oltre al file *JAR* ottenuto dalla fase di *package*, un ulteriore
-file di dimensione maggiori, all'interno di cui sono state assemblate
+file di dimensione maggiori, all'interno del quale sono state assemblate
 tutte le dipendenze richieste dal progetto. Tale file *JAR* può essere
 direttamente distribuito agli Uploader che lo possono eseguire da
 terminale (ammesso che abbiano installato Java 8) con il comando 

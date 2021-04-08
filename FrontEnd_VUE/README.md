@@ -1,8 +1,8 @@
-# progetto-progrweb-2020-vue
-Questo progetto *Vue* realizza una Single Page Application
+# Front-end con Vue.js
+Questo progetto *Vue.js* realizza una *Single Page Application*
 che soddisfa i requisiti (client-side) richiesti dal
-progetto d'esame del corso di Programmazione Web
-dell'anno accademico 2019-2020.
+progetto d'esame del corso di *Programmazione Web*
+dell'Anno Accademico 2019-2020.
 
 ## Variabili d'ambiente
 Questo progetto fa uso di variabili d'ambiente.
@@ -34,9 +34,10 @@ d'ambiente per la modalità di produzione.
 Per installare le dipendenze del progetto, utilizzare
 il comando `npm install`.
 
-### Compilazione ed Compiles and hot-reloads for development
+### Compilazione e *hot-reloads*
 Il comando `npm run serve` compila i file del progetto e
-permette l'*hot-reload* dell'applicazione.
+permette l'*hot-reload* dell'applicazione, da utilizzare
+nella fase di sviluppo.
 
 ### Compilazione e minificazione dei file per la fase di produzione
 Il comando `npm run build` si occupa di installare tutte le
@@ -48,3 +49,9 @@ nella cartella *dist*.
 ### Validazione *Lints*
 Il comando `npm run lint` permette di validare i file del progetto
 usando *Lints*.
+
+
+## File di configurazione
+Nel progetto sono presenti dei file (*\*.config.js*)
+utilizzati per la configurazione dei moduli usati nel
+progetto.
