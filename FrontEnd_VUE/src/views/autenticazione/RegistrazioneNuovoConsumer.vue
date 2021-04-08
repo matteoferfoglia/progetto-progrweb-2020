@@ -67,7 +67,7 @@
 
 <script>
 
-import {getHttpResponseStatus, HTTP_STATUS_CONFLICT, richiestaPost} from "@/utils/http";
+import {getHttpResponseStatus, HTTP_STATUS_CONFLICT, richiestaPost} from "../../utils/http";
 
 export default {
   name: 'RegistrazioneNuovoConsumer',

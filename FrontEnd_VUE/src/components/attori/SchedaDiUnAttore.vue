@@ -135,8 +135,8 @@
 
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
-import {generaIdUnivoco} from "@/utils/utilitaGenerale";
-import {richiestaGet} from "@/utils/http";
+import {generaIdUnivoco} from "../../utils/utilitaGenerale";
+import {richiestaGet} from "../../utils/http";
 import ListaDocumentiPerConsumerVistaDaUploader from "./uploader/ListaDocumentiPerConsumerVistaDaUploader";
 import ResocontoDiUnAttore from "./administrator/ResocontoDiUnAttore";
 import TabellaDocumenti from "./TabellaDocumenti";
@@ -144,8 +144,8 @@ import Loader from "../layout/Loader";
 import {
   getIdentificativoAttoreAttualmenteAutenticato,
   setTokenAutenticazione
-} from "@/utils/autenticazione";
-import {creaUrlLogo, eliminaAttore} from "@/utils/richiesteSuAttori";
+} from "../../utils/autenticazione";
+import {creaUrlLogo, eliminaAttore} from "../../utils/richiesteSuAttori";
 export default {
   name: "SchedaDiUnAttore",
   components: {Loader, TabellaDocumenti, ResocontoDiUnAttore, ListaDocumentiPerConsumerVistaDaUploader, FormCampiAttore},

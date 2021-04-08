@@ -23,8 +23,8 @@ import 'firebase/auth'; // Add the Firebase services that you want to use
 
 import * as firebaseui from 'firebaseui'
 
-import {richiestaPostContenutoTextPlain} from "@/utils/http";
-import Loader from "@/components/layout/Loader";
+import {richiestaPostContenutoTextPlain} from "../../utils/http";
+import Loader from "../../components/layout/Loader";
 
 export default {
   name: "AutenticazioneFirebase",

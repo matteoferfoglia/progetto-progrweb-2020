@@ -13,7 +13,7 @@
  * viene inoltrato tale token al componente padre.
  */
 
-import {richiediCSRFTokenAlServer} from "@/utils/CSRF";
+import {richiediCSRFTokenAlServer} from "../../utils/CSRF";
 
 export default {
   name: 'FormConCsrfToken',

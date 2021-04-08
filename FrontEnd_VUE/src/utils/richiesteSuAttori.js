@@ -2,7 +2,7 @@
  * richiedere al server delle informazioni su un attore.*/
 
 import {richiestaDelete, richiestaGet} from "./http";
-import {logout} from "@/utils/autenticazione";
+import {logout} from "./autenticazione";
 
 /** Richiede le informazioni relative all'attore il cui identificativo
  * è passato come parametro. Se la richiesta va a buon fine, viene

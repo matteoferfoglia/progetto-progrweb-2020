@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import {camelCaseToHumanReadable, generaIdUnivoco} from "@/utils/utilitaGenerale";
-import {richiestaGet} from "@/utils/http";
+import {camelCaseToHumanReadable, generaIdUnivoco} from "../../../utils/utilitaGenerale";
+import {richiestaGet} from "../../../utils/http";
 
 export default {
   name: "ResocontoDiUnAttore",

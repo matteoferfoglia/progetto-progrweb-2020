@@ -96,14 +96,14 @@
 
 <script>
 import FormConCsrfToken from "../../components/layout/FormConCsrfToken";
-import {richiestaPostConFile} from "@/utils/http";
+import {richiestaPostConFile} from "../../utils/http";
 import {
   getEmailAttoreAttualmenteAutenticato,
   getNomeAttoreAttualmenteAutenticato,
   getUsernameAttoreAttualmenteAutenticato,
   setTokenAutenticazione
-} from "@/utils/autenticazione";
-import FormCampiAttore from "@/components/layout/FormCampiAttore";
+} from "../../utils/autenticazione";
+import FormCampiAttore from "../../components/layout/FormCampiAttore";
 export default {
   name: "ImpostazioniAccount",
   components: {FormCampiAttore, FormConCsrfToken},

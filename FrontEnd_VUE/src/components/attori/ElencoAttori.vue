@@ -100,13 +100,13 @@
 </template>
 
 <script>
-import {richiestaGet} from "@/utils/http";
+import {richiestaGet} from "../../utils/http";
 import AggiuntaAttore from "./AggiuntaAttore";
-import {creaUrlLogo, eliminaAttore, getMappa_idAttore_proprietaAttore} from "@/utils/richiesteSuAttori";
+import {creaUrlLogo, eliminaAttore, getMappa_idAttore_proprietaAttore} from "../../utils/richiesteSuAttori";
 import Loader from "../layout/Loader";
-import {areArrayEquivalenti} from "@/utils/utilitaGenerale";
-import {getIdentificativoAttoreAttualmenteAutenticato} from "@/utils/autenticazione";
-import FormConCsrfToken from "@/components/layout/FormConCsrfToken";
+import {areArrayEquivalenti} from "../../utils/utilitaGenerale";
+import {getIdentificativoAttoreAttualmenteAutenticato} from "../../utils/autenticazione";
+import FormConCsrfToken from "../../components/layout/FormConCsrfToken";
 
 export default {
   name: "ElencoAttori",

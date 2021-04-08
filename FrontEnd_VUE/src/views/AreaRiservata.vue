@@ -19,8 +19,8 @@
 
 <script>
 
-import {getIdentificativoAttoreAttualmenteAutenticato} from "@/utils/autenticazione";
-import {creaUrlLogo} from "@/utils/richiesteSuAttori";
+import {getIdentificativoAttoreAttualmenteAutenticato} from "../utils/autenticazione";
+import {creaUrlLogo} from "../utils/richiesteSuAttori";
 
 export default {
   inheritAttrs: false,  // Fonte (warning when using dynamic components and custom-events): https://stackoverflow.com/a/65555712

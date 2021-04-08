@@ -37,10 +37,10 @@
 
 /** Form viene mostrato solo dopo aver ricevuto dal server il CSRF token.*/
 
-import {richiestaPost} from "@/utils/http";
-import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "@/utils/http";
+import {richiestaPost} from "../../utils/http";
+import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/http";
 import Form from "../../components/layout/FormConCsrfToken";
-import AutenticazioneFirebase from "@/components/autenticazione/AutenticazioneFirebase";
+import AutenticazioneFirebase from "../../components/autenticazione/AutenticazioneFirebase";
 
 export default {
   name: 'LoginUtenteGiaRegistrato',
