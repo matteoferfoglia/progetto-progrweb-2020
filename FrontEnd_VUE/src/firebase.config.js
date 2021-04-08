@@ -1,6 +1,8 @@
 // Script di configurazione per Firebase
 
 // Your web app's Firebase configuration
+
+// noinspection JSUnusedGlobalSymbols   // usato da altri moduli
 export const firebaseConfig = {
     apiKey: "AIzaSyBDWeuSii3vJeNw0mD8lnOej2aoAzWB36w",
     authDomain: "progettoprogrweb2020.firebaseapp.com",
