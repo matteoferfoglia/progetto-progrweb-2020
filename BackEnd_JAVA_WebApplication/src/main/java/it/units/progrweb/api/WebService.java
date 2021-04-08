@@ -79,7 +79,8 @@ public class WebService {
                                     Attore.TipoAttore.Consumer,
                                     null
                                 ),
-                        mittente.getIdentificativoAttore());
+                                mittente.getIdentificativoAttore()
+                        );
                 return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
                         mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());
 
