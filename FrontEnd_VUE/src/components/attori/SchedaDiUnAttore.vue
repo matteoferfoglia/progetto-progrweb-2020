@@ -397,12 +397,14 @@ export default {
           this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
               process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
 
-          if (this.$route && this.$route.params &&  // controllare che sia definita
-              this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]) {
-            this.mostrarePulsanteChiusuraQuestaSchedaAttore =
-                this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]==="true"; // parametri VueRouter salvato come String
+          if( this.isConsumerAttualmenteAutenticato() ) {
+            if (this.$route && this.$route.params &&  // controllare che sia definita
+                this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]) {
+              this.mostrarePulsanteChiusuraQuestaSchedaAttore =
+                  this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] === "true"; // parametri VueRouter salvato come String
+            }
           } else {
-            this.mostrarePulsanteChiusuraQuestaSchedaAttore = !this.isConsumerAttualmenteAutenticato();
+            this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
           }
 
           this.urlLogoUploader = creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce);
