@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class Main {
 
     /** Uri base del server a cui eseguire le richieste.*/
-    final static String URI_BASE_WEB_SERVICE = "https://progettoprogrweb2020.ew.r.appspot.com/api/webService";
+    final static String URI_BASE_WEB_SERVICE = "https://progettoprogrweb2020.appspot.com/api/webService";
 //    final static String URI_BASE_WEB_SERVICE = "http://localhost:8910/api/webService"; // server di sviluppo
 
     /** Uri web service per upload di un documento. */
