@@ -385,9 +385,6 @@ export default {
     }, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
   },
-  beforeUnmount () {
-    clearInterval(this.timerAutoUpdate);
-  },
   methods: {
 
     /** Resetta tutti gli hashtag e mostra tutti i documenti disponibili.*/

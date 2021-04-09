@@ -168,6 +168,9 @@ export default {
        * di scegliere tale classe in modo programmatico. */
       classeRouterLinkUploader: "",
 
+      /** Nome della route associata a questo componente. */
+      nomeRouteQuestoComponente: this.$route.name,
+
 
       // Wrapper
       tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
@@ -192,12 +195,15 @@ export default {
     this.caricamentoQuestoComponente(); // altrimenti sarà fatto dal watch
 
     // Timer-auto aggiornamento
-    this.timerAutoUpdate = setInterval(this.caricamentoQuestoComponente,
-                                       process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
+    this.timerAutoUpdate = setInterval( () => {
+      if( this.nomeRouteQuestoComponente!==this.$route.name ) {
+        // se è stata cambiata route, si elimina il timer
+        clearInterval( this.timerAutoUpdate );
+      } else {
+        this.caricamentoQuestoComponente();
+      }
+    }, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
-  },
-  beforeUnmount () {
-    clearInterval(this.timerAutoUpdate);
   },
   methods: {
 
