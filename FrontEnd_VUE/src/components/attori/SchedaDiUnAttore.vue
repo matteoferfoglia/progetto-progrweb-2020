@@ -379,12 +379,12 @@ export default {
               .join(" ");
     },
 
-    /** Metodo per i caricamento di questo componente.*/
+    /** Metodo per il caricamento di questo componente.*/
     async caricaQuestoComponente() {
 
       const MSG_ERRORE_SE_COMPONENTE_NON_CARICATO = "Non caricato, attendendo variabili.";
 
-      ( async () => {
+      const caricamentoComponente = async () => {
 
         if (this.NOME_PROP_USERNAME_wrapper && this.NOME_PROP_NOMINATIVO_wrapper && this.NOME_PROP_EMAIL_wrapper) {
           // Procede con le richieste al server solo se i wrapper di tutte le proprietà sono truthy
@@ -458,12 +458,15 @@ export default {
         } else {
           throw new Error(MSG_ERRORE_SE_COMPONENTE_NON_CARICATO);
         }
-      })()
-      .then( () => this.isComponenteCaricato = true )
-      .catch( errore => {
-        if(errore.message!==MSG_ERRORE_SE_COMPONENTE_NON_CARICATO)
-          console.error(errore);
-      });
+
+      };
+
+      return caricamentoComponente()
+              .then( () => this.isComponenteCaricato = true )
+              .catch( errore => {
+                if(errore.message!==MSG_ERRORE_SE_COMPONENTE_NON_CARICATO)
+                  console.error(errore);
+              });
     },
 
     /** Restituisce true se è possibile modificare il logo di un uploader.*/
