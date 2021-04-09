@@ -379,7 +379,8 @@ export default {
 
       const MSG_ERRORE_SE_COMPONENTE_NON_CARICATO = "Non caricato, attendendo variabili.";
 
-      await ( async () => {
+      ( async () => {
+
         if (this.NOME_PROP_USERNAME_wrapper && this.NOME_PROP_NOMINATIVO_wrapper && this.NOME_PROP_EMAIL_wrapper) {
           // Procede con le richieste al server solo se i wrapper di tutte le proprietà sono truthy
 
@@ -402,6 +403,21 @@ export default {
                 this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]) {
               this.mostrarePulsanteChiusuraQuestaSchedaAttore =
                   this.$route.params[process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE] === "true"; // parametri VueRouter salvato come String
+            } else {
+              // Se qui: è un Consumer attualmente autenticato, ma non
+              //  è definito il parametro che indica se mostrare o meno
+              //  il pulsante di chiusura della scheda
+              // Può succedere ad esempio se il Consumer ricarica la pagina
+              //  e si perdono i parametri di Vue Router
+
+              richiestaGet( process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER )
+                  .then( arrayIdAttoriServentiQuestoConsumer =>
+                      this.mostrarePulsanteChiusuraQuestaSchedaAttore = arrayIdAttoriServentiQuestoConsumer.length>1 )
+                  .catch( rispostaErrore => {
+                    console.error("Errore durante il caricamento della lista di attori: " + rispostaErrore );
+                    return Promise.reject(rispostaErrore);
+                  });
+
             }
           } else {
             this.mostrarePulsanteChiusuraQuestaSchedaAttore = true;
