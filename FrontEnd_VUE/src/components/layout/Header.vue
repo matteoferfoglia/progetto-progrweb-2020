@@ -47,6 +47,10 @@
 
 <script>
 import FormConCsrfToken from "./FormConCsrfToken";
+import {
+  getTipoAttoreAttualmenteAutenticato,
+  isAdministratorAttualmenteAutenticato
+} from "../../utils/autenticazione";
 export default {
   name: "Header",
   components: {FormConCsrfToken},
@@ -62,9 +66,6 @@ export default {
     /** Nome dell'attore attualmente autenticato.*/
    'nomeUtenteAutenticato',
 
-    /** Tipo dell'attore attualmente autenticato.*/
-    'tipoUtenteAutenticato',
-
     /** Valore del CSRF token.*/
     'csrfToken'
   ],
@@ -72,7 +73,6 @@ export default {
     return {
 
       nomeUtenteAutenticato_wrapper: this.nomeUtenteAutenticato,  // wrapper in data() per aggiornarlo dinamicamente
-      tipoUtenteAutenticato_wrapper: this.tipoUtenteAutenticato,  // wrapper
 
       // Dati per header
       NOME_APPLICAZIONE          : process.env.VUE_APP_NOME_APPLICAZIONE,
@@ -84,33 +84,28 @@ export default {
       PERCORSO_AREA_RISERVATA      : process.env.VUE_APP_ROUTER_PATH_AREA_RISERVATA,
 
       // CSRF token attualmente valido
-      csrfToken_wrapper: undefined
+      csrfToken_wrapper: undefined,
+
+      // Import funzioni
+      isAdministratorAttualmenteAutenticato: isAdministratorAttualmenteAutenticato
 
     }
   },
   methods: {
     isAutenticato() {
-      return !!this.tipoUtenteAutenticato_wrapper;  // verifica se truthy
-    },
-    isAdministrator() {
-      return this.tipoUtenteAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
+      return !!getTipoAttoreAttualmenteAutenticato();  // verifica se truthy
     }
   },
   watch: {
-    // Watch per modifiche sulla prop da parte del componente padre
+
+    /** Nome dell'utente potrebbe essere modificato sul client.
+     * Questo watcher permette l'aggiornamento della UI senza
+     * attendere l'aggiornamento della pagina, né richiedere il
+     * nuovo nome al server. */
     nomeUtenteAutenticato: {
       immediate: true,
       handler( nuovoNome ) {
         this.nomeUtenteAutenticato_wrapper = nuovoNome;
-      },
-      deep: true
-    },
-
-    tipoUtenteAutenticato: {
-      immediate: true,
-      handler( nuovoTipo ) {
-        this.tipoUtenteAutenticato_wrapper = nuovoTipo;
       },
       deep: true
     },
@@ -126,6 +121,7 @@ export default {
       deep: true
     }
   }
+
 }
 
 </script>

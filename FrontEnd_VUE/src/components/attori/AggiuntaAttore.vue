@@ -1,17 +1,17 @@
 <template>
 
   <article :id="idSectionAggiuntaAttore" class="card">
-    <p v-if="isAdministrator()">
+    <p v-if="isAdministratorAttualmenteAutenticato()">
       Da qui è possibile aggiungere un nuovo <i>{{ tipoAttore_uploader }}</i>
       oppure un nuovo <i>{{ tipoAttore_administrator }}</i> alla piattaforma.
     </p>
-    <p v-if="isUploader()">
+    <p v-if="isUploaderAttualmenteAutenticato()">
       Da qui è possibile aggiungere un nuovo <i>{{ tipoAttore_consumer }}</i>.
     </p>
     <FormCampiAttore :flag_mostrareLabelCampiInput="false"
-                     :urlInvioFormTramitePost="isUploader() ? urlAggiuntaNuovoConsumerPerUploader : urlAggiuntaNuovoAttorePerAdmin"
+                     :urlInvioFormTramitePost="isUploaderAttualmenteAutenticato() ? urlAggiuntaNuovoConsumerPerUploader : urlAggiuntaNuovoAttorePerAdmin"
                      :flag_inviaDatiForm="flag_inviareDatiFormAggiuntaAttore"
-                     :isQuestoFormRiferitoAConsumer="isUploader()"
+                     :isQuestoFormRiferitoAConsumer="isUploaderAttualmenteAutenticato()"
                      :csrfToken="csrfToken_wrapper"
                      :datiAggiuntiviDaInviareAlServer="datiAggiuntiviDaInviareAlServer"
                      :isContentType_JSON="true"
@@ -20,7 +20,7 @@
                      @dati-form-inviati="formAggiuntaAttoreInviato($event)"
                      @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)">
 
-      <p v-if="isAdministrator()" class="form-check">Qualifica:
+      <p v-if="isAdministratorAttualmenteAutenticato()" class="form-check">Qualifica:
         <!-- Sezione solo per administrator -->
         <label class="form-check-label">
           <input type="radio"
@@ -49,10 +49,15 @@
 import FormCampiAttore from "../layout/FormCampiAttore";
 import {unisciOggetti} from "../../utils/utilitaGenerale";
 import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/http";
+import {
+  isAdministratorAttualmenteAutenticato,
+  isConsumerAttualmenteAutenticato,
+  isUploaderAttualmenteAutenticato
+} from "../../utils/autenticazione";
 export default {
   name: "AggiuntaAttore",
   components: {FormCampiAttore},
-  props: ['tipoAttoreAutenticato', 'csrfToken'],
+  props: ['csrfToken'],
   emits: [
     'csrf-token-ricevuto',
     'nominativo-attore-modificato',
@@ -91,14 +96,17 @@ export default {
         [process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME]: process.env.VUE_APP_TIPO_UTENTE__CONSUMER  // default
       },
 
-
       // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template
       tipoAttore_consumer: process.env.VUE_APP_TIPO_UTENTE__CONSUMER,
       tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
       tipoAttore_administrator: process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR,
 
+      // Import funzioni
+      isConsumerAttualmenteAutenticato: isConsumerAttualmenteAutenticato,
+      isUploaderAttualmenteAutenticato: isUploaderAttualmenteAutenticato,
+      isAdministratorAttualmenteAutenticato: isAdministratorAttualmenteAutenticato,
+
       // Wrapper
-      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
       csrfToken_wrapper: this.csrfToken
     }
   },
@@ -147,30 +155,9 @@ export default {
           .finally( () => {
             this.flag_inviareDatiFormAggiuntaAttore = false;
           });
-    },
-
-    isConsumer() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
-    },
-    isUploader() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    },
-    isAdministrator() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     }
   },
   watch: {
-
-    tipoAttoreAutenticato: {
-      immediate: true,
-      deep: true,
-      handler( nuovoValore ) {
-        this.tipoAttoreAutenticato_wrapper = nuovoValore;
-      }
-    },
 
     csrfToken : {
       immediate: true,

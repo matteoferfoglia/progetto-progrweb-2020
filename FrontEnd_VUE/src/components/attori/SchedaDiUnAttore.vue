@@ -113,7 +113,6 @@
                               :urlRichiestaElencoDocumentiPerUnAttore=
                                   "urlRichiestaElencoDocumentiPerUnConsumerDaQuestoUploader"
                               :urlDownloadDocumento="urlDownloadDocumentoPerConsumer"
-                              :tipoAttoreAutenticato="tipoAttoreAutenticato"
                               :csrfToken="csrfToken_wrapper"
                               @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
           </div></div>
@@ -143,6 +142,9 @@ import TabellaDocumenti from "./TabellaDocumenti";
 import Loader from "../layout/Loader";
 import {
   getIdentificativoAttoreAttualmenteAutenticato,
+  getTipoAttoreAttualmenteAutenticato, isAdministratorAttualmenteAutenticato,
+  isConsumerAttualmenteAutenticato,
+  isUploaderAttualmenteAutenticato,
   setTokenAutenticazione
 } from "../../utils/autenticazione";
 import {creaUrlLogo, eliminaAttore} from "../../utils/richiesteSuAttori";
@@ -161,9 +163,6 @@ export default {
     'csrf-token-ricevuto'
   ],
   props: [
-
-    /** Indica il tipo di attore che sta visualizzando questo componente.*/
-    "tipoAttoreAutenticato",
 
     // Nomi delle proprietà di un attore
     /** Nome della proprietà contenente lo username di un attore nell'oggetto
@@ -184,6 +183,9 @@ export default {
   ],
   data() {
     return{
+
+      /** Indica il tipo di attore che sta visualizzando questo componente.*/
+      tipoAttoreAutenticato: getTipoAttoreAttualmenteAutenticato(),
 
       // Proprietà ottenute da Vue Router caricate durante created()
       /** Identificativo dell'attore a cui questa scheda si riferisce.*/
@@ -214,13 +216,13 @@ export default {
 
       /** Flag: true se l'utente attualmente autenticato può modificare
        * le informazioni di un attore mostrate da questo componente.*/
-      utenteAutenticatoPuoModificareInfoAttore: ! this.isConsumerAttualmenteAutenticato(),
+      utenteAutenticatoPuoModificareInfoAttore: isConsumerAttualmenteAutenticato(),
 
       /** ID html di questo componente.*/
       idHtmlQuestoComponente: "schedaAttore-" + generaIdUnivoco(),
 
       /** Flag: true se questa scheda si riferisce ad un Consumer.*/
-      isQuestaSchedaRiferitaAdUnConsumer: this.isUploaderAttualmenteAutenticato(), // Se è un Uploader a visualizzare,
+      isQuestaSchedaRiferitaAdUnConsumer: isUploaderAttualmenteAutenticato(), // Se è un Uploader a visualizzare,
                                                                         // allora sta guardando la scheda di un Consumer
 
       /** Flag: true se questa scheda si riferisce ad un Uploader.*/
@@ -231,7 +233,7 @@ export default {
 
       /** Url a cui i dati del form devono essere inviati
        * per la modifica delle informazioni di un attore.*/
-      urlModificaInfoAttore: this.isUploaderAttualmenteAutenticato() ?  // url e permessi diversi in base a chi chiede la modifica
+      urlModificaInfoAttore: isUploaderAttualmenteAutenticato() ?  // url e permessi diversi in base a chi chiede la modifica
                              process.env.VUE_APP_URL_MODIFICA_CONSUMER__RICHIESTA_DA_UPLOADER :
                              process.env.VUE_APP_URL_MODIFICA_ATTORE__RICHIESTA_DA_ADMIN,
 
@@ -269,6 +271,9 @@ export default {
       // Import funzioni per visibilità in template
       getIdentificativoAttoreAttualmenteAutenticato: getIdentificativoAttoreAttualmenteAutenticato,
       eliminaAttore: eliminaAttore,
+      isConsumerAttualmenteAutenticato: isConsumerAttualmenteAutenticato,
+      isUploaderAttualmenteAutenticato: isUploaderAttualmenteAutenticato,
+      isAdministratorAttualmenteAutenticato: isAdministratorAttualmenteAutenticato,
 
 
       // Wrapper
@@ -466,27 +471,6 @@ export default {
       return this.isAdministratorAttualmenteAutenticato() &&
           this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
           process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    },
-
-    /** Restituisce true se l'utente attualmente autenticato
-     * è un Consumer, false altrimenti.*/
-    isConsumerAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
-    },
-
-    /** Restituisce true se l'utente attualmente autenticato
-     * è un Uploader, false altrimenti.*/
-    isUploaderAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    },
-
-    /** Restituisce true se l'utente attualmente autenticato
-     * è un Uploader, false altrimenti.*/
-    isAdministratorAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     },
 
 

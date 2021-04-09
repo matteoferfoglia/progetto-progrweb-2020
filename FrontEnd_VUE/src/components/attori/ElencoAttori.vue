@@ -5,8 +5,7 @@
   <Loader :isComponenteCaricato="isComponenteCaricato">
 
 
-    <AggiuntaAttore :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
-                    :csrfToken="csrfToken_wrapper"
+    <AggiuntaAttore :csrfToken="csrfToken_wrapper"
                     @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"
                     @aggiunto-nuovo-attore="aggiungiNuovoAttoreAllElenco($event)"
                     @nominativo-attore-modificato="$emit('nominativo-attore-modificato',$event)"
@@ -46,7 +45,7 @@
 
             <button @click.prevent=" () => eliminaAttore( attore[0],
                                                        String(getIdentificativoAttoreAttualmenteAutenticato()),
-                                                       tipoAttoreAutenticato,
+                                                       getTipoAttoreAttualmenteAutenticato(),
                                                        csrfToken_wrapper,
                                                        attore[1][NOME_PROP_NOMINATIVO],
                                                        attore[0]===String(getIdentificativoAttoreAttualmenteAutenticato()),
@@ -105,7 +104,13 @@ import AggiuntaAttore from "./AggiuntaAttore";
 import {creaUrlLogo, eliminaAttore, getMappa_idAttore_proprietaAttore} from "../../utils/richiesteSuAttori";
 import Loader from "../layout/Loader";
 import {areArrayEquivalenti} from "../../utils/utilitaGenerale";
-import {getIdentificativoAttoreAttualmenteAutenticato} from "../../utils/autenticazione";
+import {
+  getIdentificativoAttoreAttualmenteAutenticato,
+  getTipoAttoreAttualmenteAutenticato,
+  isAdministratorAttualmenteAutenticato,
+  isConsumerAttualmenteAutenticato,
+  isUploaderAttualmenteAutenticato
+} from "../../utils/autenticazione";
 import FormConCsrfToken from "../../components/layout/FormConCsrfToken";
 
 export default {
@@ -117,9 +122,6 @@ export default {
       'csrf-token-ricevuto'
   ],
   props: [
-    /** Tipo attore attualmente autenticato.*/
-    "tipoAttoreAutenticato",
-
     /** Nome della proprietà contenente il nominativo di un attore nell'oggetto
      * che lo rappresenta.*/
     "NOME_PROP_NOMINATIVO",
@@ -173,7 +175,6 @@ export default {
 
 
       // Wrapper
-      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
       csrfToken_wrapper: this.csrfToken,
 
       // Copia dalle variabili d'ambiente: bisogna dichiararle per usarle nel template
@@ -186,7 +187,12 @@ export default {
       // Import funzioni
       creaUrlLogo: creaUrlLogo,
       eliminaAttore: eliminaAttore,
-      getIdentificativoAttoreAttualmenteAutenticato: getIdentificativoAttoreAttualmenteAutenticato
+      getIdentificativoAttoreAttualmenteAutenticato: getIdentificativoAttoreAttualmenteAutenticato,
+      getTipoAttoreAttualmenteAutenticato: getTipoAttoreAttualmenteAutenticato,
+      isConsumerAttualmenteAutenticato: isConsumerAttualmenteAutenticato,
+      isUploaderAttualmenteAutenticato: isUploaderAttualmenteAutenticato,
+      isAdministratorAttualmenteAutenticato: isAdministratorAttualmenteAutenticato
+
 
     }
   },
@@ -211,87 +217,80 @@ export default {
      * richieste al server per l'elenco degli attori).*/
     async caricamentoQuestoComponente() {
 
-      if( this.tipoAttoreAutenticato_wrapper ) {
-        {
-          // Decide il tipo attore di cui mostrare l'elenco
-          this.tipiAttoreCuiQuestoElencoSiRiferisce = this.qualeTipoAttoriDiCuiMostrareElenco();
-          if (this.isAdministratorAttualmenteAutenticato()) {
-            if (this.tipiAttoreCuiQuestoElencoSiRiferisce === this.tipoAttore_administrator) {
-              this.classeRouterLinkAdministrator = '"router-link-exact-active"';
-              this.classeRouterLinkUploader = '""';
-            } else {
-              this.classeRouterLinkAdministrator = '""';
-              this.classeRouterLinkUploader = '"router-link-exact-active"';
-            }
+      {
+        // Decide il tipo attore di cui mostrare l'elenco
+        this.tipiAttoreCuiQuestoElencoSiRiferisce = this.qualeTipoAttoriDiCuiMostrareElenco();
+        if (this.isAdministratorAttualmenteAutenticato()) {
+          if (this.tipiAttoreCuiQuestoElencoSiRiferisce === this.tipoAttore_administrator) {
+            this.classeRouterLinkAdministrator = '"router-link-exact-active"';
+            this.classeRouterLinkUploader = '""';
+          } else {
+            this.classeRouterLinkAdministrator = '""';
+            this.classeRouterLinkUploader = '"router-link-exact-active"';
           }
         }
-
-        const richiestaElencoAttoriAlServer = async () => {
-          // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
-
-          const msg_NO_MODIFICHE = "Nessuna modifica rilevata";
-
-          // Richiede l'elenco degli Attori associati con questo attualmente autenticato
-          return getElencoAttori(this.tipoAttoreAutenticato_wrapper,
-              this.tipiAttoreCuiQuestoElencoSiRiferisce)
-
-              .then(arrayConIdTuttiGliAttoriDaMostrare => {
-                if (areArrayEquivalenti(arrayConIdTuttiGliAttoriDaMostrare, Array.from(this.mappa_idAttore_proprietaAttore.keys())))
-                  return Promise.reject(msg_NO_MODIFICHE);
-                else
-                  return arrayConIdTuttiGliAttoriDaMostrare;
-              })
-
-              // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
-              // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
-              .then(arrayConIdTuttiGliAttoriDaMostrare =>
-                  getMappa_idAttore_proprietaAttore(arrayConIdTuttiGliAttoriDaMostrare,
-                      this.tipoAttoreAutenticato_wrapper,
-                      this.tipiAttoreCuiQuestoElencoSiRiferisce))
-
-              // Ordina la mappa degli Attori (con relative proprietà) alfabeticamente e la salva nelle proprietà di questo componente
-              .then(mappa_idAttore_proprietaAttore => {
-                this.mappa_idAttore_proprietaAttore = mappa_idAttore_proprietaAttore;
-                this.ordinaElencoAttori();
-              })
-
-              .catch(reason => {
-                if (reason !== msg_NO_MODIFICHE)
-                  console.error(reason)
-              });
-        };
-
-        return richiestaElencoAttoriAlServer()
-            .then(() => {
-
-              if (this.isConsumerAttualmenteAutenticato() &&
-                  this.mappa_idAttore_proprietaAttore.size === 1) {
-                // Da requisiti:
-                // Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,mostra direttamente la
-                // lista dei documenti caricati da questi (in sintesi, non si mostra la schermata di scelta Uploader).
-
-                const entryMappa_unicoAttore = Array.from(this.mappa_idAttore_proprietaAttore.entries())[0];
-
-                return this.$router.push({
-                  name: this.NOME_ROUTE_SCHEDA_ATTORE,
-                  params: {
-                    [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]: false, // vedere componente SchedaAttore
-                    [this.NOME_PARAM_ID_ATTORE_router]: entryMappa_unicoAttore[0],                          // idAttore nell'elemento [0]
-                    [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
-                    // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
-                  }
-                });
-
-              }
-            })
-            .then( () => this.isComponenteCaricato = true )
-            .catch(console.error);
-
-      } else {
-        // Se il corpo del metodo non è stato eseguito a causa di parametri invalidi
-        // Allora riprova tra poco:
-        setTimeout( this.caricamentoQuestoComponente, 10 );
       }
+
+      const richiestaElencoAttoriAlServer = async () => {
+        // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
+
+        const msg_NO_MODIFICHE = "Nessuna modifica rilevata";
+
+        // Richiede l'elenco degli Attori associati con questo attualmente autenticato
+        return getElencoAttori(this.getTipoAttoreAttualmenteAutenticato(),
+            this.tipiAttoreCuiQuestoElencoSiRiferisce)
+
+            .then(arrayConIdTuttiGliAttoriDaMostrare => {
+              if (areArrayEquivalenti(arrayConIdTuttiGliAttoriDaMostrare, Array.from(this.mappa_idAttore_proprietaAttore.keys())))
+                return Promise.reject(msg_NO_MODIFICHE);
+              else
+                return arrayConIdTuttiGliAttoriDaMostrare;
+            })
+
+            // Richiede le info di ogni Attore nell'elenco restituito dalla Promise precedente
+            // poi richiede la mappa { idAttore => {proprietaQuestoAttore} }
+            .then(arrayConIdTuttiGliAttoriDaMostrare =>
+                getMappa_idAttore_proprietaAttore(arrayConIdTuttiGliAttoriDaMostrare,
+                    this.getTipoAttoreAttualmenteAutenticato(),
+                    this.tipiAttoreCuiQuestoElencoSiRiferisce))
+
+            // Ordina la mappa degli Attori (con relative proprietà) alfabeticamente e la salva nelle proprietà di questo componente
+            .then(mappa_idAttore_proprietaAttore => {
+              this.mappa_idAttore_proprietaAttore = mappa_idAttore_proprietaAttore;
+              this.ordinaElencoAttori();
+            })
+
+            .catch(reason => {
+              if (reason !== msg_NO_MODIFICHE)
+                console.error(reason)
+            });
+      };
+
+      return richiestaElencoAttoriAlServer()
+          .then(() => {
+
+            if (this.isConsumerAttualmenteAutenticato() &&
+                this.mappa_idAttore_proprietaAttore.size === 1) {
+              // Da requisiti:
+              // Nel caso in cui il Consumer abbia ricevuto documenti da un solo Uploader,mostra direttamente la
+              // lista dei documenti caricati da questi (in sintesi, non si mostra la schermata di scelta Uploader).
+
+              const entryMappa_unicoAttore = Array.from(this.mappa_idAttore_proprietaAttore.entries())[0];
+
+              return this.$router.push({
+                name: this.NOME_ROUTE_SCHEDA_ATTORE,
+                params: {
+                  [process.env.VUE_APP_ROUTER_PARAMETRO_MOSTRARE_PULSANTE_CHIUSURA_SCHEDA_ATTORE]: false, // vedere componente SchedaAttore
+                  [this.NOME_PARAM_ID_ATTORE_router]: entryMappa_unicoAttore[0],                          // idAttore nell'elemento [0]
+                  [this.NOME_PARAM_PROPRIETA_ATTORE_router]: JSON.stringify(entryMappa_unicoAttore[1])    // propAttore nell'elemento [1]
+                  // JSON.stringify risolve il problema del passaggio di oggetti come props in Vue-Router
+                }
+              });
+
+            }
+          })
+          .then( () => this.isComponenteCaricato = true )
+          .catch(console.error);
 
     },
 
@@ -378,25 +377,8 @@ export default {
 
       return tipoAttoreDiCuiMostrareElenco;
 
-    },
-
-    /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
-    isConsumerAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
-    },
-
-    /** Restituisce true se è un ConsumerAttualmenteAutenticato.*/
-    isUploaderAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    },
-
-    /** Restituisce true se l'attore attualmente autenticato è un Administrator.*/
-    isAdministratorAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
     }
+
   },
   watch: {
 
@@ -416,16 +398,6 @@ export default {
                                                   // Altrimenti ci pensa già la funzione di caricamento a mostrare le cose corrette (e non serve ricaricare)
           }
         }
-      }
-    },
-
-    /** Osserva la property ottenuta dal componente padre, attendendo un valore
-     * non undefined. */
-    tipoAttoreAutenticato: {
-      immediate: true,
-      deep: true,
-      handler: function(nuovoValore) {
-        this.tipoAttoreAutenticato_wrapper = nuovoValore;
       }
     },
 
@@ -452,12 +424,12 @@ const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCu
 
   let urlRichiesta;
 
-  if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
+  if( isAdministratorAttualmenteAutenticato() ) {
     urlRichiesta = process.env.VUE_APP_URL_GET_ELENCO_ATTORI_PER_QUESTO_ADMINISTRATOR  +
         "/" + tipoAttoriDiCuiMostrareElenco;  // tipo attori richiesti appeso come @PathParam
-  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__UPLOADER ) {
+  } else if( isUploaderAttualmenteAutenticato() ) {
     urlRichiesta = process.env.VUE_APP_URL_GET_ELENCO_CONSUMER__RICHIESTA_DA_UPLOADER;
-  } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
+  } else if( isConsumerAttualmenteAutenticato() ) {
     urlRichiesta = process.env.VUE_APP_ELENCO_UPLOADER_PER_QUESTO_CONSUMER__RICHIESTA_DA_CONSUMER;
   } else {
     urlRichiesta = "";

@@ -115,6 +115,7 @@ import {
 } from "../../utils/documenti";
 import FormConCsrfToken from "../layout/FormConCsrfToken";
 import Loader from "../layout/Loader";
+import {isConsumerAttualmenteAutenticato} from "../../utils/autenticazione";
 
 export default {
   name: "TabellaDocumenti",
@@ -144,9 +145,6 @@ export default {
 
     /** Nome del Consumer a cui questi documenti si riferiscono.*/
     "nomeConsumer",
-
-    /** Tipo attore attualmente autenticato.*/
-    "tipoAttoreAutenticato",
 
     /** Token CSRF ricevuto dal padre.*/
     "csrfToken"
@@ -484,7 +482,7 @@ export default {
           a.click();
           URL.revokeObjectURL(downloadUrl);
 
-          if( this.tipoAttoreAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
+          if( isConsumerAttualmenteAutenticato() ) {
             // Se un consumer ha scaricato il documento, si aggiorna la vista per mostrare la data/ora
             // (richiesta al server per conformità nel formato scelto dal server) a meno che tale
             // data/ora non sia già scritta (perché il documento era già stato visualizzato)

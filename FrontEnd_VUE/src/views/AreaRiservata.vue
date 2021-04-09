@@ -8,8 +8,7 @@
          v-if="urlLogoUploader && isUploaderAttualmenteAutenticato()"/>
   </div>
 
-  <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
-               :csrfToken="csrfToken_wrapper"
+  <router-view :csrfToken="csrfToken_wrapper"
                @nominativo-attore-modificato="$emit('nominativo-attore-modificato', $event)"
                @logo-attore-modificato="urlLogoUploader= creaUrlLogo(this.idAttoreCuiQuestaSchedaSiRiferisce)
                                         /*query string per aggiornare l'immagine allo stesso url*/"
@@ -19,7 +18,7 @@
 
 <script>
 
-import {getIdentificativoAttoreAttualmenteAutenticato} from "../utils/autenticazione";
+import {getIdentificativoAttoreAttualmenteAutenticato, isUploaderAttualmenteAutenticato} from "../utils/autenticazione";
 import {creaUrlLogo} from "../utils/richiesteSuAttori";
 
 export default {
@@ -36,9 +35,6 @@ export default {
     'csrf-token-ricevuto'
   ],
   props: [
-    /** Tipo dell'attore autenticato.*/
-    'tipoAttoreAutenticato',
-
     /** CSRF token attualmente valido.*/
     'csrfToken'
   ],
@@ -54,11 +50,11 @@ export default {
       urlLogoUploader: undefined,                     // caricato in created
 
       // Wrapper
-      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,
       csrfToken_wrapper: this.csrfToken,
 
       // Funzione importata
-      creaUrlLogo: creaUrlLogo
+      creaUrlLogo: creaUrlLogo,
+      isUploaderAttualmenteAutenticato: isUploaderAttualmenteAutenticato
     }
   },
   created() {
@@ -67,23 +63,8 @@ export default {
     this.idAttoreCuiQuestaSchedaSiRiferisce = identificativoAttore;
     this.urlLogoUploader = creaUrlLogo(identificativoAttore);
   },
-  methods: {
-
-    /** Restituisce true se è un Uploader attualmente autenticato.*/
-    isUploaderAttualmenteAutenticato() {
-      return this.tipoAttoreAutenticato_wrapper ===
-          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    }
-
-  },
   watch: {
-    tipoAttoreAutenticato: {
-      immediate: true,
-      deep: true,
-      handler( nuovoValore ) {
-        this.tipoAttoreAutenticato_wrapper = nuovoValore;
-      }
-    },
+
     csrfToken : {
       immediate: true,
       deep: true,
@@ -91,6 +72,7 @@ export default {
         this.csrfToken_wrapper = nuovoValore;
       }
     }
+
   }
 }
 </script>

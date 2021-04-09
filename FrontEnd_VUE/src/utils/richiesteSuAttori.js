@@ -2,7 +2,12 @@
  * richiedere al server delle informazioni su un attore.*/
 
 import {richiestaDelete, richiestaGet} from "./http";
-import {logout} from "./autenticazione";
+import {
+    isAdministratorAttualmenteAutenticato,
+    isConsumerAttualmenteAutenticato,
+    isUploaderAttualmenteAutenticato,
+    logout
+} from "./autenticazione";
 
 /** Richiede le informazioni relative all'attore il cui identificativo
  * è passato come parametro. Se la richiesta va a buon fine, viene
@@ -19,15 +24,15 @@ export const getInfoAttore = async (idAttoreDiCuiRichiedereInfo,
 
     let urlRichiesta;
 
-    if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
+    if( isAdministratorAttualmenteAutenticato() ) {
         if( tipoAttoreDiCuiRichiedereInfo === process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR ) {
             urlRichiesta = process.env.VUE_APP_URL_GET_INFO_ADMINISTRATOR__RICHIESTA_DA_ADMINISTRATOR;
         } else {
             urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
         }
-    } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__UPLOADER ) {
+    } else if( isUploaderAttualmenteAutenticato() ) {
         urlRichiesta = process.env.VUE_APP_URL_GET_INFO_CONSUMER__RICHIESTA_DA_UPLOADER;
-    } else if( tipoAttoreAttualmenteAutenticato === process.env.VUE_APP_TIPO_UTENTE__CONSUMER ) {
+    } else if( isConsumerAttualmenteAutenticato() ) {
         urlRichiesta = process.env.VUE_APP_URL_GET_INFO_UPLOADER;
     } else {
         urlRichiesta = "";

@@ -1,8 +1,7 @@
 <template>
 
   <Loader :isComponenteCaricato="isComponenteCaricato">
-    <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato_wrapper"
-                 :csrfToken="csrfToken_wrapper"
+    <router-view :csrfToken="csrfToken_wrapper"
                  :NOME_PROP_NOMINATIVO ="NOME_PROP_NOME_ATTORE"
                  :NOME_PROP_USERNAME   ="NOME_PROP_USERNAME_ATTORE"
                  :NOME_PROP_EMAIL      ="NOME_PROP_EMAIL_ATTORE"
@@ -26,7 +25,7 @@ export default {
   components: {Loader},
   inheritAttrs: false,
   emits: ['csrf-token-ricevuto','nominativo-attore-modificato'],
-  props: ['tipoAttoreAutenticato', 'csrfToken'],
+  props: ['csrfToken'],
   data() {
 
     return {
@@ -50,7 +49,6 @@ export default {
       NOME_PROP_USERNAME_ATTORE: undefined,
 
       // Wrapper
-      tipoAttoreAutenticato_wrapper: this.tipoAttoreAutenticato,  //wrapper (prop non è modificabile)
       csrfToken_wrapper: this.csrfToken
 
     }
@@ -77,17 +75,6 @@ export default {
 
   },
   watch: {
-
-    /** Watch per il tipo di attore attualmente autenticato (potrebbe
-     * fare logout e potrebbe autenticarsi subito dopo un attore
-     * con un'altra qualifica).*/
-    tipoAttoreAutenticato: {
-      immediate: true,
-      deep: true,
-      handler( nuovoValore ) {
-        this.tipoAttoreAutenticato_wrapper = nuovoValore;
-      }
-    },
 
     csrfToken : {
       immediate: true,

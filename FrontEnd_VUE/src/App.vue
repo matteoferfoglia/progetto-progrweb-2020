@@ -1,13 +1,11 @@
 <template id="app">
 
   <Header :nomeUtenteAutenticato="nomeAttoreAutenticato"
-          :tipoUtenteAutenticato="tipoAttoreAutenticato"
           :csrfToken="csrfToken /*Informare il componente se cambia.*/"
           @logout="logout"
           @csrf-token-ricevuto="csrfToken = $event" />
 
-  <router-view :tipoAttoreAutenticato="tipoAttoreAutenticato"
-               :csrfToken="csrfToken /*Informare il componente se è cambiato.*/"
+  <router-view :csrfToken="csrfToken /*Informare il componente se è cambiato.*/"
                @nominativo-attore-modificato="nomeAttoreAutenticato = $event"
                @csrf-token-ricevuto="csrfToken = $event"
                @login="login($event)" />
@@ -19,7 +17,6 @@
 import Header from "./components/layout/Header";
 import {
   getNomeAttoreAttualmenteAutenticato,
-  getTipoAttoreAttualmenteAutenticato,
   logout,
   verificaAutenticazione
 } from "./utils/autenticazione";
@@ -34,9 +31,6 @@ export default {
 
       /** Nome dell'attore (se) autenticato.*/
       nomeAttoreAutenticato: undefined,
-
-      /** Tipo dell'attore (se) autenticato (Administrator/Consumer/Uploader).*/
-      tipoAttoreAutenticato: undefined,
 
       /** Valore del token CSRF attualmente valido.*/
       csrfToken: undefined
@@ -56,10 +50,8 @@ export default {
       await verificaAutenticazione( this.$route )
               .then( async isUtenteAutenticato => {
 
-                if (isUtenteAutenticato) {
-                  this.tipoAttoreAutenticato = getTipoAttoreAttualmenteAutenticato();
+                if (isUtenteAutenticato)
                   this.nomeAttoreAutenticato = getNomeAttoreAttualmenteAutenticato();
-                }
 
                 return isUtenteAutenticato;
 
@@ -87,7 +79,6 @@ export default {
       logout( this.csrfToken )  // funzione importata dal modulo di autenticazione
         .then( () => {
           this.csrfToken             = undefined;
-          this.tipoAttoreAutenticato = undefined;
           this.nomeAttoreAutenticato = undefined;
           this.isUtenteAutenticato   = false;
         })

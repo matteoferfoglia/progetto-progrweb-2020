@@ -4,7 +4,7 @@
   <article class="card">
     <h3>Informazioni personali</h3>
     <FormCampiAttore :flag_mostrareLabelCampiInput="true"
-                     :isQuestoFormRiferitoAConsumer="isConsumer()"
+                     :isQuestoFormRiferitoAConsumer="isConsumerAttualmenteAutenticato()"
                      :username_readOnly="true"
                      :tuttiICampi_readOnly="true"
                      :username="username"
@@ -75,7 +75,7 @@
       </label>
     </fieldset>
 
-    <fieldset class="modifica-logo" v-if="isUploader()">
+    <fieldset class="modifica-logo" v-if="isUploaderAttualmenteAutenticato()">
       <legend>Modifica immagine logo</legend>
       <label>Nuovo logo
         <input type="file"
@@ -100,7 +100,7 @@ import {richiestaPostConFile} from "../../utils/http";
 import {
   getEmailAttoreAttualmenteAutenticato,
   getNomeAttoreAttualmenteAutenticato,
-  getUsernameAttoreAttualmenteAutenticato,
+  getUsernameAttoreAttualmenteAutenticato, isConsumerAttualmenteAutenticato, isUploaderAttualmenteAutenticato,
   setTokenAutenticazione
 } from "../../utils/autenticazione";
 import FormCampiAttore from "../../components/layout/FormCampiAttore";
@@ -123,7 +123,7 @@ export default {
     'logo-attore-modificato'
 
 ],
-  props: ['tipoAttoreAutenticato','nomeUtenteAutenticato', 'csrfToken'],
+  props: ['nomeUtenteAutenticato', 'csrfToken'],
   data() {
     return {
 
@@ -164,7 +164,12 @@ export default {
       // c'è un listener nel componente da aggiornare che lo fa aggiornare)
       valoreQualsiasiPerAggiornareIlComponenteSeModificato: 0,
 
-      csrfToken_wrapper: this.csrfToken
+      // Wrapper
+      csrfToken_wrapper: this.csrfToken,
+
+      // Import funzioni
+      isConsumerAttualmenteAutenticato: isConsumerAttualmenteAutenticato,
+      isUploaderAttualmenteAutenticato: isUploaderAttualmenteAutenticato
 
     }
   },
@@ -180,18 +185,6 @@ export default {
       this.nominativo = getNomeAttoreAttualmenteAutenticato();
       this.email      = getEmailAttoreAttualmenteAutenticato();
       this.username   = getUsernameAttoreAttualmenteAutenticato();
-    },
-
-    /** Restituisce true se è un uploader, false altrimenti.*/
-    isUploader() {
-      return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
-    },
-
-    /** Restituisce true se è un consumer, false altrimenti.*/
-    isConsumer() {
-      return this.tipoAttoreAutenticato ===
-          process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
     },
 
     aggiornaCsrfToken( nuovoValore ) {

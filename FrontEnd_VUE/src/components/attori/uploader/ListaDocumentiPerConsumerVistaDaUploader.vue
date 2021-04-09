@@ -16,7 +16,6 @@
                :urlRichiestaElencoDocumentiPerUnAttore="urlRichiestaElencoDocumentiPerUnConsumer"
                :urlDownloadDocumento="urlDownloadDocumento"
                :urlEliminazioneDocumento="urlEliminazioneDocumento"
-               :tipoAttoreAutenticato="tipoAttore_uploader"
                @csrf-token-ricevuto="$emit('csrf-token-ricevuto', $event)"/>
 
 </template>
@@ -50,9 +49,6 @@ export default {
       nomeRouteTabellaDocumenti:              process.env.VUE_APP_ROUTER_NOME_TABELLA_DOCUMENTI,
       nomeRouteListaDocumentiVistaDaUploader: process.env.VUE_APP_ROUTER_NOME_LISTA_DOCUMENTI_VISTA_DA_UPLOADER,
       nomeRouteSchedaAttore:                  process.env.VUE_APP_ROUTER_NOME_SCHEDA_UN_ATTORE,
-
-      // Copia da variabile d'ambiente
-      tipoAttore_uploader: process.env.VUE_APP_TIPO_UTENTE__UPLOADER,
 
       // Wrapper
       csrfToken_wrapper: this.csrfToken

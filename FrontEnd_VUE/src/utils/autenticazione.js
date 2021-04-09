@@ -153,3 +153,20 @@ export const getIdentificativoAttoreAttualmenteAutenticato = () => {
     return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_IDENTIFICATIVO_ATTORE );
 }
 
+/** Restituisce true se è un consumer, false altrimenti.*/
+export const isConsumerAttualmenteAutenticato = () => {
+    return getTipoAttoreAttualmenteAutenticato() ===
+        process.env.VUE_APP_TIPO_UTENTE__CONSUMER;
+}
+
+/** Restituisce true se è un Uploader, false altrimenti.*/
+export const isUploaderAttualmenteAutenticato = () => {
+    return getTipoAttoreAttualmenteAutenticato() ===
+        process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
+}
+
+/** Restituisce true se è un Administrator, false altrimenti.*/
+export const isAdministratorAttualmenteAutenticato = () => {
+    return getTipoAttoreAttualmenteAutenticato() ===
+        process.env.VUE_APP_TIPO_UTENTE__ADMINISTRATOR;
+}
