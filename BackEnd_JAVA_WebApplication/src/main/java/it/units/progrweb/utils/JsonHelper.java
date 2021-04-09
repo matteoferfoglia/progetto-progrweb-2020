@@ -43,6 +43,19 @@ public class JsonHelper {
 
     }
 
+    /** Restituisce la rappresentazione JSON dell'oggetto fornito come parametro. */
+    public static String convertiOggettoInJSON(Object oggettoDaConvertireInJSON) {
+        return gson.toJson(oggettoDaConvertireInJSON);
+    }
+
+    /** Restituisce l'oggetto Java corrispondente al valore JSON fornito come parametro.
+     * @param valoreJSON La stringa JSON da convertire in oggetto.
+     * @param classeOggettoDaRestituire Classe dell'oggetto da restituire.
+     * @param <T> Generic rappresentante il tipo da restituire.*/
+    public static<T> T convertiOggettoDaJSON(String valoreJSON, Class<T> classeOggettoDaRestituire) {
+        return gson.fromJson(valoreJSON,classeOggettoDaRestituire);
+    }
+
     /**
      * Data una mappa, restituisce la stringa corrispondente alla
      * rappresentazione JSON di tale oggetto.
