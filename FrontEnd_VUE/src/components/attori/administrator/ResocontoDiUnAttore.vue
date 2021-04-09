@@ -7,6 +7,7 @@
         <label>da
           <input type="date"
                  :value="dataInizio/*v-bind non funziona correttamente con input[type=date]*/"
+                 :max="dataOggi()"
                  :id="idDataInizio"
                  class="form-control"
                  @input.prevent="setDataInizio($event.target.value)"
@@ -16,6 +17,7 @@
           <input type="date"
                  :value="dataFine"
                  :min="dataInizio"
+                 :max="dataOggi()"
                  :id="idDataFine"
                  class="form-control"
                  @input.prevent="setDataFine($event.target.value)"
@@ -98,6 +100,17 @@ export default {
   },
 
   methods: {
+
+    /** Restituisce la data di oggi come stringa nel formato yyyy-mm-dd. */
+    dataOggi() {
+      const oggi = new Date();
+      const yyyy = oggi.getFullYear();
+      let mm = oggi.getMonth()+1;     // mesi iniziano da 0 (=Gennaio)
+      let dd = oggi.getDate();
+      mm = mm<10 ? '0'+mm : mm;
+      dd = dd<10 ? '0'+dd : dd;
+      return yyyy+'-'+mm+'-'+dd;
+    },
 
     /** Setter per la data finale (v-model non funzionava correttamente).
      * Controlla la validità della data inserita.
