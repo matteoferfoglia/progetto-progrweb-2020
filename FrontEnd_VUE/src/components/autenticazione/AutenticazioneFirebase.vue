@@ -23,8 +23,10 @@ import 'firebase/auth'; // Add the Firebase services that you want to use
 
 import * as firebaseui from 'firebaseui'
 
-import {richiestaPostContenutoTextPlain} from "../../utils/http";
+import {HTTP_STATUS_CONFLICT, richiestaPostContenutoTextPlain} from "../../utils/http";
 import Loader from "../../components/layout/Loader";
+
+import swal from "sweetalert"; // Sweet alert
 
 export default {
   name: "AutenticazioneFirebase",
@@ -75,20 +77,69 @@ export default {
             this.attendendoRispostaDaServerApplicazione = true; // login con Firebase ok,
             // ora chiederà autenticazione al server dell'applicazione
 
+            let tokenAutenticazioneFirebase;  // memorizzerà il token di autenticazione ottenuto da Firebase
+
+            // Da invocare DOPO aver ricevuto il token da Firebase e averlo salvato nella variabile 'tokenAutenticazioneFirebase'
+            const richiestaAutenticazioneAServerApplicazione = urlRichiesta =>
+              richiestaPostContenutoTextPlain(
+                  urlRichiesta,
+                  tokenAutenticazioneFirebase    // è il token JWT ottenuto da Firebase con info sull'utente
+              );  // il mio server risponde con il token di autenticazione da lui emesso se login va a buon fine
+
+            const handler_loginRiuscito = tokenAutenticazionePerQuestaApplicazione => {
+              this.$emit('login-riuscito', tokenAutenticazionePerQuestaApplicazione);
+            };
+
+            const handler_loginFallito = errore => {
+              console.error(errore);
+              this.ui = this.creaEAvviaAuthUiFirebase();
+              this.$emit('login-fallito', errore);
+            }
+
+            const MSG_LOGIN_RIUSCITO = "Login riuscito";  // usato per uscire dalla then-catch chain
             authResult.user.getIdToken()
-                .then( tokenJwtDaFirebase =>
-                  richiestaPostContenutoTextPlain(
-                      process.env.VUE_APP_URL_LOGIN_CON_FIREBASE,
-                      tokenJwtDaFirebase    // è il token JWT ottenuto da Firebase con info sull'utente
-                  )
-                )
-                .then( tokenAutenticazionePerQuestaApplicazione => { // il mio server risponde con il token di autenticazione da lui emesso se login va a buon fine
-                  this.$emit('login-riuscito', tokenAutenticazionePerQuestaApplicazione);
+                .then( tokenJwtDaFirebase => {
+                  tokenAutenticazioneFirebase = tokenJwtDaFirebase;
+                  return richiestaAutenticazioneAServerApplicazione(process.env.VUE_APP_URL_LOGIN_CON_FIREBASE);
+                })
+                .then( tokenAutenticazionePerQuestaApplicazione => {
+                  handler_loginRiuscito(tokenAutenticazionePerQuestaApplicazione);
+                  return Promise.reject(MSG_LOGIN_RIUSCITO);  // per uscire da questa chain di then-catch
                 })
                 .catch( errore => {
-                  console.error(errore);
-                  this.ui = this.creaEAvviaAuthUiFirebase();
-                  this.$emit('login-fallito', errore);
+
+                  if (errore.status === HTTP_STATUS_CONFLICT) {
+                    // più utenti con stessa email
+
+                    // Oggetto rappresentante i button da mostrare, avente per valore il testo da mostrare
+                    const __buttons = Object.fromEntries(errore.data.map(unUsername => [unUsername, unUsername])); // errore.data contiene la lista di username possibili
+
+                    return swal("Sono stati trovati nel sistema più utenti " +
+                        "associati all'account selezionato. Sceglierne uno:", {
+                      buttons: __buttons
+                    })
+
+                  } else {
+
+                    // Errore diverso non gestito da questo catch e rilanciato
+                    return Promise.reject(errore);
+
+                  }
+
+                })
+                .then( usernameDaAutenticare => {
+
+                  const urlRichiestaAutenticazioneConUsername =
+                      process.env.VUE_APP_URL_LOGIN_CON_FIREBASE +
+                      '?' + process.env.VUE_APP_FORM_USERNAME_INPUT_FIELD_NAME + '=' + usernameDaAutenticare;
+
+                  return richiestaAutenticazioneAServerApplicazione(urlRichiestaAutenticazioneConUsername);
+
+                })
+                .then( handler_loginRiuscito )
+                .catch( errore => {
+                  if( errore!==MSG_LOGIN_RIUSCITO )
+                    handler_loginFallito(errore);
                 });
 
           }

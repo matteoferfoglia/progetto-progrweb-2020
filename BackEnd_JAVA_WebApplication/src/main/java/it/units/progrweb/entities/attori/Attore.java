@@ -12,10 +12,7 @@ import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
-import it.units.progrweb.utils.EncoderPrevenzioneXSS;
-import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.RegexHelper;
-import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.*;
 import it.units.progrweb.utils.mail.MailSender;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
@@ -439,8 +436,13 @@ public abstract class Attore implements Cloneable, Principal {
     }
 
     /** Ricerca nel database e restituisce l'attore corrispondente
-     * all'email fornita, oppure null se non trovato.*/
-    public static Attore getAttoreDaEmail(String email) {
+     * all'email fornita, oppure null se non trovato.
+     * @throws IllegalStateException se vengono trovati più istanze
+     * di {@link Attore} con la stessa email.
+     * Vedere {@link Attore#ricercaInDatabase(String, String)} per
+     * il messaggio restituito dall'eccezione. */
+    public static Attore getAttoreDaEmail(String email)
+            throws IllegalStateException {
 
         String nomeAttributoQuery = "email";
         return ricercaInDatabase(email, nomeAttributoQuery);
@@ -448,7 +450,10 @@ public abstract class Attore implements Cloneable, Principal {
     }
 
     /** Metodo privato per la ricerca di un {@link Attore} nel database,
-     * avente l'attributo specificato nei parametri con il valore specificato. */
+     * avente l'attributo specificato nei parametri con il valore specificato.
+     * @throws IllegalStateException Se viene trovato più di un attore con il
+     * valore indicato nella query, avente come messaggio la rappresentazione
+     * JSON della lista degli username degli Attori trovati.*/
     private static Attore ricercaInDatabase(String valoreAttributoDaCercare, String nomeAttributoQuery) {
 
         if( UtilitaGenerale.esisteAttributoInClasse( nomeAttributoQuery, Attore.class ) ) {
@@ -462,6 +467,12 @@ public abstract class Attore implements Cloneable, Principal {
 
             if( risultatoQuery.size() == 1 ) {
                 return (Attore) risultatoQuery.get(0);
+            } else if( risultatoQuery.size() > 1 ) {
+                List<?> listaUsernameTrovati = risultatoQuery
+                        .stream()
+                        .map( unAttore -> ((Attore)unAttore).getUsername() )
+                        .collect(Collectors.toList());
+                throw new IllegalStateException(JsonHelper.convertiOggettoInJSON(listaUsernameTrovati) );
             } else {
                 return null;
             }

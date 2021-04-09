@@ -1,5 +1,6 @@
 package it.units.progrweb.api.autenticazioneERegistrazione;
 
+import com.google.api.gax.rpc.UnauthenticatedException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
@@ -7,9 +8,7 @@ import it.units.progrweb.entities.AuthenticationTokenInvalido;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.filters.FiltroAutenticazione;
 import it.units.progrweb.persistence.NotFoundException;
-import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.EncoderPrevenzioneXSS;
-import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.*;
 import it.units.progrweb.utils.mail.MailSender;
 
 import javax.mail.MessagingException;
@@ -21,6 +20,9 @@ import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Classe per la gestione dell'autenticazione dei client.
@@ -41,11 +43,20 @@ public class LoginLogout {
 
     /** Risponde alle richieste di login effettuate tramite Firebase:
      * questo metodo attende il token JWT rilasciato da Firebase dopo
-     * aver autenticato l'utente, contenente le informazioni dell'utente.*/
+     * aver autenticato l'utente, contenente le informazioni dell'utente.
+     * Se vengono trovati più attori nel sistema associati alla stessa
+     * email, allora la risposta avrà lo stato CONFLICT e restituirà
+     * l'array con i diversi usernameDaAutenticare_optional associati agli attori trovati.
+     * @param tokenJwtAutenticazioneUtenteRilasciatoDaFirebase Il token
+     *      rilasciato da Firebase con le informazioni per l'autenticazione.
+     * @param usernameDaAutenticare_optional Query param, non necessario, contenente lo
+     *      usernameDaAutenticare_optional da autenticare, nel caso in cui l'autenticazione
+     *      con Firebase sia associata a più account.*/
     @Path("/firebaseLogin")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response loginConFirebase(String tokenJwtAutenticazioneUtenteRilasciatoDaFirebase) {
+    public Response loginConFirebase(String tokenJwtAutenticazioneUtenteRilasciatoDaFirebase,
+                                     @QueryParam("username") String usernameDaAutenticare_optional) {
 
         if( tokenJwtAutenticazioneUtenteRilasciatoDaFirebase!=null ) {
 
@@ -56,9 +67,30 @@ public class LoginLogout {
 
                 String emailAttoreDaToken = decodedToken.getEmail();
 
-                Attore attoreInDb = Attore.getAttoreDaEmail(emailAttoreDaToken);
+                try {
+                    Attore attoreInDb = Attore.getAttoreDaEmail(emailAttoreDaToken);
+                    return Autenticazione.creaResponseAutenticazione(attoreInDb);
+                } catch (IllegalStateException e) {
+                    // Trovati più attori con la stessa email
 
-                return Autenticazione.creaResponseAutenticazione(attoreInDb);
+                    String[] usernameAttoriTrovati =
+                            JsonHelper.convertiOggettoDaJSON(e.getMessage(), String[].class);
+
+                    if( UtilitaGenerale.isStringaNonNullaNonVuota(usernameDaAutenticare_optional)) {
+                        // Client ha specificato quale username si sta autenticando
+
+                        if( Arrays.asList(usernameAttoriTrovati).contains(usernameDaAutenticare_optional) ) {
+                            return Autenticazione.creaResponseAutenticazione(Attore.getAttoreDaUsername(usernameDaAutenticare_optional));
+                        } else {
+                            throw new NotAuthorizedException(usernameDaAutenticare_optional + " non autorizzato");   // raccolto dal catch sotto
+                        }
+                    }
+
+                    return Response.status(Response.Status.CONFLICT)
+                                   .type( MediaType.APPLICATION_JSON )
+                                   .entity( usernameAttoriTrovati )    // lista con username trovati
+                                   .build();
+                }
 
             } catch (Exception e) {
                 return Autenticazione.creaResponseUnauthorized();
