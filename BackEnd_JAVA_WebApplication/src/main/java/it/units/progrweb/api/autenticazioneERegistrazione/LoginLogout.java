@@ -1,6 +1,5 @@
 package it.units.progrweb.api.autenticazioneERegistrazione;
 
-import com.google.api.gax.rpc.UnauthenticatedException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
@@ -20,9 +19,7 @@ import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Classe per la gestione dell'autenticazione dei client.
@@ -177,7 +174,8 @@ public class LoginLogout {
                     MailSender mailSender = new MailSender();
                     try {
                         mailSender.inviaEmail(attore.getEmail(), attore.getNominativo(), "Reset password",
-                                "E' stato richiesto il reset della password per il Suo account.\n" +
+                                "E' stato richiesto il reset della password per il Suo account " +
+                                        "(username: " + attore.getUsername() + ").\n" +
                                         "La nuova password è: \"" + passwordTemporanea + "\".\n" +
                                         "Si consiglia di modificare tale password al primo accesso.\n" +
                                         "Se non è stato Lei a richiedere la modifica della password, ignorare" +
