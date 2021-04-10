@@ -225,7 +225,7 @@ public class FiltroCSRF implements Filter {
 }
 
 
-/** Wrapper per HttpServletRequest, Fonte:  https://stackoverflow.com/a/25640232 .
+/** Wrapper per HttpServletRequest.
  * Motivazione di utilizzo di questo wrapper: getReader() può essere invocato una
  * volta sola (e verrà usato dai servizi REST), altrimenti:
  *  java.lang.IllegalStateException: READER . Questo wrapper serve per poter leggere
