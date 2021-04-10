@@ -7,9 +7,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 
 /**
- * Gestore delle chiavi privata e pubblica per questo server.
- * Fonti: <a href="https://docs.oracle.com/javase/tutorial/security/apisign/step1.html">Fonte</a>,
- * <a href="https://docs.oracle.com/javase/tutorial/security/apisign/step2.html">Fonte</a>.
+ * Gestore di sicurezza per questo server.
  *
  * @author Matteo Ferfoglia
  */
