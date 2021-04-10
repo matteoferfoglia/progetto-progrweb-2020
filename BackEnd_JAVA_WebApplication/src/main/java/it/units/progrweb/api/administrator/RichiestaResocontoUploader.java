@@ -57,7 +57,6 @@ public class RichiestaResocontoUploader {
             return new Resoconto( identificativoUploader, periodoTemporale);
 
         } else {
-            // Utilizzo httpServletResponse per rispondere con errore (Fonte: https://stackoverflow.com/a/22869076 )
             httpServletResponse.sendError( HttpServletResponse.SC_NOT_FOUND,
                                            "Uploader [" + identificativoUploader + "] non trovato" );
             return null;

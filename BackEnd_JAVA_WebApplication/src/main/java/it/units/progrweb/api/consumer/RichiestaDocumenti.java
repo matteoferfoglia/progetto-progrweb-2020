@@ -106,7 +106,6 @@ public class RichiestaDocumenti {
 
     /** Restituisce il documento il cui identificativo è
      * nel @PathParam.
-     * <a href="https://stackoverflow.com/a/12251265">Fonte (restituzione file tramite JAX-RS)</a>.
      */
     @Path("/downloadDocumento/{identificativoFile}")
     @GET
