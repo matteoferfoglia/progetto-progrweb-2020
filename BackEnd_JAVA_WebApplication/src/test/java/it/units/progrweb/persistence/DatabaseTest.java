@@ -147,24 +147,6 @@ public class DatabaseTest {
 
     }
 
-    /** Test per {@link DatabaseHelper#salvaEntita(java.lang.Object)}.*/
-    @ParameterizedTest
-    @MethodSource("generaEntitaDaSalvareNelDatabase")
-    void testSalvataggioEntita(Class<?> classeEntita, Object entita){
-
-        if(! classeEntita.equals(Object.class)) {   // il @MethodSource genera Object in caso di classi astratte, ma non sono entità (evitate con questo if)
-
-            assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entità salvate all'inizializzazione del datastore
-
-            DatabaseHelper.salvaEntita(entita);
-            DatabaseHelper.completaOra(); // svuota transazioni in corso
-
-            assertEquals(1, DatabaseHelper.contaEntitaNelDatabase());
-
-        }
-
-    }
-
 
     /** Test per {@link DatabaseHelper#salvaEntita(Object)}.*/
     @ParameterizedTest
@@ -174,9 +156,7 @@ public class DatabaseTest {
         if(! classeEntita.equals(Object.class)) {   // il @MethodSource genera Object in caso di classi astratte, ma non sono entità (evitate con questo if)
 
             assertEquals(0, DatabaseHelper.contaEntitaNelDatabase());   // 0 entita salvate all'inizializzazione del datastore
-
             DatabaseHelper.salvaEntita(entita);
-
             assertEquals(1, DatabaseHelper.contaEntitaNelDatabase());
 
         }

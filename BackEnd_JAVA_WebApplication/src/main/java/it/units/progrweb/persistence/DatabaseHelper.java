@@ -243,34 +243,4 @@ public abstract class DatabaseHelper {
 
     }
 
-    /**
-     * Porta a termine <em>adesso</em> tutte le operazioni differite nel database.
-     * Nota: in ogni caso il sistema garantisce di portare a termine le
-     * transazioni in corso, anche senza usare questo metodo, ma l'invocazione
-     * di questo metodo lo fa subito (in modo sincrono).*/
-    public static void completaOra() {
-
-        AsyncCacheFilter.complete();    // Fonte: https://groups.google.com/g/objectify-appengine/c/a4CaFbZdqh0/m/Ih_vEaoBRCEJ
-        if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
-            // Local development server
-
-            // Pur seguendo la documentazione di Objectify, dai test si è visto che
-            // circa il 10% delle volte la modifica non si propagava in modo sincrono
-            // sul database locale, quindi si aggiunge un breve ritardo (~ millisecondi)
-            // tale che al termine di questo metodo la modifica sia propagata nel
-            // database.
-
-            final long MILLISECONDI_RITARDO_FORZATO = 50;
-
-            try {
-                TimeUnit.MILLISECONDS.sleep(MILLISECONDI_RITARDO_FORZATO);
-            } catch (InterruptedException e) {
-                Logger.scriviEccezioneNelLog(DatabaseHelper.class,
-                        "Eccezione nel completamento immediato di un'operazione" +
-                        " nel database, eccezione generata dal ritardo imposto nel codice", e);
-            }
-        }
-
-    }
-
 }
