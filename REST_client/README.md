@@ -4,6 +4,8 @@ In questo progetto *Maven* è stato implementato un semplice client *REST*
 in *Java*, con l'obiettivo di dimostrare il corretto funzionamento del 
 *Web Service REST* implementato sul server.
 
+Questo progetto richiede la versione 3.5 di *Maven*.
+
 Il funzionamento può essere verificato eseguendo il metodo *main* della
 classe *Main*.
 
