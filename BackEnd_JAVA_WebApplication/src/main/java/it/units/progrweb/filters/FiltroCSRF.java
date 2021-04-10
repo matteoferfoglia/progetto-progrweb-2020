@@ -93,7 +93,7 @@ public class FiltroCSRF implements Filter {
                 if( contentType.toLowerCase().contains(CONTENT_TYPE_JSON) ||
                         contentType.toLowerCase().contains(COTENT_TYPE_MULTIPART_FORM) ) {
 
-                    // Parsing del body della request per trovare il csrfToken se presente (Fonte: https://stackoverflow.com/a/3831791 e adattato)
+                    // Parsing del body della request per trovare il csrfToken se presente
                     StringBuilder requestBody = new StringBuilder();
 
                     try {
