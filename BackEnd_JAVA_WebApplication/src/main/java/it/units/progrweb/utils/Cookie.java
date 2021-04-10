@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 public class Cookie extends NewCookie {
 
     // Parametri comuni e tipici per tutti i cookie creati da questo server
-    // fONTE: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+    // Fonte: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
 
     /**
      * Attributo <i>Path</i> usato di default per il cookie, quando non specificato. E' il
