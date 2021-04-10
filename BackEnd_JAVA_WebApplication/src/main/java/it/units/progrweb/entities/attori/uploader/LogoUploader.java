@@ -76,23 +76,21 @@ class LogoUploader implements Serializable {
     public String getMediaTypeLogo() {
 
         // Mappa di conversione Estensione -> MediaType
-        Map<String,String> mappa_estensioneFile_mediaType = new HashMap<String, String>() {{
-            // Inizializzazione mappa, Fonte: https://stackoverflow.com/a/6802502
+        Map<String,String> mappa_estensioneFile_mediaType = new HashMap<>();
 
-            // Tabella di conversione, Fonte: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types#image_types
-            put("apng", "image/apng");
-            put("avif", "image/avif");
-            put("gif",  "image/gif");
-            put("jpg",  "image/jpeg");
-            put("jpeg", "image/jpeg");
-            put("jfif", "image/jpeg");
-            put("pjpeg","image/jpeg");
-            put("pjp",  "image/jpeg");
-            put("png",  "image/png");
-            put("svg",  "image/svg+xml");
-            put("webp", "image/webp");
-            put("ico", "image/x-icon");
-        }};
+        // Mappa di conversione, Fonte: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types#image_types
+        mappa_estensioneFile_mediaType.put("apng", "image/apng");
+        mappa_estensioneFile_mediaType.put("avif", "image/avif");
+        mappa_estensioneFile_mediaType.put("gif",  "image/gif");
+        mappa_estensioneFile_mediaType.put("jpg",  "image/jpeg");
+        mappa_estensioneFile_mediaType.put("jpeg", "image/jpeg");
+        mappa_estensioneFile_mediaType.put("jfif", "image/jpeg");
+        mappa_estensioneFile_mediaType.put("pjpeg","image/jpeg");
+        mappa_estensioneFile_mediaType.put("pjp",  "image/jpeg");
+        mappa_estensioneFile_mediaType.put("png",  "image/png");
+        mappa_estensioneFile_mediaType.put("svg",  "image/svg+xml");
+        mappa_estensioneFile_mediaType.put("webp", "image/webp");
+        mappa_estensioneFile_mediaType.put("ico", "image/x-icon");
 
         String estensione = estensioneFileContenenteLogo.toLowerCase();
         String mediaType = mappa_estensioneFile_mediaType.get(estensione);
