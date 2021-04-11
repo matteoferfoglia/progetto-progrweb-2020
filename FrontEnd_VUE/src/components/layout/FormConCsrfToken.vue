@@ -29,8 +29,7 @@ export default {
     /** Valore CSRF token, se modificato dal componente padre.*/
     'csrfToken_prop',
 
-    /** Chiave utilizzata per "forzare" l'aggiornamento del componente,
-     * che si aggiorna quando cambia la chiave.
+    /** Chiave utilizzata per "forzare" l'aggiornamento del componente.
      * (<a href="https://stackoverflow.com/a/47466574">Fonte</a>).*/
     'valoreQualsiasiPerAggiornareIComponenteSeModificato'
   ],

@@ -35,7 +35,6 @@
     </fieldset>
   </form>
   <dl v-for="(valoreProp, nomeProp) in resoconto" :key="nomeProp">
-    <!-- Fonte: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl#wrapping_name-value_groups_in_htmlelementdiv_elements -->
     <dt>{{camelcaseToHumanReadable( nomeProp )}}</dt>
     <dd>{{ valoreProp }}</dd>
   </dl>
@@ -79,8 +78,7 @@ export default {
   },
 
   /** Imposta di defualt il periodo temporale dal primo giorno
-   * del mese precedente all'ultimo giorno del mese precedente
-   * (<a href="">Fonte</a>).*/
+   * del mese precedente all'ultimo giorno del mese precedente.*/
   created() {
 
     const adesso = new Date();

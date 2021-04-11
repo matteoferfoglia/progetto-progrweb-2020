@@ -14,7 +14,7 @@
 <script>
 
 export default {
-  inheritAttrs: false,  // Fonte (warning when using dynamic components and custom-events): https://stackoverflow.com/a/65555712
+  inheritAttrs: false,
   name: 'PaginaAutenticazione',
   emits: [
 

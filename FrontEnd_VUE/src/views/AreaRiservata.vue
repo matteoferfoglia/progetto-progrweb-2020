@@ -22,7 +22,7 @@ import {getIdentificativoAttoreAttualmenteAutenticato, isUploaderAttualmenteAute
 import {creaUrlLogo} from "../utils/richiesteSuAttori";
 
 export default {
-  inheritAttrs: false,  // Fonte (warning when using dynamic components and custom-events): https://stackoverflow.com/a/65555712
+  inheritAttrs: false,  // Fonte (Disabling Attribute Inheritance): https://v3.vuejs.org/guide/component-attrs.html#disabling-attribute-inheritance
   emits: [
 
     /** Evento emesso quando viene modificato il nominativo

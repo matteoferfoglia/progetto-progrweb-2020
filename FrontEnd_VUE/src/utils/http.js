@@ -62,7 +62,10 @@ const tokenAutenticazione = ( () => {
 
 
 /** Oggetto di configurazione per le richieste HTTP (ad es. contenente
- * degli header particolari, come "Authorization"), realizzato con closure.*/
+ * degli header particolari, come "Authorization"), realizzato con closure.
+ * Fonte: <a href="https://stackoverflow.com/a/45581882">
+ *   How to set header and options in axios?
+ * </a>.*/
 const configRichiesteHttp = ( () => {
 
     let oggettoConfig = {headers : {}}; // è l'oggetto di configurazione vero e proprio
@@ -79,9 +82,6 @@ const configRichiesteHttp = ( () => {
 
 /** Imposta header "Authorization" per le successive richieste,
  * con il valore del token passato come parametro.
- * Fonte: <a href="https://stackoverflow.com/a/45581882">
- *   How to set header and options in axios?
- * </a>.
  * @param token Token da inserire nell'header "Authorization" delle
  *              successive richieste HTTP
  */

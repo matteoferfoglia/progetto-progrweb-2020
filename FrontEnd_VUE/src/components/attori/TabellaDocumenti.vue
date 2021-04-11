@@ -412,10 +412,10 @@ export default {
         this.listaHashtagDaMostrare = new Set( [...this.listaHashtagDaMostrare].filter( hashtagDaMostrare => hashtagDaMostrare!==hashtag) );
       }
 
-      const listaIdDocumentiDaMostrare = new Set(                                   // utilizzo Set per evitare chiavi di documenti duplicate
+      const listaIdDocumentiDaMostrare = new Set(                                 // utilizzo Set per evitare valori duplicati
           Array.from(this.mappa_hashtag_idDocumenti.entries())
-               .filter( entry => this.listaHashtagDaMostrare.has(entry[0]) ) // entry[0] è la chiave (l'hashtag)
-               .flatMap( entry => entry[1] )                               // entry[1] è l'array con gli id dei file che contengono l'hashtag specificato in entry[0]
+               .filter( entry => this.listaHashtagDaMostrare.has(entry[0]) )      // entry[0] è l'hashtag
+               .flatMap( entry => entry[1] )                               // entry[1] è l'array con gli id dei file che contengono l'hashtag
           // Fonte (flatMap): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
       );
 
@@ -467,9 +467,9 @@ export default {
       richiestaGet( urlDownloadDocumento, {}, true)
         .then( risposta => {
 
-          // "noinspection JSCheckFunctionSignatures" soppresso perché primo parametro del costruttore deve essere
-          // "An Array of ArrayBuffer, ArrayBufferView, Blob, USVString objects" (Fonte: https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob#parameters)
-          // ed effettivamente lo è
+          // warning "noinspection JSCheckFunctionSignatures" soppresso perché (da documentazione) il primo parametro del costruttore deve essere
+          //   "An Array of ArrayBuffer, ArrayBufferView, Blob, USVString objects" (Fonte: https://developer.mozilla.org/en-US/docs/Web/API/Blob/Blob#parameters)
+          //   ed effettivamente lo è
           // noinspection JSCheckFunctionSignatures
           const blob = new Blob( [risposta], {type: "octet/stream"} );
 
