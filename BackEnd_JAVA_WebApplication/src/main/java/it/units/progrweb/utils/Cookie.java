@@ -1,5 +1,7 @@
 package it.units.progrweb.utils;
 
+import com.google.appengine.api.utils.SystemProperty;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.NewCookie;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ public class Cookie extends NewCookie {
     public final static int MAX_AGE_DEFAULT_IN_SECONDI = 3600;
 
     /**  Flag <i>Secure</i> usato di default per il cookie. */
-    public final static boolean SECURE_DEFAULT = false;
+    public final static boolean SECURE_DEFAULT = SystemProperty.environment.value() == SystemProperty.Environment.Value.Production; // server di sviluppo non supporta HTTPS
 
     /** Flag <i>HttpOnly</i> usato di default per il cookie.*/
     public final static boolean HTTP_ONLY_DEFAULT = true;
