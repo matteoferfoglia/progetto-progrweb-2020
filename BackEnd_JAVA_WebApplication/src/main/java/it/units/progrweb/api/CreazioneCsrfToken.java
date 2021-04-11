@@ -1,7 +1,7 @@
 package it.units.progrweb.api;
 
 import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.csrf.CsrfCookies;
+import it.units.progrweb.utils.csrf.CsrfCookie;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +32,7 @@ import java.security.NoSuchAlgorithmException;
 public class CreazioneCsrfToken {
 
     /** Numero di caratteri che formeranno il CSRF token. */
-    public static final short CSRF_TOKEN_LENGTH = 64;
-
-    /** Numero di caratteri che formeranno il token identificativo per il client. */
-    public static final short CLIENT_ID_TOKEN_LENGTH = 64;
+    public static final short LUNGHEZZA_TOKEN_CSRF = 64;
 
 
     /**
@@ -43,27 +40,26 @@ public class CreazioneCsrfToken {
      * server) contenente nel payload il token CSRF
      * (<a href="https://stackoverflow.com/a/28004533">Fonte</a>).
      * Un ulteriore cookie è usato per l'identità del client.
-     * Vedere {@link CsrfToken} e {@link CsrfCookies} per i dettagli.
+     * Vedere {@link CsrfToken} e {@link CsrfCookie} per i dettagli.
      * <a href="https://stackoverflow.com/a/14255549">Fonte
      * (Recupero indirizzo IP del client in JAX-RS)</a>.
      */
     @GET
     @Path("/generaCSRFToken")
     @Produces(MediaType.TEXT_PLAIN)
-    public static Response creaCookiesConCsrfTokenEdIdentificativoClient(@Context HttpServletRequest httpServletRequest){
+    public static Response creaCookiesConCsrfTokenInJWT(@Context HttpServletRequest httpServletRequest){
 
         try {
 
             String IPClient = httpServletRequest.getRemoteAddr();
-            CsrfToken csrfToken = new CsrfToken(CSRF_TOKEN_LENGTH, CLIENT_ID_TOKEN_LENGTH, IPClient);
+            CsrfToken csrfToken = new CsrfToken(LUNGHEZZA_TOKEN_CSRF, IPClient);
 
-            // Creazione cookies
-            CsrfCookies csrfCookies = csrfToken.creaCookiesPerCsrf();
+            // Creazione cookie contenente il token JWT contenente token CSRF nel payload
+            CsrfCookie csrfCookie = csrfToken.creaCookiePerCsrf();
 
             // Invia risposta positiva ed aggiungi il cookie creato sopra
             return Response .ok()
-                            .cookie(csrfCookies.getCookieCSRF())
-                            .cookie(csrfCookies.getCookieVerificaIdentitaClient())
+                            .cookie(csrfCookie.getCookieCSRF())
                             .entity(csrfToken.getValoreCsrfToken())      // CSRF token anche nel body della response
                             .build();
 

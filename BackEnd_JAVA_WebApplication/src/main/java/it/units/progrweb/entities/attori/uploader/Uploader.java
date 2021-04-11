@@ -110,6 +110,7 @@ public abstract class Uploader extends Attore {
     abstract public byte[] getImmagineLogo();
 
     /** Restituisce l'estensione dell'immagine del logo. */
+    @SuppressWarnings("unused") // implementato nelle classi derivate
     abstract public String getEstensioneImmagineLogo();
 
     /** Restituisce il Mediatype dell'immagine del logo. */

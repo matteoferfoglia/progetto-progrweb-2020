@@ -86,11 +86,11 @@ public class Cookie extends NewCookie {
      * proprietà), impostando gli attributi <i>Max-Age</i> e <i>HttpOnly</i>
      * in base ai parametri ricevuti.
      */
-    public Cookie(Cookie cookieCSRF, int maxAge, boolean httpOnly){
-        this(cookieCSRF.getName(), cookieCSRF.getValue(),
-                cookieCSRF.getPath(), cookieCSRF.getDomain(),
-                cookieCSRF.getComment(), maxAge,
-                cookieCSRF.isSecure(), httpOnly);
+    public Cookie(Cookie cookie, int maxAge, boolean httpOnly){
+        this(cookie.getName(), cookie.getValue(),
+                cookie.getPath(), cookie.getDomain(),
+                cookie.getComment(), maxAge,
+                cookie.isSecure(), httpOnly);
     }
 
     /** Crea un'istanza di questa classe copiando le informazioni dalla super classe.*/

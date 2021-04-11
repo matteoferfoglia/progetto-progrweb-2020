@@ -3,7 +3,6 @@ package it.units.progrweb.utils;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.persistence.NotFoundException;
-import it.units.progrweb.utils.csrf.CsrfCookies;
 import it.units.progrweb.utils.jwt.JwtToken;
 import it.units.progrweb.utils.jwt.componenti.JwtPayload;
 import it.units.progrweb.utils.jwt.componenti.claims.*;
@@ -68,11 +67,6 @@ public class Autenticazione {
 
     }
 
-    /** Restituisce true se l'attore è autenticato, false altrimenti.*/
-    public static boolean isAttoreAutenticato(Attore attore) {
-        return attore != null;
-    }
-
     /** Date le credenziali, restituisce una {@link javax.ws.rs.core.Response}
      * per un attore che si sta autenticando.
      * Procedura di autenticazione di un client: si verifica la validità delle
@@ -113,7 +107,8 @@ public class Autenticazione {
      * la risposta di autenticazione a partire da un {@link Attore} anziché
      * dalle sue credenziali.*/
     public static Response creaResponseAutenticazione(Attore attore) {
-        if( Autenticazione.isAttoreAutenticato(attore) ) {
+        boolean isAttoreAutenticato = attore!=null;
+        if( isAttoreAutenticato ) {
             try {
                 return creaResponseAutenticazionePerAttore(attore);
             } catch (NotFoundException ignored) { /*viene comunque restituita la risposta unauthorized*/}
@@ -156,16 +151,18 @@ public class Autenticazione {
      * della risposta creata da questo metodo.*/
     public static Response creaResponseLogout() {
 
-        Cookie cookieIdClientSovrascritto = CsrfCookies.creaCookieContenenteIdentificativoClient(NOME_COOKIE_CLIENT_TOKEN, "deleted",0);
-
         return Response.ok()
-                       .cookie(cookieIdClientSovrascritto)
+                       .cookie(new Cookie( NOME_COOKIE_CLIENT_TOKEN,
+                                           "deleted", 0,
+                                           "Rimozione cookie di autenticazione."))
                        .build();
     }
 
     /** Metodo da invocare se un attore ha fornito le credenziali corrette.
      * Restituisce una response contenente i cookie ed il token di autenticazione
      * che il client dovrà esibire a questo server per autenticarsi.
+     * Questo metodo può essere usato anche per aggiornare il token di
+     * autenticazione del client.
      *
      * @param attore che ha fornito le credenziali corrette.
      * @return Response con token e cookie di autenticazione per l'attore.
@@ -176,9 +173,10 @@ public class Autenticazione {
 
         try {
             String valoreTokenAutenticazione = generaTokenAlfanumerico(LUNGHEZZA_TOKEN_AUTENTICAZIONE);
-            Cookie cookieIdClientPerAutenticazione = CsrfCookies.creaCookieContenenteIdentificativoClient(NOME_COOKIE_CLIENT_TOKEN,
-                                                                                                          valoreTokenAutenticazione,
-                                                                                                          TIMEOUT_AUTENTICAZIONE_IN_SECONDI);
+            Cookie cookieIdClientPerAutenticazione = new Cookie( NOME_COOKIE_CLIENT_TOKEN,
+                                                                 valoreTokenAutenticazione,
+                                                                 TIMEOUT_AUTENTICAZIONE_IN_SECONDI,
+                                                                 "Cookie per l'autenticazione del client." );
             String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore, valoreTokenAutenticazione);
 
             return Response.ok()

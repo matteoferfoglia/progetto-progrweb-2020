@@ -1,16 +1,12 @@
 package it.units.progrweb.persistence;
 
-import com.google.appengine.api.utils.SystemProperty;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.cache.AsyncCacheFilter;
 import com.googlecode.objectify.cmd.Query;
-import it.units.progrweb.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Classe di utilità per interagire con il database.
