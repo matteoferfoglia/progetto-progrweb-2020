@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "progettoprogrweb2020",
+  "private_key_id": "0638876e436c2aac6a6369e29d91bfbc3d825fc6",
+  "private_key": "La chiave privata può essere generata dalle impostazioni del progetto Firebase, alla voce <Account di servizio>. Per revocare la chiave, da < Google Cloud->IAM e amministratore->Account di servizio > ed eliminare l'account con l'email riportata in <client_email> in questo file.",
+  "client_email": "firebase-adminsdk-uamu2@progettoprogrweb2020.iam.gserviceaccount.com",
+  "client_id": "113646539830844529500",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-uamu2%40progettoprogrweb2020.iam.gserviceaccount.com"
+}

@@ -5,18 +5,20 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.attori.AttoreProxy;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.DatabaseHelper;
 import it.units.progrweb.persistence.NotFoundException;
+import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 
@@ -34,23 +36,20 @@ import static it.units.progrweb.entities.AuthenticationTokenInvalido.INTERVALLO_
 public class StarterDatabase implements ServletContextListener {
 
     /** Array di attori da creare e salvare nel DB in modalità di sviluppo.
+     * In modalità di sviluppo verranno salvati anche quelli marcati per
+     * la modalità di produzione.
      * Questi attori saranno giò presenti al primo accesso al sistema. */
     private final static AttoreConCredenziali[] attoriDaCreareInDevMod = {
             new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Consumer di Prova", Attore.TipoAttore.Consumer),
             new AttoreConCredenziali("AB01", "5678","uploaderprova@example.com","Uploader di Prova", Attore.TipoAttore.Uploader),
             new AttoreConCredenziali("AdminTest", "9012","adminprova@example.com","Amministratore di Prova", Attore.TipoAttore.Administrator),
-            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw", "admin@example.com","Primo Admin", Attore.TipoAttore.Administrator)
     };
 
-    /** Come {@link #attoriDaCreareInDevMod}, ma per la modalità di produzione. */
-    private final static AttoreConCredenziali[] attoriDaCreareInProdMod = {
-            new AttoreConCredenziali("admin", " 4famefo9p$#eMkw", "admin@example.com","Primo Admin", Attore.TipoAttore.Administrator)
-    };
-
+    /** Percorso del file contenente le credenziali del primo utente amministratore
+     * da inserire nel database, in Production mode (come da requisiti). */
+    private final static String fileCredenzialiPrimoAdmin = "WEB-INF/credenziali/credenzialiPrimoAmministratoreAllAvvioDellaPiattaforma.json";
 
     // -------------- FINE PARAMETRI CONFIGURABILI --------------
-
-
 
 
     /** Array dei nomi delle classi corrispondenti alle entità da
@@ -98,14 +97,26 @@ public class StarterDatabase implements ServletContextListener {
         if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
             // Local development server
             caricaEntitaInDB( attoriDaCreareInDevMod );
-        } else {
-            // Production
-            // which is: SystemProperty.Environment.Value.Production
-
-            // Da requisiti: All’avvio della piattaforma per la prima volta, vi sarà un solo utente amministratore.
-            caricaEntitaInDB( attoriDaCreareInProdMod );
-
         }
+
+
+
+        // Sia Production sia Development
+
+        // Da requisiti: All’avvio della piattaforma per la prima volta, vi sarà un solo utente amministratore.
+        // Proprietà attore caricate da file (password non esposta su repository pubblica)
+        try {
+
+            AttoreConCredenziali[] attoriDaCreareInProdMod = new AttoreConCredenziali[]{
+                    new AttoreConCredenziali( fileCredenzialiPrimoAdmin )
+            };
+
+            caricaEntitaInDB(attoriDaCreareInProdMod);
+
+        } catch (IOException e) {
+            Logger.scriviEccezioneNelLog(StarterDatabase.class, "Errore nella lettura della credenziali.", e);
+        }
+
     }
 
     /** Metodo per il salvataggio nel database delle entità contenute
@@ -124,37 +135,76 @@ public class StarterDatabase implements ServletContextListener {
 class AttoreConCredenziali {
 
     /** L'{@link Attore} associato a quest'istanza. */
-    private final Attore attore;
+    private Attore attore;
 
     /** L'istanza di {@link AuthenticationDatabaseEntry} rappresentante
      * le credenziali di {@link #attore}. */
-    private final AuthenticationDatabaseEntry authenticationDatabaseEntry;
+    private AuthenticationDatabaseEntry authenticationDatabaseEntry;
 
     public AttoreConCredenziali(String username, String password,
                                 String email, String nominativo, Attore.TipoAttore tipoAttore ) {
 
-        switch( tipoAttore ) {
-            case Consumer:
-                this.attore = Consumer.creaAttore(username, nominativo, email);
-                break;
-            case Uploader:
-                this.attore = Uploader.creaAttore(username, nominativo, email);
-                break;
-            case Administrator:
-                this.attore = Administrator.creaAttore(username, nominativo, email);
-                break;
-            default:
-                throw new RuntimeException("Tipo attore non valido.");
-        }
+        creaAttore(username, password, email, nominativo, tipoAttore);
+
+    }
+
+    /** Da usare nel costruttore.*/
+    private void creaAttore( String username, String password,
+                             String email, String nominativo, Attore.TipoAttore tipoAttore ) {
 
         try {
+
+            // Costruzione dell'attore
+            final Attore attore;
+            switch(tipoAttore) {
+                case Consumer:
+                    attore = Consumer.creaAttore(username, nominativo, email);
+                    break;
+                case Uploader:
+                    attore = Uploader.creaAttore(username, nominativo, email);
+                    break;
+                case Administrator:
+                    attore = Administrator.creaAttore(username, nominativo, email);
+                    break;
+                default:
+                    throw new RuntimeException("Tipo attore non valido.");
+            }
+            this.attore = attore;
+
+            // Costruzione del Database entry
             this.authenticationDatabaseEntry =
                     new AuthenticationDatabaseEntry(username, password, true);
-        } catch (InvalidKeyException|NoSuchAlgorithmException e) {
+
+        } catch (Exception e) {
+            Logger.scriviEccezioneNelLog(StarterDatabase.class, "Errore nella creazione di un attore.", e);
             throw new RuntimeException(e);  // eventuale eccezione compare a runtime (unchecked exception)
         }
 
     }
+
+    /** Dato il percorso del file JSON con le credenziali e le proprietà
+     * di un {@link Attore} da creare, crea un'istanza di questa classe. */
+    public AttoreConCredenziali(String percorsoFileJson)
+            throws IOException {
+
+        String contenutoJson = UtilitaGenerale.leggiContenutoFile(percorsoFileJson);
+
+        // Stesso file contiene sia proprietà dell'attore sia le credenziali
+        Attore attoreDaInput = JsonHelper.convertiOggettoDaJSON(contenutoJson, AttoreProxy.class);
+
+        CredenzialiUsernamePassword credenzialiUsernamePassword =
+                JsonHelper.convertiOggettoDaJSON(contenutoJson, CredenzialiUsernamePassword.class);
+
+        creaAttore(
+                credenzialiUsernamePassword.getUsername(),
+                credenzialiUsernamePassword.getPassword(),
+                attoreDaInput.getEmail(),
+                attoreDaInput.getNominativo(),
+                Attore.TipoAttore.valueOf(attoreDaInput.getTipoAttore())
+        );
+
+    }
+
 
     public Attore getAttore() {
         return attore;
@@ -214,4 +264,41 @@ class AttoreConCredenziali {
 
     }
 
+}
+
+/** Classe di comodo per deserializzazione JSON (in Database credenziali salvate Hashed&Salted).*/
+class CredenzialiUsernamePassword {
+
+    String username;
+    String password;
+
+    CredenzialiUsernamePassword() throws NoSuchFieldException {
+
+        // Verifica nomi attributi corretti
+        String nomeAttr_username = "username";
+        String nomeAttr_password = "password";
+
+        if( ! ( UtilitaGenerale.esisteAttributoInClasse(nomeAttr_username, this.getClass()) &&
+                UtilitaGenerale.esisteAttributoInClasse(nomeAttr_password, this.getClass())    ) ) {
+
+            throw new NoSuchFieldException("Verificare i nomi degli attributi (\""+nomeAttr_username+"\" e \""+ nomeAttr_password +"\")");
+
+        }
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

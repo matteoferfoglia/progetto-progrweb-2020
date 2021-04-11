@@ -19,12 +19,15 @@ import java.io.FileInputStream;
 @WebListener
 public class FirebaseBootstrapper implements ServletContextListener {
 
+    /** Percorso del file contenente le credenziali Firebase. */
+    private final static String percorsoFileCredenzialieFirebase = "WEB-INF/credenziali/credenzialiFirebase.json";
+
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
             FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(new FileInputStream("WEB-INF/credenzialiFirebase.json")))
+                    .setCredentials(GoogleCredentials.fromStream(new FileInputStream(percorsoFileCredenzialieFirebase)))
                     .build();
             FirebaseApp.initializeApp(options);
             Logger.scriviInfoNelLog(FirebaseBootstrapper.class,"Firebase operativo");

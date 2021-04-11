@@ -2,3 +2,4 @@
 target/
 *.iml
 lib/
+src/main/webapp/WEB-INF/credenziali/
