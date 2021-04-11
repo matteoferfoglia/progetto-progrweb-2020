@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -212,5 +213,61 @@ public class UtilitaGenerale {
     public static boolean isStringaNonNullaNonVuota(String stringa) {
         if( stringa == null ) return false;
         return !stringa.trim().isEmpty();
+    }
+
+    /** Dato il percorso di un file, restituisce il suo contenuto in una stringa.
+     * @throws IOException In caso di errore I/O.*/
+    public static String leggiContenutoFile(String percorsoFile)
+            throws IOException {
+
+        InputStream fileAttore = new FileInputStream(percorsoFile);
+        StringBuilder tmp = new StringBuilder();
+
+        leggiDaInputStream(fileAttore, tmp);
+
+        fileAttore.close();
+        return tmp.toString();
+
+    }
+
+    /** Legge dall'istanza di {@link InputStream} data e scrive quanto letto nell'istanza
+     * di {@link StringBuilder} data, utilizzato {@link EnvironmentVariables#STANDARD_CHARSET}
+     * per la costruzione delle stringhe.
+     * @throws IOException In caso di problemi I/O.
+     * @throws NullPointerException Se almeno uno dei parametri passati è nullo.*/
+    public static void leggiDaInputStream(InputStream sorgente, StringBuilder destinazione)
+            throws IOException {
+
+        if( sorgente==null || destinazione==null ) {
+            throw new NullPointerException("I parametri non possono essere nulli.");
+        } else {
+
+            // readLine(), Fonte: https://docs.oracle.com/javase/1.5.0/docs/api/java/io/InputStream.html#read(byte[],%20int,%20int)
+
+            final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
+            byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
+            int numeroByteLetti;
+
+            while( (numeroByteLetti = sorgente.read( arrayByteLettura,           // array di lettura "buffer"
+                    0,                          // in lettura, occupiamo l'array (primo parametro) dal primo elemento
+                    DIMENSIONE_ARRAY_LETTURA) ) // massimo spazio disponibile nell'array
+                    != -1) {
+
+                String tmp_buffer;
+                if( numeroByteLetti>0 ) {
+                    // Array dei byte effettivamente letti
+                    byte[] arrayByteLetti = new byte[numeroByteLetti];
+                    System.arraycopy(arrayByteLettura, 0, arrayByteLetti, 0, numeroByteLetti);
+
+                    tmp_buffer = new String(arrayByteLetti, EnvironmentVariables.STANDARD_CHARSET);
+                }
+                else {
+                    tmp_buffer = "";
+                }
+                destinazione.append(tmp_buffer);
+            }
+
+        }
+
     }
 }

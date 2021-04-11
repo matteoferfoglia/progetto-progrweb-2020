@@ -1,6 +1,5 @@
 package it.units.progrweb.filters;
 
-import it.units.progrweb.EnvironmentVariables;
 import it.units.progrweb.utils.Cookie;
 import it.units.progrweb.utils.JsonHelper;
 import it.units.progrweb.utils.Logger;
@@ -193,31 +192,9 @@ public class FiltroCSRF implements Filter {
      *                          oppure {@link ServletInputStream#readLine(byte[], int, int)}.
      */
     private void getRequestBody(HttpServletRequest httpServletRequest, StringBuilder requestBody) throws IOException {
-        ServletInputStream reader = httpServletRequest.getInputStream();
+        ServletInputStream inputStream = httpServletRequest.getInputStream();
 
-        // readLine(), Fonte: https://docs.oracle.com/javaee/6/api/javax/servlet/ServletInputStream.html#readLine(byte[],%20int,%20int)
-        final int DIMENSIONE_ARRAY_LETTURA = 64;                        // in bytes
-        byte[] arrayByteLettura = new byte[DIMENSIONE_ARRAY_LETTURA];   // array of bytes into which data is read
-        int numeroByteLetti;
-        while( (numeroByteLetti = reader.readLine(arrayByteLettura,            // array di lettura "buffer"
-                                                  0,                       // in lettura, occupiamo l'array (primo parametro) dal primo elemento
-                                                  DIMENSIONE_ARRAY_LETTURA))   // massimo spazio disponibile nell'array
-                != -1) {
-
-            // Lettura di una linea alla volta
-            String line;
-            if( numeroByteLetti>0 ) {
-                // Array dei byte effettivamente letti
-                byte[] arrayByteLetti = new byte[numeroByteLetti];
-                System.arraycopy(arrayByteLettura, 0, arrayByteLetti, 0, numeroByteLetti);
-
-                line = new String(arrayByteLetti, EnvironmentVariables.STANDARD_CHARSET);
-            }
-            else {
-                line = "";
-            }
-            requestBody.append(line);
-        }
+        UtilitaGenerale.leggiDaInputStream(inputStream, requestBody);
     }
 
     public void init(FilterConfig config) /*throws ServletException*/ {}
