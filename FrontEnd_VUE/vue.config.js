@@ -9,11 +9,24 @@
 
 module.exports = {
     productionSourceMap: false,  // evita source maps in production
-    // chainWebpack: config => config.optimization.minimize(true),    // flag: true se si vuole minificare i file in production mode (se non specificato, default: true)
     transpileDependencies: [     // transpiling delle dipendenze se hanno delle funzionalità non supportate nei browser in cui l'app dovrebbe funzionare
         "axios",
         "core-js",
         "vue",
         "vue-router"
-    ]
+    ],
+    // chainWebpack: config => {
+    //     config.optimization.minimize(true), // flag: true se si vuole minificare i file in production mode (se non specificato, default: true)
+    //     config.performance                  // Modificare le dimensioni dei file per cui mostrare warning durante la compilazione, Fonte: https://forum.vuejs.org/t/asset-size-limit-warning/40429/4
+    //         .maxEntrypointSize(500000)
+    //         .maxAssetSize(500000)
+    // },
+    configureWebpack: {
+        optimization: {             // Specifica come suddividere (in base alle dimensioni) i file JS prodotti, Fonte: https://stackoverflow.com/a/52634444
+            splitChunks: {
+                minSize: 10000,
+                maxSize: 250000,
+            }
+        }
+    }
 }
