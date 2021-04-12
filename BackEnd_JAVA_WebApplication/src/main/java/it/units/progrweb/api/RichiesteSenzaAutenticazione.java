@@ -160,7 +160,6 @@ public class RichiesteSenzaAutenticazione {
     /** Dato come @PathParam l'identificativo di un Uploader, restituisce
      * il suo logo.*/
     @Path("/logoUploader/{identificativoUploader}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @GET
     public Response getLogoUploader(@PathParam("identificativoUploader") Long identificativoUploader) {
 
@@ -174,7 +173,7 @@ public class RichiesteSenzaAutenticazione {
                                                 // se mediatype non specificato
 
                 return Response.ok(logo, mediatypeLogo)
-                                   .build();
+                               .build();
             }
             else {
                 try {
