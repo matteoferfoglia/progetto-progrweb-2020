@@ -37,6 +37,10 @@
     <url-pattern>/api/uploader/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>FiltroUploader</filter-name>
+    <url-pattern>*/uploadDocumento</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>FiltroAdministrator</filter-name>
     <url-pattern>/api/administrator/*</url-pattern>
   </filter-mapping>

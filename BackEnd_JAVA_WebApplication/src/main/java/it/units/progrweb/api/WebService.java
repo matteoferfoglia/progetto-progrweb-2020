@@ -58,44 +58,36 @@ public class WebService {
                                @FormDataParam("contenutoFile")                      InputStream contenuto,
                                @FormDataParam("contenutoFile")                      FormDataContentDisposition dettagliFile ) {
 
-        String tokenAutenticazione = Autenticazione.getTokenAutenticazioneBearer(httpServletRequest);
+        // Autorizzazione verificata da filtro Uploader
+        Attore mittente = Autenticazione.getAttoreDaDatabase(httpServletRequest);
 
-        if (JwtToken.isTokenValido(tokenAutenticazione)) {
+        try {
 
-            Attore mittente = Autenticazione.getAttoreDaDatabase(httpServletRequest);
-            if (!(mittente instanceof Uploader)) // check autenticazione uploader mittente
-                return Autenticazione.creaResponseUnauthorized();
+            // Non crea nulla se il consumer esiste già
+            CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore
+                    = associaConsumerAdUploader(
+                            httpServletRequest,
+                            new CreazioneAttore.CampiFormAggiuntaAttore(
+                                codiceFiscaleConsumerDestinatario,
+                                null,
+                                nomeCognomeConsumerDestinatario,
+                                emailConsumerDestinatario,
+                                Attore.TipoAttore.Consumer,
+                                null
+                            ),
+                            mittente.getIdentificativoAttore()
+                    );
+            return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
+                    mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());
 
-            try {
-
-                // Non crea nulla se il consumer esiste già
-                CreazioneAttore.CampiFormAggiuntaAttore campiFormAggiuntaAttore
-                        = associaConsumerAdUploader(
-                                httpServletRequest,
-                                new CreazioneAttore.CampiFormAggiuntaAttore(
-                                    codiceFiscaleConsumerDestinatario,
-                                    null,
-                                    nomeCognomeConsumerDestinatario,
-                                    emailConsumerDestinatario,
-                                    Attore.TipoAttore.Consumer,
-                                    null
-                                ),
-                                mittente.getIdentificativoAttore()
-                        );
-                return GestioneDocumenti.uploadFile(httpServletRequest, contenuto, dettagliFile, nomeFile, listaHashtag,
-                        mittente.getIdentificativoAttore(), campiFormAggiuntaAttore.getIdentificativoAttore());
-
-            } catch (InputMismatchException e) {
-                // Consumer trovato nel sistema, ma incoerenza nei campi
-                return Response.status( Response.Status.BAD_REQUEST )
-                        .entity( e.getMessage() )
-                        .build();
-            } catch (MessagingException | NoSuchAlgorithmException |
-                    InvalidKeyException | UnsupportedEncodingException e) {
-                return Response.serverError().entity( e.getMessage() ).build();
-            }
-        } else {
-            return Autenticazione.creaResponseUnauthorized();
+        } catch (InputMismatchException e) {
+            // Consumer trovato nel sistema, ma incoerenza nei campi
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity( e.getMessage() )
+                    .build();
+        } catch (MessagingException | NoSuchAlgorithmException |
+                InvalidKeyException | UnsupportedEncodingException e) {
+            return Response.serverError().entity( e.getMessage() ).build();
         }
 
     }
