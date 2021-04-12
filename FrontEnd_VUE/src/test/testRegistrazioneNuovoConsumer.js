@@ -35,11 +35,11 @@ jest.mock('axios', () => ({
 
 // noinspection SpellCheckingInspection
 const tabellaParametriDeiTest = [
-    ["SPNFRZ63D22H5L1S","Mario Rossi","prova@example.com","pssw","pssw",true],
-    ["SPNFRZ63D22H5L1S","Mario Rossi","prova@example.com","pssw","",false],
-    ["SPNFRZ63D22H5L1S","Mario Rossi","a@a","pssw","pssw",true],
+    ["PPPPLT80A01A952G","Mario Rossi","prova@example.com","pssw","pssw",true],
+    ["PPPPLT80A01A952G","Mario Rossi","prova@example.com","pssw","",false],
+    ["PPPPLT80A01A952G","Mario Rossi","a@a","pssw","pssw",true],
     ["aa","Mario Rossi","prova@example.com","pssw","pssw",false],
-    ["SPNFRZ63D22H5L1S","","prova@example.com","pssw","pssw",false]
+    ["PPPPLT80A01A952G","","prova@example.com","pssw","pssw",false]
 ];
 
 
@@ -89,7 +89,7 @@ describe.each(tabellaParametriDeiTest)('RegistrazioneNuovoConsumer.vue',
 
             const datiAttesi = {
                 [process.env.VUE_APP_FORM_CODFISC_INPUT_FIELD_NAME]     : codFisc,
-                [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME] : nominativo,
+                [process.env.VUE_APP_FORM_NOMINATIVO_INPUT_FIELD_NAME]  : nominativo,
                 [process.env.VUE_APP_FORM_EMAIL_INPUT_FIELD_NAME]       : email,
                 [process.env.VUE_APP_FORM_PASSWORD_INPUT_FIELD_NAME]    : password
             }
