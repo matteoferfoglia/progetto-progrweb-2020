@@ -32,9 +32,9 @@ class RestClient {
      *                      client invierà le richieste.*/
     public RestClient(String webServiceUri) {
         this.restWebServiceUri = webServiceUri;
-        this.client = ClientBuilder.newClient();
-        this.client.register(MultiPartFeature.class)    // Per serializzazione Multipart
-                   .register(JacksonFeature.class);     // Per serializzazione JSON
+        this.client = ClientBuilder.newClient()
+                                   .register(MultiPartFeature.class)   // Per serializzazione Multipart
+                                   .register(JacksonFeature.class);    // Per serializzazione JSON
         this.tokenAutenticazione = "";
     }
 
@@ -109,7 +109,7 @@ class RestClient {
     public boolean login(String credenziali_username, String credenziali_password, String loginUri) {
 
         /* Classe di supporto utilizzata per la serializzazione dei dati da inviare al server. */
-        @SuppressWarnings("unused")  // Alcuni metodi "unused" in realtà sono utilizzati per le operazioni di de/serializzazione
+        @SuppressWarnings("unused")  // Alcuni metodi "unused" in realtà sono utilizzati per le operazioni di de/serializzazione dell'oggetto
         class Login {
             private String username;
             private String password;

@@ -6,12 +6,13 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 /**
- * Classe main per dimostrare il funzionamento del web service: un
- * Uploader può usare il web service esposta dal sistema per caricare
+ * Classe Main per dimostrare il funzionamento del web service: un
+ * Uploader può usare il web service esposto dal sistema per caricare
  * tramite questa applicazione client un documento destinato ad un
- * Consumer. L'Uploader deve specificare qui le proprie credenziali
- * ed i parametri per il file da caricare, come richiesti dal web
- * service.
+ * Consumer. L'Uploader deve specificare come parametri per il metodo
+ * main le proprie credenziali ed i parametri per il file da caricare,
+ * come richiesti dal web service.
+ *
  * @author Matteo Ferfoglia
  */
 public class Main {
@@ -30,20 +31,16 @@ public class Main {
 
     /**
      * Metodo main.
-     * @param args Array con 2 elementi:
+     * @param args Array con i parametri di input. Il metodo attende
+     *             i seguenti parametri separati dal punto e virgola (;):
      *             <ol>
-     *              <li>Nome dell'applicazione</li>
-     *              <li>Parametri per il Web Service. Specificare i seguenti
-     *                   valori separati dal punto e virgola (;):
-     *              <ol>
      *                <li>Username dell'Uploader</li>
      *                <li>Password dell'Uploader</li>
      *                <li>Username del Consumer destinatario</li>
      *                <li>Email del Consumer destinatario</li>
      *                <li>Nominativo del Consumer destinatario</li>
      *                <li>Percorso file da caricare</li>
-     *                <li>lista di hashtag separati da virgola senza spazi</li>
-     *              </ol>
+     *                <li>Lista di hashtag separati dalla virgola (,)</li>
      *             </ol>
      * */
     public static void main(String[] args) {
@@ -56,15 +53,15 @@ public class Main {
                 "Nominativo del Consumer destinatario",
                 "Nome del file da caricare (visibile nella piattaforma)",
                 "Percorso del file da caricare (estensione compresa)",
-                "Lista di hashtag separati da virgola senza spazi"
+                "Lista di hashtag separati dalla virgola"
         };
 
         String[] parametriInseriti =
                 args.length>0 ?
-                    String.join(" ", args).split(";") : //  Lo spazio è un separatore per args, ma per l'applicazione uno spazio può essere usato come valore per un parametro
+                    String.join(" ", args).split(";") : //  Lo spazio è un separatore per args, ma per l'applicazione uno spazio può essere usato come valore per un parametro e si consideta ';' come separatore
                     new String[0];
 
-        if(parametriInseriti.length!=8) {
+        if(parametriInseriti.length!=nomiParametriAttesi.length) {
 
             System.out.println("Sono stati ricevuti " + parametriInseriti.length + " parametri. Inserire: ");
             for (String s : nomiParametriAttesi)
@@ -93,9 +90,9 @@ public class Main {
             // ---- FINE ACQUISIZIONE PARAMETRI ----
 
 
-            System.out.println("\nUpload del file ...\n");
 
-            File file = leggiFileLocale(percorsoFileLocale);
+            // Lettura del file
+            File file = new File(percorsoFileLocale);
 
             // Creazione client REST ed invio del contenuto
             RestClient restClient = new RestClient(PATH_SERVIZIO_UPLOAD_FILE);
@@ -105,6 +102,7 @@ public class Main {
                 if( restClient.login(credenziali_username, credenziali_password, PATH_SERVIZIO_LOGIN_UPLOADER) ) {
 
                     // Upload del file e risposta dal server
+                    System.out.println("\nUpload del file ...\n");
                     Response risposta =
                             restClient.inviaFileAConsumer(
                                     codiceFiscaleConsumer, emailConsumer, nomeCognomeConsumer,
@@ -129,16 +127,6 @@ public class Main {
         }
 
 
-    }
-
-    private static File leggiFileLocale(String percorsoFileLocale) {
-        File file;
-
-        // Lettura del file
-        file = new File(percorsoFileLocale);
-//        stampaFile(file);
-
-        return file;
     }
 
 
