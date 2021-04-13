@@ -455,8 +455,10 @@ export default {
                     this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "") : "";
           }
 
+          return Promise.resolve();
+
         } else {
-          throw new Error(MSG_ERRORE_SE_COMPONENTE_NON_CARICATO);
+          return Promise.reject( MSG_ERRORE_SE_COMPONENTE_NON_CARICATO );
         }
 
       };
