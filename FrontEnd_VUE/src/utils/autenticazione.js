@@ -15,19 +15,25 @@ import router from "../router";
  * Funzione per verificare se un utente è già autenticato.
  * Richiede Vue-Router per funzionare (vedere il parametro).
  * @param $route La property $route (this.$route) del componente che invoca questo metodo.
+ *               Potrebbe contenere il parametro con il token di autenticazione.
  * @return Promise il cui valore (se la Promise è risolta) è
  *          true se l'utente è autenticato, false altrimenti.
  */
-export const verificaAutenticazione = async $route => {
+export const verificaAutenticazione = $route => {
 
     // Prima di chiedere al server se autenticato
     // imposta il token che potrebbe essere arrivato dal parametro
     impostaTokenDiAutenticazioneSeEsiste($route);
 
-    // Richiesta al server se l'utente è attualmente autenticato
-    return await richiestaGet(process.env.VUE_APP_URL_VERIFICA_TOKEN_AUTENTICAZIONE)
+    if( !getTokenAutenticazione() ) {
+        // Richiesta al server se l'utente è attualmente autenticato
+        return richiestaGet(process.env.VUE_APP_URL_VERIFICA_TOKEN_AUTENTICAZIONE)
             .then(  esito  => Promise.resolve(esito) )
             .catch( errore => Promise.reject(errore) );
+    } else {
+        return Promise.resolve(true);   // token autenticazione presente
+    }
+
 }
 
 /** Elimina le informazioni di autenticazione dal client

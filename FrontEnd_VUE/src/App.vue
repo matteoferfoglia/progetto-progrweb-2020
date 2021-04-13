@@ -27,7 +27,7 @@ export default {
     return {
 
       /** Flag: true se l'utente risulta autenticato.*/
-      isUtenteAutenticato: undefined,
+      isUtenteAutenticato: false,
 
       /** Nome dell'attore (se) autenticato.*/
       nomeAttoreAutenticato: undefined,
@@ -45,18 +45,18 @@ export default {
   methods: {
 
     /** Setup della pagina.*/
-    async setup() {
+    setup() {
 
-      await verificaAutenticazione( this.$route )
-              .then( async isUtenteAutenticato => {
+      verificaAutenticazione( this.$route )
+        .then( isUtenteAutenticato => {
 
-                if (isUtenteAutenticato)
-                  this.nomeAttoreAutenticato = getNomeAttoreAttualmenteAutenticato();
+          if (isUtenteAutenticato)
+            this.nomeAttoreAutenticato = getNomeAttoreAttualmenteAutenticato();
 
-                return isUtenteAutenticato;
+          return isUtenteAutenticato;
 
-              })
-              .catch( console.error );
+        })
+        .catch( console.error );
 
     },
 

@@ -13,10 +13,7 @@
  */
 
 import {createRouter, createWebHashHistory} from 'vue-router'
-import {
-  eliminaInfoAutenticazione,
-  verificaAutenticazione
-} from "../utils/autenticazione";
+import {eliminaInfoAutenticazione, verificaAutenticazione} from "../utils/autenticazione";
 import {getProprietaAttoreTarget, getTipoAttoreTarget} from "../utils/richiesteSuAttori";
 
 /** Oggetto contenente i possibili campi "meta" usati nelle
@@ -149,62 +146,63 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
   if( routeDestinazione.matched.some(route => route.meta[metaProps_enum.requiresAuth]) ) {
     // Gestione instradamento per route che richiede autenticazione
 
-    verificaAutenticazione(routeDestinazione)
-      .then( async isUtenteAutenticato => {
 
-        if(isUtenteAutenticato) {
-          // Autenticato
+    verificaAutenticazione(routeDestinazione)
+        .then( isUtenteAutenticato => isUtenteAutenticato ? Promise.resolve() : Promise.reject() )
+        .catch( () => next(router.creaRouteAutenticazione()) )  // non autenticato
+        .then( () => {                                          // autenticato
+
           routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";  // salvata come String
 
           if (routeDestinazione.matched.some(route => route.meta[metaProps_enum.requiresInfoAttore])) {
 
-              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]) {
+            // Promise chain per (eventualmente) recuperare le informazioni mancanti
+            ( () => {
+
+              if ( !routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE] ) {
+
                 // Se qui, nella route manca il parametro con l'id dell'attore di cui sono richieste le informazioni
                 console.error("Identificativo dell'attore non presente, selezionare un utente dall'elenco.");
-                return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                return Promise.reject();
+
+              } else {
+                const tipoAttoreTarget = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
+                if ( tipoAttoreTarget ) {
+                  // Se qui, nella route manca il tipo attore "target" (per mostrare scheda di un attore)
+                  return getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]);
+                } else {
+                  return Promise.resolve(tipoAttoreTarget);
+                }
               }
 
-              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE]) {
-                // Se qui, nella route manca il tipo attore
-                await getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
-                    .then(tipoAttoreTarget =>
-                        routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] = String(tipoAttoreTarget)
-                    )
-                    .catch(errore => {
-                      console.error(errore);
-                      return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
-                    });
-              }
-
-              if (!routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE]) {
-                // Se qui, nella route manca il tipo attore
-                await getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
-                    .then(propAttoreTarget => {
-                      routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
-                          JSON.stringify(propAttoreTarget);
-                    })
-                    .catch(errore => {
-                      console.error(errore);
-                      return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
-                    });
-              }
-
-              next();
+            })()
+                .then( tipoAttoreTarget =>
+                    routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] = String(tipoAttoreTarget)
+                )
+                .then( () => {
+                  const proprietaAttoreTarget = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE];
+                  if (!proprietaAttoreTarget) {
+                    // Se qui, nella route mancano le proprieta dell'attore "target"
+                    return getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
+                  } else {
+                    return Promise.resolve(proprietaAttoreTarget);
+                  }
+                })
+                .then(proprietaAttoreTarget => {
+                  routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
+                      JSON.stringify(proprietaAttoreTarget);
+                })
+                .then( next )
+                .catch(errore => {
+                  console.error(errore);
+                  return router.push({name: process.env.VUE_APP_ROUTER_NOME_ELENCO_ATTORI}); // rimanda ad elenco attori
+                });
 
           } else {
             next();
           }
 
-        } else {
-          // Non autenticato
-          next(router.creaRouteAutenticazione());
-        }
-
-      })
-      .catch( error => {
-        console.error(error);
-        return router.push({path: process.env.VUE_APP_ROUTER_AUTENTICAZIONE_PATH}); // rimanda ad autenticazione
-      })
+        })
 
   } else  {
     // SE route non richiede autorizzazione, ALLORA instrada senza problemi
