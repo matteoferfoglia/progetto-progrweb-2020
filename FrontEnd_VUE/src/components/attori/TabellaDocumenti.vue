@@ -222,7 +222,7 @@ export default {
 
     const richiestaInfo = () => {
           // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
-      getNomePropertyDataVisualizzazioneDocumenti()
+      return getNomePropertyDataVisualizzazioneDocumenti()
         .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
 
         // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
