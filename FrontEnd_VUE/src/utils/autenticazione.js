@@ -25,13 +25,13 @@ export const verificaAutenticazione = $route => {
     // imposta il token che potrebbe essere arrivato dal parametro
     impostaTokenDiAutenticazioneSeEsiste($route);
 
-    if( !getTokenAutenticazione() ) {
+    if( getTokenAutenticazione() && isTokenAutenticazioneScaduto() ) {
+        return Promise.resolve(true);   // token autenticazione presente
+    } else {
         // Richiesta al server se l'utente è attualmente autenticato
         return richiestaGet(process.env.VUE_APP_URL_VERIFICA_TOKEN_AUTENTICAZIONE)
             .then(  esito  => Promise.resolve(esito) )
             .catch( errore => Promise.reject(errore) );
-    } else {
-        return Promise.resolve(true);   // token autenticazione presente
     }
 
 }
@@ -157,6 +157,11 @@ export const getEmailAttoreAttualmenteAutenticato = () => {
 /** Restituisce l'identificativo dell'attore attualmente autenticato.*/
 export const getIdentificativoAttoreAttualmenteAutenticato = () => {
     return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_IDENTIFICATIVO_ATTORE );
+}
+
+/** Restituisce true se il token di autenticazione risulta scaduto.*/
+export const isTokenAutenticazioneScaduto = () => {
+    return getValoreClaimDaTokenJwtAutenticazione( process.env.VUE_APP_NOME_CLAIM_JWT_EXP ) > new Date().getTime()/1000;
 }
 
 /** Restituisce true se è un consumer, false altrimenti.*/
