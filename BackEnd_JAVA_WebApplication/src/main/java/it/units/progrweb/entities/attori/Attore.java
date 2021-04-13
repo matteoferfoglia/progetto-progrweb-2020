@@ -379,6 +379,7 @@ public abstract class Attore implements Cloneable, Principal {
             this.nominativo = EncoderPrevenzioneXSS.encodeForJava(nominativo);
     }
 
+    @SuppressWarnings("unused") // Usato per de/serializzazione JSON dell'oggetto
     public void setUsername(String username) {
         if( UtilitaGenerale.isStringaNonNullaNonVuota(username) )
             this.username = EncoderPrevenzioneXSS.encodeForJava( username );

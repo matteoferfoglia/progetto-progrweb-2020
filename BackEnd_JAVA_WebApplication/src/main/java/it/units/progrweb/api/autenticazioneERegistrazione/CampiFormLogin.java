@@ -5,13 +5,13 @@ import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 /**
  * @author Matteo Ferfoglia
  */
+@SuppressWarnings("unused") // campi usati per de/serializzazione (serve costruttore vuoto e getter/setter)
 public class CampiFormLogin {
 
     private String username;
     private String password;
 
-    CampiFormLogin() {
-    }
+    CampiFormLogin() {}
 
     public String getUsername() {
         return username;

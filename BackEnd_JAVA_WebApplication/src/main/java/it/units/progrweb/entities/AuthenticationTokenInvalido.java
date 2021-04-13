@@ -71,12 +71,12 @@ public class AuthenticationTokenInvalido {
 
     /** Token da considerare invalido. */
     @Index
-    @SuppressWarnings("FieldCanBeLocal")    // deve poter essere salvata in DB
+    @SuppressWarnings({"unused","FieldCanBeLocal"}) // attributo deve poter essere salvato in DB
     private String tokenInvalido;
 
     /** Scadenza del token in secondi, rispetto a Epoch time (1 January 1970, 00:00:00 UTC). */
     @Index
-    @SuppressWarnings("FieldCanBeLocal")    // deve poter essere salvata in DB
+    @SuppressWarnings({"unused","FieldCanBeLocal"}) // attributo deve poter essere salvato in DB
     private Long scadenzaTokenInSecondiDaEpoch;
 
 

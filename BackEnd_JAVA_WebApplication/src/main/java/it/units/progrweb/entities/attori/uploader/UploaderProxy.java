@@ -6,21 +6,21 @@ package it.units.progrweb.entities.attori.uploader;
  */
 public class UploaderProxy extends Uploader {
 
+    private final UploaderStorage uploaderStorage;
+
     public UploaderProxy(UploaderStorage uploaderStorage) {
         super( uploaderStorage );
+        this.uploaderStorage = uploaderStorage;
     }
 
     @Override
     public byte[] getImmagineLogo() {
-        return new byte[0];
+        return uploaderStorage.getImmagineLogo();
     }
 
     @Override
-    public String getEstensioneImmagineLogo() {
-        return null;
+    public String getMediatypeImmagineLogo() {
+        return uploaderStorage.getMediatypeImmagineLogo();
     }
-
-    @Override
-    public String getMediatypeImmagineLogo() { return null; }
 
 }

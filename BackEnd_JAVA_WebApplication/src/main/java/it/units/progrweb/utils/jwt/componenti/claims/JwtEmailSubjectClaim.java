@@ -13,7 +13,7 @@ public class JwtEmailSubjectClaim extends JwtClaim<String> {
      * @param emailSubject L'email del subject.
      */
     public JwtEmailSubjectClaim(String emailSubject) {
-        super(JwtClaim.JWT_EMAIL_SUBJECT_CLAIM_NAME, emailSubject);
+        super(NomeClaim.EMAIL_ATTORE.nomeClaim(), emailSubject);
     }
 
 }

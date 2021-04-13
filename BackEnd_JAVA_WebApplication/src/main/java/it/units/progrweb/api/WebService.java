@@ -3,9 +3,7 @@ package it.units.progrweb.api;
 import it.units.progrweb.api.autenticazioneERegistrazione.CampiFormLogin;
 import it.units.progrweb.api.uploader.GestioneDocumenti;
 import it.units.progrweb.entities.attori.Attore;
-import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.jwt.JwtToken;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 

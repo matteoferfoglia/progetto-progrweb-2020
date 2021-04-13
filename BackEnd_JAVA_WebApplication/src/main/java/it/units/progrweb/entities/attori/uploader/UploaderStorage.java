@@ -57,11 +57,6 @@ class UploaderStorage extends Uploader {
     }
 
     @Override
-    public String getEstensioneImmagineLogo() {
-        return immagineLogoUploader.getEstensioneFileContenenteLogo();
-    }
-
-    @Override
     public String getMediatypeImmagineLogo() {
         return immagineLogoUploader.getMediaTypeLogo();
     }

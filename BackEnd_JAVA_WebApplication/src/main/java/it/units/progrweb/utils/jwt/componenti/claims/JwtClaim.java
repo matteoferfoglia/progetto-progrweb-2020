@@ -60,7 +60,7 @@ public class JwtClaim<TipoValoreClaim> implements Comparable<JwtClaim<?>> {
         USERNAME_ATTORE           (JWT_USERNAME_SUBJECT_CLAIM_NAME),
 
         /**Vedere {@link JwtClaim#JWT_EMAIL_SUBJECT_CLAIM_NAME}. */
-        EMAIL_ATTORE           (JWT_EMAIL_SUBJECT_CLAIM_NAME),
+        EMAIL_ATTORE              (JWT_EMAIL_SUBJECT_CLAIM_NAME),
 
         /**Vedere {@link JwtClaim#JWT_TIPO_ATTORE_CLAIM_NAME}. */
         TIPO_ATTORE               (JWT_TIPO_ATTORE_CLAIM_NAME),

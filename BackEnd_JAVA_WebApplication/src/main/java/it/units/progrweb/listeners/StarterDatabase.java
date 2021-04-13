@@ -267,6 +267,7 @@ class AttoreConCredenziali {
 }
 
 /** Classe di comodo per deserializzazione JSON (in Database credenziali salvate Hashed&Salted).*/
+@SuppressWarnings("unused") // campi usati per de/serializzazione (serve costruttore vuoto e getter/setter)
 class CredenzialiUsernamePassword {
 
     String username;
