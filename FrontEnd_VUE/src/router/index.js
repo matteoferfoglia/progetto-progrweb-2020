@@ -149,8 +149,8 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
     verificaAutenticazione(routeDestinazione)
         .then( isUtenteAutenticato => isUtenteAutenticato ? Promise.resolve() : Promise.reject() )
-        .catch( () => next(router.creaRouteAutenticazione()) )  // non autenticato
-        .then( () => {                                          // autenticato
+        .catch( () => router.push(router.creaRouteAutenticazione()) )  // non autenticato
+        .then( () => {                                                 // autenticato
 
           routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_IS_UTENTE_AUTENTICATO] = "true";  // salvata come String
 
