@@ -1,13 +1,16 @@
 <template>
 
-  <nav id="navAutenticazione">
-    <ul class="d-flex justify-content-center flex-wrap p-0 mt-5">
-      <li class="nav-item text-center"><router-link :to="PERCORSO_LOGIN" class="nav-link">Login</router-link></li>
-      <li class="nav-item text-center"><router-link :to="PERCORSO_REGISTRAZIONE_CONSUMER" class="nav-link">Registrazione Consumer</router-link></li>
-    </ul>
-  </nav>
-  <router-view @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
-               @login="$emit('login', $event)" />
+  <div class="d-flex justify-content-center align-items-center flex-column container-autenticazione">
+    <nav id="navAutenticazione">
+      <ul class="d-flex justify-content-center flex-wrap p-0">
+        <li class="nav-item text-center"><router-link :to="PERCORSO_LOGIN" class="nav-link">Login</router-link></li>
+        <li class="nav-item text-center"><router-link :to="PERCORSO_REGISTRAZIONE_CONSUMER" class="nav-link">Registrazione Consumer</router-link></li>
+      </ul>
+    </nav>
+    <router-view @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
+                 @login="$emit('login', $event)" />
+  </div>
+
 
 </template>
 
@@ -67,5 +70,12 @@ div.card-autenticazione input[type=submit] {
 }
 #navAutenticazione .nav-link:hover {
   text-decoration: underline;
+}
+.container-autenticazione {
+  /* Centratura verticale ed orizzontale (utilizzando flex di Bootstrap) */
+  height: 100%;
+  top:0;
+  position: fixed;  /* rispetto a view-port */
+  width: 100%;
 }
 </style>
