@@ -28,7 +28,7 @@ public abstract class Logger {
 
     /** Come {@link #scriviNelLog(Class, Level, String, Throwable)},
      * ma non riporta l'oggetto throwable.*/
-    private static void scriviNelLog(Class<?> classe, Level livelloLogging, String messaggio) {
+    private static void scriviNelLog(Class<?> classe, @SuppressWarnings("SameParameterValue") Level livelloLogging, String messaggio) {
         getLogger(classe).log(livelloLogging, messaggio);
     }
 
