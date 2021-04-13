@@ -6,6 +6,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import it.units.progrweb.UtilsInTest;
 import it.units.progrweb.entities.AuthenticationDatabaseEntry;
+import it.units.progrweb.entities.ProprietaSistema;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.listeners.StarterDatabase;
 import it.units.progrweb.utils.Logger;
@@ -117,13 +118,17 @@ public class DatabaseTest {
                                  Object nuovaEntita = costruttore.newInstance();
 
                                  // Per gli attori, bisogna impostare ID (String non automaticamente impostato da Objectify)
+                                 Field id_field = null;
                                  if( classeEntita.getName().contains("attori") ) {
-                                     Field id_field = Attore.class.getDeclaredField("username");
-                                     id_field.setAccessible(true);
-                                     id_field.set(nuovaEntita, String.valueOf(valoreIdIncrementale++));
+                                     id_field = Attore.class.getDeclaredField("username");
                                  }
                                  if( classeEntita.getName().contains("AuthenticationDatabaseEntry") ) {
-                                     Field id_field = AuthenticationDatabaseEntry.class.getDeclaredField("username");
+                                     id_field = AuthenticationDatabaseEntry.class.getDeclaredField("username");
+                                 }
+                                 if( classeEntita.getName().contains("ProprietaSistema") ) {
+                                     id_field = ProprietaSistema.class.getDeclaredField("nomeParametro");
+                                 }
+                                 if( id_field!=null ) {
                                      id_field.setAccessible(true);
                                      id_field.set(nuovaEntita, String.valueOf(valoreIdIncrementale++));
                                  }
