@@ -28,7 +28,9 @@ import static it.units.progrweb.entities.AuthenticationTokenInvalido.INTERVALLO_
 
 /**
  * Starter del database per indicare quali classi
- * dovranno essere gestite come entità.
+ * dovranno essere gestite come entità e verificare
+ * che nel database siano presenti (altrimenti vengono
+ * aggiunti) gli attori richiesti.
  *
  * @author Matteo Ferfoglia
  */
@@ -96,7 +98,7 @@ public class StarterDatabase implements ServletContextListener {
         // Fonte: https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server#detecting_the_application_runtime_environment
         if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
             // Local development server
-            caricaEntitaInDB( attoriDaCreareInDevMod );
+            salvaAttoreInDB( attoriDaCreareInDevMod );
         }
 
 
@@ -111,7 +113,7 @@ public class StarterDatabase implements ServletContextListener {
                     new AttoreConCredenziali( fileCredenzialiPrimoAdmin )
             };
 
-            caricaEntitaInDB(attoriDaCreareInProdMod);
+            salvaAttoreInDB(attoriDaCreareInProdMod);
 
         } catch (IOException e) {
             Logger.scriviEccezioneNelLog(StarterDatabase.class, "Errore nella lettura della credenziali.", e);
@@ -121,7 +123,7 @@ public class StarterDatabase implements ServletContextListener {
 
     /** Metodo per il salvataggio nel database delle entità contenute
      * nell'array passato come parametro. */
-    private void caricaEntitaInDB( AttoreConCredenziali[] attoriDaSalvare ) {
+    private void salvaAttoreInDB(AttoreConCredenziali[] attoriDaSalvare ) {
         for( AttoreConCredenziali attore : attoriDaSalvare )
             attore.salvaInDB();
     }
@@ -230,25 +232,25 @@ class AttoreConCredenziali {
                     String usernameAttoreDaSalvare = getAttore().getUsername();
 
                     // Verifica se l'attore da salvare esiste già nel sistema
-                    boolean attoreGiaNelSistema;
+                    Attore attoreInDB = Attore.getAttoreDaUsername(usernameAttoreDaSalvare);
+                    AuthenticationDatabaseEntry authEntry;
                     try {
-                        AuthenticationDatabaseEntry.cercaAttoreInAuthDb( usernameAttoreDaSalvare );
-
+                        authEntry = AuthenticationDatabaseEntry.cercaAttoreInAuthDb( usernameAttoreDaSalvare );
                         // Se non vengono generate eccezioni, significa che l'attore è stato trovato in AuthDB
-                        attoreGiaNelSistema = true;
-                    } catch (NotFoundException notFoundException) {
+                    } catch (NotFoundException ignored) {
                         // Se qui: attore non trovato in AuthDB
-                        attoreGiaNelSistema = Attore.getAttoreDaUsername(usernameAttoreDaSalvare) != null;
+                        authEntry=null;
                     }
 
-                    if( !attoreGiaNelSistema ) {
+                    if( attoreInDB==null && authEntry==null ) {
 
                         DatabaseHelper.salvaEntita(getAttore());
                         DatabaseHelper.salvaEntita(getAuthenticationDatabaseEntry());
 
-                    } else {
+                    } else if( attoreInDB==null ^ authEntry==null ) {   // xor
                         String messaggioErrore = "Attore " + usernameAttoreDaSalvare +
-                                " o le sue credenziali sono già presenti nel Database";
+                                " o le sue credenziali sono già presenti nel Database," +
+                                " ma non entrambi.";
 
                         Logger.scriviEccezioneNelLog(
                                 StarterDatabase.class,
