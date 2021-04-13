@@ -21,6 +21,8 @@ import javax.servlet.annotation.WebListener;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static it.units.progrweb.entities.AuthenticationTokenInvalido.EliminatoreTokenInvalidi.avviaSchedulazionePeriodicaEliminazioneTokenInvalidi;
 import static it.units.progrweb.entities.AuthenticationTokenInvalido.EliminatoreTokenInvalidi.rimuoviSchedulazionePeriodicaEliminazioneTokenInvalidi;
@@ -28,9 +30,9 @@ import static it.units.progrweb.entities.AuthenticationTokenInvalido.INTERVALLO_
 
 /**
  * Starter del database per indicare quali classi
- * dovranno essere gestite come entità e verificare
- * che nel database siano presenti (altrimenti vengono
- * aggiunti) gli attori richiesti.
+ * dovranno essere gestite come entità. In modalità di
+ * sviluppo, vengono aggiunti, se non già presenti, gli
+ * attori specificati negli attributi.
  *
  * @author Matteo Ferfoglia
  */
@@ -41,15 +43,18 @@ public class StarterDatabase implements ServletContextListener {
      * In modalità di sviluppo verranno salvati anche quelli marcati per
      * la modalità di produzione.
      * Questi attori saranno giò presenti al primo accesso al sistema. */
-    private final static AttoreConCredenziali[] attoriDaCreareInDevMod = {
+    private final static AttoreConCredenziali[] attoriDaCreare = {
             new AttoreConCredenziali("PPPPLT80A01A952G", "1234","consumerprova@example.com","Consumer di Prova", Attore.TipoAttore.Consumer),
             new AttoreConCredenziali("AB01", "5678","uploaderprova@example.com","Uploader di Prova", Attore.TipoAttore.Uploader),
             new AttoreConCredenziali("AdminTest", "9012","adminprova@example.com","Amministratore di Prova", Attore.TipoAttore.Administrator),
     };
 
-    /** Percorso del file contenente le credenziali del primo utente amministratore
-     * da inserire nel database, in Production mode (come da requisiti). */
-    private final static String fileCredenzialiPrimoAdmin = "WEB-INF/credenziali/credenzialiPrimoAmministratoreAllAvvioDellaPiattaforma.json";
+    /** Array con i percorsi dei file contenenti le proprietà degli utenti
+     * (credenziali comprese) da aggiungere nel sistema. Ciò permette di
+     * salvare nel database degli utenti "caricati da file".*/
+    private final static String[] filesPropECredenzialiUtenti = {
+            "WEB-INF/credenziali/credenzialiPrimoAmministratoreAllAvvioDellaPiattaforma.json"
+    };
 
     // -------------- FINE PARAMETRI CONFIGURABILI --------------
 
@@ -98,32 +103,31 @@ public class StarterDatabase implements ServletContextListener {
         // Fonte: https://cloud.google.com/appengine/docs/standard/java/tools/using-local-server#detecting_the_application_runtime_environment
         if (SystemProperty.environment.value() == SystemProperty.Environment.Value.Development) {
             // Local development server
-            salvaAttoreInDB( attoriDaCreareInDevMod );
-        }
 
+            // Caricamento attori nel DB da file
+            AttoreConCredenziali[] attoriDaSalvareInDB = Stream.concat(
+                    Arrays.stream(filesPropECredenzialiUtenti)
+                          .map(percorsoFileUnAttore -> {
+                              try {
+                                  return new AttoreConCredenziali(percorsoFileUnAttore);
+                              } catch (IOException e) {
+                                  Logger.scriviEccezioneNelLog(StarterDatabase.class, "Errore nella lettura della credenziali.", e);
+                                  return null;
+                              }
+                          })
+                          .filter(Objects::nonNull),
+                    Arrays.stream(attoriDaCreare)
+            ).toArray(AttoreConCredenziali[]::new);
 
+            salvaAttoriInDB(attoriDaSalvareInDB);
 
-        // Sia Production sia Development
-
-        // Da requisiti: All’avvio della piattaforma per la prima volta, vi sarà un solo utente amministratore.
-        // Proprietà attore caricate da file (password non esposta su repository pubblica)
-        try {
-
-            AttoreConCredenziali[] attoriDaCreareInProdMod = new AttoreConCredenziali[]{
-                    new AttoreConCredenziali( fileCredenzialiPrimoAdmin )
-            };
-
-            salvaAttoreInDB(attoriDaCreareInProdMod);
-
-        } catch (IOException e) {
-            Logger.scriviEccezioneNelLog(StarterDatabase.class, "Errore nella lettura della credenziali.", e);
         }
 
     }
 
     /** Metodo per il salvataggio nel database delle entità contenute
      * nell'array passato come parametro. */
-    private void salvaAttoreInDB(AttoreConCredenziali[] attoriDaSalvare ) {
+    private void salvaAttoriInDB(AttoreConCredenziali[] attoriDaSalvare ) {
         for( AttoreConCredenziali attore : attoriDaSalvare )
             attore.salvaInDB();
     }
