@@ -31,8 +31,7 @@
               <input type="checkbox"
                      class="form-check-input"
                      @change="mostraDocumentiConHashtagFiltrato(hashtag, $event.target.checked)/*
-                              Se cliccato, mostra documenti con questo hashtag
-                              Fonte: https://stackoverflow.com/a/41001483 */"
+                              Se cliccato, mostra documenti con questo hashtag */"
                      :checked="listaHashtagDaMostrare.has(hashtag)"/>
               {{ hashtag === '' ? 'Senza hashtag' : hashtag }}
             </label>

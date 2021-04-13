@@ -124,7 +124,7 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
             .forEach( id => mappaDocumenti.delete(id) );
 
         // Restituisci il merge delle mappe (ora nell'ordinamento corretto)
-        return new Map([...mappaSoloDocumentiNonLetti, ...mappaDocumenti]); // Fonte: https://stackoverflow.com/a/32000937
+        return new Map([...mappaSoloDocumentiNonLetti, ...mappaDocumenti]);
 
 }
 
