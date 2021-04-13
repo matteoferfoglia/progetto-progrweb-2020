@@ -18,9 +18,9 @@ import {
  * @param idAttoreDiCuiRichiedereInfo Identificativo dell'attore per cui si richiedono le informazioni.
  * @param tipoAttoreAttualmenteAutenticato Tipo di attore attualmente autenticato.
  * @param tipoAttoreDiCuiRichiedereInfo Tipo di attore per cui si richiedono le informazioni.*/
-export const getInfoAttore = async (idAttoreDiCuiRichiedereInfo,
-                                    tipoAttoreAttualmenteAutenticato,
-                                    tipoAttoreDiCuiRichiedereInfo) => {
+export const getInfoAttore = ( idAttoreDiCuiRichiedereInfo,
+                               tipoAttoreAttualmenteAutenticato,
+                               tipoAttoreDiCuiRichiedereInfo     ) => {
 
     let urlRichiesta;
 
@@ -40,7 +40,7 @@ export const getInfoAttore = async (idAttoreDiCuiRichiedereInfo,
 
     urlRichiesta += "/" + idAttoreDiCuiRichiedereInfo;
 
-    return await richiestaGet( urlRichiesta )
+    return richiestaGet( urlRichiesta )
         .then(rispostaConProprietaAttore => [idAttoreDiCuiRichiedereInfo, rispostaConProprietaAttore]);  // restituisce l'entry: [ idAttoreDiCuiRichiedereInfo, {propQuestoAttore} ]
 }
 
@@ -49,9 +49,9 @@ export const getInfoAttore = async (idAttoreDiCuiRichiedereInfo,
  * Attori e per valori l'oggetto con le proprietà dell'Attore
  * indicato dalla chiave.
  */
-export const getMappa_idAttore_proprietaAttore = async (arrayIdAttore,
-                                                        tipoAttoreAttualmenteAutenticato,
-                                                        tipoAttoriDiCuiRichiedereInfo) => {
+export const getMappa_idAttore_proprietaAttore = ( arrayIdAttore,
+                                                   tipoAttoreAttualmenteAutenticato,
+                                                   tipoAttoriDiCuiRichiedereInfo     ) => {
     // Richiede al server info su ogni Attore nell'array
 
     // "noinspection JSCheckFunctionSignatures" perché segnalava un warning sul costruttore 'new Map(...)' ma in realtà
@@ -72,7 +72,7 @@ export const getMappa_idAttore_proprietaAttore = async (arrayIdAttore,
 /** Dato l'id di un attore, se l'utente attualmente autenticato è autorizzato
  * a saperlo, restituisce il ruolo dell'attore "target" il cui id è stato fornito
  * in una Promise risolta, altrimenti restituisce una Promise rigettata.*/
-export const getTipoAttoreTarget = async idAttoreTarget => {
+export const getTipoAttoreTarget = idAttoreTarget => {
     return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_ATTORE_CORRISPONDENTE + "/" + idAttoreTarget)
             .then( risposta => risposta )
             .catch( errore => {
@@ -84,7 +84,7 @@ export const getTipoAttoreTarget = async idAttoreTarget => {
 /** Dato l'id di un attore, se l'utente attualmente autenticato è autorizzato
  * a saperlo, restituisce le proprietà dell'attore "target" il cui id è stato fornito
  * in una Promise risolta, altrimenti restituisce una Promise rigettata.*/
-export const getProprietaAttoreTarget = async idAttoreTarget => {
+export const getProprietaAttoreTarget = idAttoreTarget => {
     return richiestaGet(process.env.VUE_APP_URL_GET_PROPRIETA_ATTORE_CORRISPONDENTE + "/" + idAttoreTarget)
         .then( risposta => risposta )
         .catch( errore => {

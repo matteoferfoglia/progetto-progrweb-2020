@@ -215,23 +215,21 @@ export default {
 
     /** Metodo per il caricamento dell'intero componente (incluse le
      * richieste al server per l'elenco degli attori).*/
-    async caricamentoQuestoComponente() {
+    caricamentoQuestoComponente() {
 
-      {
-        // Decide il tipo attore di cui mostrare l'elenco
-        this.tipiAttoreCuiQuestoElencoSiRiferisce = this.qualeTipoAttoriDiCuiMostrareElenco();
-        if (this.isAdministratorAttualmenteAutenticato()) {
-          if (this.tipiAttoreCuiQuestoElencoSiRiferisce === this.tipoAttore_administrator) {
-            this.classeRouterLinkAdministrator = '"router-link-exact-active"';
-            this.classeRouterLinkUploader = '""';
-          } else {
-            this.classeRouterLinkAdministrator = '""';
-            this.classeRouterLinkUploader = '"router-link-exact-active"';
-          }
+      // Decide il tipo attore di cui mostrare l'elenco
+      this.tipiAttoreCuiQuestoElencoSiRiferisce = this.qualeTipoAttoriDiCuiMostrareElenco();
+      if (this.isAdministratorAttualmenteAutenticato()) {
+        if (this.tipiAttoreCuiQuestoElencoSiRiferisce === this.tipoAttore_administrator) {
+          this.classeRouterLinkAdministrator = '"router-link-exact-active"';
+          this.classeRouterLinkUploader = '""';
+        } else {
+          this.classeRouterLinkAdministrator = '""';
+          this.classeRouterLinkUploader = '"router-link-exact-active"';
         }
       }
 
-      const richiestaElencoAttoriAlServer = async () => {
+      const richiestaElencoAttoriAlServer = () => {
         // Il server fornirà una mappa { idAttore => {oggetto con le prop dell'attore idAttore} }
 
         const msg_NO_MODIFICHE = "Nessuna modifica rilevata";
@@ -420,7 +418,7 @@ export default {
  *                                      nell'elenco restituito dal server (es. Consumer
  *                                      dovrà richiedere elenco di Uploader).
  */
-const getElencoAttori = async ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiMostrareElenco ) => {
+const getElencoAttori = ( tipoAttoreAttualmenteAutenticato, tipoAttoriDiCuiMostrareElenco ) => {
 
   let urlRichiesta;
 

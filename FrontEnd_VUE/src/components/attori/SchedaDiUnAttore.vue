@@ -380,11 +380,11 @@ export default {
     },
 
     /** Metodo per il caricamento di questo componente.*/
-    async caricaQuestoComponente() {
+    caricaQuestoComponente() {
 
       const MSG_ERRORE_SE_COMPONENTE_NON_CARICATO = "Non caricato, attendendo variabili.";
 
-      const caricamentoComponente = async () => {
+      const caricamentoComponente = () => {
 
         if (this.NOME_PROP_USERNAME_wrapper && this.NOME_PROP_NOMINATIVO_wrapper && this.NOME_PROP_EMAIL_wrapper) {
           // Procede con le richieste al server solo se i wrapper di tutte le proprietà sono truthy

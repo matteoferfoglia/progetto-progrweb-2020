@@ -133,7 +133,7 @@ export const ordinaMappaSuDataCaricamentoConNonVisualizzatiDavanti =
  * quel documento da parte del Consumer.
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
-export const getNomePropertyDataVisualizzazioneDocumenti = async () => {
+export const getNomePropertyDataVisualizzazioneDocumenti = () => {
 
     return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTI)
         .then(  risposta       => risposta )

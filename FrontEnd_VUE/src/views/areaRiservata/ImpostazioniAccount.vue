@@ -278,7 +278,7 @@ export default {
                 });
 
           }
-        })().finally( () => {
+        })().finally( () => { // da eseguire in ogni caso
 
           // Reset dei campi input
           document.getElementById(this.idForm_modificaInformazioniAttore).reset();

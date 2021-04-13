@@ -220,22 +220,22 @@ export default {
   },
   created() {
 
-    const richiestaInfo = async () => {
+    const richiestaInfo = () => {
           // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
-      await getNomePropertyDataVisualizzazioneDocumenti()
-          .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
+      getNomePropertyDataVisualizzazioneDocumenti()
+        .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
 
-          // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
-          .then( getNomePropertyDataCaricamentoDocumenti )
-          .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp)
+        // Richiede il nome della property di un documento contenente la data di caricamento del documento stesso
+        .then( getNomePropertyDataCaricamentoDocumenti )
+        .then(nomeProp => this.NOME_PROP_DATA_CARICAMENTO_DOCUMENTO = nomeProp)
 
-          // Richiede il nome della property di un documento contenente il nome del documento stesso
-          .then( getNomePropertyNomeDocumenti )
-          .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
+        // Richiede il nome della property di un documento contenente il nome del documento stesso
+        .then( getNomePropertyNomeDocumenti )
+        .then(nomeProp => this.NOME_PROP_NOME_DOCUMENTO = nomeProp)
 
-          // Richiede il nome della property di un documento contenere la lista di hashtag del documento stesso
-          .then( getNomePropertyListaHashtagDocumenti )
-          .then(nomeProp => this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomeProp);
+        // Richiede il nome della property di un documento contenere la lista di hashtag del documento stesso
+        .then( getNomePropertyListaHashtagDocumenti )
+        .then(nomeProp => this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomeProp);
 
     }
 
@@ -246,14 +246,14 @@ export default {
      *                                        mappa al server, altrimenti (se tale parametro è
      *                                        definito) il componente verrà caricato usando le
      *                                        informazioni contenute in tale parametro.*/
-    const caricamentoComponente = async (rispostaServerConMappaDocumenti=undefined) => {
+    const caricamentoComponente = (rispostaServerConMappaDocumenti=undefined) => {
 
       const MSG_NOMI_PROP_DOCUMENTI_GIA_NOTE_AL_CLIENT = "I nomi delle properties di ogni documento sono già noti al client," +
                                                          " quindi non serve richiederli al server";
 
         // Richiede mappa idFile-propFile per questo attore se non già nota
         // noinspection JSCheckFunctionSignatures // segnala warning con Object.entries(..), ma in realtà rispetta le specifiche
-      await ( rispostaServerConMappaDocumenti === undefined ?
+      ( rispostaServerConMappaDocumenti === undefined ?
           richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) :
           Promise.resolve(rispostaServerConMappaDocumenti) )
 
@@ -341,7 +341,7 @@ export default {
       })
 
     // Gestione dell'auto-aggiornamento della tabella
-    this.timerAutoUpdate = setInterval(async () => {
+    this.timerAutoUpdate = setInterval(() => {
 
       if( this.nomeRouteQuestoComponente!==this.$route.name ) {
         // se è stata cambiata route, si elimina il timer
@@ -618,7 +618,7 @@ export default {
  * quel documento.
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyDataCaricamentoDocumenti = async () => {
+const getNomePropertyDataCaricamentoDocumenti = () => {
 
   return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_DATA_CARICAMENTO_IN_DOCUMENTI)
       .then(  risposta       => risposta )
@@ -634,7 +634,7 @@ const getNomePropertyDataCaricamentoDocumenti = async () => {
  * oggetto "documento" il cui valore è il nome di quel documento.
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyNomeDocumenti = async () => {
+const getNomePropertyNomeDocumenti = () => {
 
   return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_NOME_DOCUMENTO)
       .then(  risposta       => risposta )
@@ -651,7 +651,7 @@ const getNomePropertyNomeDocumenti = async () => {
  * documento.
  * Se la richiesta va a buon fine, viene restituita una Promise
  * risolta con valore il nome dell'attributo restituito dal server.*/
-const getNomePropertyListaHashtagDocumenti = async () => {
+const getNomePropertyListaHashtagDocumenti = () => {
 
   return richiestaGet(process.env.VUE_APP_URL_GET_NOME_PROP_HAHSTAGS_IN_DOCUMENTI)
       .then(  risposta       => risposta )
