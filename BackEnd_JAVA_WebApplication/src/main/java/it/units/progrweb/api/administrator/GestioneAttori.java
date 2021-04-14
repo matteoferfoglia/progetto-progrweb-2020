@@ -119,18 +119,4 @@ public class GestioneAttori {
 
     }
 
-    /** Dato l'identificativo di un {@link Administrator}, restituisce l'oggetto JSON
-     * con le properties di quell'{@link Administrator}.*/
-    @Path("/proprietaAdministrator/{identificativoAdministrator}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON )
-    public Administrator getAdministrator(@PathParam("identificativoAdministrator") Long identificativoAdministrator,
-                                @Context HttpServletRequest httpServletRequest ) {
-
-        return Administrator.cercaAdministratorDaIdentificativo(identificativoAdministrator);
-
-    }
-
-
 }
-

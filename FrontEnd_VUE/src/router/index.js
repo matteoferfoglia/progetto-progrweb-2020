@@ -14,7 +14,7 @@
 
 import {createRouter, createWebHashHistory} from 'vue-router'
 import {eliminaInfoAutenticazione, verificaAutenticazione} from "../utils/autenticazione";
-import {getProprietaAttoreTarget, getTipoAttoreTarget} from "../utils/richiesteSuAttori";
+import {getProprietaAttoreTarget} from "../utils/richiesteSuAttori";
 
 /** Oggetto contenente i possibili campi "meta" usati nelle
  * route, qua definiti in stile "enum".*/
@@ -166,31 +166,30 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                 return Promise.reject();
 
               } else {
-                const tipoAttoreTarget = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
-                if ( !tipoAttoreTarget ) {
-                  // Se qui, nella route manca il tipo attore "target" (per mostrare scheda di un attore)
-                  return getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]);
+                const proprietaAttoreTarget = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE];
+                if (!proprietaAttoreTarget) {
+                  // Se qui, nella route mancano le proprieta dell'attore "target"
+                  return getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
                 } else {
-                  return Promise.resolve(tipoAttoreTarget);
+                  return Promise.resolve(JSON.parse(proprietaAttoreTarget));  // la richiesta al server restituisce un oggetto JSON (non la stringa corrispondente)
                 }
               }
 
             })()
-                .then( tipoAttoreTarget =>
-                    routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] = String(tipoAttoreTarget)
-                )
-                .then( () => {
-                  const proprietaAttoreTarget = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE];
-                  if (!proprietaAttoreTarget) {
-                    // Se qui, nella route mancano le proprieta dell'attore "target"
-                    return getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
-                  } else {
-                    return Promise.resolve(JSON.parse(proprietaAttoreTarget));  // la richiesta al server restituisce un oggetto JSON (non la stringa corrispondente)
-                  }
-                })
                 .then(proprietaAttoreTarget => {    // atteso oggetto JSON
-                  routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
-                      JSON.stringify(proprietaAttoreTarget);
+
+                  let mancanoProprieta = !proprietaAttoreTarget &&
+                      proprietaAttoreTarget[process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME];
+
+                  if( !mancanoProprieta ) {
+                    routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
+                        JSON.stringify(proprietaAttoreTarget);
+                    routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE] =
+                        String(proprietaAttoreTarget[process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME]);
+                    return Promise.resolve();
+                  } else {
+                    return Promise.reject("Proprietà dell'attore target non disponibili.");
+                  }
                 })
                 .then( next )
                 .catch(errore => {

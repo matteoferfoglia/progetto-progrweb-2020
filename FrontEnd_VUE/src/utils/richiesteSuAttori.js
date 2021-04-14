@@ -68,19 +68,6 @@ export const getMappa_idAttore_proprietaAttore = ( arrayIdAttore,
 
 }
 
-
-/** Dato l'id di un attore, se l'utente attualmente autenticato è autorizzato
- * a saperlo, restituisce il ruolo dell'attore "target" il cui id è stato fornito
- * in una Promise risolta, altrimenti restituisce una Promise rigettata.*/
-export const getTipoAttoreTarget = idAttoreTarget => {
-    return richiestaGet(process.env.VUE_APP_URL_GET_TIPO_ATTORE_CORRISPONDENTE + "/" + idAttoreTarget)
-            .then( risposta => risposta )
-            .catch( errore => {
-                console.error(errore);
-                return Promise.reject(errore);
-            })
-}
-
 /** Dato l'id di un attore, se l'utente attualmente autenticato è autorizzato
  * a saperlo, restituisce le proprietà dell'attore "target" il cui id è stato fornito
  * in una Promise risolta, altrimenti restituisce una Promise rigettata.*/

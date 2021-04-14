@@ -32,14 +32,5 @@ public abstract class Administrator extends Attore {
         return Attore.getListaIdentificativiTuttiGliAttoriNelSistema( Administrator.class );
     }
 
-    /** Restituisce l'entità {@link Administrator Administrator} cercata nel
-     * database in base all'identificativo fornito.
-     * @return L'{@link Administrator} cercato, oppure null in caso di errore.*/
-    public static Administrator cercaAdministratorDaIdentificativo(Long identificativoAdministrator ) {
-        Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoAdministrator);
-        return attoreTrovatoInDb instanceof AdministratorStorage ?
-                new AdministratorProxy((AdministratorStorage) attoreTrovatoInDb) : null;
-    }
-
 }
 

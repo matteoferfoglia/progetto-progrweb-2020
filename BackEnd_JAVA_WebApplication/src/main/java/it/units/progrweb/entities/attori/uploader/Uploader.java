@@ -68,15 +68,6 @@ public abstract class Uploader extends Attore {
 
     }
 
-    /** Restituisce l'entità {@link Uploader Uploader} cercata nel
-     * database in base all'identificativo fornito.
-     * @return L'uploader cercato, oppure null in caso di errore.*/
-    public static Uploader cercaUploaderDaIdentificativo(Long identificativoUploader ) {
-        Attore attoreTrovatoInDb = Attore.getAttoreDaIdentificativo(identificativoUploader);
-        return attoreTrovatoInDb instanceof UploaderStorage ?
-                new UploaderProxy((UploaderStorage) attoreTrovatoInDb) : null;
-    }
-
     /** Aggiorna nel database gli attributi di un {@link Uploader}
      * con quelli forniti nei parametri (solo se validi).
      * @throws IOException Se il logo ha una dimensione eccessiva.*/

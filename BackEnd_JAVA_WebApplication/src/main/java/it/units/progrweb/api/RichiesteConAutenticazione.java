@@ -5,9 +5,7 @@ import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.AttoreProxy;
 import it.units.progrweb.entities.attori.consumer.Consumer;
-import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
-import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
 
@@ -17,13 +15,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.function.Function;
 
 /**
  * Classe che espone i servizi di richieste informazioni,
- * indipendentemente dal tipo di attore da cui provengono.
+ * indipendentemente dal tipo di attore da cui provengono
+ * (eventuali autorizzazioni particolari gestite direttamente
+ * da questa classe), con l'obiettivo di evitare duplicazione
+ * di codice (molte richieste sono comuni o simili tra tutti
+ * i tipi di attori).
  * Esempio di utilizzo: restituire i nomi dei parametri
  * attesi dai servizi esposti dalle altre classi cosicché
  * tali nomi non vengano "cablati" sul client costituendo
@@ -114,57 +113,6 @@ public class RichiesteConAutenticazione {
         return Attore.getNomeFieldEmailAttore();
     }
 
-    /** Dato l'identificativo di un Uploader, restituisce l'oggetto JSON
-     * con le properties di quell'Uploader.*/
-    @Path("/proprietaUploader/{identificativoUploader}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON )
-    public Uploader getUploader(@PathParam("identificativoUploader") Long identificativoUploader,
-                                @Context HttpServletRequest httpServletRequest ) {
-
-        Uploader uploader = Uploader.cercaUploaderDaIdentificativo(identificativoUploader);
-
-        if( uploader!=null &&
-                Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest)
-                              .equals(Consumer.class.getSimpleName()) ) {
-            // Consumer non deve poter vedere username dell'Uploader
-
-            try {
-                Field fieldUsername = Attore.class.getDeclaredField("username");
-                fieldUsername.setAccessible(true);
-                fieldUsername.set(uploader, null);
-            } catch (IllegalAccessException | NoSuchFieldException exception) {
-                Logger.scriviEccezioneNelLog(RichiesteConAutenticazione.class,
-                        "Potrebbe essere stato modificato, nella classe, l'attributo con lo username di un attore.",
-                        exception);
-            }
-
-        }
-
-        return uploader;
-
-    }
-
-    /** Dato come @PathParam l'identificativo di un {@link Attore}, se l'utente
-     * da cui proviene la richiesta è autorizzato a saperlo, restituisce il tipo
-     * di attore di cui è stato fornito l'identificativo.*/
-    @Path("tipoAttoreTarget/{idAttoreTarget}")
-    @GET
-    public Response getTipoAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(@PathParam("idAttoreTarget") Long idAttoreTarget,
-                                                                                       @Context HttpServletRequest httpServletRequest) {
-
-        // Lambda function per restituire il tipo dell'attore corrispondente all'id fornito
-        Function<Long, Response> getTipoAttoreTarget = idAttore -> {
-            Attore attoreTarget = Attore.getAttoreDaIdentificativo(idAttore);
-            return attoreTarget==null ?
-                    Response.status(Response.Status.NOT_FOUND).entity(idAttore + " non trovato nel sistema.").build() :
-                    Response.ok().entity(attoreTarget.getTipoAttore()).type(MediaType.TEXT_PLAIN).build();
-        };
-
-        return checkPermessiERestituisciInfoSuAttore(idAttoreTarget, httpServletRequest, getTipoAttoreTarget);
-
-    }
-
     /** Dato come @PathParam l'identificativo di un {@link Attore}, se l'utente
      * da cui proviene la richiesta è autorizzato a saperlo, restituisce un oggetto
      * JSON con le proprietà dell'attore target.*/
@@ -173,44 +121,82 @@ public class RichiesteConAutenticazione {
     public Response getProprietaAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(@PathParam("idAttoreTarget") Long idAttoreTarget,
                                                                                             @Context HttpServletRequest httpServletRequest) {
 
-        // Lambda function per restituire il tipo dell'attore corrispondente all'id fornito
-        Function<Long, Response> getProprietaAttoreTarget = idAttore -> {
-            Attore attoreTarget = Attore.getAttoreDaIdentificativo(idAttore);
-            if (attoreTarget == null)
-                return Response.status(Response.Status.NOT_FOUND).entity(idAttore + " non trovato nel sistema.").build();
-            else
-                return Response.ok().entity( new AttoreProxy(attoreTarget) ).type(MediaType.APPLICATION_JSON).build();
-        };
+        Attore attoreTarget = Attore.getAttoreDaIdentificativo(idAttoreTarget);
+        Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
-        return checkPermessiERestituisciInfoSuAttore(idAttoreTarget, httpServletRequest, getProprietaAttoreTarget);
+        Long idConsumer = null; // usati in seguito per determinare se consumer ed uploader sono in relazione
+        Long idUploader = null; //   nel caso in cui uno di questi ruoli stia facendo una richiesta sull'altro
 
-    }
+        if (attoreTarget == null)
+            return Response.status(Response.Status.NOT_FOUND).entity(idAttoreTarget + " non trovato nel sistema.").build();
+        else {
 
-    /** Funzione di supporto per
-     * {@link #getProprietaAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(Long, HttpServletRequest)}
-     * e {@link #getTipoAttoreCorrispondenteAIdentificativoSeRichiedenteAutorizzato(Long, HttpServletRequest)}.*/
-    private Response checkPermessiERestituisciInfoSuAttore(Long idAttoreTarget,
-                                                           HttpServletRequest httpServletRequest,
-                                                           Function<Long, Response> creazioneRisposta) {
+            try {
 
-        String tipoAttoreAutenticato = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
-        if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Administrator.name()) ) {
-            return creazioneRisposta.apply(idAttoreTarget);
-        } else {
-            // uploader e consumer devono essere in relazione per vedere uno le info dell'altro
-            Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
-            Long idConsumer, idUploader;
-            if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Consumer.name()) ) {
-                idConsumer = idAttoreAutenticato;
-                idUploader = idAttoreTarget;
-            } else {
-                idUploader = idAttoreAutenticato;
-                idConsumer = idAttoreTarget;
+                Attore.TipoAttore tipoAttoreRichiedente =
+                        Attore.TipoAttore.valueOf( Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest) );
+                Attore.TipoAttore tipoAttoreTarget =
+                        Attore.TipoAttore.valueOf( attoreTarget.getTipoAttore() );
+
+                boolean isRichiedenteAutorizzato = false;
+
+                switch( tipoAttoreRichiedente ) {
+                    case Consumer:
+                        // Consumer può vedere solo Uploader e non deve poter vedere username dell'Uploader
+                        if( tipoAttoreTarget==Attore.TipoAttore.Uploader ) {
+                            try {
+                                Field fieldUsername = Attore.class.getDeclaredField("username");
+                                fieldUsername.setAccessible(true);
+                                fieldUsername.set(attoreTarget, null);
+                            } catch (IllegalAccessException | NoSuchFieldException exception) {
+                                Logger.scriviEccezioneNelLog(RichiesteConAutenticazione.class,
+                                        "Potrebbe essere stato modificato, nella classe, l'attributo con lo username di un attore.",
+                                        exception);
+                            }
+                            idConsumer = idAttoreAutenticato;
+                            idUploader = idAttoreTarget;
+                            isRichiedenteAutorizzato = true;
+                        }
+                        break;
+
+                    case Uploader:
+                        if( tipoAttoreTarget==Attore.TipoAttore.Consumer ) {
+                            isRichiedenteAutorizzato = true;
+                            idUploader = idAttoreAutenticato;
+                            idConsumer = idAttoreTarget;
+                        }
+                        break;
+
+                    case Administrator:
+                        isRichiedenteAutorizzato = true;
+                        break;
+
+                    default:
+                        isRichiedenteAutorizzato = false;
+                        break;
+
+                }
+
+                // uploader e consumer devono essere in relazione tra loro per vedere uno le info dell'altro
+                if (isRichiedenteAutorizzato && idConsumer != null && idUploader != null)
+                    isRichiedenteAutorizzato = RelazioneUploaderConsumer.isConsumerServitoDaUploader(idUploader, idConsumer);
+
+                if( isRichiedenteAutorizzato )
+                    return Response
+                            .ok()
+                            .entity(new AttoreProxy(attoreTarget))    // Proxy nasconde implementazione vera
+                            .type(MediaType.APPLICATION_JSON)
+                            .build();
+                else
+                    return Autenticazione.creaResponseForbidden("Il ruolo del richiedente non è autorizzato ad ottenere le informazioni richieste.");
+
+            } catch (IllegalArgumentException tipoAttoreInvalidoException) {
+                // Eccezione generabile da Attore.TipoAttore.valueOf
+                Logger.scriviEccezioneNelLog(this.getClass(), "Il tipo attore non è valido.", tipoAttoreInvalidoException);
+                return Response.serverError().build();
             }
-            return RelazioneUploaderConsumer.isConsumerServitoDaUploader(idUploader, idConsumer) ?
-                    creazioneRisposta.apply(idAttoreTarget) :
-                    Autenticazione.creaResponseForbidden("Consumer non in relazione con Uploader.");
         }
+
     }
 
 }
