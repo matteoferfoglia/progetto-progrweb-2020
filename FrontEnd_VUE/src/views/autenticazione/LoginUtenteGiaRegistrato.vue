@@ -1,9 +1,10 @@
 <template>
-  <div class="card card-autenticazione" v-show="csrfToken">
+
+  <div class="card card-autenticazione">
     <h2 class="card-header">Login</h2>
     <Form class="card-body d-flex justify-content-between flex-wrap"
           @submit="validaEdInviaForm"
-          @csrf-token-ricevuto="aggiornaCsrfToken($event)">
+          @csrf-token-ricevuto="componenteCaricato($event)">
       <label>Username
         <input type="text"
                class="form-control"
@@ -30,7 +31,6 @@
   <AutenticazioneFirebase @login-riuscito="loginRiuscito"
                           @login-fallito="loginFallito"  />
 
-
 </template>
 
 <script>
@@ -47,6 +47,9 @@ export default {
   emits: [
     /** Evento emesso quando viene ricevuto il token CSRF dal server.*/
     'csrf-token-ricevuto',
+
+    /** Evento emesso quando questo componente viene caricato.*/
+    'componente-caricato',
 
     /** Evento emesso se la procedura di login va a buon fine.*/
     'login'
@@ -74,9 +77,19 @@ export default {
 
     },
 
-    aggiornaCsrfToken(nuovoValore) {
-      this.csrfToken = nuovoValore;
-      this.$emit('csrf-token-ricevuto', nuovoValore);
+    /** Metodo da eseguire quando viene caricato il componente.
+     * @param csrfToken Token CSRF.
+     */
+    componenteCaricato(csrfToken) {
+      this.aggiornaCsrfToken(csrfToken);
+      this.$emit('componente-caricato');
+    },
+
+    /** Metodo per aggiornare il token CSRF ed informare il componente padre.
+     * @param nuovoValoreCsrf Nuovo valore per il token CSRF. */
+    aggiornaCsrfToken(nuovoValoreCsrf) {
+      this.csrfToken = nuovoValoreCsrf;
+      this.$emit('csrf-token-ricevuto', nuovoValoreCsrf);
     },
 
     /** Se il login va a buon fine, bisogna impostare lo header <i>Authorization</i>

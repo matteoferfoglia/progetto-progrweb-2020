@@ -1,6 +1,7 @@
 <template>
 
-  <div class="d-flex justify-content-center align-items-center flex-column container-autenticazione">
+  <div class="d-flex justify-content-center align-items-center flex-column container-autenticazione"
+       :class="{'nascosto':!mostraQuestoComponente}">
     <nav id="navAutenticazione">
       <ul class="d-flex justify-content-center flex-wrap p-0">
         <li class="nav-item text-center"><router-link :to="PERCORSO_LOGIN" class="nav-link">Login</router-link></li>
@@ -8,6 +9,7 @@
       </ul>
     </nav>
     <router-view @csrf-token-ricevuto="$emit('csrf-token-ricevuto',$event)"
+                 @componente-caricato="mostraQuestoComponente=true"
                  @login="$emit('login', $event)" />
   </div>
 
@@ -31,7 +33,10 @@ export default {
   data() {
     return {
       PERCORSO_LOGIN: process.env.VUE_APP_ROUTER_PATH_LOGIN,
-      PERCORSO_REGISTRAZIONE_CONSUMER: process.env.VUE_APP_ROUTER_PATH_REGISTRAZIONE_CONSUMER
+      PERCORSO_REGISTRAZIONE_CONSUMER: process.env.VUE_APP_ROUTER_PATH_REGISTRAZIONE_CONSUMER,
+
+      /** Flag: diventa true quando deve essere mostrato questo componente. */
+      mostraQuestoComponente: undefined
     }
   }
 }
@@ -73,9 +78,26 @@ div.card-autenticazione input[type=submit] {
 }
 .container-autenticazione {
   /* Centratura verticale ed orizzontale (utilizzando flex di Bootstrap) */
-  height: 100%;
+  height: 100vh;
   top:0;
   position: fixed;  /* rispetto a view-port */
   width: 100%;
+}
+.nascosto {
+  visibility: hidden !important;  /* Necessario important a causa di Bootstrap che lo usa */
+}
+
+@media all and (max-height: 800px) {
+  .container-autenticazione {
+    height: unset;
+    position: static;
+    margin: 2rem auto;
+  }
+}
+
+@media all and (max-width: 500px) {
+  .container-autenticazione .card {
+    width: 100%;
+  }
 }
 </style>

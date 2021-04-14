@@ -72,6 +72,10 @@ import {getHttpResponseStatus, HTTP_STATUS_CONFLICT, richiestaPost} from "../../
 export default {
   name: 'RegistrazioneNuovoConsumer',
   inheritAttrs: false,
+  emits: [
+    /** Evento emesso quando questo componente viene caricato.*/
+    'componente-caricato'
+  ],
   data() {
     return {
       codiceFiscale: "",
@@ -82,6 +86,9 @@ export default {
       REGEX_CODICE_FISCALE: process.env.VUE_APP_REGEX_CODICE_FISCALE,
       REGEX_EMAIL: process.env.VUE_APP_REGEX_EMAIL
     }
+  },
+  mounted() {
+    this.$emit('componente-caricato');
   },
   methods: {
     validaEdInviaForm() {
