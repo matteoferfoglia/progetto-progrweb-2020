@@ -14,7 +14,7 @@
   </article>
 
   <FormConCsrfToken
-      :valoreQualsiasiPerAggiornareIComponenteSeModificato="valoreQualsiasiPerAggiornareIlComponenteSeModificato"
+      :valoreQualsiasiPerAggiornareIlComponenteSeModificato="valoreQualsiasiPerAggiornareIlComponenteSeModificato"
       :id="idForm_modificaInformazioniAttore"
       class="card"
       @change="isFormModificato = true"

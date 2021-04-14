@@ -32,7 +32,7 @@ export default {
 
     /** Chiave utilizzata per "forzare" l'aggiornamento del componente.
      * (<a href="https://stackoverflow.com/a/47466574">Fonte</a>).*/
-    'valoreQualsiasiPerAggiornareIComponenteSeModificato'
+    'valoreQualsiasiPerAggiornareIlComponenteSeModificato'
   ],
   data: function () {
     return {
@@ -64,7 +64,7 @@ export default {
   },
   watch: {
 
-    valoreQualsiasiPerAggiornareIComponenteSeModificato: {
+    valoreQualsiasiPerAggiornareIlComponenteSeModificato: {
       immediately: true,
       handler() {
         this.richiestaCSRFTokenAlServer();
