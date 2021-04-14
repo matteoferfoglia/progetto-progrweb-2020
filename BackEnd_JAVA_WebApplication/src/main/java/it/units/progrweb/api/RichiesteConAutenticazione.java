@@ -3,6 +3,7 @@ package it.units.progrweb.api;
 import it.units.progrweb.api.uploader.GestioneConsumer;
 import it.units.progrweb.entities.RelazioneUploaderConsumer;
 import it.units.progrweb.entities.attori.Attore;
+import it.units.progrweb.entities.attori.AttoreProxy;
 import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
@@ -178,7 +179,7 @@ public class RichiesteConAutenticazione {
             if (attoreTarget == null)
                 return Response.status(Response.Status.NOT_FOUND).entity(idAttore + " non trovato nel sistema.").build();
             else
-                return Response.ok().entity(attoreTarget).type(MediaType.APPLICATION_JSON).build();
+                return Response.ok().entity( new AttoreProxy(attoreTarget) ).type(MediaType.APPLICATION_JSON).build();
         };
 
         return checkPermessiERestituisciInfoSuAttore(idAttoreTarget, httpServletRequest, getProprietaAttoreTarget);
@@ -191,7 +192,7 @@ public class RichiesteConAutenticazione {
     private Response checkPermessiERestituisciInfoSuAttore(Long idAttoreTarget,
                                                            HttpServletRequest httpServletRequest,
                                                            Function<Long, Response> creazioneRisposta) {
-        
+
         String tipoAttoreAutenticato = Autenticazione.getTipoAttoreDaHttpServletRequest(httpServletRequest);
         if( tipoAttoreAutenticato.equals(Attore.TipoAttore.Administrator.name()) ) {
             return creazioneRisposta.apply(idAttoreTarget);
