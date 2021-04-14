@@ -235,8 +235,8 @@ export default {
         const msg_NO_MODIFICHE = "Nessuna modifica rilevata";
 
         // Richiede l'elenco degli Attori associati con questo attualmente autenticato
-        return getElencoAttori(this.getTipoAttoreAttualmenteAutenticato(),
-            this.tipiAttoreCuiQuestoElencoSiRiferisce)
+        return getElencoAttori( this.getTipoAttoreAttualmenteAutenticato(),
+                                this.tipiAttoreCuiQuestoElencoSiRiferisce  )
 
             .then(arrayConIdTuttiGliAttoriDaMostrare => {
               if (areArrayEquivalenti(arrayConIdTuttiGliAttoriDaMostrare, Array.from(this.mappa_idAttore_proprietaAttore.keys())))
@@ -356,20 +356,17 @@ export default {
         tipoAttoreDiCuiMostrareElenco = this.tipoAttore_uploader; // valore default
 
         if( this.$route && this.$route.params &&  // Verifica che non siano undefined o null
-            this.$route.params[this.NOME_PARAM_TIPO_ATTORE]) {
-          let varComodoPerValutareSeParametroDefinito =
-              this.$route.params[this.NOME_PARAM_TIPO_ATTORE];
-          if( varComodoPerValutareSeParametroDefinito ) {
-            tipoAttoreDiCuiMostrareElenco = varComodoPerValutareSeParametroDefinito;
-          }
+            this.$route.params[this.NOME_PARAM_TIPO_ATTORE] &&
+            this.$route.params[this.NOME_PARAM_TIPO_ATTORE]!=="undefined" ) {   // parametri in Vue-Router passaqti come string e la stringa "undefined" è truty
+            tipoAttoreDiCuiMostrareElenco = this.$route.params[this.NOME_PARAM_TIPO_ATTORE];
         } else {
-          // route undefined, quindi imposta route default
+          // parametro non definito nella route undefined, quindi imposta route default
           this.$router.push({to:"", params:{[this.NOME_PARAM_TIPO_ATTORE]: tipoAttoreDiCuiMostrareElenco}});
         }
 
       } else if ( this.isConsumerAttualmenteAutenticato() ) {
         tipoAttoreDiCuiMostrareElenco = this.tipoAttore_uploader;
-      } else {
+      } else {  // altrimenti è Uploader attualmente autenticato
         tipoAttoreDiCuiMostrareElenco = this.tipoAttore_consumer;
       }
 

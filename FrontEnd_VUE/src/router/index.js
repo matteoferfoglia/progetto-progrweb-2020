@@ -167,7 +167,7 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
 
               } else {
                 const tipoAttoreTarget = routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_TIPO_ATTORE_CUI_SCHEDA_SI_RIFERISCE];
-                if ( tipoAttoreTarget ) {
+                if ( !tipoAttoreTarget ) {
                   // Se qui, nella route manca il tipo attore "target" (per mostrare scheda di un attore)
                   return getTipoAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE]);
                 } else {
@@ -185,10 +185,10 @@ router.beforeEach((routeDestinazione, routeProvenienza, next) => {
                     // Se qui, nella route mancano le proprieta dell'attore "target"
                     return getProprietaAttoreTarget(routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_ID_ATTORE])
                   } else {
-                    return Promise.resolve(proprietaAttoreTarget);
+                    return Promise.resolve(JSON.parse(proprietaAttoreTarget));  // la richiesta al server restituisce un oggetto JSON (non la stringa corrispondente)
                   }
                 })
-                .then(proprietaAttoreTarget => {
+                .then(proprietaAttoreTarget => {    // atteso oggetto JSON
                   routeDestinazione.params[process.env.VUE_APP_ROUTER_PARAMETRO_PROPRIETA_ATTORE] =
                       JSON.stringify(proprietaAttoreTarget);
                 })

@@ -102,7 +102,7 @@
             <ResocontoDiUnAttore :nomeUploaderCuiQuestoResocontoSiRiferisce="nominativo"
                                  :identificativoUploader="idAttoreCuiQuestaSchedaSiRiferisce"
                                  v-if="isAdministratorAttualmenteAutenticato() &&
-                                      isQuestaSchedaRiferitaAdUnUploader" />
+                                       isQuestaSchedaRiferitaAdUnUploader" />
 
             <ListaDocumentiPerConsumerVistaDaUploader v-if="isUploaderAttualmenteAutenticato()"
                                                       :idConsumer="idAttoreCuiQuestaSchedaSiRiferisce"
@@ -386,9 +386,13 @@ export default {
 
       const caricamentoComponente = () => {
 
-        if (this.NOME_PROP_USERNAME_wrapper && this.NOME_PROP_NOMINATIVO_wrapper && this.NOME_PROP_EMAIL_wrapper) {
-          // Procede con le richieste al server solo se i wrapper di tutte le proprietà sono truthy
+        if (!this.isComponenteCaricato) {
 
+          if(!(this.NOME_PROP_USERNAME_wrapper && this.NOME_PROP_NOMINATIVO_wrapper && this.NOME_PROP_EMAIL_wrapper)) {
+            return Promise.reject( MSG_ERRORE_SE_COMPONENTE_NON_CARICATO );
+          }
+
+          // Procede con le richieste al server solo se i wrapper di tutte le proprietà sono truthy
 
           // Caricamento proprietà da Vue-Router
           this.idAttoreCuiQuestaSchedaSiRiferisce =
@@ -402,6 +406,7 @@ export default {
 
           this.isQuestaSchedaRiferitaAdUnUploader = this.tipoAttoreCuiQuestaSchedaSiRiferisce ===
               process.env.VUE_APP_TIPO_UTENTE__UPLOADER;
+
 
           if( this.isConsumerAttualmenteAutenticato() ) {
             if (this.$route && this.$route.params &&  // controllare che sia definita
@@ -442,29 +447,25 @@ export default {
           if (this.proprietaAttoreCuiQuestaSchedaSiRiferisce) {
             // Verifica che le proprietà da mostrare siano ben definite
 
-            this.username = this.NOME_PROP_USERNAME_wrapper ?
-                (this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] ?
-                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] : "") : "";
+            this.username = this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] ?
+                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_USERNAME_wrapper] : "";
 
-            this.nominativo = this.NOME_PROP_NOMINATIVO_wrapper ?
-                (this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] ?
-                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] : "") : "";
+            this.nominativo = this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] ?
+                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_NOMINATIVO_wrapper] : "";
 
-            this.email = this.NOME_PROP_EMAIL_wrapper ?
-                (this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] ?
-                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "") : "";
+            this.email = this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] ?
+                    this.proprietaAttoreCuiQuestaSchedaSiRiferisce[this.NOME_PROP_EMAIL_wrapper] : "";
           }
 
-          return Promise.resolve();
+          this.isComponenteCaricato = true
 
-        } else {
-          return Promise.reject( MSG_ERRORE_SE_COMPONENTE_NON_CARICATO );
-        }
+        }   // else: componente già caricato
+
+        return Promise.resolve();
 
       };
 
       return caricamentoComponente()
-              .then( () => this.isComponenteCaricato = true )
               .catch( errore => {
                 if(errore.message!==MSG_ERRORE_SE_COMPONENTE_NON_CARICATO)
                   console.error(errore);
