@@ -215,9 +215,14 @@ const onErrorHandler = async errore => {
 
         if (errore.response.status === HTTP_STATUS_UNAUTHORIZED ||
             errore.response.status === HTTP_STATUS_FORBIDDEN) {
-            // Redirection automatica a login
-            alert( "Autenticarsi." );
+
+            const MSG_ERRORE = (errore.response.status === HTTP_STATUS_FORBIDDEN ?
+                "Operazione non permessa. " : "" ) + "Autenticarsi";
+
+            alert( MSG_ERRORE );
             eliminaTokenAutenticazione();
+
+            // Redirection automatica a login
             await router.redirectVersoPaginaAutenticazione();
         }
 

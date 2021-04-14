@@ -521,7 +521,7 @@ export default {
             })
             .catch( rispostaServer => {
               console.error( rispostaServer );
-              alert( "ERRORE: "+ rispostaServer.data );
+              alert( rispostaServer.data );
             });
       } else {
         this.ripristinaValoriForm();  // utente non ha confermato le modifiche, quindi si ripristano i valori precedenti

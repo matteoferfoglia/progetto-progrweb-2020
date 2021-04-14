@@ -235,11 +235,23 @@ export default {
 
         /** Funzione per informare il componente padre che l'evento di
          * richiesta invio dati del form è stato gestito.
+         * L'evento contiene come valore un oggetto con due propery:
+         * <dl>
+         *   <dt>datiInviati</dt>
+         *   <dd>
+         *     L'oggetto con i dati inviati.
+         *   </dd>
+         *   <dt>promiseRispostaServer</dt>
+         *   <dd>
+         *     Una promise la cui risoluzione conterrà la risposta ricevuta
+         *     dal server, oppure direttamente una Promise rigettata se la
+         *     richiesta non è stata proprio inviata al server.
+         *   </dd>
+         * </dl>
          * @param promiseRispostaServer Promise la cui risoluzione contiene
-         * la risposta del server a seguito delle modifiche, oppure oggetto
-         * undefined se non viene inviata alcuna richiesta al server.
-         * @param datiInviatiAlServer Dati eventualmente inviati al server. */
-        const informaComponentePadreEventoGestito = (promiseRispostaServer, datiInviatiAlServer) => {
+         * la risposta del server a seguito delle modifiche.
+         * @param datiInviatiAlServer Dati eventualmente inviati al server.*/
+        const informaComponentePadreEventoGestito = (promiseRispostaServer, datiInviatiAlServer={}) => {
           this.$emit('dati-form-inviati', {
             'datiInviati': datiInviatiAlServer,
             'promiseRispostaServer': promiseRispostaServer
@@ -247,6 +259,11 @@ export default {
         };
 
         if( flag_inviaDatiForm ) {
+
+          // Crea una promise rigettata nell'evenienza che non si effettui una richiesta
+          // così da poter comunque seguire il flusso delle operazioni "promise"-based
+          const creaERestituisciPromiseRigettataSeNonSiInvianoDatiAlServer = messaggioDaMostrare =>
+              Promise.reject({['data']:messaggioDaMostrare}); // property 'data' come in una risposta HTTP fallita
 
           if (this.isFormModificato()) {
 
@@ -329,7 +346,7 @@ export default {
                   }
 
                   promise
-                      .then(risposta => {
+                      .then( risposta => {
 
                         if (this.resetCampiInputDopoInvioForm_wrapper) {
                           // pulizia dei campi del form
@@ -344,9 +361,15 @@ export default {
                       .catch(console.error);            // tiene traccia dell'eventuale errore
 
                 })
-                .catch(() => {
-                }) // utente non ha confermato le modifiche, non si fa nulla
-                .finally(() => {
+                .catch( () => {
+
+                  // utente non ha confermato le modifiche
+
+                  promise = creaERestituisciPromiseRigettataSeNonSiInvianoDatiAlServer("Operazione interrotta, nessuna modifica effettuata.");
+                  // come in una risposta http fallita, in cui c'è il campo 'data'
+
+                })
+                .finally( () => {
 
                   // In ogni caso, informare il componente padre
                   informaComponentePadreEventoGestito(promise, datiDaInviareAlServer);
@@ -355,8 +378,10 @@ export default {
 
           } else {
             // In ogni caso, informare il componente padre
-            informaComponentePadreEventoGestito();
-            alert( "Nessuna modifica rilevata." );
+            informaComponentePadreEventoGestito(
+              creaERestituisciPromiseRigettataSeNonSiInvianoDatiAlServer("Nessuna modifica rilevata."),
+              {}
+            );
           }
         }
 

@@ -125,6 +125,7 @@ export default {
      * @param oggetto Oggetto restituito dal gestore di {@link FormCampiAttore.script.default.watch.flag_inviaDatiForm}.
      */
     formAggiuntaAttoreInviato ( oggetto ) {
+
       oggetto.promiseRispostaServer
           .then( identificativoAttore => {
 
@@ -147,10 +148,12 @@ export default {
           })
           .catch( rispostaServer => {
             console.error( rispostaServer );
-            if(getHttpResponseStatus(rispostaServer) === HTTP_STATUS_UNAUTHORIZED) // es. se è scaduto il token di autenticazione
+            if(getHttpResponseStatus(rispostaServer) === HTTP_STATUS_UNAUTHORIZED) { // es. se è scaduto il token di autenticazione
               alert("Non autorizzato. Autenticarsi.");
-            else
-              alert( "ERRORE: "+ rispostaServer.data );
+            } else {
+              const MSG_ERRORE = rispostaServer.data ? String(rispostaServer.data) : String(rispostaServer);
+              alert( MSG_ERRORE );
+            }
           })
           .finally( () => {
             this.flag_inviareDatiFormAggiuntaAttore = false;
