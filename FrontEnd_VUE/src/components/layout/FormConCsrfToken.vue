@@ -1,5 +1,6 @@
 <template>
-  <form  v-if="isCsrfTokenCaricato" @submit.prevent="$emit('submit')/*Deve essere propagato*/">
+  <form v-show="isCsrfTokenCaricato"
+        @submit.prevent="$emit('submit')/*Deve essere propagato*/">
     <slot><!--qua i campi del form--></slot>
     <input type="hidden" v-model="csrfToken">
   </form>
@@ -40,23 +41,24 @@ export default {
     }
   },
   created() {
-    // dati già disponibili e modificabili in questo hook
+
     this.richiestaCSRFTokenAlServer();
 
   },
   methods: {
 
-    richiestaCSRFTokenAlServer() {
-      richiediCSRFTokenAlServer().then( valoreToken => {
-        // Se qui, allora token csrf ricevuto dal server
-        this.csrfToken = valoreToken;
-        this.isCsrfTokenCaricato = true;
-        this.$emit('csrf-token-ricevuto',valoreToken);
-      }).catch( errore => {
-        // Errore durante la ricezione del token csrf
-        console.error("Errore in " +
-            this.$options.name /*Nome componente: */ + ": " + errore);
-      });
+    richiestaCSRFTokenAlServer() {  // definito in methods per essere riutilizzato
+      richiediCSRFTokenAlServer()
+        .then( valoreToken => {
+          // Se qui, allora token csrf ricevuto dal server
+          this.csrfToken = valoreToken;
+          this.isCsrfTokenCaricato = true;
+          this.$emit('csrf-token-ricevuto',valoreToken);
+        })
+        .catch( errore => {
+          // Errore durante la ricezione del token csrf
+          console.error("Errore in " + this.$options.name /*Nome componente: */ + ": " + errore);
+        });
     }
 
   },
