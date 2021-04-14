@@ -26,7 +26,8 @@ import * as firebaseui from 'firebaseui'
 import {HTTP_STATUS_CONFLICT, richiestaPostContenutoTextPlain} from "../../utils/http";
 import Loader from "../../components/layout/Loader";
 
-import swal from "sweetalert"; // Sweet alert
+import swal from "sweetalert";
+import {authConfig} from "../../../firebase.config"; // Sweet alert
 
 export default {
   name: "AutenticazioneFirebase",
@@ -61,7 +62,13 @@ export default {
 
         /** Opzioni di login. */
         signInOptions: [
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID // login con account Google
+
+          // Sign-in con Google mostrando finestra di scelta account
+          //   Fonte: https://stackoverflow.com/a/59744590
+          { provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            customParameters: { prompt: 'select_account' }
+          }
+
         ],
 
         /** Permette di scegliere come mostrare le opzioni di autenticazione:
@@ -157,6 +164,7 @@ export default {
     // Quando viene creato questo componente, l'utente deve essere undefined
     // (non si è ancora autenticato)
     firebase.auth().signOut();
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence[authConfig.persistence]); // imposta livello di persistenza delle credenziali Firebase
 
   },
 
@@ -179,7 +187,7 @@ export default {
 
       // se esiste gia AuthUi, prima si cancella la vecchia istanza
       if( firebaseUiSeEsisteGia ) {
-        firebaseUiSeEsisteGia.delete()
+        firebaseUiSeEsisteGia.delete()    // cancella istanza di Firebase AuthUI
                              .then( creaAuthUiFirebase )
                              .catch( console.error );
       } else {

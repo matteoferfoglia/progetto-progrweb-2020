@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import {configurazioneAxios} from "../axios.config";
 import firebase from "firebase/app";
-import {firebaseConfig} from "./firebase.config";
+import {firebaseConfig} from "../firebase.config";
 import swal from 'sweetalert';  // custom alert box, Fonte: https://sweetalert.js.org/guides/
 
 
@@ -30,9 +30,10 @@ window.confirm = msg =>
             icon: "warning",
             buttons: ["Annulla", "OK"],
             dangerMode: false,
-    }).then( esitoConfirm => {
-            if(esitoConfirm)
-                    return Promise.resolve();
-            else
-                    return Promise.reject();
+    })
+    .then( esitoConfirm => {
+        if(esitoConfirm)
+            return Promise.resolve();
+        else
+            return Promise.reject();
     });

@@ -11,3 +11,7 @@ export const firebaseConfig = {
     messagingSenderId: "579459811437",
     appId: "1:579459811437:web:530daa81892009a2b45764"
 };
+
+export const authConfig = {
+    persistence: "NONE" // LOCAL, SESSION, NONE, Fonte: https://firebase.google.com/docs/auth/web/auth-state-persistence#supported_types_of_auth_state_persistence
+}
