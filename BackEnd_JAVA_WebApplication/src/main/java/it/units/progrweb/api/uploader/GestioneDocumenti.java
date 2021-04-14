@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static it.units.progrweb.EnvironmentVariables.API_CONTEXT_ROOT;
+import static it.units.progrweb.EnvironmentVariables.API_NOAUTH_SERVLET_PATH;
+
 /**
  * Classe per permettere ad un {@link Uploader} di gestire
  * i documenti inviati ad un {@link Consumer}.
@@ -36,9 +39,13 @@ import java.util.stream.Collectors;
 @Path("/uploader/documenti")
 public class GestioneDocumenti {
 
+    /** Il path (seguente al context root e al servlet path in un URL)
+     * per le richieste di download di un documento. */
+    public final static String URL_PATH_DOWNLOAD_DOCUMENTO = "/downloadDocumento";
+
     /** Restituisce il documento il cui identificativo è
      * nel @PathParam.*/
-    @Path("/downloadDocumento/{identificativoFile}")
+    @Path(URL_PATH_DOWNLOAD_DOCUMENTO+"/{identificativoFile}")
     @GET
     // Mediatype indicato nella response
     public Response downloadFile(@PathParam("identificativoFile") Long identificativoFile,
@@ -181,7 +188,9 @@ public class GestioneDocumenti {
                                                                              @Context HttpServletRequest httpServletRequest) {
 
         String indirizzoServer  = UtilitaGenerale.getIndirizzoServer(httpServletRequest);
-        String linkDownloadFile =  indirizzoServer + "/api/noauth/downloadDocumento/" + fileAggiunto.getIdentificativoFile() + "/" + fileAggiunto.getTokenCasuale();
+        String urlDownloadFile =  indirizzoServer +
+                API_CONTEXT_ROOT + API_NOAUTH_SERVLET_PATH + URL_PATH_DOWNLOAD_DOCUMENTO +          // request URI
+                "/" + fileAggiunto.getIdentificativoFile() + "/" + fileAggiunto.getTokenCasuale();  // query string
 
         String oggettoNotifica   = EnvironmentVariables.NOME_APPLICAZIONE + " - Nuovo documento disponibile";
         String emailDestinatario = destinatarioFile.getEmail();
@@ -202,7 +211,7 @@ public class GestioneDocumenti {
                             "<p>" + mittenteFile.getNominativo() + " ha caricato il file "  +
                                 "&ldquo;" + fileAggiunto.getNomeDocumento() + "&rdquo;. "   +
                                 "<a href=\"" + indirizzoServer + "\">Accedi</a> al sistema" +
-                                " oppure <a href=\"" + linkDownloadFile + "\">scarica</a> " +
+                                " oppure <a href=\"" + urlDownloadFile + "\">scarica</a> " +
                                 "direttamente il file."                                     +
                             "</p>"                                                          +
                         "</body>"                                                           +

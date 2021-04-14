@@ -16,6 +16,10 @@ public class EnvironmentVariables {
      * aggiornare anche il file di configurazione web.xml.*/
     public static final String API_CONTEXT_ROOT = "/api";
 
+    /** Servlet path (seguente al context path) per le richieste
+     * "api" che non richiedono autenticazione. */
+    public static final String API_NOAUTH_SERVLET_PATH = "/noauth";
+
     /** Nome dell'applicazione */
     public static final String NOME_APPLICAZIONE = "FileSharing";
 }

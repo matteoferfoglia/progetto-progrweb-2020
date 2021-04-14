@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static it.units.progrweb.EnvironmentVariables.API_CONTEXT_ROOT;
+import static it.units.progrweb.EnvironmentVariables.API_NOAUTH_SERVLET_PATH;
 import static it.units.progrweb.api.autenticazioneERegistrazione.VerificaRegistrazione.PATH_SERVIZIO_VERIFICA_ACCCOUNT;
 import static it.units.progrweb.utils.UtilitaGenerale.*;
 
@@ -39,7 +40,7 @@ public class FiltroAutenticazione implements Filter {
             API_CONTEXT_ROOT+"/verificaTokenAutenticazione",
             API_CONTEXT_ROOT+"/registrazioneNuovoConsumer",
             API_CONTEXT_ROOT+"/CSRFToken/generaCSRFToken",
-            API_CONTEXT_ROOT+"/noauth",
+            API_CONTEXT_ROOT+API_NOAUTH_SERVLET_PATH,
             API_CONTEXT_ROOT+"/openapi",
             "/_ah/admin", "/_ah/admin/datastore", "/_ah/resources" // console di amministrazione del sever di sviluppo
     };
