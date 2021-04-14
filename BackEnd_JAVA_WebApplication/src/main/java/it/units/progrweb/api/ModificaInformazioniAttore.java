@@ -91,6 +91,13 @@ public class ModificaInformazioniAttore {
                 if( optionalModificaAuthDb.get() instanceof Supplier )
                     ((Supplier<?>) optionalModificaAuthDb.get()).get(); // esegue il Supplier restituito da AuthenticationDatabaseEntry#modificaPassword
 
+            } else {
+                // Errore nella modifica della password
+                return Response
+                        .status( Response.Status.BAD_REQUEST )
+                        .entity( "Password inserite non valide." )
+                        .type( MediaType.TEXT_PLAIN )
+                        .build();
             }
 
             try {
@@ -107,6 +114,7 @@ public class ModificaInformazioniAttore {
             // Se qui significa attore non trovato
             return Response.status( Response.Status.BAD_REQUEST )
                            .entity( "Problemi nel recupero delle informazioni dell'autore della richiesta." )
+                           .type( MediaType.TEXT_PLAIN )
                            .build();
         }
 
