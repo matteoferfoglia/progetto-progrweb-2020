@@ -220,8 +220,12 @@ export default {
   },
   created() {
 
+    /** Restituisce una Promise risolta con valore undefined se
+     * le richieste di informazioni vanno a buon fine, una
+     * Promise rigettata altrimenti.*/
     const richiestaInfo = () => {
-          // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
+
+         // Richiede il nome della property di un documento contenente la data di visualizzazione del documento stesso
       return getNomePropertyDataVisualizzazioneDocumenti()
         .then(nomeProp => this.NOME_PROP_DATA_VISUALIZZAZIONE_DOCUMENTO = nomeProp)
 
@@ -235,7 +239,11 @@ export default {
 
         // Richiede il nome della property di un documento contenere la lista di hashtag del documento stesso
         .then( getNomePropertyListaHashtagDocumenti )
-        .then(nomeProp => this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomeProp);
+        .then(nomeProp => this.NOME_PROP_LISTA_HASHTAG_DOCUMENTO = nomeProp)
+
+        // Restituisce Promise
+        .then( () => Promise.resolve(undefined) )
+        .catch( Promise.reject );
 
     }
 
