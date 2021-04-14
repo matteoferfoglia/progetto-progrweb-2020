@@ -4,6 +4,7 @@ import it.units.progrweb.api.CreazioneAttore;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.uploader.Uploader;
+import it.units.progrweb.utils.ResponseHelper;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
@@ -32,20 +33,10 @@ public class GestioneAttori {
         // Ricerca dell'attore da eliminare
         boolean attoreEliminato = Attore.eliminaAttoreDaIdentificativo( identificativoAttoreDaEliminare );
 
-        if( attoreEliminato ) {
-
-            return Response
-                    .status( Response.Status.OK )
-                    .entity("Attore eliminato")
-                    .build();
-
-        } else {
-            return Response
-                    .status( Response.Status.BAD_REQUEST )
-                    .entity( "Impossibile eliminare l'attore " + identificativoAttoreDaEliminare )
-                    .build();
-        }
-
+        if( attoreEliminato )
+            return ResponseHelper.creaResponseOk("Attore eliminato");
+        else
+            return ResponseHelper.creaResponseBadRequest( "Impossibile eliminare l'attore " + identificativoAttoreDaEliminare );
 
     }
 
@@ -85,10 +76,7 @@ public class GestioneAttori {
             );
 
         } else {
-            return Response
-                    .status( Response.Status.BAD_REQUEST )
-                    .entity("Specificare l'identificativo del Consumer da specificare.")
-                    .build();
+            return ResponseHelper.creaResponseBadRequest("Specificare l'identificativo del Consumer da specificare.");
         }
 
 

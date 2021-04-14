@@ -4,12 +4,14 @@ import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.net.URI;
@@ -53,17 +55,16 @@ public class RichiesteSenzaAutenticazione {
             if( logo!=null && logo.length>0  && !mediatypeLogo.equals("") ) {
                 // se mediatype non specificato
 
-                return Response.ok(logo, mediatypeLogo)
-                        .build();
+                return ResponseHelper.creaResponseOk(logo, MediaType.valueOf(mediatypeLogo));
             }
             else {
                 try {
-                    return Response.seeOther(new URI("/logoDefault.svg")).build();
+                    return ResponseHelper.creaResponseSeeOther(new URI("/logoDefault.svg"));
                 } catch (URISyntaxException e) {
                     Logger.scriviEccezioneNelLog(this.getClass(),
                             "Errore nella restituzione del logo di default",
                             e);
-                    return Response.serverError().build();
+                    return ResponseHelper.creaResponseServerError("");
                 }
             }
         } else {

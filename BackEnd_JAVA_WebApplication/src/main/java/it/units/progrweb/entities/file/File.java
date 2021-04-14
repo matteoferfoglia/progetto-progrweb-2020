@@ -394,7 +394,7 @@ public abstract class File {
                      file.getIdentificativoMittente().equals(identificativoAttoreDaHttpServletRequest) );       // altimenti bisogna verificare che chi richiede il file sia o il mittente o il destinatario di tale file
 
             if(!isClientAutorizzato)
-                return Autenticazione.creaResponseForbidden("Accesso al file vietato.");
+                return ResponseHelper.creaResponseForbidden("Accesso al file vietato.");
 
             if(file.isEliminato())
                 throw new NotFoundException();
@@ -404,9 +404,11 @@ public abstract class File {
                                                                            .replaceAll("\\[","")
                                                                            .replaceAll("]",""),     // rimuove "[]" intorno all'indirizzo
                                                          salvaDatiVisualizzazione);
-            return Response.ok(contenutoFile, MediaType.APPLICATION_OCTET_STREAM)
-                           .header("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
-                           .build();
+            return ResponseHelper.creaResponseOk(
+                    contenutoFile,
+                    MediaType.APPLICATION_OCTET_STREAM_TYPE,
+                    new ResponseHelper.HeaderResponse("Content-Disposition", "attachment; filename=\"" + file.getNomeDocumento() + "\"")
+            );
 
         } catch (NotFoundException notFoundException) {
             return NotFoundException.creaResponseNotFound("File non trovato.");

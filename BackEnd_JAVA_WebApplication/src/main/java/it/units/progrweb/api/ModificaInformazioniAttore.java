@@ -7,6 +7,7 @@ import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -80,9 +81,7 @@ public class ModificaInformazioniAttore {
                         Uploader.modificaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
                     } catch (IOException e) {
                         // Dimensioni logo eccessive
-                        return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
-                                       .entity( e.getMessage() )
-                                       .build();
+                        return ResponseHelper.creaResponseRequestEntityTooLarge(e.getMessage());
                     }
                 } else {
                     Attore.modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
@@ -93,11 +92,7 @@ public class ModificaInformazioniAttore {
 
             } else {
                 // Errore nella modifica della password
-                return Response
-                        .status( Response.Status.BAD_REQUEST )
-                        .entity( "Password inserite non valide." )
-                        .type( MediaType.TEXT_PLAIN )
-                        .build();
+                return ResponseHelper.creaResponseBadRequest( "Password inserite non valide." );
             }
 
             try {
@@ -107,15 +102,12 @@ public class ModificaInformazioniAttore {
                 return Autenticazione.creaResponseAutenticazionePerAttore(attoreDaModificare);
             } catch (NotFoundException notFoundException) {
                 Logger.scriviEccezioneNelLog(ModificaInformazioniAttore.class, notFoundException);
-                return Response.serverError().build();
+                return ResponseHelper.creaResponseServerError("");
             }
 
         } else {
             // Se qui significa attore non trovato
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( "Problemi nel recupero delle informazioni dell'autore della richiesta." )
-                           .type( MediaType.TEXT_PLAIN )
-                           .build();
+            return ResponseHelper.creaResponseBadRequest( "Problemi nel recupero delle informazioni dell'autore della richiesta." );
         }
 
     }

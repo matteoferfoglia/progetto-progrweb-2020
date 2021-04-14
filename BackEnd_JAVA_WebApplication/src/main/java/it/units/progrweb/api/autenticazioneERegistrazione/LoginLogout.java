@@ -83,10 +83,7 @@ public class LoginLogout {
                         }
                     }
 
-                    return Response.status(Response.Status.CONFLICT)
-                                   .type( MediaType.APPLICATION_JSON )
-                                   .entity( usernameAttoriTrovati )    // lista con username trovati
-                                   .build();
+                    return ResponseHelper.creaResponseConflict( usernameAttoriTrovati, MediaType.APPLICATION_JSON_TYPE );    // lista con username trovati
                 }
 
             } catch (Exception e) {
@@ -94,9 +91,7 @@ public class LoginLogout {
             }
 
         } else {
-            return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("Errore: ricevuto token nullo.")
-                           .build();
+            return ResponseHelper.creaResponseBadRequest("Errore: ricevuto token nullo.");
         }
 
     }
@@ -216,7 +211,7 @@ public class LoginLogout {
             return Autenticazione.creaResponseAutenticazionePerAttore(Autenticazione.getAttoreDaDatabase(httpServletRequest));
         } catch (NotFoundException notFoundException) {
             Logger.scriviEccezioneNelLog(LoginLogout.class, "Attore non trovato nel sistema", notFoundException);
-            return Response.serverError().build();
+            return ResponseHelper.creaResponseServerError("");
         }
     }
 

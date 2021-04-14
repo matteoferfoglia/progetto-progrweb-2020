@@ -1,5 +1,7 @@
 package it.units.progrweb.persistence;
 
+import it.units.progrweb.utils.ResponseHelper;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -13,9 +15,7 @@ public class NotFoundException extends Exception{
     /** Metodo di utilità per generare un'appropriata
      * {@link Response} se una risorsa non viene trovata.*/
     public static Response creaResponseNotFound( String messaggioErrore ) {
-        return Response.status( Response.Status.NOT_FOUND )
-                       .entity( messaggioErrore )
-                       .build();
+        return ResponseHelper.creaResponseNotFound( messaggioErrore );
     }
 
 }

@@ -1,6 +1,7 @@
 package it.units.progrweb.filters;
 
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.ResponseHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 
 import javax.servlet.*;
@@ -64,7 +65,7 @@ public class FiltroAutenticazione implements Filter {
             chain.doFilter(req, resp);
             // attualmente, solo richieste di tipo "api" possibili
         } else {
-            Autenticazione.creaResponseUnauthorized((HttpServletResponse) resp);
+            ResponseHelper.creaResponseUnauthorized("", (HttpServletResponse) resp);
         }
 
     }

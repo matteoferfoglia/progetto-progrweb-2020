@@ -4,6 +4,7 @@ import it.units.progrweb.api.autenticazioneERegistrazione.CampiFormLogin;
 import it.units.progrweb.api.uploader.GestioneDocumenti;
 import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.ResponseHelper;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
@@ -80,12 +81,10 @@ public class WebService {
 
         } catch (InputMismatchException e) {
             // Consumer trovato nel sistema, ma incoerenza nei campi
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( e.getMessage() )
-                    .build();
+            return ResponseHelper.creaResponseBadRequest( e.getMessage() );
         } catch (MessagingException | NoSuchAlgorithmException |
                 InvalidKeyException | UnsupportedEncodingException e) {
-            return Response.serverError().entity( e.getMessage() ).build();
+            return ResponseHelper.creaResponseServerError( e.getMessage() );
         }
 
     }

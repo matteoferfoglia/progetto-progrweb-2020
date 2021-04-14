@@ -8,6 +8,7 @@ import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.mail.MailSender;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -66,11 +67,9 @@ public class GestioneDocumenti {
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
         if( File.eliminaFileDiUploader(idFileDaEliminare, identificativoUploader) )
-            return Response
-                    .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                    .entity("File " + idFileDaEliminare + " eliminato")
-                    .build();
-        else return Autenticazione.creaResponseForbidden("Non autorizzato a cancellare il file.");
+            return ResponseHelper.creaResponseOk("File " + idFileDaEliminare + " eliminato");
+
+        else return ResponseHelper.creaResponseForbidden("Non autorizzato a cancellare il file.");
 
     }
 
@@ -141,9 +140,8 @@ public class GestioneDocumenti {
                     Uploader mittente = Uploader.getAttoreDaIdentificativo(identificativoUploaderMittente);
 
                     if( mittente==null )
-                        return Response.status( Response.Status.BAD_REQUEST )
-                                .entity( "Uploader " + identificativoUploaderMittente + " non trovato nel sistema." )
-                                .build();
+                        return ResponseHelper.creaResponseBadRequest( "Uploader " +
+                                identificativoUploaderMittente + " non trovato nel sistema." );
 
                     inviaNotificaDocumentoCaricatoAlConsumerDestinatario(fileAggiunto, mittente, destinatario, httpServletRequest);
 
@@ -154,24 +152,17 @@ public class GestioneDocumenti {
                     return UtilitaGenerale.rispostaJsonConMappaConValoriJSON(mappa_idFile_propFile);
 
                 } catch( ApiProxy.RequestTooLargeException e) {
-                    return Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Il file che si è cercato di caricare è troppo grande. " +
-                                    "Dimensioni massime consentite: " + (int)Math.floor(File.MAX_SIZE_FILE/1024.0) + " KB.")
-                            .build();
+                    return ResponseHelper.creaResponseBadRequest("Il file che si è cercato di caricare è troppo grande. " +
+                                    "Dimensioni massime consentite: " + (int)Math.floor(File.MAX_SIZE_FILE/1024.0) + " KB.");
                 }
 
             } else {
 
-                return Response.status( Response.Status.BAD_REQUEST )
-                        .entity( "Consumer " + identificativoConsumerDestinatario + " non trovato nel sistema." )
-                        .build();
+                return ResponseHelper.creaResponseBadRequest( "Consumer " + identificativoConsumerDestinatario + " non trovato nel sistema." );
 
             }
         } else {
-
-            return Response.status( 422, "Unprocessable Entity" )
-                    .entity( "Caricare un file valido." )
-                    .build();
+            return ResponseHelper.creaResponseUnprocessableEntity("Caricare un file valido.");
         }
 
     }

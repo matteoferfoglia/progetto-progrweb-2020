@@ -8,11 +8,9 @@ import it.units.progrweb.utils.jwt.componenti.JwtPayload;
 import it.units.progrweb.utils.jwt.componenti.claims.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.NoSuchElementException;
@@ -119,27 +117,10 @@ public class Autenticazione {
     }
 
     public static Response creaResponseUnauthorized() {
-        return Response.status(Response.Status.UNAUTHORIZED)
-                       .header(NOME_HEADER_AUTHENTICATE, TIPO_AUTENTICAZIONE_RICHIESTA)   // invita il client ad autenticarsi
-                       .entity("Credenziali invalide")                                    // body della response
-                       .build();
-    }
-
-    /** Invia una risposta al client indicando che non è autorizzato.*/
-    public static void creaResponseUnauthorized(HttpServletResponse response)
-            throws IOException {
-
-        response.sendError(
-                Response.Status.UNAUTHORIZED.getStatusCode(),
-                Response.Status.UNAUTHORIZED.getReasonPhrase()
+        return ResponseHelper.creaResponseUnauthorized(
+                "Credenziali invalide",
+                new ResponseHelper.HeaderResponse(NOME_HEADER_AUTHENTICATE, TIPO_AUTENTICAZIONE_RICHIESTA) // invita il client ad autenticarsi
         );
-
-    }
-
-    public static Response creaResponseForbidden(String messaggio) {
-        return Response.status(Response.Status.FORBIDDEN)
-                .entity(messaggio)
-                .build();
     }
 
     /** Crea una risposta HTTP grazie alla quale sovrascrive il cookie il cui
@@ -151,11 +132,13 @@ public class Autenticazione {
      * della risposta creata da questo metodo.*/
     public static Response creaResponseLogout() {
 
-        return Response.ok()
-                       .cookie(new Cookie( NOME_COOKIE_CLIENT_TOKEN,
-                                           "deleted", 0,
-                                           "Rimozione cookie di autenticazione."))
-                       .build();
+        return ResponseHelper.creaResponseOk("", new Cookie[]{
+                new Cookie( NOME_COOKIE_CLIENT_TOKEN,
+                            "deleted", 0,
+                            "Rimozione cookie di autenticazione."
+                )
+        });
+
     }
 
     /** Metodo da invocare se un attore ha fornito le credenziali corrette.
@@ -177,20 +160,20 @@ public class Autenticazione {
                                                                  valoreTokenAutenticazione,
                                                                  TIMEOUT_AUTENTICAZIONE_IN_SECONDI,
                                                                  "Cookie per l'autenticazione del client." );
-            String tokenAutenticazione = Autenticazione.creaJwtTokenAutenticazionePerAttore(attore, valoreTokenAutenticazione);
 
-            return Response.ok()
-                           .cookie(cookieIdClientPerAutenticazione)
-                           .entity(tokenAutenticazione)
-                           .type(MediaType.APPLICATION_FORM_URLENCODED) // token non è propriamente application/json
-                           .build();
+            return ResponseHelper.creaResponseOk(
+                    Autenticazione.creaJwtTokenAutenticazionePerAttore(attore, valoreTokenAutenticazione),
+                    MediaType.APPLICATION_FORM_URLENCODED_TYPE,  // token non è propriamente application/json
+                    new Cookie[]{
+                            cookieIdClientPerAutenticazione
+                    }
+            );
 
         } catch (NoSuchAlgorithmException|InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(Autenticazione.class,
                     "Impossibile creare il token JWT di autenticazione.", e);
 
-            return Response.serverError()
-                           .build();
+            return ResponseHelper.creaResponseServerError("");
         }
 
     }

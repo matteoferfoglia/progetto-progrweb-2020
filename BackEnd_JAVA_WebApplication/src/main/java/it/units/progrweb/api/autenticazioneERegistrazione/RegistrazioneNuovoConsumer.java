@@ -5,6 +5,7 @@ import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
 import it.units.progrweb.utils.Logger;
 import it.units.progrweb.utils.RegexHelper;
+import it.units.progrweb.utils.ResponseHelper;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,26 +51,17 @@ public class RegistrazioneNuovoConsumer {
                     registrazioneConclusaConSuccesso = false;
                 }
                 if( registrazioneConclusaConSuccesso )
-                    return Response.ok()
-                            .type( MediaType.TEXT_PLAIN )
-                            .entity("La registrazione è andata buon fine. Seguire le indicazioni inviate via e-mail.")
-                            .build();
+                    return ResponseHelper.creaResponseOk("La registrazione è andata buon fine. Seguire le indicazioni inviate via e-mail.");
 
-                else return Response.serverError().build();
+                else return ResponseHelper.creaResponseServerError("");
 
             } else {
-                return Response.status( Response.Status.CONFLICT )
-                               .type( MediaType.TEXT_PLAIN )
-                               .entity( codiceFiscale + " risulta gia' registrato nella piattaforma." )
-                               .build();
+                return ResponseHelper.creaResponseConflict(codiceFiscale + " risulta gia' registrato nella piattaforma.", MediaType.TEXT_PLAIN_TYPE);
             }
 
         } else {
 
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .type( MediaType.TEXT_PLAIN )
-                           .entity( "Valori di input inseriti non validi." )
-                           .build();
+            return ResponseHelper.creaResponseBadRequest( "Valori di input inseriti non validi." );
 
         }
     }

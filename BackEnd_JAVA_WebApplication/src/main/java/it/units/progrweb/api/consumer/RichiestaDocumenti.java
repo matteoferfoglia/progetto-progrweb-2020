@@ -5,6 +5,7 @@ import it.units.progrweb.entities.file.File;
 import it.units.progrweb.persistence.NotFoundException;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 import it.units.progrweb.utils.UtilitaGenerale;
 import it.units.progrweb.utils.datetime.DateTime;
 
@@ -89,13 +90,13 @@ public class RichiestaDocumenti {
 
         if( numeroDocumentiAttualmenteNotiAlClient!=null ) {
             if (numeroDocumentiAttualmenteNotiAlClient.equals(listaFile.size())) {
-                return Response.notModified().build();
+                return ResponseHelper.creaResponseNotModified();
             } else {
                 try {
-                    return Response.seeOther(new URI(URI_redirection)).build();    // redirect a questa stessa api, con numeroDocumentiAttualmenteNotiAlClient=null
+                    return ResponseHelper.creaResponseSeeOther(new URI(URI_redirection));    // redirect a questa stessa api, con numeroDocumentiAttualmenteNotiAlClient=null
                 } catch (URISyntaxException e) {
                     Logger.scriviEccezioneNelLog(RichiestaDocumenti.class, e);
-                    return Response.serverError().build();
+                    return ResponseHelper.creaResponseServerError("");
                 }
             }
         } else {

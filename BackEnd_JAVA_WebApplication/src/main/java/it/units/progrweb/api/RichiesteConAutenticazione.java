@@ -8,6 +8,7 @@ import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.file.File;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -128,7 +129,7 @@ public class RichiesteConAutenticazione {
         Long idUploader = null; //   nel caso in cui uno di questi ruoli stia facendo una richiesta sull'altro
 
         if (attoreTarget == null)
-            return Response.status(Response.Status.NOT_FOUND).entity(idAttoreTarget + " non trovato nel sistema.").build();
+            return ResponseHelper.creaResponseNotFound(idAttoreTarget + " non trovato nel sistema.");
         else {
 
             try {
@@ -182,18 +183,14 @@ public class RichiesteConAutenticazione {
                     isRichiedenteAutorizzato = RelazioneUploaderConsumer.isConsumerServitoDaUploader(idUploader, idConsumer);
 
                 if( isRichiedenteAutorizzato )
-                    return Response
-                            .ok()
-                            .entity(new AttoreProxy(attoreTarget))    // Proxy nasconde implementazione vera
-                            .type(MediaType.APPLICATION_JSON)
-                            .build();
+                    return ResponseHelper.creaResponseOk(new AttoreProxy(attoreTarget), MediaType.APPLICATION_JSON_TYPE);    // Proxy nasconde implementazione vera
                 else
-                    return Autenticazione.creaResponseForbidden("Il ruolo del richiedente non è autorizzato ad ottenere le informazioni richieste.");
+                    return ResponseHelper.creaResponseForbidden("Il ruolo del richiedente non è autorizzato ad ottenere le informazioni richieste.");
 
             } catch (IllegalArgumentException tipoAttoreInvalidoException) {
                 // Eccezione generabile da Attore.TipoAttore.valueOf
                 Logger.scriviEccezioneNelLog(this.getClass(), "Il tipo attore non è valido.", tipoAttoreInvalidoException);
-                return Response.serverError().build();
+                return ResponseHelper.creaResponseServerError("");
             }
         }
 

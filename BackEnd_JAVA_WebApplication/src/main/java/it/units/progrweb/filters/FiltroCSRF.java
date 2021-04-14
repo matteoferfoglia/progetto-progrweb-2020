@@ -1,9 +1,6 @@
 package it.units.progrweb.filters;
 
-import it.units.progrweb.utils.Cookie;
-import it.units.progrweb.utils.JsonHelper;
-import it.units.progrweb.utils.Logger;
-import it.units.progrweb.utils.UtilitaGenerale;
+import it.units.progrweb.utils.*;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
 import javax.servlet.*;
@@ -12,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -110,8 +106,7 @@ public class FiltroCSRF implements Filter {
 
                     } catch (Exception e) {
                         Logger.scriviEccezioneNelLog(this.getClass(), "Errore nella lettura del body della request", e);
-                        ((HttpServletResponse)resp).sendError(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
-                                Response.Status.INTERNAL_SERVER_ERROR.getReasonPhrase());
+                        ResponseHelper.creaResponseServerError("",(HttpServletResponse)resp);
                     }
 
                 }

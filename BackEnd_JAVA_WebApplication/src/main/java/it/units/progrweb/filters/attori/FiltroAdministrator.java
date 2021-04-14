@@ -3,6 +3,7 @@ package it.units.progrweb.filters.attori;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.filters.FiltroAutenticazione;
 import it.units.progrweb.utils.Autenticazione;
+import it.units.progrweb.utils.ResponseHelper;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -33,7 +34,7 @@ public class FiltroAdministrator implements Filter {
         if(tipoAttore.equals(Administrator.class.getSimpleName()))
             chain.doFilter(req, resp);
         else
-            Autenticazione.creaResponseUnauthorized((HttpServletResponse) resp);
+            ResponseHelper.creaResponseUnauthorized("",(HttpServletResponse) resp);
 
     }
 

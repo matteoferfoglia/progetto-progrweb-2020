@@ -5,6 +5,7 @@ import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.administrator.Resoconto;
 import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.utils.EncoderPrevenzioneXSS;
+import it.units.progrweb.utils.ResponseHelper;
 import it.units.progrweb.utils.datetime.DateTime;
 import it.units.progrweb.utils.datetime.PeriodoTemporale;
 
@@ -57,8 +58,7 @@ public class RichiestaResocontoUploader {
             return new Resoconto( identificativoUploader, periodoTemporale);
 
         } else {
-            httpServletResponse.sendError( HttpServletResponse.SC_NOT_FOUND,
-                                           "Uploader [" + identificativoUploader + "] non trovato" );
+            ResponseHelper.creaResponseNotFound("Uploader [" + identificativoUploader + "] non trovato", httpServletResponse);
             return null;
         }
     }

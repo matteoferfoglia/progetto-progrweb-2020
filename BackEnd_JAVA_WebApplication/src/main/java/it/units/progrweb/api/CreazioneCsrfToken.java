@@ -1,6 +1,8 @@
 package it.units.progrweb.api;
 
+import it.units.progrweb.utils.Cookie;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 import it.units.progrweb.utils.csrf.CsrfCookie;
 import it.units.progrweb.utils.csrf.CsrfToken;
 
@@ -58,16 +60,13 @@ public class CreazioneCsrfToken {
             CsrfCookie csrfCookie = csrfToken.creaCookiePerCsrf();
 
             // Invia risposta positiva ed aggiungi il cookie creato sopra
-            return Response .ok()
-                            .cookie(csrfCookie.getCookieCSRF())
-                            .entity(csrfToken.getValoreCsrfToken())      // CSRF token anche nel body della response
-                            .build();
+            return ResponseHelper.creaResponseOk(csrfToken.getValoreCsrfToken(), new Cookie[]{csrfCookie.getCookieCSRF()});
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(CreazioneCsrfToken.class,e.getMessage(), e);
         }
 
-        return Response.serverError().build();
+        return ResponseHelper.creaResponseServerError("");
     }
 
 }

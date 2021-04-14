@@ -8,6 +8,7 @@ import it.units.progrweb.entities.attori.consumer.ConsumerProxy;
 import it.units.progrweb.entities.attori.uploader.Uploader;
 import it.units.progrweb.utils.Autenticazione;
 import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.ResponseHelper;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.mail.MessagingException;
@@ -74,19 +75,12 @@ public class GestioneConsumer {
         try {
             CreazioneAttore.CampiFormAggiuntaAttore consumerAppenaAggiunto
                     = associaConsumerAdUploader(httpServletRequest, campiFormAggiuntaAttore, identificativoUploader);
-            return Response.ok()
-                           .entity(consumerAppenaAggiunto.getIdentificativoAttore())
-                           .type(MediaType.TEXT_PLAIN)
-                           .build();
+            return ResponseHelper.creaResponseOk(consumerAppenaAggiunto.getIdentificativoAttore());
         } catch ( NoSuchAlgorithmException | InvalidKeyException  |
                   MessagingException | UnsupportedEncodingException e) {
-            return Response.serverError()
-                           .entity("Errore durante la creazione del consumer.")
-                           .build();
+            return ResponseHelper.creaResponseServerError("Errore durante la creazione del consumer.");
         } catch (InputMismatchException e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                           .entity(e.getMessage())
-                           .build();
+            return ResponseHelper.creaResponseBadRequest(e.getMessage());
         }
 
 
@@ -166,10 +160,7 @@ public class GestioneConsumer {
         Long identificativoUploader = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
         RelazioneUploaderConsumer.dissociaConsumerDaUploader(identificativoConsumerDaEliminare, identificativoUploader);
 
-        return Response
-                   .status( Response.Status.OK )// Fonte (200 nella risposta): https://tools.ietf.org/html/rfc7231#section-4.3.5
-                   .entity("Consumer eliminato")
-                   .build();
+        return ResponseHelper.creaResponseOk("Consumer eliminato");
 
 
     }
@@ -203,18 +194,12 @@ public class GestioneConsumer {
 
             } else {
 
-                return Response
-                        .status( Response.Status.BAD_REQUEST )
-                        .entity("Consumer non gestito dall'Uploader che ne ha richiesto la modifica.")
-                        .build();
+                return ResponseHelper.creaResponseBadRequest("Consumer non gestito dall'Uploader che ne ha richiesto la modifica.");
 
             }
 
         } else {
-            return Response
-                    .status( Response.Status.BAD_REQUEST )
-                    .entity( "Identificativo del consumer da modificare non può essere null." )
-                    .build();
+            return ResponseHelper.creaResponseBadRequest( "Identificativo del consumer da modificare non può essere null." );
         }
 
     }

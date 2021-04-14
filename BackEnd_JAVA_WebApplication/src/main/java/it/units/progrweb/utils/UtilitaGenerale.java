@@ -162,10 +162,7 @@ public class UtilitaGenerale {
                 "}";
 
         // Costruzione della response
-        return Response.ok()
-                       .type(MediaType.APPLICATION_JSON)
-                       .entity(rappresentazioneJson)
-                       .build();
+        return ResponseHelper.creaResponseOk(rappresentazioneJson, MediaType.APPLICATION_JSON_TYPE);
     }
 
     /** Effettua la conversione da Input Stream a byte[]

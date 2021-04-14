@@ -125,10 +125,7 @@ public abstract class Attore implements Cloneable, Principal {
             if( modificaRichiestaDaUploader &&
                     ! (attore_recuperatoDaDB instanceof Consumer) ) {
 
-                return Response
-                        .status(Response.Status.FORBIDDEN)
-                        .entity("Un " + TipoAttore.Uploader + " può modificare solo un " + TipoAttore.Consumer)
-                        .build();
+                return ResponseHelper.creaResponseForbidden("Un " + TipoAttore.Uploader + " può modificare solo un " + TipoAttore.Consumer);
 
             } else {
 
@@ -153,9 +150,7 @@ public abstract class Attore implements Cloneable, Principal {
 
                     } catch (IOException e) {
                         // Dimensione immagine logo eccessiva
-                        return Response.status( Response.Status.REQUEST_ENTITY_TOO_LARGE )
-                                .entity( e.getMessage() )
-                                .build();
+                        return ResponseHelper.creaResponseUnprocessableEntity(e.getMessage());
                     }
 
                 } else {
@@ -168,19 +163,13 @@ public abstract class Attore implements Cloneable, Principal {
                     DatabaseHelper.salvaEntita(attore_recuperatoDaDB);
                 }
 
-                return Response.ok()
-                        .type( MediaType.APPLICATION_JSON )
-                        .entity( new AttoreProxy(attore_recuperatoDaDB) )
-                        .build();
+                return ResponseHelper.creaResponseOk( new AttoreProxy(attore_recuperatoDaDB), MediaType.APPLICATION_JSON_TYPE );
             }
 
 
         } else {
 
-            return Response
-                    .status( Response.Status.BAD_REQUEST )
-                    .entity("Attore da modificare non presente nel sistema.")
-                    .build();
+            return ResponseHelper.creaResponseBadRequest("Attore da modificare non presente nel sistema.");
 
         }
 

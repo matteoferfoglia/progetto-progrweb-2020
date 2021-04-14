@@ -5,16 +5,12 @@ import it.units.progrweb.entities.attori.Attore;
 import it.units.progrweb.entities.attori.administrator.Administrator;
 import it.units.progrweb.entities.attori.consumer.Consumer;
 import it.units.progrweb.entities.attori.uploader.Uploader;
-import it.units.progrweb.utils.Autenticazione;
-import it.units.progrweb.utils.EncoderPrevenzioneXSS;
-import it.units.progrweb.utils.GeneratoreTokenCasuali;
-import it.units.progrweb.utils.Logger;
+import it.units.progrweb.utils.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -142,42 +138,30 @@ public class CreazioneAttore {
             attoreDaCreare = creaNuovoAttore(httpServletRequest, campiFormAggiuntaAttore, tipoAttoreRichiedenteCreazione);
 
             if(attoreDaCreare==null)
-                return Response
-                        .status(Response.Status.BAD_REQUEST)
-                        .entity("L'attore \"" + campiFormAggiuntaAttore.getUsername() + "\" è già presente nel sistema.")
-                        .build();
+                return ResponseHelper.creaResponseBadRequest("L'attore \"" + campiFormAggiuntaAttore.getUsername() + "\" è già presente nel sistema.");
 
-            return Response
-                    .ok()
-                    .entity(attoreDaCreare.getIdentificativoAttore())
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
-
+            return ResponseHelper.creaResponseOk( attoreDaCreare.getIdentificativoAttore() );
 
         } catch(NotAuthorizedException e) {
-            return Autenticazione.creaResponseForbidden("Autorizzazione alla creazione di attori negata.");
+            return ResponseHelper.creaResponseForbidden("Autorizzazione alla creazione di attori negata.");
         } catch( Attore.FormatoUsernameInvalido e ) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
+            return ResponseHelper.creaResponseBadRequest(e.getMessage());
         } catch (IllegalArgumentException e) {
             // Tipo attore ricevuto non valido
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Valori di input inseriti non validi.")
-                    .build();
+            return ResponseHelper.creaResponseBadRequest("Valori di input inseriti non validi.");
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             Logger.scriviEccezioneNelLog(GestioneAttori.class,
                     "Errore durante la scrittura in AuthDB",
                     e);
-            return Response.serverError().build();
+            return ResponseHelper.creaResponseServerError("");
         } catch (UnsupportedEncodingException | MessagingException e) {
             Logger.scriviEccezioneNelLog(GestioneAttori.class,
                     "Errore durante l'invio della mail'",
                     e);
-            return Response.serverError().build();
+            return ResponseHelper.creaResponseServerError("");
         } catch (NullPointerException e) {
             Logger.scriviEccezioneNelLog(GestioneAttori.class, e);
-            return Response.serverError().build();
+            return ResponseHelper.creaResponseServerError("");
         }
 
     }
