@@ -95,9 +95,7 @@ public class Autenticazione {
      * del token CSRF (valore nel cookie) e verificare che combaci con il valore nel
      * token JWT di autenticazione per poter considerare il client autenticato.*/
     public static Response creaResponseAutenticazione(String username, String password) {
-
         Attore attore = Autenticazione.getAttoreDaCredenziali(username, password);
-
         return creaResponseAutenticazione(attore);
     }
 

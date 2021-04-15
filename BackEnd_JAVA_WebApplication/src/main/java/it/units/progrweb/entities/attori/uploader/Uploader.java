@@ -71,9 +71,9 @@ public abstract class Uploader extends Attore {
     /** Aggiorna nel database gli attributi di un {@link Uploader}
      * con quelli forniti nei parametri (solo se validi).
      * @throws IOException Se il logo ha una dimensione eccessiva.*/
-    public static void modificaInfoUploader(@NotNull Uploader uploaderDaModificare,
-                                            InputStream nuovoLogo, FormDataContentDisposition dettagliNuovoLogo,
-                                            String nuovoNominativo, String nuovaEmail)
+    public static void modificaESalvaInfoUploader(@NotNull Uploader uploaderDaModificare,
+                                                  InputStream nuovoLogo, FormDataContentDisposition dettagliNuovoLogo,
+                                                  String nuovoNominativo, String nuovaEmail)
             throws IOException {
 
         if( nuovoLogo!=null && dettagliNuovoLogo!=null && dettagliNuovoLogo.getFileName()!=null ) {
@@ -85,7 +85,7 @@ public abstract class Uploader extends Attore {
                     );
         }
 
-        modificaInfoAttore( uploaderDaModificare, nuovoNominativo, nuovaEmail );
+        modificaESalvaInfoAttore( uploaderDaModificare, nuovoNominativo, nuovaEmail );
 
     }
 

@@ -58,6 +58,7 @@ public class ModificaInformazioniAttore {
 
         if (attoreDaModificare != null) {
 
+            attoreDaModificare = attoreDaModificare.clone(); // clone per evitare di sporcare la copia nella cache di Objectify
             String username = attoreDaModificare.getUsername();
 
             // Obiettivo: minimizzare il #accessi al db, prevedendo un meccanismo di rollback se qualche dato è invalido
@@ -78,13 +79,13 @@ public class ModificaInformazioniAttore {
 
                 if ( attoreDaModificare.getTipoAttore().equals(Attore.TipoAttore.Uploader.name()) ) {
                     try {
-                        Uploader.modificaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
+                        Uploader.modificaESalvaInfoUploader((Uploader) attoreDaModificare, nuovoLogo, dettagliNuovoLogo, nuovoNominativo, nuovaEmail);
                     } catch (IOException e) {
                         // Dimensioni logo eccessive
                         return ResponseHelper.creaResponseRequestEntityTooLarge(e.getMessage());
                     }
                 } else {
-                    Attore.modificaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
+                    Attore.modificaESalvaInfoAttore(attoreDaModificare, nuovoNominativo, nuovaEmail);   // in generale, gli attori non hanno il logo
                 }
 
                 if( optionalModificaAuthDb.get() instanceof Supplier )

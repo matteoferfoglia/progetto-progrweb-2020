@@ -123,6 +123,8 @@ public class RichiesteConAutenticazione {
                                                                                             @Context HttpServletRequest httpServletRequest) {
 
         Attore attoreTarget = Attore.getAttoreDaIdentificativo(idAttoreTarget);
+        attoreTarget = attoreTarget==null ? null : attoreTarget.clone();
+
         Long idAttoreAutenticato = Autenticazione.getIdentificativoAttoreDaHttpServletRequest(httpServletRequest);
 
         Long idConsumer = null; // usati in seguito per determinare se consumer ed uploader sono in relazione

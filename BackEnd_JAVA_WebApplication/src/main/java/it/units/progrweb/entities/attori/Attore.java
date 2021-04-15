@@ -130,18 +130,18 @@ public abstract class Attore implements Cloneable, Principal {
             } else {
 
                 // Recupera dal DB l'attore da modificare, ne crea un clone di riferimento,
-                // modifica l'entità recuperata dal database e se ci sono modifiche valide
-                // allora aggiorna l'entità salvata in database
+                // modifica il clone e se ci sono modifiche valide, allora aggiorna l'entità nel database
+                // (evitare problemi di cache)
 
                 Attore clone_attoreRecuperatoDaDB = attore_recuperatoDaDB.clone();
                 clone_attoreRecuperatoDaDB.setIdentificativoAttore( attore_recuperatoDaDB.getIdentificativoAttore() );
 
-                if( attore_recuperatoDaDB instanceof Uploader) {    // Solo Uploader ha il logo
+                if( clone_attoreRecuperatoDaDB instanceof Uploader) {    // Solo Uploader ha il logo
 
                     try {
 
-                        Uploader.modificaInfoUploader(
-                                ((Uploader)attore_recuperatoDaDB),
+                        Uploader.modificaESalvaInfoUploader(
+                                ((Uploader)clone_attoreRecuperatoDaDB),
                                 nuovoLogo,
                                 dettagliNuovoLogo,
                                 nuovoNominativo,
@@ -154,13 +154,7 @@ public abstract class Attore implements Cloneable, Principal {
                     }
 
                 } else {
-                    modificaInfoAttore(attore_recuperatoDaDB, nuovoNominativo, nuovaEmail);
-                }
-
-                // Salvataggio delle modifiche in DB (se presenti)
-                if( ! attore_recuperatoDaDB.equals(clone_attoreRecuperatoDaDB) ) {
-                    // Se non ci sono modifiche, risparmio l'inutile accesso in scrittura al DB
-                    DatabaseHelper.salvaEntita(attore_recuperatoDaDB);
+                    modificaESalvaInfoAttore(clone_attoreRecuperatoDaDB, nuovoNominativo, nuovaEmail);
                 }
 
                 return ResponseHelper.creaResponseOk( new AttoreProxy(attore_recuperatoDaDB), MediaType.APPLICATION_JSON_TYPE );
@@ -177,8 +171,8 @@ public abstract class Attore implements Cloneable, Principal {
 
     /** Aggiorna <strong>nel database</strong> gli attributi di un {@link Attore}
      * con quelli forniti nei parametri (solo se validi).*/
-    public static void modificaInfoAttore(@NotNull Attore attoreDaModificare,
-                                          String nuovoNominativo, String nuovaEmail) {
+    public static void modificaESalvaInfoAttore(@NotNull Attore attoreDaModificare,
+                                                String nuovoNominativo, String nuovaEmail) {
 
         if( UtilitaGenerale.isStringaNonNullaNonVuota(nuovoNominativo) ) {
             attoreDaModificare.setNominativo( nuovoNominativo );
@@ -188,7 +182,15 @@ public abstract class Attore implements Cloneable, Principal {
             attoreDaModificare.setEmail( nuovaEmail );
         }
 
-        DatabaseHelper.salvaEntita( attoreDaModificare );
+        Attore attoreAttualmenteInDB =
+                Attore.getAttoreDaUsername( attoreDaModificare.getUsername() ); // attoreDaModificare potrebbe essere un clone senza ID (e non l'entità salvata attualmente)
+
+        if( ! attoreAttualmenteInDB.equals(attoreDaModificare) ) {
+            DatabaseHelper.salvaEntita(attoreDaModificare);                                                            // salva nuova entità
+            if( ! attoreAttualmenteInDB.getIdentificativoAttore()
+                                       .equals(attoreDaModificare.getIdentificativoAttore()) )
+                DatabaseHelper.cancellaAdessoEntitaById(attoreAttualmenteInDB.getIdentificativoAttore(), Attore.class);// cancella vecchia entità (IF serve a controllare di non cancellare quella appena salvata)
+        }
 
     }
 
@@ -414,6 +416,7 @@ public abstract class Attore implements Cloneable, Principal {
 
             return true;
         } catch (Exception e) {
+            Logger.scriviEccezioneNelLog(Attore.class, "Errore durante l'eliminazione di un'entità dal database.", e);
             return false;
         }
     }
@@ -530,7 +533,7 @@ public abstract class Attore implements Cloneable, Principal {
     /** Restituisce una copia di questo attore
      * (<a href="https://stackoverflow.com/a/18146676">Fonte</a>).
      * @return Il clone dell'istanza data, oppure null se si verificano
-     *         dei problemi durante lo'operazione.
+     *         dei problemi durante l'operazione.
      */
     @SuppressWarnings("MethodDoesntCallSuperMethod")    // metodo gestito interamente qui senza chiamata a super
     @Override
