@@ -104,6 +104,7 @@ import {
   setTokenAutenticazione
 } from "../../utils/autenticazione";
 import FormCampiAttore from "../../components/layout/FormCampiAttore";
+import {generaIdUnivoco} from "@/utils/utilitaGenerale";
 export default {
   name: "ImpostazioniAccount",
   components: {FormCampiAttore, FormConCsrfToken},
@@ -131,7 +132,7 @@ export default {
       REGEX_EMAIL: process.env.VUE_APP_REGEX_EMAIL,
 
       /** Valore dell'attributo "id" del form per il caricamento dei documenti.*/
-      idForm_modificaInformazioniAttore: "modificaInformazioniAttore",
+      idForm_modificaInformazioniAttore: "modificaInformazioniAttore-" + generaIdUnivoco(),
 
       /** Email dell'utente attualmente autenticato */
       emailUtenteAutenticato: "",

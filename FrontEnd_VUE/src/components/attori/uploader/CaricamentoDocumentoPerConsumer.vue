@@ -20,6 +20,7 @@
 <script>
 import {richiestaPostConFile} from "../../../utils/http";
 import FormConCsrfToken from "../../layout/FormConCsrfToken";
+import {generaIdUnivoco} from "@/utils/utilitaGenerale";
 
 export default {
   name: "CaricamentoDocumentoPerConsumer",
@@ -40,7 +41,7 @@ export default {
   data() {
     return {
       /** Valore dell'attributo "id" del form per il caricamento dei documenti.*/
-      idForm_caricaNuovoDocumento: "caricaNuovoDocumento",
+      idForm_caricaNuovoDocumento: "caricaNuovoDocumento-" + generaIdUnivoco(),
 
       // PROPRIETA CARICAMENTO NUOVO DOCUMENTO:
       nomeDocumento: "",

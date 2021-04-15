@@ -47,7 +47,7 @@
 
 <script>
 import FormCampiAttore from "../layout/FormCampiAttore";
-import {unisciOggetti} from "../../utils/utilitaGenerale";
+import {generaIdUnivoco, unisciOggetti} from "../../utils/utilitaGenerale";
 import {getHttpResponseStatus, HTTP_STATUS_UNAUTHORIZED} from "../../utils/http";
 import {
   isAdministratorAttualmenteAutenticato,
@@ -88,7 +88,7 @@ export default {
       nomeParametroForm_qualificaAttoreDaAggiungere: process.env.VUE_APP_FORM_TIPO_ATTORE_INPUT_FIELD_NAME,
 
       /** ID dell'elemento HTML usato per contenere il form di aggiunta nuovo attore.*/
-      idSectionAggiuntaAttore: "aggiuntaUploaderOAdministrator",
+      idSectionAggiuntaAttore: "aggiuntaUploaderOAdministrator-" + generaIdUnivoco(),
 
       /** Dati aggiuntivi (oggetto) che il {@link FormCampiAttore} deve
        * inviare al server, oltre a quelli già specificati nel componente stesso.*/
