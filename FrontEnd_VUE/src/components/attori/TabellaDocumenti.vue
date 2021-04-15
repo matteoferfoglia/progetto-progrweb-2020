@@ -104,7 +104,7 @@
  * in quanto ne ha semplificato l'implementazione.*/
 
 
-import {camelCaseToHumanReadable, capitalize} from "../../utils/utilitaGenerale";
+import {camelCaseToHumanReadable, capitalize, isStringaNonNullaNonVuota} from "../../utils/utilitaGenerale";
 import {HTTP_STATUS_NOT_MODIFIED, richiestaDelete, richiestaGet} from "../../utils/http";
 import {
   creaIndiceDeiFileRispettoAgliHashtagCheContengono,
@@ -573,15 +573,38 @@ export default {
 
     },
 
-    /** Data un'entry rappresentante un documento, ne formatta le date presenti.
+    /** Data un'entry rappresentante un documento, ne formatta le date presenti
+     * (modifica l'oggetto passato come parametro senza crearne una copia).
      * @param entry Array avente come primo elemento l'identificativo di un
      *              documento come secondo elemento gli attributi di quel documento.
+     * @return La stessa entry nel parametro con la data formattata o lo stesso
+     *         parametro se esso risultasse invalido.
      */
     formattaDate( entry ) {
 
+      if( !entry || entry.length!==2 ||
+          !entry[0] || !entry[1] ||
+          typeof entry[1] !== "object") {
+        // Se qui: parametro invalido
+        console.error( entry + " non è un parametro valido." );
+        return entry; // termina subito e restituisce l'entry stessa
+      }
+
+      // Metodo per la formattazione della data (data come stringa nel parametro)
+      // Restituisce il parametro stesso se non rappresenta una data valida
       const formattaData = stringaRappresentanteData => {
-        if (!stringaRappresentanteData)
+
+        if (!isStringaNonNullaNonVuota(stringaRappresentanteData))
+          return stringaRappresentanteData; // restituisce la stringa così com'è se invalida
+
+        if ( Number.isNaN(Date.parse(stringaRappresentanteData)) ) {
+          // Stringa rappresentante una data non riconosciuta
+          // Fonte: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
           return stringaRappresentanteData;
+        }
+
+
+        // Se qui, la stringa rappresenta una data valida
 
         return capitalize(
             new Date(stringaRappresentanteData)
@@ -591,6 +614,7 @@ export default {
                       hour: '2-digit', minute: '2-digit', second: '2-digit'
                     })
         );
+
       }
 
       const proprietaQuestoDocumento = entry[1]; // è un oggetto
