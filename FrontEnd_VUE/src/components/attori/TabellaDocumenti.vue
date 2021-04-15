@@ -261,7 +261,7 @@ export default {
 
         // Richiede mappa idFile-propFile per questo attore se non già nota
         // noinspection JSCheckFunctionSignatures // segnala warning con Object.entries(..), ma in realtà rispetta le specifiche
-      ( rispostaServerConMappaDocumenti === undefined ?
+      return ( rispostaServerConMappaDocumenti === undefined ?
           richiestaGet(this.urlRichiestaElencoDocumentiPerUnAttore) :
           Promise.resolve(rispostaServerConMappaDocumenti) )
 
