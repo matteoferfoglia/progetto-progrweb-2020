@@ -26,7 +26,7 @@ public abstract class Uploader extends Attore {
     }
 
     /** Costruttore.
-     * @throws IllegalArgumentException Se lo username non è valido.
+     * @throws FormatoUsernameInvalido Se lo username non è valido.
      */
     public Uploader(String username, String nominativo, String email) {
         super(username, nominativo, email, TipoAttore.Uploader);
