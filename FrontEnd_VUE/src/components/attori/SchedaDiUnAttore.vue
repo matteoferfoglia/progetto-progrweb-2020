@@ -285,7 +285,7 @@ export default {
 
     }
   },
-  created() {
+  mounted() {
 
     this.caricaQuestoComponente()
           .then( () => {
