@@ -206,6 +206,24 @@
         </dependency>
 
 
+        <!--
+            Le seguenti dipendenze evitano l'errore
+                GCLOUD: SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+                GCLOUD: SLF4J: Defaulting to no-operation (NOP) logger implementation
+                GCLOUD: SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+        -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
