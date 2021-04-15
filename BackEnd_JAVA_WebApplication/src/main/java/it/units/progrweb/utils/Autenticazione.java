@@ -290,7 +290,7 @@ public class Autenticazione {
     /** Ricerca l'attore nel database in base al token di autenticazione
      * della richiesta giunta dal client: se trova l'attore nel database,
      * lo restituisce, altrimenti restituisce null.*/
-    public static Attore getAttoreDaTokenAutenticazione(@NotNull String tokenAutenticazione) {
+    public static Attore getAttoreDaDbInBaseATokenAutenticazione(@NotNull String tokenAutenticazione) {
 
         try {
             JwtToken jwtTokenAutenticazione = JwtToken.creaJwtTokenDaStringaCodificata(tokenAutenticazione);
@@ -308,11 +308,11 @@ public class Autenticazione {
      * per quella HttpServletRequest. Se la richiesta proviene da un client
      * che non si è autenticato oppure se l'autenticazione non è valida,
      * allora restituisce null.
-     * Questo metodo utilizza {@link #getAttoreDaTokenAutenticazione(String)}*/
+     * Questo metodo utilizza {@link #getAttoreDaDbInBaseATokenAutenticazione(String)}*/
     public static Attore getAttoreDaDatabase(HttpServletRequest httpServletRequest) {
 
         String tokenAutenticazione = getTokenAutenticazioneBearer(httpServletRequest);
-        return getAttoreDaTokenAutenticazione(tokenAutenticazione);
+        return getAttoreDaDbInBaseATokenAutenticazione(tokenAutenticazione);
 
     }
 
