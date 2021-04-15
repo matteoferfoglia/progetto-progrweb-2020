@@ -392,8 +392,10 @@ public abstract class Attore implements Cloneable, Principal {
      * oppure null se non trovato.*/
     public static Attore getAttoreDaIdentificativo(Long identificativoAttore) {
         try {
+            if( identificativoAttore==null )
+                throw new NullPointerException();
             return  (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException|NullPointerException ignored) {
             return null;
         }
     }
@@ -402,7 +404,7 @@ public abstract class Attore implements Cloneable, Principal {
      * @return true se l'eliminazione viene completata, false se si verificano errori.*/
     public static boolean eliminaAttoreDaIdentificativo(Long identificativoAttore) {
         try {
-            Attore attoreDaEliminare = (Attore) DatabaseHelper.getById(identificativoAttore, Attore.class);
+            Attore attoreDaEliminare = getAttoreDaIdentificativo(identificativoAttore);
 
             RelazioneUploaderConsumer.eliminaUploader(identificativoAttore);    // se non è un Uploader non fa nulla
             DatabaseHelper.cancellaAdessoEntitaById(identificativoAttore, Attore.class);
