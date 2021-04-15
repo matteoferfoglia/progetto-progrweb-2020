@@ -15,18 +15,18 @@ module.exports = {
         "vue",
         "vue-router"
     ],
-    // chainWebpack: config => {
-    //     config.optimization.minimize(true), // flag: true se si vuole minificare i file in production mode (se non specificato, default: true)
-    //     config.performance                  // Modificare le dimensioni dei file per cui mostrare warning durante la compilazione, Fonte: https://forum.vuejs.org/t/asset-size-limit-warning/40429/4
-    //         .maxEntrypointSize(500000)
-    //         .maxAssetSize(500000)
-    // },
     configureWebpack: {
-        optimization: {             // Specifica come suddividere (in base alle dimensioni) i file JS prodotti, Fonte: https://stackoverflow.com/a/52634444
+        optimization: {                     // Fonte: https://webpack.js.org/configuration/optimization/, https://webpack.js.org/plugins/split-chunks-plugin/
+            minimize: true,
             splitChunks: {
-                minSize: 10000,
-                maxSize: 250000,
+                minSize: 20000,             // Minimum size, in bytes, for a chunk to be generated.
+                maxSize: 60000,             // Try to split chunks bigger than maxSize bytes into smaller parts. Parts will be at least minSize.
             }
+        },
+        performance: {                      // Fonte: https://webpack.js.org/configuration/performance/
+            hints: 'warning',               // Impostare se si vogliono vedere i suggerimenti di performance
+            maxEntrypointSize: 500000,      // This option controls when webpack should emit performance hints based on the maximum entry point size in bytes.
+            maxAssetSize: 500000            // This option controls when webpack emits a performance hint based on individual asset size in bytes.
         }
     }
 }
