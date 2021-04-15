@@ -202,14 +202,12 @@ export default {
 
     // Timer-auto aggiornamento
     this.timerAutoUpdate = setInterval( () => {
-      if( this.nomeRouteQuestoComponente!==this.$route.name ) {
-        // se è stata cambiata route, si elimina il timer
-        clearInterval( this.timerAutoUpdate );
-      } else {
-        this.caricamentoQuestoComponente();
-      }
+      this.caricamentoQuestoComponente();
     }, process.env.VUE_APP_MILLISECONDI_AUTOAGGIORNAMENTO);
 
+  },
+  beforeUnmount() {
+    clearInterval( this.timerAutoUpdate );
   },
   methods: {
 
