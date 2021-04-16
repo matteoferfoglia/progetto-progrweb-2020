@@ -58,11 +58,11 @@ public class ModificaInformazioniAttore {
 
         if (attoreDaModificare != null) {
 
-            attoreDaModificare = attoreDaModificare.clone(); // clone per evitare di sporcare la copia nella cache di Objectify
             String username = attoreDaModificare.getUsername();
+            Long idAttoreDaModificare = attoreDaModificare.getIdentificativoAttore();
+            attoreDaModificare = attoreDaModificare.clone(); // clone per evitare di sporcare la copia nella cache di Objectify
+            attoreDaModificare.setIdentificativoAttore(idAttoreDaModificare);   // id perso a seguito di clone
 
-            // Obiettivo: minimizzare il #accessi al db, prevedendo un meccanismo di rollback se qualche dato è invalido
-            // Minore leggibilità del codice, ma non spreco accessi al database.
 
             Optional<?> optionalModificaAuthDb = Optional.of("qualsiasi valore di inizializzazione," +
                                                              "così isPresent() restituirà true se non viene modificato");

@@ -295,8 +295,8 @@ public class Autenticazione {
             Long idAttore = ((Number)jwtTokenAutenticazione.getValoreClaimByName(JwtClaim.NomeClaim.ID_ATTORE)).longValue();
 
             return Attore.getAttoreDaIdentificativo(idAttore);
-        } catch (IllegalArgumentException e) {
-            // Se il token di autenticazione è mal formato
+        } catch (Exception ignored) {
+            // Se il token di autenticazione è mal formato o manca il token di autenticazione
             return null;
         }
 
