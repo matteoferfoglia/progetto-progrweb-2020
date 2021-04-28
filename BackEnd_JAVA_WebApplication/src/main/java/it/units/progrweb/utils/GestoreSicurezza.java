@@ -4,6 +4,7 @@ import it.units.progrweb.EnvironmentVariables;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.*;
 
 /**
@@ -13,9 +14,41 @@ import java.security.*;
  */
 public class GestoreSicurezza {
 
+    /** Percorso del file sul server contenente le chiavi del server. */
+    private final static String PERCORSO_CHIAVI_SERVER = "WEB-INF/credenziali/chiaviServer.json";
+
     /** Chiave segreta di questo server usata in {@link #hmacSha256(String)},
      * generata con algoritmo RSA a 1024 bit.*/
-    private final static String CHIAVE_SEGRETA_SERVER_HS256 = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAKwvp_-oaEHmBnpT4eHB-vV10CbeP0rKh4AVSoPWJvJ3_fUxNslHDBeV_G_9rS5SFn57w4TCyvIU6e2-CgcARq-nEL3bN9Oq5cA2tsXzD2YbRUfpK4_KDVexiC2NLp9SFETx_zkubOthkF5Ao3xzN7yI1FklS76q77ZRZ0ScFQrbAgMBAAECgYEApAM5CYOG286aOQeR0BOQUyOHxJ5Kt5k3fL_LHM1uh-PYWigowY0VbZoGvT5sKgUzPAPz94_89J8LPNSahJS0vqerxqIC_Yj1TAT_qFq_ncTkSqkVbz-SHy6DuUKUNTex5QLfIPCD4_VD2M-lEFfgPMTbWWcSFqjTwDBgllaeR6ECQQDfX-mO8bLqqo2RTDGab6n46iKSvMqrX25g23lmu-1KmimNzzzfwTSUv9ni-1R-R84VFDJkb42O5_xbzqZmq9OJAkEAxVXH5dglFOTjIR2ohU6X31K9rcOdhqvh6iIUTkkyEyCGZ3WYIhEC7opu4SOVa9GTA9Z3mI0BY2AL5NhXpPW-QwJBALhVy0UmWpLjam5kZW7gBXGfriZP3CRuXYVauSW5ogn1jKM1STQRmdXDOQjihYissvmcMDXIBRbQhOYydAm4dJkCQQCcc3kLwkUL_rgQjkoIfposJZZaiKeAmQ-AqEo_EwsPXQ8SQYo_IAuaAckM2EBj_gE33rZtDQYXupNTeS5ri6WvAkBfWGvoArqyepLBuWh_jGBuRDUIBJo7x4aRNIVkufRFaBDlBjWNE9eZIfaX9CCgLck5w6oNCkQmLiI092Qucryx";
+    private static String CHIAVE_SEGRETA_SERVER_HS256;
+    static {
+        try {
+            CHIAVE_SEGRETA_SERVER_HS256 = JsonHelper.convertiOggettoDaJSON(
+                    UtilitaGenerale.leggiContenutoFile(PERCORSO_CHIAVI_SERVER),
+                    CoppiaChiaviPubblicaPrivata.class
+            ).getPrivateKey();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Classe di comodo per la rappresentazione di una coppia di chiavi
+     * pubblica e privata (usato per deserializzazione). */
+    @SuppressWarnings("unused") // classe di comodo usata per de/serializzazione
+    static class CoppiaChiaviPubblicaPrivata {
+        /** Chiave privata */
+        private String privateKey;
+
+        /** Chiave pubblica */
+        private String publicKey;
+
+        public String getPrivateKey() {
+            return privateKey;
+        }
+
+        public String getPublicKey() {
+            return publicKey;
+        }
+    }
 
 
     /**
