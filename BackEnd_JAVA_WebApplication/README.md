@@ -4,6 +4,12 @@ Web Application
 Questo progetto realizza una *App Engine Standard Java application*,
 utilizzando *Maven* come sistema di *build automation*.
 
+Tutte le credenziali necessarie all'applicazione (credenziali del primo
+utente amministratore -come richiesto dai requisiti-, chiavi pubblica e
+privata del server e credenziali per l'utilizzo di *Firebase*) si trovano
+nella cartella *WEB-INF/credenziali*: aggiornarle, se necessario,
+utilizzando lo stesso formato.
+
 Il progetto è stato inizialmente generato con *Google Cloud SDK*
 (installabile da https://cloud.google.com/sdk/docs/install),
 usando l'archetipo *appengine-standard-archetype*.
