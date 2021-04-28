@@ -275,6 +275,46 @@
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.1.0</version>
+
+                <!-- Default: elimina la cartella target del progetto -->
+
+                <!-- Cancella la copia di WEB-INF dalla cartella principale dopo aver eseguito i test -->
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>clean</phase><!-- In questa fase, le risorse create per i test non servono più -->
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>WEB-INF</directory>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>auto-clean-clean</id>
+                        <phase>prepare-package</phase><!-- In questa fase, le risorse create per i test non servono più -->
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>WEB-INF</directory>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -338,15 +378,16 @@
                 </executions>
             </plugin>
 
-            <!-- Copia della build Vue in webapp
-                 Fonte (tratto da): https://stackoverflow.com/q/28584442 -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
+
+                    <!-- Copia della build Vue in webapp
+                         Fonte (tratto da): https://stackoverflow.com/q/28584442 -->
                     <execution>
                         <id>copy-resources</id>
-                        <phase>prepare-package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -359,6 +400,24 @@
                             </resources>
                         </configuration>
                     </execution>
+
+                    <!-- Copia WEB-INF nella cartella principale del progetto, altrimenti i file con le credenziali non sono visibili ai test che falliranno -->
+                    <execution>
+                        <id>copy-web-inf</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>WEB-INF</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.sourceDirectory}/../webapp/WEB-INF</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
                 </executions>
             </plugin>
 
