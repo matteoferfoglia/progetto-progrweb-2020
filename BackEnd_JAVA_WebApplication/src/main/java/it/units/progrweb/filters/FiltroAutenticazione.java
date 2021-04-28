@@ -61,7 +61,11 @@ public class FiltroAutenticazione implements Filter {
             || (isRichiestaApi(httpReq)
                 && ( httpReq.getMethod().equals(FiltroCORS.METODO_HTTP_INTERCETTATO)   // "OPTIONS" per richieste "api" gestite dal filtro CORS
                      || Autenticazione.isClientAutenticato(httpReq) ) ) ) {
-
+            // TODO: SUGGERIMENTO DI MIGLIORAMENTO: la verifica di autenticazione richiede la deserializzazione del
+            //       token JWT di autenticazione: poiché le informazioni in esso contenute potrebbero essere utilizzate
+            //       più volte da altri metodi per soddisfare la richiesta, si potrebbe salvare il token della
+            //       deserializzato nel token della request, per evitare ogni volta di andare a cercarlo nella
+            //       HttpServletRequest e deserializzarlo (spreco di risorse)
             chain.doFilter(req, resp);
             // attualmente, solo richieste di tipo "api" possibili
         } else {
