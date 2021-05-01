@@ -33,7 +33,7 @@ Di seguito sono riportati alcuni screenshot esemplificativi.
 ![Form di login](./screenshots/login.png)
 
 Form di login, visto da smartphone
-![Form di login visto da smartphone](./screenshots/login da smartphone.png)
+![Form di login visto da smartphone](./screenshots/login_daSmartphone.png)
 
 ### Form di registrazione
 ![Form di registrazione](./screenshots/registrazioneConsumer.png)
